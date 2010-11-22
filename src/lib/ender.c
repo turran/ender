@@ -206,7 +206,6 @@ EAPI void ender_value_set(Ender *e, ...)
 		Ender_Property *prop;
 		uint32_t u32;
 		int32_t i32;
-		float f;
 		double d;
 		Enesim_Color color;
 		char *string;
@@ -228,17 +227,20 @@ EAPI void ender_value_set(Ender *e, ...)
 			break;
 
 			case ENDER_FLOAT:
-			f = va_arg(ap, double);
-			prop->set(e->renderer, f);
+			d = va_arg(ap, double);
+			printf("setting float %g\n", d);
+			prop->set(e->renderer, d);
 			break;
 
 			case ENDER_DOUBLE:
 			d = va_arg(ap, double);
+			printf("setting double %g\n", d);
 			prop->set(e->renderer, d);
 			break;
 
 			case ENDER_COLOR:
 			color = va_arg(ap, Enesim_Color);
+			printf("setting color %08x\n", color);
 			prop->set(e->renderer, color);
 			break;
 
