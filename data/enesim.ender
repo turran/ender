@@ -1,0 +1,66 @@
+namespace enesim {
+	abstract renderer {
+	};
+};
+
+namespace enesim.renderer {
+	abstract shape {
+		float outline_weight;
+		color outline_color;
+		color fill_color;
+	};
+
+	class rectangle : shape {
+		unsigned int width;
+		unsigned int height;
+		float corner_radius;
+	};
+
+	class circle : shape {
+		float radius;
+	};
+
+	class ellipse : shape {
+	};
+
+	class checker {
+		unsigned int width;
+		unsigned int height;
+		color even_color;
+		color odd_color;  
+	};
+
+	class dispmap {
+		float scale;
+	};
+
+	class grid {
+		unsigned int inside_width;
+		unsigned int inside_height;
+		color inside_color;
+		unsigned int border_vthickness;
+		unsigned int border_hthickness;
+		color border_color;
+	};
+
+	class perlin {
+		unsigned int octaves;
+		float persistence;
+		float xfrequency;
+		float yfrequency;
+	};
+
+	class raddist {
+		unsigned int x;
+		unsigned int y;
+		float radius;
+		float scale;
+	};
+
+	class stripes {
+		float even_thickness;
+		color even_color;
+		float odd_thickness;
+		color odd_color;
+	};
+};

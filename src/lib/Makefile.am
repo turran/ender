@@ -1,0 +1,32 @@
+MAINTAINERCLEANFILES = Makefile.in
+
+AM_CPPFLAGS = \
+-I$(top_srcdir)/src/include \
+-I. \
+@ENDER_CFLAGS@
+
+AM_YFLAGS = -d -p ender_
+AM_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
+
+CLEANFILES = \
+ender_lexer.c \
+libender_la-ender_grammar.c \
+libender_la-ender_grammar.h
+
+lib_LTLIBRARIES = libender.la
+
+libender_la_YFLAGS = -d
+
+libender_la_SOURCES = \
+ender.c \
+ender_grammar.y \
+ender_lexer.l \
+ender_parser.c
+
+libender_la_LIBADD = \
+@ENDER_LIBS@ \
+@LEXLIB@
+
+libender_la_DEPENDENCIES =
+
+libender_la_LDFLAGS = @create_shared_lib@ -version-info @version_info@
