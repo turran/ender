@@ -8,6 +8,7 @@ namespace enesim.renderer {
 		float outline_weight;
 		color outline_color;
 		color fill_color;
+		renderer fill_renderer;
 	};
 
 	class rectangle : shape {

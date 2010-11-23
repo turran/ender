@@ -120,6 +120,9 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ *
+ */
 EAPI void ender_init(void)
 {
 	eina_init();
@@ -128,6 +131,9 @@ EAPI void ender_init(void)
 	ender_parser_init();
 }
 
+/**
+ *
+ */
 EAPI void ender_shutdown(void)
 {
 	ender_parser_shutdown();
@@ -136,6 +142,9 @@ EAPI void ender_shutdown(void)
 	//eina_hash_delete(_descriptors);
 }
 
+/**
+ *
+ */
 EAPI Ender * ender_new(const char *name)
 {
 	Ender *ender;
@@ -152,11 +161,26 @@ EAPI Ender * ender_new(const char *name)
 	return ender;
 }
 
+/**
+ *
+ */
+EAPI void ender_delete(Ender *e)
+{
+	enesim_renderer_delete(e->renderer);
+	free(e);
+}
+
+/**
+ *
+ */
 EAPI const char * ender_name_get(Ender *e)
 {
 	return ender_descriptor_name_get(e->descriptor);
 }
 
+/**
+ *
+ */
 EAPI Eina_Bool ender_property_get(Ender *e, char *name, Ender_Property_Type *type)
 {
 	Ender_Property *prop;
@@ -168,6 +192,9 @@ EAPI Eina_Bool ender_property_get(Ender *e, char *name, Ender_Property_Type *typ
 	return EINA_TRUE;
 }
 
+/**
+ *
+ */
 EAPI void ender_value_get(Ender *e, ...)
 {
 	va_list ap;
@@ -190,11 +217,15 @@ EAPI void ender_value_get(Ender *e, ...)
 			case ENDER_COLOR:
 			case ENDER_STRING:
 			case ENDER_MATRIX:
+			case ENDER_RENDERER:
 			break;
 		}
 	}
 }
 
+/**
+ *
+ */
 EAPI void ender_value_set(Ender *e, ...)
 {
 	va_list ap;
@@ -210,6 +241,7 @@ EAPI void ender_value_set(Ender *e, ...)
 		Enesim_Color color;
 		char *string;
 		Enesim_Matrix *matrix;
+		Enesim_Renderer *renderer;
 
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
@@ -253,10 +285,18 @@ EAPI void ender_value_set(Ender *e, ...)
 			matrix = va_arg(ap, Enesim_Matrix *);
 			prop->set(e->renderer, matrix);
 			break;
+
+			case ENDER_RENDERER:
+			renderer = va_arg(ap, Enesim_Renderer *);
+			prop->set(e->renderer, renderer);
+			break;
 		}
 	}
 }
 
+/**
+ *
+ */
 EAPI Enesim_Renderer * ender_renderer_get(Ender *e)
 {
 	return e->renderer;

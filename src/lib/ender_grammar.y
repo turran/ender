@@ -93,6 +93,7 @@ renderer_inheritance
 		Ender_Descriptor *parent = NULL;
 
 		parent = ender_descriptor_get($2);
+		/* TODO check if the parent exists */
 		current = ender_parser_register(namespace, name, parent);
 	}
 	;
@@ -122,6 +123,14 @@ type_specifier
 	| STRING
 	{
 		type = ENDER_STRING;
+	}
+	| WORD
+	{
+		Ender_Descriptor *external = NULL;
+
+		external = ender_descriptor_get($1);
+		/* TODO check that the descriptor exists */
+		type  = ENDER_RENDERER;
 	}
 	;
 
