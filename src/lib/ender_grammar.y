@@ -104,6 +104,7 @@ types
 		Ender_Property *prop;
 		Ender_Property *parent;
 		prop = eina_array_pop(properties);
+		printf("adding %d\n", ender_property_type(prop));
 		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
 		ender_property_add(parent, prop);
 	}
@@ -113,6 +114,7 @@ types
 		Ender_Property *prop;
 		Ender_Property *parent;
 		prop = eina_array_pop(properties);
+		printf("adding %d\n", ender_property_type(prop));
 		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
 		ender_property_add(parent, prop);
 	}
@@ -172,7 +174,7 @@ type_specifier
 
 		prop = ender_property_new(ENDER_LIST);
 		eina_array_push(properties, prop);
-		printf("list found\n");
+		printf("list found %p\n", prop);
 	}
 	types EBRACKET
 	;

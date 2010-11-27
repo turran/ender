@@ -115,6 +115,7 @@ Ender_Property * ender_property_new(Ender_Property_Type t)
 
 	prop = malloc(sizeof(Ender_Property));
 	prop->type = t;
+	prop->sub = NULL;
 	switch (t)
 	{
 		case ENDER_LIST:
@@ -124,6 +125,7 @@ Ender_Property * ender_property_new(Ender_Property_Type t)
 		default:
 		break;
 	}
+	return prop;
 }
 
 void ender_property_delete(Ender_Property *d)
@@ -137,7 +139,9 @@ void ender_property_delete(Ender_Property *d)
 
 void ender_property_add(Ender_Property *d, Ender_Property *sub)
 {
+	printf("adding sub property %p to %p\n", sub, d);
 	if (!d->sub) return;
+	printf("pushing\n");
 	eina_array_push(d->sub, sub);
 }
 
@@ -160,7 +164,7 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 	dprop->set = set;
 	dprop->prop = prop;
 	eina_hash_add(edesc->properties, name, dprop);
-	DBG("Property %s added to %s", name, edesc->name);
+	DBG("Property %s (%d) added to %s", name, prop->type, edesc->name);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -304,6 +308,7 @@ EAPI void ender_value_set(Ender *e, ...)
 		char *string;
 		Enesim_Matrix *matrix;
 		Enesim_Renderer *renderer;
+		Eina_List *list;
 
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
@@ -348,6 +353,11 @@ EAPI void ender_value_set(Ender *e, ...)
 			case ENDER_RENDERER:
 			renderer = va_arg(ap, Enesim_Renderer *);
 			prop->set(e->renderer, renderer);
+			break;
+
+			case ENDER_LIST:
+			list = va_arg(ap, Eina_List *);
+			prop->set(e->renderer, list);
 			break;
 		}
 	}

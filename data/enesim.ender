@@ -5,23 +5,34 @@ namespace enesim {
 
 namespace enesim.renderer {
 	abstract shape {
-		float outline_weight;
+		double outline_weight;
 		color outline_color;
 		color fill_color;
 		renderer fill_renderer;
+		int draw_mode;
 	};
 
 	class rectangle : shape {
 		unsigned int width;
 		unsigned int height;
-		float corner_radius;
+		double corner_radius;
 	};
 
 	class circle : shape {
-		float radius;
+		double x;
+		double y;
+		double radius;
 	};
 
 	class ellipse : shape {
+		double x;
+		double y;
+		double x_radius;
+		double y_radius;
+	};
+
+	class figure : shape {
+		[[double, double]] polygon;
 	};
 
 	class checker {
