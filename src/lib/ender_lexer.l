@@ -51,6 +51,9 @@ abstract		return ABSTRACT;
 ;                       return SEMICOLON;
 :                       return COLON;
 \.			return DOT;
+\[			return OBRACKET;
+\]			return EBRACKET;
+,			return COMMA;
 \n                      /* ignore end of line */
 [ \t]+                  /* ignore whitespace */;
 %%

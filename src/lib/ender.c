@@ -24,13 +24,13 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Ender_Property
+struct _Ender_Descriptor_Property
 {
 	char *name;
 	Ender_Getter get;
 	Ender_Setter set;
-	Ender_Property_Type type;
-} Ender_Property;
+	Ender_Property *prop;
+};
 
 struct _Ender_Descriptor
 {
@@ -46,11 +46,17 @@ struct _Ender
 	Enesim_Renderer *renderer;
 };
 
+struct _Ender_Property
+{
+	Ender_Property_Type type;
+	Eina_Array *sub;
+};
+
 static Eina_Hash *_descriptors = NULL;
 
-static Ender_Property * _property_get(Ender_Descriptor *e, const char *name)
+static Ender_Descriptor_Property * _property_get(Ender_Descriptor *e, const char *name)
 {
-	Ender_Property *prop;
+	Ender_Descriptor_Property *prop;
 
 	prop = eina_hash_find(e->properties, name);
 	if (prop) return prop;
@@ -61,6 +67,8 @@ static Ender_Property * _property_get(Ender_Descriptor *e, const char *name)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+int ender_log_dom = -1;
+
 Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent)
 {
@@ -80,7 +88,7 @@ Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator cre
 	desc->properties =  eina_hash_string_superfast_new(NULL);
 
 	eina_hash_add(_descriptors, name, desc);
-	printf("descriptor %s added\n", name);
+	DBG("Descriptor %s added", name);
 
 	return desc;
 }
@@ -101,43 +109,82 @@ void ender_descriptor_unregister(Ender_Descriptor *edesc)
 	//eina_hash_remove(_descriptors, ..);
 }
 
-void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
-	Ender_Property_Type t, Ender_Getter get, Ender_Setter set)
+Ender_Property * ender_property_new(Ender_Property_Type t)
 {
 	Ender_Property *prop;
 
-	prop = eina_hash_find(edesc->properties, name);
-	if (prop) return;
+	prop = malloc(sizeof(Ender_Property));
+	prop->type = t;
+	switch (t)
+	{
+		case ENDER_LIST:
+		prop->sub = eina_array_new(1);
+		break;
+
+		default:
+		break;
+	}
+}
+
+void ender_property_delete(Ender_Property *d)
+{
+	if (d->sub)
+	{
+		/* call the delete for each descriptor */
+	}
+	free(d);
+}
+
+void ender_property_add(Ender_Property *d, Ender_Property *sub)
+{
+	if (!d->sub) return;
+	eina_array_push(d->sub, sub);
+}
+
+void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
+	Ender_Property *prop, Ender_Getter get, Ender_Setter set)
+{
+	Ender_Descriptor_Property *dprop;
+
+	dprop = eina_hash_find(edesc->properties, name);
+	if (dprop)
+	{
+		WRN("Property %s already found on %s. Not adding it", name, edesc->name);
+		return;
+	}
 
 	/* get the getter/setter */
-	prop = malloc(sizeof(Ender_Property));
-	prop->name = strdup(name);
-	prop->type = t;
-	prop->get = get;
-	prop->set = set;
-	eina_hash_add(edesc->properties, name, prop);
+	dprop = malloc(sizeof(Ender_Descriptor_Property));
+	dprop->name = strdup(name);
+	dprop->get = get;
+	dprop->set = set;
+	dprop->prop = prop;
+	eina_hash_add(edesc->properties, name, dprop);
+	DBG("Property %s added to %s", name, edesc->name);
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
 /**
- *
+ * Initialize the ender library
  */
 EAPI void ender_init(void)
 {
 	eina_init();
+	ender_log_dom = eina_log_domain_register("ender", NULL);
 	enesim_init();
 	_descriptors = eina_hash_string_superfast_new(NULL);
 	ender_parser_init();
 }
 
 /**
- *
+ * Shutdown the ender library
  */
 EAPI void ender_shutdown(void)
 {
 	ender_parser_shutdown();
 	enesim_shutdown();
+	eina_log_domain_unregister(ender_log_dom);
 	eina_shutdown();
 	//eina_hash_delete(_descriptors);
 }
@@ -181,15 +228,30 @@ EAPI const char * ender_name_get(Ender *e)
 /**
  *
  */
-EAPI Eina_Bool ender_property_get(Ender *e, char *name, Ender_Property_Type *type)
+EAPI Ender_Property * ender_property_get(Ender *e, char *name)
 {
-	Ender_Property *prop;
+	Ender_Descriptor_Property *dprop;
 
-	prop = _property_get(e->descriptor, name);
-	if (!prop) return EINA_FALSE;
+	dprop = _property_get(e->descriptor, name);
+	if (!dprop) return NULL;
 
-	*type = prop->type;
-	return EINA_TRUE;
+	return dprop->prop;
+}
+
+/**
+ *
+ */
+EAPI Ender_Property_Type ender_property_type(Ender_Property *p)
+{
+	return p->type;
+}
+
+/**
+ *
+ */
+EAPI const Eina_Array * ender_property_sub(Ender_Property *p)
+{
+	return p->sub;
 }
 
 /**
@@ -203,12 +265,12 @@ EAPI void ender_value_get(Ender *e, ...)
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{
-		Ender_Property *prop;
+		Ender_Descriptor_Property *prop;
 		
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
 
-		switch (prop->type)
+		switch (prop->prop->type)
 		{
 			case ENDER_UINT32:
 			case ENDER_INT32:
@@ -234,7 +296,7 @@ EAPI void ender_value_set(Ender *e, ...)
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{
-		Ender_Property *prop;
+		Ender_Descriptor_Property *prop;
 		uint32_t u32;
 		int32_t i32;
 		double d;
@@ -246,7 +308,7 @@ EAPI void ender_value_set(Ender *e, ...)
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
 
-		switch (prop->type)
+		switch (prop->prop->type)
 		{
 			case ENDER_UINT32:
 			u32 = va_arg(ap, uint32_t);
@@ -260,19 +322,16 @@ EAPI void ender_value_set(Ender *e, ...)
 
 			case ENDER_FLOAT:
 			d = va_arg(ap, double);
-			printf("setting float %g\n", d);
 			prop->set(e->renderer, d);
 			break;
 
 			case ENDER_DOUBLE:
 			d = va_arg(ap, double);
-			printf("setting double %g\n", d);
 			prop->set(e->renderer, d);
 			break;
 
 			case ENDER_COLOR:
 			color = va_arg(ap, Enesim_Color);
-			printf("setting color %08x\n", color);
 			prop->set(e->renderer, color);
 			break;
 

@@ -25,12 +25,12 @@ int ender_wrap()
 static Ender_Descriptor *current = NULL;
 static char *name = NULL;
 static char *namespace = NULL;
-static Ender_Property_Type type;
+extern Eina_Array *properties;
  
 %}
 
 %token UNSIGNED INT COLOR DOUBLE FLOAT IMAGE SURFACE COORD PATH STRING
-%token WORD OBRACE EBRACE SEMICOLON EQUAL QUOTE COLON DOT
+%token WORD OBRACE EBRACE SEMICOLON EQUAL QUOTE COLON DOT OBRACKET EBRACKET COMMA
 %token ABSTRACT CLASS NAMESPACE
 
 %%
@@ -98,46 +98,92 @@ renderer_inheritance
 	}
 	;
 
+types
+	: type_specifier
+	{
+		Ender_Property *prop;
+		Ender_Property *parent;
+		prop = eina_array_pop(properties);
+		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
+		ender_property_add(parent, prop);
+	}
+	COMMA types
+	| type_specifier
+	{
+		Ender_Property *prop;
+		Ender_Property *parent;
+		prop = eina_array_pop(properties);
+		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
+		ender_property_add(parent, prop);
+	}
+	;
 
 type_specifier
 	: UNSIGNED INT
 	{
-		type = ENDER_UINT32;
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_UINT32);
+		eina_array_push(properties, prop);
 	}
 	| INT
 	{
-		type = ENDER_INT32;
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_INT32);
+		eina_array_push(properties, prop);
 	}
 	| COLOR
 	{
-		type = ENDER_COLOR;
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_COLOR);
+		eina_array_push(properties, prop);
 	}
 	| DOUBLE
 	{
-		type = ENDER_DOUBLE;
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_DOUBLE);
+		eina_array_push(properties, prop);
 	}
 	| FLOAT
 	{
-		type = ENDER_FLOAT;
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_FLOAT);
+		eina_array_push(properties, prop);
 	}
 	| STRING
 	{
-		type = ENDER_STRING;
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_STRING);
+		eina_array_push(properties, prop);
 	}
 	| WORD
 	{
+		Ender_Property *prop;
 		Ender_Descriptor *external = NULL;
 
 		external = ender_descriptor_get($1);
-		/* TODO check that the descriptor exists */
-		type  = ENDER_RENDERER;
+		/* TODO check that the propriptor exists */
+		prop = ender_property_new(ENDER_RENDERER);
+		printf("renderer found\n");
+		eina_array_push(properties, prop);
 	}
+	| OBRACKET
+	{ 
+		Ender_Property *prop;
+
+		prop = ender_property_new(ENDER_LIST);
+		eina_array_push(properties, prop);
+		printf("list found\n");
+	}
+	types EBRACKET
 	;
 
 declaration
 	: type_specifier WORD SEMICOLON
 	{
-		ender_parser_property_add(namespace, current, $2, type);
+		Ender_Property *prop;
+
+		prop = eina_array_pop(properties);
+		ender_parser_property_add(namespace, current, $2, prop);
 	}
 	;
 

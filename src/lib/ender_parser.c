@@ -56,7 +56,6 @@ static void _dir_list_cb(const char *name, const char *path, void *data)
 {
 	char file[PATH_MAX];
 
-	printf("file found %s at %s\n", name, path);
 	snprintf(file, PATH_MAX, "%s/%s", path, name);
 	ender_parser_parse(file);
 }
@@ -67,6 +66,8 @@ extern FILE *ender_in;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Eina_Array *properties = NULL;
+
 Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender_Descriptor * parent)
 {
 	Ender_Descriptor *desc;
@@ -74,7 +75,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 	Ender_Namespace *namespace;
 	char ctor_name[PATH_MAX];
 
-	printf("parser register %s %s %p\n", ns, name, parent);
+	DBG("Registering %s %s %p", ns, name, parent);
 	if (!ns) return NULL;
 
 	/* check if we already have the namespace */
@@ -141,29 +142,29 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 		free(namespace);
 		return NULL;
 	}
-	printf("class %s@%s registered correctly %p\n", name, ns, desc);
+	DBG("class %s@%s registered correctly %p", name, ns, desc);
 
 	return desc;
 }
 
 void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
-		const char *name, Ender_Property_Type t)
+		const char *name, Ender_Property *prop)
 {
 	Ender_Getter get;
 	Ender_Setter set;
 	Ender_Namespace *namespace;
 	char prefix[PATH_MAX];
 	char func_name[PATH_MAX];
+	const char *edesc_name;
 
-	printf("ns = %s\n", ns);
 	if (!ns) return;
 
 	namespace = eina_hash_find(_namespaces, ns);
-	printf("namespace = %p\n", namespace);
 	if (!namespace) return;
 
-	printf("adding property %s to %p\n", name, edesc);
-	snprintf(prefix, PATH_MAX, "%s_%s_%s_", namespace->prefix, ender_descriptor_name_get(edesc), name);
+	edesc_name = ender_descriptor_name_get(edesc);
+	DBG("Adding property %s to %s", name, edesc_name);
+	snprintf(prefix, PATH_MAX, "%s_%s_%s_", namespace->prefix, edesc_name, name);
 
 	/* the getter */
 	strncpy(func_name, prefix, PATH_MAX);
@@ -171,7 +172,7 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 	get = dlsym(namespace->lib->dl_handle, func_name);
 	if (!get)
 	{
-		printf("no getter %s\n", func_name);
+		WRN("No getter %s for type %s", func_name, edesc_name);
 	}
 	/* the setter */
 	strncpy(func_name, prefix, PATH_MAX);
@@ -179,15 +180,17 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 	set = dlsym(namespace->lib->dl_handle, func_name);
 	if (!set)
 	{
-		printf("no setter %s\n", func_name);
+		WRN("No setter %s for type %s", func_name, edesc_name);
 	}
-	ender_descriptor_property_add(edesc, name, t, get, set);
+	ender_descriptor_property_add(edesc, name, prop, get, set);
 }
 
 void ender_parser_init(void)
 {
 	_namespaces = eina_hash_string_superfast_new(NULL);
 	_libraries = eina_hash_string_superfast_new(NULL);
+	/* FIXME create a proper context */
+	properties = eina_array_new(1);
 	/* iterate over the list of .ender files and parse them */
 	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
 }
@@ -206,7 +209,6 @@ void ender_parser_parse(const char *file)
 
 	/* check for files on DATADIR */
 	f = fopen(file, "r");
-	printf("trying %s\n", file);
 	if (!f)
 	{
 		char real_file[PATH_MAX];
@@ -217,13 +219,12 @@ void ender_parser_parse(const char *file)
 		strncat(real_file, file, PATH_MAX - strlen(real_file));
 
 		f = fopen(file, "r");
-		printf("file not found at %s trying %s\n", file, real_file);
+		ERR("file %s not found at . or %s", file, real_file);
 		if (!f) return;
 	}
 
 	ender_in = f;
 	ret = ender_parse();
-	printf("parser returned %d\n", ret);
 	fclose(f);
 }
 

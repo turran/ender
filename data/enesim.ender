@@ -64,4 +64,8 @@ namespace enesim.renderer {
 		float odd_thickness;
 		color odd_color;
 	};
+
+	class compound {
+		[renderer,int] layer;
+	};
 };

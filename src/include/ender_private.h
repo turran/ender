@@ -8,7 +8,17 @@
 #include <dlfcn.h>
 
 /* core */
+#define ERR(...) EINA_LOG_DOM_ERR(ender_log_dom, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(ender_log_dom, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
+extern int ender_log_dom;
+
 typedef struct _Ender_Descriptor Ender_Descriptor;
+typedef struct _Ender_Descriptor_Property Ender_Descriptor_Property;
+
+Ender_Property * ender_property_new(Ender_Property_Type t);
+void ender_property_delete(Ender_Property *p);
+void ender_property_add(Ender_Property *p, Ender_Property *sub);
 
 typedef Enesim_Renderer * (*Ender_Creator)(void);
 typedef void (*Ender_Getter)(Enesim_Renderer *r, ...);
@@ -19,7 +29,7 @@ Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator cre
 void ender_descriptor_unregister(Ender_Descriptor *edesc);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_get(const char *name);
-void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Property_Type t,
+void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Property *p,
 	Ender_Getter get, Ender_Setter set);
 
 /* the parser */
