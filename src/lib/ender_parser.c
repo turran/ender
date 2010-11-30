@@ -131,7 +131,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 	/* an interface? */
 	if (!creator)
 	{
-		printf("no creator found?\n");
+		DBG("No creator found?\n");
 	}
 	desc = ender_descriptor_register(name, creator, parent);
 	if (!desc)

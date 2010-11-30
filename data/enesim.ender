@@ -42,7 +42,19 @@ namespace enesim.renderer {
 		color odd_color;  
 	};
 
+	class image {
+		surface src;
+		int x;
+		int y;
+		int w;
+		int h;
+	};
+
 	class dispmap {
+		surface map;
+		surface src;
+		int x_channel;
+		int y_channel;
 		float scale;
 	};
 
@@ -63,6 +75,7 @@ namespace enesim.renderer {
 	};
 
 	class raddist {
+		surface src;
 		unsigned int x;
 		unsigned int y;
 		float radius;

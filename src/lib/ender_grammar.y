@@ -104,7 +104,7 @@ types
 		Ender_Property *prop;
 		Ender_Property *parent;
 		prop = eina_array_pop(properties);
-		printf("adding %d\n", ender_property_type(prop));
+		//printf("adding %d\n", ender_property_type(prop));
 		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
 		ender_property_add(parent, prop);
 	}
@@ -114,7 +114,7 @@ types
 		Ender_Property *prop;
 		Ender_Property *parent;
 		prop = eina_array_pop(properties);
-		printf("adding %d\n", ender_property_type(prop));
+		//printf("adding %d\n", ender_property_type(prop));
 		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
 		ender_property_add(parent, prop);
 	}
@@ -157,6 +157,12 @@ type_specifier
 		prop = ender_property_new(ENDER_STRING);
 		eina_array_push(properties, prop);
 	}
+	| SURFACE
+	{
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_SURFACE);
+		eina_array_push(properties, prop);
+	}
 	| WORD
 	{
 		Ender_Property *prop;
@@ -165,7 +171,7 @@ type_specifier
 		external = ender_descriptor_get($1);
 		/* TODO check that the propriptor exists */
 		prop = ender_property_new(ENDER_RENDERER);
-		printf("renderer found\n");
+		//printf("renderer found\n");
 		eina_array_push(properties, prop);
 	}
 	| OBRACKET
@@ -174,7 +180,7 @@ type_specifier
 
 		prop = ender_property_new(ENDER_LIST);
 		eina_array_push(properties, prop);
-		printf("list found %p\n", prop);
+		//printf("list found %p\n", prop);
 	}
 	types EBRACKET
 	;

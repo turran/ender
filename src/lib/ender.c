@@ -139,9 +139,9 @@ void ender_property_delete(Ender_Property *d)
 
 void ender_property_add(Ender_Property *d, Ender_Property *sub)
 {
-	printf("adding sub property %p to %p\n", sub, d);
+	//printf("adding sub property %p to %p\n", sub, d);
 	if (!d->sub) return;
-	printf("pushing\n");
+	//printf("pushing\n");
 	eina_array_push(d->sub, sub);
 }
 
@@ -309,6 +309,7 @@ EAPI void ender_value_set(Ender *e, ...)
 		Enesim_Matrix *matrix;
 		Enesim_Renderer *renderer;
 		Eina_List *list;
+		Enesim_Surface *surface;
 
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
@@ -343,6 +344,11 @@ EAPI void ender_value_set(Ender *e, ...)
 			case ENDER_STRING:
 			string = va_arg(ap, char *);
 			prop->set(e->renderer, string);
+			break;
+
+			case ENDER_SURFACE:
+			surface = va_arg(ap, Enesim_Surface *);
+			prop->set(e->renderer, surface);
 			break;
 
 			case ENDER_MATRIX:
