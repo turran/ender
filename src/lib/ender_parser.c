@@ -94,7 +94,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 		}
 		else
 		{
-			strncpy(lib_name, ns, PATH_MAX); 
+			strncpy(lib_name, ns, PATH_MAX);
 		}
 		/* check if we already have the library */
 		library = eina_hash_find(_libraries, lib_name);
