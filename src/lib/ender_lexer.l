@@ -30,7 +30,7 @@
                             strcat(ender_lval, tmp);
 
 			    return STRING;
-                    }}                           
+                    }}
 unsigned		return UNSIGNED;
 int			return INT;
 color			return COLOR;
@@ -40,6 +40,7 @@ float			return FLOAT;
 surface			return SURFACE;
 path			return PATH;
 string			return STRING;
+matrix			return MATRIX;
 namespace		return NAMESPACE;
 class			return CLASS;
 abstract		return ABSTRACT;

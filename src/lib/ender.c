@@ -201,9 +201,18 @@ EAPI Ender * ender_new(const char *name)
 	Ender *ender;
 	Ender_Descriptor *desc;
 
+	DBG("Creating new ender \"%s\"", name);
 	desc = eina_hash_find(_descriptors, name);
-	if (!desc) return NULL;
-	if (!desc->create) return NULL;
+	if (!desc)
+	{
+		ERR("No such descriptor for name \"%s\"", name);
+		return NULL;
+	}
+	if (!desc->create)
+	{
+		ERR("The descriptor for name \"%s\" does not have a creator", name);
+		return NULL;
+	}
 
 	ender = malloc(sizeof(Ender));
 	ender->renderer = desc->create();
@@ -265,12 +274,12 @@ EAPI void ender_value_get(Ender *e, ...)
 {
 	va_list ap;
 	char *name;
-	
+
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{
 		Ender_Descriptor_Property *prop;
-		
+
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
 
@@ -296,7 +305,7 @@ EAPI void ender_value_set(Ender *e, ...)
 {
 	va_list ap;
 	char *name;
-	
+
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{

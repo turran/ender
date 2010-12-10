@@ -11,25 +11,25 @@
 
 #define YYSTYPE char *
 #define YYERROR_VERBOSE
- 
+
 void ender_error(const char *str)
 {
         fprintf(stderr,"error: %s\n",str);
 }
- 
+
 int ender_wrap()
 {
         return 1;
-} 
+}
 
 static Ender_Descriptor *current = NULL;
 static char *name = NULL;
 static char *namespace = NULL;
 extern Eina_Array *properties;
- 
+
 %}
 
-%token UNSIGNED INT COLOR DOUBLE FLOAT IMAGE SURFACE COORD PATH STRING
+%token UNSIGNED INT COLOR DOUBLE FLOAT IMAGE SURFACE COORD PATH STRING MATRIX
 %token WORD OBRACE EBRACE SEMICOLON EQUAL QUOTE COLON DOT OBRACKET EBRACKET COMMA
 %token ABSTRACT CLASS NAMESPACE
 
@@ -42,7 +42,7 @@ namespace_list
 
 namespace_name
 	:
-	| DOT WORD 
+	| DOT WORD
 	{
 		namespace = realloc(namespace, strlen(namespace) + strlen($2) + 1);
 		strcat(namespace, ".");
@@ -174,8 +174,15 @@ type_specifier
 		//printf("renderer found\n");
 		eina_array_push(properties, prop);
 	}
+	| MATRIX
+	{
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_MATRIX);
+		eina_array_push(properties, prop);
+
+	}
 	| OBRACKET
-	{ 
+	{
 		Ender_Property *prop;
 
 		prop = ender_property_new(ENDER_LIST);

@@ -91,10 +91,12 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 		if (tmp)
 		{
 			strncpy(lib_name, ns, tmp - ns);
+			lib_name[tmp - ns] = '\0';
 		}
 		else
 		{
 			strncpy(lib_name, ns, PATH_MAX);
+			lib_name[PATH_MAX] = '\0';
 		}
 		/* check if we already have the library */
 		library = eina_hash_find(_libraries, lib_name);
@@ -105,7 +107,11 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 
 			snprintf(real_lib, PATH_MAX, "lib%s.so", lib_name);
 			dl_handle = dlopen(real_lib, RTLD_LAZY);
-			if (!dl_handle) return NULL;
+			if (!dl_handle)
+			{
+				ERR("The library %s can not be found", real_lib);
+				return NULL;
+			}
 
 			library = malloc(sizeof(Ender_Library));
 			library->name = strdup(lib_name);

@@ -1,10 +1,11 @@
 namespace enesim {
 	abstract renderer {
+		matrix transformation;
 	};
 };
 
 namespace enesim.renderer {
-	abstract shape {
+	abstract shape : renderer {
 		double outline_weight;
 		color outline_color;
 		color fill_color;
@@ -35,11 +36,11 @@ namespace enesim.renderer {
 		[[double, double]] polygon;
 	};
 
-	class checker {
+	class checker : renderer {
 		unsigned int width;
 		unsigned int height;
 		color even_color;
-		color odd_color;  
+		color odd_color;
 	};
 
 	class image {
