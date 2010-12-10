@@ -43,7 +43,7 @@ namespace enesim.renderer {
 		color odd_color;
 	};
 
-	class image {
+	class image : renderer {
 		surface src;
 		int x;
 		int y;
@@ -51,7 +51,7 @@ namespace enesim.renderer {
 		int h;
 	};
 
-	class dispmap {
+	class dispmap : renderer {
 		surface map;
 		surface src;
 		int x_channel;
@@ -59,7 +59,7 @@ namespace enesim.renderer {
 		float scale;
 	};
 
-	class grid {
+	class grid : renderer {
 		unsigned int inside_width;
 		unsigned int inside_height;
 		color inside_color;
@@ -68,14 +68,14 @@ namespace enesim.renderer {
 		color border_color;
 	};
 
-	class perlin {
+	class perlin : renderer {
 		unsigned int octaves;
 		float persistence;
 		float xfrequency;
 		float yfrequency;
 	};
 
-	class raddist {
+	class raddist : renderer {
 		surface src;
 		unsigned int x;
 		unsigned int y;
@@ -83,14 +83,14 @@ namespace enesim.renderer {
 		float scale;
 	};
 
-	class stripes {
+	class stripes : renderer {
 		float even_thickness;
 		color even_color;
 		float odd_thickness;
 		color odd_color;
 	};
 
-	class compound {
+	class compound : renderer {
 		[renderer,int] layer;
 	};
 };
