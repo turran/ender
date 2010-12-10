@@ -56,7 +56,7 @@ namespace enesim.renderer {
 		surface src;
 		int x_channel;
 		int y_channel;
-		float scale;
+		float factor;
 	};
 
 	class grid : renderer {
@@ -80,7 +80,7 @@ namespace enesim.renderer {
 		unsigned int x;
 		unsigned int y;
 		float radius;
-		float scale;
+		float factor;
 	};
 
 	class stripes : renderer {
