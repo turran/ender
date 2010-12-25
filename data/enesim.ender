@@ -1,6 +1,8 @@
 namespace enesim {
 	abstract renderer {
 		matrix transformation;
+		double x_origin;
+		double y_origin;
 	};
 };
 
