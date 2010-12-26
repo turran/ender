@@ -224,9 +224,17 @@ void ender_parser_parse(const char *file)
 		strncat(real_file, "/", PATH_MAX - strlen(real_file));
 		strncat(real_file, file, PATH_MAX - strlen(real_file));
 
-		f = fopen(file, "r");
-		ERR("file %s not found at . or %s", file, real_file);
-		if (!f) return;
+		f = fopen(real_file, "r");
+		if (!f)
+		{
+			ERR("File %s not found at . or %s", file, real_file);
+			return;
+		}
+		DBG("Parsing file %s", real_file);
+	}
+	else
+	{
+		DBG("Parsing file %s", file);
 	}
 
 	ender_in = f;
