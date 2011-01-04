@@ -95,4 +95,15 @@ namespace enesim.renderer {
 	class compound : renderer {
 		[renderer,int] layer;
 	};
+
+	abstract gradient : renderer {
+		[color, double] stop;
+	};
+
+	class gradient_linear : gradient {
+		double x0;
+		double y0;
+		double x1;
+		double y1;
+	};
 };
