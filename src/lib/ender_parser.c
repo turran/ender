@@ -37,6 +37,11 @@ typedef struct _Ender_Namespace
 	Ender_Library *lib;
 } Ender_Namespace;
 
+typedef struct _Ender_Parser
+{
+	char *file;
+} Ender_Parser;
+
 static void _library_unref(Ender_Library *lib)
 {
 	lib->ref--;

@@ -196,6 +196,33 @@ EAPI void ender_shutdown(void)
 /**
  *
  */
+EAPI void ender_list(Ender_List_Callback cb, void *data)
+{
+	Eina_Iterator *it;
+	char *name;
+
+	it = eina_hash_iterator_key_new(_descriptors);
+	while (eina_iterator_next(it, (void **)&name))
+	{
+		cb(name, data);
+	}
+	eina_iterator_free(it);
+}
+
+/**
+ *
+ */
+EAPI Eina_Bool ender_exists(const char *name)
+{
+	Ender_Descriptor *desc;
+
+	desc = eina_hash_find(_descriptors, name);
+	if (desc) return EINA_TRUE;
+	else return EINA_FALSE;
+}
+/**
+ *
+ */
 EAPI Ender * ender_new(const char *name)
 {
 	Ender *ender;
@@ -241,7 +268,7 @@ EAPI const char * ender_name_get(Ender *e)
 /**
  *
  */
-EAPI Ender_Property * ender_property_get(Ender *e, char *name)
+EAPI Ender_Property * ender_property_get(Ender *e, const char *name)
 {
 	Ender_Descriptor_Property *dprop;
 
@@ -249,6 +276,23 @@ EAPI Ender_Property * ender_property_get(Ender *e, char *name)
 	if (!dprop) return NULL;
 
 	return dprop->prop;
+}
+/**
+ *
+ */
+EAPI void ender_property_list(Ender *e, Ender_Property_List_Callback cb, void *data)
+{
+	Eina_Iterator *it;
+	Ender_Descriptor *desc;
+	char *name;
+
+	desc = e->descriptor;
+	it = eina_hash_iterator_key_new(desc->properties);
+	while (eina_iterator_next(it, (void **)&name))
+	{
+		cb(e, name, data);
+	}
+	eina_iterator_free(it);
 }
 
 /**

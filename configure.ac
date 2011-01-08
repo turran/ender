@@ -71,6 +71,7 @@ data/Makefile
 src/Makefile
 src/lib/Makefile
 src/include/Makefile
+src/bin/Makefile
 ],[
 ])
 

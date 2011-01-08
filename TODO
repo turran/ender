@@ -1,0 +1,2 @@
+Add callbacks? a way to notify whenever some property has changed. This will be useful for relative
+actions, like renderers that change some property based on another one.
