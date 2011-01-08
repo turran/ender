@@ -62,6 +62,7 @@ static void _dir_list_cb(const char *name, const char *path, void *data)
 
 static Eina_Hash *_namespaces = NULL;
 static Eina_Hash *_libraries = NULL;
+static Eina_List *_files = NULL;
 extern FILE *ender_in;
 /*============================================================================*
  *                                 Global                                     *
@@ -75,7 +76,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 	Ender_Namespace *namespace;
 	char ctor_name[PATH_MAX];
 
-	DBG("Registering %s %s %p", ns, name, parent);
+	DBG("Registering %s %s with parent %p", ns, name, parent);
 	if (!ns) return NULL;
 
 	/* check if we already have the namespace */
@@ -137,7 +138,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 	/* an interface? */
 	if (!creator)
 	{
-		DBG("No creator found?\n");
+		DBG("No creator found?");
 	}
 	desc = ender_descriptor_register(name, creator, parent);
 	if (!desc)
@@ -207,14 +208,19 @@ void ender_parser_shutdown(void)
 	eina_hash_free(_namespaces);
 }
 
-void ender_parser_parse(const char *file)
+FILE * ender_parser_locate(const char *file)
 {
 	FILE *f;
-	int ret;
 	struct stat st;
+	char complete[PATH_MAX];
 
+	strcpy(complete, file);
+	if (strcmp(complete + strlen(complete) - 6, ".ender"))
+	{
+		strcat(complete, ".ender");
+	}
 	/* check for files on DATADIR */
-	f = fopen(file, "r");
+	f = fopen(complete, "r");
 	if (!f)
 	{
 		char real_file[PATH_MAX];
@@ -222,13 +228,13 @@ void ender_parser_parse(const char *file)
 		/* TODO check if the file is relative or absolute */
 		strncpy(real_file, PACKAGE_DATA_DIR, PATH_MAX);
 		strncat(real_file, "/", PATH_MAX - strlen(real_file));
-		strncat(real_file, file, PATH_MAX - strlen(real_file));
+		strncat(real_file, complete, PATH_MAX - strlen(real_file));
 
 		f = fopen(real_file, "r");
 		if (!f)
 		{
-			ERR("File %s not found at . or %s", file, real_file);
-			return;
+			ERR("File %s not found at . or %s", complete, real_file);
+			return NULL;
 		}
 		DBG("Parsing file %s", real_file);
 	}
@@ -236,12 +242,27 @@ void ender_parser_parse(const char *file)
 	{
 		DBG("Parsing file %s", file);
 	}
+	return f;
+}
+
+void ender_parser_parse(const char *file)
+{
+	FILE *f;
+	int ret;
+
+	f = ender_parser_locate(file);
+	if (!f) return;
+	/* TODO check that we haven't parsed the file already */
 
 	ender_in = f;
 	ret = ender_parse();
+	ender_lex_destroy();
+	if (!ret)
+	{
+
+	}
 	fclose(f);
 }
-
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
