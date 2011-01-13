@@ -3,6 +3,7 @@ namespace enesim {
 		matrix transformation;
 		double x_origin;
 		double y_origin;
+		int rop;
 	};
 };
 
@@ -93,7 +94,7 @@ namespace enesim.renderer {
 	};
 
 	class compound : renderer {
-		[renderer,int] layer;
+		[renderer] layer;
 	};
 
 	abstract gradient : renderer {
