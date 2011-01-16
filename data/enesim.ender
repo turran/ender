@@ -10,8 +10,8 @@ namespace enesim {
 namespace enesim.renderer {
 	abstract shape : renderer {
 		double outline_weight;
-		color outline_color;
-		color fill_color;
+		argb outline_argb;
+		argb fill_argb;
 		renderer fill_renderer;
 		int draw_mode;
 	};
@@ -42,8 +42,8 @@ namespace enesim.renderer {
 	class checker : renderer {
 		unsigned int width;
 		unsigned int height;
-		color even_color;
-		color odd_color;
+		argb even_argb;
+		argb odd_argb;
 	};
 
 	class image : renderer {
@@ -65,10 +65,10 @@ namespace enesim.renderer {
 	class grid : renderer {
 		unsigned int inside_width;
 		unsigned int inside_height;
-		color inside_color;
+		argb inside_argb;
 		unsigned int border_vthickness;
 		unsigned int border_hthickness;
-		color border_color;
+		argb border_argb;
 	};
 
 	class perlin : renderer {
@@ -88,9 +88,9 @@ namespace enesim.renderer {
 
 	class stripes : renderer {
 		float even_thickness;
-		color even_color;
+		argb even_argb;
 		float odd_thickness;
-		color odd_color;
+		argb odd_argb;
 	};
 
 	class compound : renderer {
@@ -98,7 +98,7 @@ namespace enesim.renderer {
 	};
 
 	abstract gradient : renderer {
-		[color, double] stop;
+		[argb, double] stop;
 	};
 
 	class gradient_linear : gradient {
@@ -106,5 +106,9 @@ namespace enesim.renderer {
 		double y0;
 		double x1;
 		double y1;
+	};
+
+	class background : renderer {
+		argb color;
 	};
 };

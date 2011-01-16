@@ -29,7 +29,7 @@ extern Eina_Array *properties;
 
 %}
 
-%token UNSIGNED INT COLOR DOUBLE FLOAT IMAGE SURFACE COORD PATH STRING MATRIX
+%token UNSIGNED INT ARGB DOUBLE FLOAT IMAGE SURFACE COORD PATH STRING MATRIX
 %token WORD OBRACE EBRACE SEMICOLON EQUAL QUOTE COLON DOT OBRACKET EBRACKET COMMA
 %token ABSTRACT CLASS NAMESPACE
 
@@ -133,10 +133,10 @@ type_specifier
 		prop = ender_property_new(ENDER_INT32);
 		eina_array_push(properties, prop);
 	}
-	| COLOR
+	| ARGB
 	{
 		Ender_Property *prop;
-		prop = ender_property_new(ENDER_COLOR);
+		prop = ender_property_new(ENDER_ARGB);
 		eina_array_push(properties, prop);
 	}
 	| DOUBLE

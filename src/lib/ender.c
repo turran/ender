@@ -333,7 +333,7 @@ EAPI void ender_value_get(Ender *e, ...)
 			case ENDER_INT32:
 			case ENDER_FLOAT:
 			case ENDER_DOUBLE:
-			case ENDER_COLOR:
+			case ENDER_ARGB:
 			case ENDER_STRING:
 			case ENDER_MATRIX:
 			case ENDER_RENDERER:
@@ -389,7 +389,7 @@ EAPI void ender_value_set(Ender *e, ...)
 			prop->set(e->renderer, d);
 			break;
 
-			case ENDER_COLOR:
+			case ENDER_ARGB:
 			color = va_arg(ap, Enesim_Color);
 			prop->set(e->renderer, color);
 			break;

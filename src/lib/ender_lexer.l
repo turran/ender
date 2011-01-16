@@ -36,7 +36,7 @@
                     }}
 unsigned		return UNSIGNED;
 int			return INT;
-color			return COLOR;
+argb			return ARGB;
 double			return DOUBLE;
 coord			return COORD;
 float			return FLOAT;
