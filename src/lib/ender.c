@@ -194,7 +194,9 @@ EAPI void ender_shutdown(void)
 }
 
 /**
- *
+ * Get the enders registered on the library
+ * @param cb
+ * @param data
  */
 EAPI void ender_list(Ender_List_Callback cb, void *data)
 {
@@ -210,7 +212,8 @@ EAPI void ender_list(Ender_List_Callback cb, void *data)
 }
 
 /**
- *
+ * Check if an ender with name @name exists on the library
+ * @param name
  */
 EAPI Eina_Bool ender_exists(const char *name)
 {
@@ -221,7 +224,9 @@ EAPI Eina_Bool ender_exists(const char *name)
 	else return EINA_FALSE;
 }
 /**
- *
+ * Create a new ender
+ * @param name
+ * @return
  */
 EAPI Ender * ender_new(const char *name)
 {
@@ -249,7 +254,7 @@ EAPI Ender * ender_new(const char *name)
 }
 
 /**
- *
+ * Delete an ender
  */
 EAPI void ender_delete(Ender *e)
 {
@@ -323,6 +328,15 @@ EAPI void ender_value_get(Ender *e, ...)
 	while ((name = va_arg(ap, char *)))
 	{
 		Ender_Descriptor_Property *prop;
+		uint32_t *u32;
+		int32_t *i32;
+		double d;
+		Enesim_Color color;
+		char *string;
+		Enesim_Matrix *matrix;
+		Enesim_Renderer *renderer;
+		Eina_List *list;
+		Enesim_Surface *surface;
 
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
@@ -330,7 +344,15 @@ EAPI void ender_value_get(Ender *e, ...)
 		switch (prop->prop->type)
 		{
 			case ENDER_UINT32:
+			u32 = va_arg(ap, uint32_t *);
+			prop->get(e->renderer, u32);
+			break;
+
 			case ENDER_INT32:
+			i32 = va_arg(ap, int32_t *);
+			prop->get(e->renderer, i32);
+			break;
+
 			case ENDER_DOUBLE:
 			case ENDER_ARGB:
 			case ENDER_STRING:
@@ -417,7 +439,9 @@ EAPI void ender_value_set(Ender *e, ...)
 }
 
 /**
- *
+ * Get the enesim renderer associated with an ender
+ * @param e
+ * @return
  */
 EAPI Enesim_Renderer * ender_renderer_get(Ender *e)
 {
