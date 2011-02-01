@@ -59,7 +59,7 @@ namespace enesim.renderer {
 		surface src;
 		int x_channel;
 		int y_channel;
-		float factor;
+		double factor;
 	};
 
 	class grid : renderer {
@@ -73,23 +73,23 @@ namespace enesim.renderer {
 
 	class perlin : renderer {
 		unsigned int octaves;
-		float persistence;
-		float xfrequency;
-		float yfrequency;
+		double persistence;
+		double xfrequency;
+		double yfrequency;
 	};
 
 	class raddist : renderer {
 		surface src;
 		unsigned int x;
 		unsigned int y;
-		float radius;
-		float factor;
+		double radius;
+		double factor;
 	};
 
 	class stripes : renderer {
-		float even_thickness;
+		double even_thickness;
 		argb even_color;
-		float odd_thickness;
+		double odd_thickness;
 		argb odd_color;
 	};
 

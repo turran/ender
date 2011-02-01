@@ -29,7 +29,7 @@ extern Eina_Array *properties;
 
 %}
 
-%token UNSIGNED INT ARGB DOUBLE FLOAT IMAGE SURFACE COORD PATH STRING MATRIX
+%token UNSIGNED INT ARGB DOUBLE IMAGE SURFACE COORD PATH STRING MATRIX
 %token WORD OBRACE EBRACE SEMICOLON EQUAL QUOTE COLON DOT OBRACKET EBRACKET COMMA
 %token ABSTRACT CLASS NAMESPACE
 
@@ -143,12 +143,6 @@ type_specifier
 	{
 		Ender_Property *prop;
 		prop = ender_property_new(ENDER_DOUBLE);
-		eina_array_push(properties, prop);
-	}
-	| FLOAT
-	{
-		Ender_Property *prop;
-		prop = ender_property_new(ENDER_FLOAT);
 		eina_array_push(properties, prop);
 	}
 	| STRING

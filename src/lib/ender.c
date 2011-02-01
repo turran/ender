@@ -331,7 +331,6 @@ EAPI void ender_value_get(Ender *e, ...)
 		{
 			case ENDER_UINT32:
 			case ENDER_INT32:
-			case ENDER_FLOAT:
 			case ENDER_DOUBLE:
 			case ENDER_ARGB:
 			case ENDER_STRING:
@@ -377,11 +376,6 @@ EAPI void ender_value_set(Ender *e, ...)
 			case ENDER_INT32:
 			i32 = va_arg(ap, int32_t);
 			prop->set(e->renderer, i32);
-			break;
-
-			case ENDER_FLOAT:
-			d = va_arg(ap, double);
-			prop->set(e->renderer, d);
 			break;
 
 			case ENDER_DOUBLE:

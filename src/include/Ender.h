@@ -58,7 +58,6 @@ typedef enum _Ender_Property_Type
 {
 	ENDER_UINT32,
 	ENDER_INT32,
-	ENDER_FLOAT,
 	ENDER_DOUBLE,
 	ENDER_ARGB,
 	ENDER_STRING,
@@ -68,7 +67,6 @@ typedef enum _Ender_Property_Type
 	ENDER_SURFACE,
 	ENDER_VALUES,
 } Ender_Property_Type;
-
 
 EAPI void ender_init(void);
 EAPI void ender_shutdown(void);

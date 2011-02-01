@@ -39,7 +39,6 @@ int			return INT;
 argb			return ARGB;
 double			return DOUBLE;
 coord			return COORD;
-float			return FLOAT;
 surface			return SURFACE;
 path			return PATH;
 string			return STRING;
