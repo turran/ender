@@ -23,6 +23,8 @@ void ender_property_add(Ender_Property *p, Ender_Property *sub);
 typedef Enesim_Renderer * (*Ender_Creator)(void);
 typedef void (*Ender_Getter)(Enesim_Renderer *r, ...);
 typedef void (*Ender_Setter)(Enesim_Renderer *r, ...);
+typedef void (*Ender_Init)(void);
+typedef void (*Ender_Shutdown)(void);
 
 Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent);

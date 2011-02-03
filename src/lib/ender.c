@@ -52,6 +52,7 @@ struct _Ender
 	EINA_MAGIC;
 	Ender_Descriptor *descriptor;
 	Enesim_Renderer *renderer;
+	Eina_Hash *listeners;
 };
 
 struct _Ender_Property
@@ -72,6 +73,8 @@ static Ender_Descriptor_Property * _property_get(Ender_Descriptor *e, const char
 
 	return _property_get(e->parent, name);
 }
+
+static int _init = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -182,11 +185,14 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
  */
 EAPI void ender_init(void)
 {
-	eina_init();
-	ender_log_dom = eina_log_domain_register("ender", NULL);
-	enesim_init();
-	_descriptors = eina_hash_string_superfast_new(NULL);
-	ender_parser_init();
+	if (!_init++)
+	{
+		eina_init();
+		ender_log_dom = eina_log_domain_register("ender", NULL);
+		enesim_init();
+		_descriptors = eina_hash_string_superfast_new(NULL);
+		ender_parser_init();
+	}
 }
 
 /**
@@ -194,11 +200,15 @@ EAPI void ender_init(void)
  */
 EAPI void ender_shutdown(void)
 {
-	ender_parser_shutdown();
-	enesim_shutdown();
-	eina_log_domain_unregister(ender_log_dom);
-	eina_shutdown();
-	//eina_hash_delete(_descriptors);
+	if (!_init == 1)
+	{
+		ender_parser_shutdown();
+		enesim_shutdown();
+		eina_log_domain_unregister(ender_log_dom);
+		eina_shutdown();
+		//eina_hash_delete(_descriptors);
+	}
+	_init--;
 }
 
 /**

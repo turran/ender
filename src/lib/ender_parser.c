@@ -108,6 +108,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 		library = eina_hash_find(_libraries, lib_name);
 		if (!library)
 		{
+			Ender_Init init;
 			char real_lib[PATH_MAX];
 			void *dl_handle;
 
@@ -123,6 +124,11 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 			library->name = strdup(lib_name);
 			library->dl_handle = dl_handle;
 			library->ref = 0;
+			/* initialize the library */
+			snprintf(real_lib, PATH_MAX, "%s_init", lib_name);
+			init = dlsym(dl_handle, real_lib);
+			if (init) init();
+			/* keep a reference to the library */
 			eina_hash_add(_libraries, lib_name, library);
 		}
 		namespace = malloc(sizeof(Ender_Namespace));
@@ -209,6 +215,7 @@ void ender_parser_init(void)
 
 void ender_parser_shutdown(void)
 {
+	/* TODO call the shutdown on every library */
 	/* dlclose every namespace */
 	eina_hash_free(_namespaces);
 }

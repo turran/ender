@@ -51,6 +51,7 @@
 
 typedef struct _Ender Ender;
 typedef struct _Ender_Property Ender_Property;
+
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender *e, const char *name, void *data);
 
