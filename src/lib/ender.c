@@ -24,6 +24,13 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENDER_MAGIC 0xe743e001
+#define ENDER_MAGIC_CHECK(d)\
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENDER_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENDER_MAGIC);\
+	} while(0)
+
 struct _Ender_Descriptor_Property
 {
 	char *name;
@@ -42,6 +49,7 @@ struct _Ender_Descriptor
 
 struct _Ender
 {
+	EINA_MAGIC;
 	Ender_Descriptor *descriptor;
 	Enesim_Renderer *renderer;
 };
@@ -232,6 +240,7 @@ EAPI Ender * ender_new(const char *name)
 {
 	Ender *ender;
 	Ender_Descriptor *desc;
+	Enesim_Renderer *renderer;
 
 	DBG("Creating new ender \"%s\"", name);
 	desc = eina_hash_find(_descriptors, name);
@@ -246,9 +255,12 @@ EAPI Ender * ender_new(const char *name)
 		return NULL;
 	}
 
+	renderer = desc->create();
 	ender = malloc(sizeof(Ender));
-	ender->renderer = desc->create();
+	EINA_MAGIC_SET(ender, ENDER_MAGIC);
+	ender->renderer = renderer;
 	ender->descriptor = desc;
+	enesim_renderer_private_set(renderer, "ender", ender);
 
 	return ender;
 }
@@ -258,6 +270,7 @@ EAPI Ender * ender_new(const char *name)
  */
 EAPI void ender_delete(Ender *e)
 {
+	ENDER_MAGIC_CHECK(e);
 	enesim_renderer_delete(e->renderer);
 	free(e);
 }
@@ -267,6 +280,7 @@ EAPI void ender_delete(Ender *e)
  */
 EAPI const char * ender_name_get(Ender *e)
 {
+	ENDER_MAGIC_CHECK(e);
 	return ender_descriptor_name_get(e->descriptor);
 }
 
@@ -277,6 +291,7 @@ EAPI Ender_Property * ender_property_get(Ender *e, const char *name)
 {
 	Ender_Descriptor_Property *dprop;
 
+	ENDER_MAGIC_CHECK(e);
 	dprop = _property_get(e->descriptor, name);
 	if (!dprop) return NULL;
 
@@ -291,6 +306,7 @@ EAPI void ender_property_list(Ender *e, Ender_Property_List_Callback cb, void *d
 	Ender_Descriptor *desc;
 	char *name;
 
+	ENDER_MAGIC_CHECK(e);
 	desc = e->descriptor;
 	it = eina_hash_iterator_key_new(desc->properties);
 	while (eina_iterator_next(it, (void **)&name))
@@ -324,17 +340,18 @@ EAPI void ender_value_get(Ender *e, ...)
 	va_list ap;
 	char *name;
 
+	ENDER_MAGIC_CHECK(e);
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{
 		Ender_Descriptor_Property *prop;
 		uint32_t *u32;
 		int32_t *i32;
-		double d;
-		Enesim_Color color;
-		char *string;
+		double *d;
+		Enesim_Color *color;
+		char **string;
 		Enesim_Matrix *matrix;
-		Enesim_Renderer *renderer;
+		Enesim_Renderer **renderer;
 		Eina_List *list;
 		Enesim_Surface *surface;
 
@@ -354,10 +371,28 @@ EAPI void ender_value_get(Ender *e, ...)
 			break;
 
 			case ENDER_DOUBLE:
+			d = va_arg(ap, double *);
+			prop->get(e->renderer, d);
+			break;
+
 			case ENDER_ARGB:
+			color = va_arg(ap, Enesim_Color *);
+			prop->get(e->renderer, color);
+			break;
+
 			case ENDER_STRING:
+			string = va_arg(ap, char **);
+			prop->set(e->renderer, string);
+			break;
+
 			case ENDER_MATRIX:
+			matrix = va_arg(ap, Enesim_Matrix *);
+			prop->get(e->renderer, matrix);
+			break;
+
 			case ENDER_RENDERER:
+			renderer = va_arg(ap, Enesim_Renderer **);
+			prop->set(e->renderer, renderer);
 			break;
 		}
 	}
@@ -371,6 +406,7 @@ EAPI void ender_value_set(Ender *e, ...)
 	va_list ap;
 	char *name;
 
+	ENDER_MAGIC_CHECK(e);
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{
@@ -445,6 +481,16 @@ EAPI void ender_value_set(Ender *e, ...)
  */
 EAPI Enesim_Renderer * ender_renderer_get(Ender *e)
 {
+	ENDER_MAGIC_CHECK(e);
 	return e->renderer;
 }
 
+/**
+ * Get the ender associated with an enesim renderer
+ * @param r
+ * @return
+ */
+EAPI Ender * ender_renderer_from(Enesim_Renderer *r)
+{
+	return enesim_renderer_private_get(r, "ender");
+}
