@@ -108,7 +108,6 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 		library = eina_hash_find(_libraries, lib_name);
 		if (!library)
 		{
-			Ender_Init init;
 			char real_lib[PATH_MAX];
 			void *dl_handle;
 
@@ -124,10 +123,6 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 			library->name = strdup(lib_name);
 			library->dl_handle = dl_handle;
 			library->ref = 0;
-			/* initialize the library */
-			snprintf(real_lib, PATH_MAX, "%s_init", lib_name);
-			init = dlsym(dl_handle, real_lib);
-			if (init) init();
 			/* keep a reference to the library */
 			eina_hash_add(_libraries, lib_name, library);
 		}
@@ -205,18 +200,50 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 
 void ender_parser_init(void)
 {
+	Eina_Iterator *it;
+	Ender_Library *lib;
+
 	_namespaces = eina_hash_string_superfast_new(NULL);
 	_libraries = eina_hash_string_superfast_new(NULL);
 	/* FIXME create a proper context */
 	properties = eina_array_new(1);
 	/* iterate over the list of .ender files and parse them */
 	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
+	/* now that every ender is regsitered we can start initializing the libraries */
+	it = eina_hash_iterator_data_new(_libraries);
+	while (eina_iterator_next(it, (void **)&lib))
+	{
+		Ender_Init init;
+		char sym_name[PATH_MAX];
+
+		/* initialize the library */
+		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
+		init = dlsym(lib->dl_handle, sym_name);
+		if (init) init();
+	}
+	eina_iterator_free(it);
 }
 
 void ender_parser_shutdown(void)
 {
-	/* TODO call the shutdown on every library */
-	/* dlclose every namespace */
+	Eina_Iterator *it;
+	Ender_Library *lib;
+
+	/* call the shutdown on every library */
+	it = eina_hash_iterator_data_new(_libraries);
+	while (eina_iterator_next(it, (void **)&lib))
+	{
+		Ender_Init shutdown;
+		char sym_name[PATH_MAX];
+
+		/* initialize the library */
+		snprintf(sym_name, PATH_MAX, "%s_shutdown", lib->name);
+		shutdown = dlsym(lib->dl_handle, sym_name);
+		if (shutdown) shutdown();
+	}
+	eina_iterator_free(it);
+	/* TODO actually delete the hashes contents */
+	eina_hash_free(_libraries);
 	eina_hash_free(_namespaces);
 }
 

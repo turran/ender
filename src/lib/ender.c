@@ -266,6 +266,12 @@ EAPI Ender * ender_new(const char *name)
 	}
 
 	renderer = desc->create();
+	if (!renderer)
+	{
+		ERR("For some reason the creator for \"%s\" failed", name);
+		return NULL;
+	}
+
 	ender = malloc(sizeof(Ender));
 	EINA_MAGIC_SET(ender, ENDER_MAGIC);
 	ender->renderer = renderer;
