@@ -57,6 +57,7 @@ typedef void (*Ender_Property_List_Callback)(Ender *e, const char *name, void *d
 
 typedef enum _Ender_Property_Type
 {
+	/* basic types */
 	ENDER_UINT32,
 	ENDER_INT32,
 	ENDER_DOUBLE,
@@ -64,10 +65,26 @@ typedef enum _Ender_Property_Type
 	ENDER_STRING,
 	ENDER_MATRIX,
 	ENDER_RENDERER,
-	ENDER_LIST,
 	ENDER_SURFACE,
+	/* compound types */
+	ENDER_LIST,
 	ENDER_VALUES,
 } Ender_Property_Type;
+
+typedef union _Ender_Value
+{
+	/* basic types */
+	uint32_t uint32;
+	int32_t int32;
+	double d;
+	Enesim_Color color;
+	Enesim_Renderer *renderer;
+	char *string;
+	Enesim_Surface *surface;
+	Enesim_Matrix matrix;
+	/* compound types */
+	Eina_List *list;
+} Ender_Value;
 
 EAPI void ender_init(void);
 EAPI void ender_shutdown(void);
@@ -85,6 +102,9 @@ EAPI const Eina_Array * ender_property_sub(Ender_Property *p);
 
 EAPI void ender_value_get(Ender *e, ...);
 EAPI void ender_value_set(Ender *e, ...);
+EAPI void ender_value_get_simple(Ender *e, const char *name, Ender_Value *value);
+EAPI void ender_value_set_simple(Ender *e, const char *name, Ender_Value *value);
+
 EAPI Enesim_Renderer * ender_renderer_get(Ender *e);
 
 /**

@@ -491,6 +491,36 @@ EAPI void ender_value_set(Ender *e, ...)
 }
 
 /**
+ *
+ */
+EAPI void ender_value_get_simple(Ender *e, const char *name, Ender_Value *value)
+{
+	Ender_Descriptor_Property *prop;
+
+	ENDER_MAGIC_CHECK(e);
+	if (!value) return;
+
+	prop = _property_get(e->descriptor, name);
+	if (!prop) return;
+	prop->get(e->renderer, value);
+}
+
+/**
+ *
+ */
+EAPI void ender_value_set_simple(Ender *e, const char *name, Ender_Value *value)
+{
+	Ender_Descriptor_Property *prop;
+
+	ENDER_MAGIC_CHECK(e);
+	if (!value) return;
+
+	prop = _property_get(e->descriptor, name);
+	if (!prop) return;
+	prop->set(e->renderer, *value);
+}
+
+/**
  * Get the enesim renderer associated with an ender
  * @param e
  * @return
