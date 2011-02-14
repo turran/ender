@@ -31,6 +31,12 @@
 			EINA_MAGIC_FAIL(d, ENDER_MAGIC);\
 	} while(0)
 
+typedef struct _Ender_Listener
+{
+	Ender_Event_Callback callback;
+	void *data;
+} Ender_Listener;
+
 struct _Ender_Descriptor_Property
 {
 	char *name;
@@ -276,6 +282,7 @@ EAPI Ender * ender_new(const char *name)
 	EINA_MAGIC_SET(ender, ENDER_MAGIC);
 	ender->renderer = renderer;
 	ender->descriptor = desc;
+	ender->listeners = eina_hash_string_superfast_new(NULL);
 	enesim_renderer_private_set(renderer, "ender", ender);
 
 	return ender;
@@ -539,4 +546,59 @@ EAPI Enesim_Renderer * ender_renderer_get(Ender *e)
 EAPI Ender * ender_renderer_from(Enesim_Renderer *r)
 {
 	return enesim_renderer_private_get(r, "ender");
+}
+
+/**
+ *
+ */
+EAPI void ender_event_listener_add(Ender *e, const char *event_name,
+		Ender_Event_Callback cb, void *data)
+{
+	Ender_Listener *listener;
+	Eina_List *listeners, *tmp;
+
+	ENDER_MAGIC_CHECK(e);
+	listener = calloc(1, sizeof(Ender_Listener));
+	listener->callback = cb;
+	listener->data = data;
+
+	listeners = eina_hash_find(e->listeners, event_name);
+	tmp = eina_list_append(listeners, listener);
+	if (!listeners)
+	{
+		eina_hash_add(e->listeners, event_name, tmp);
+	}
+}
+
+/**
+ *
+ */
+EAPI void ender_event_listener_remove(Ender *e, const char *name,
+		Ender_Event_Callback cb)
+{
+	ENDER_MAGIC_CHECK(e);
+	Ender_Listener *listener;
+
+}
+
+/**
+ *
+ */
+EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_data)
+{
+	Ender_Listener *listener;
+	Eina_List *listeners;
+	Eina_Iterator *it;
+
+	ENDER_MAGIC_CHECK(e);
+	listeners = eina_hash_find(e->listeners, event_name);
+	if (!listeners) return;
+
+	it = eina_list_iterator_new(listeners);
+	while (eina_iterator_next(it, (void **)&listener))
+	{
+		listener->callback(e, event_name, event_data, listener->data);
+	}
+	eina_iterator_free(it);
+
 }

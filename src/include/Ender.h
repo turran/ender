@@ -54,6 +54,7 @@ typedef struct _Ender_Property Ender_Property;
 
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender *e, const char *name, void *data);
+typedef void (*Ender_Event_Callback)(Ender *e, const char *event_name, void *event_data, void *data);
 
 typedef enum _Ender_Property_Type
 {
@@ -106,6 +107,10 @@ EAPI void ender_value_get_simple(Ender *e, const char *name, Ender_Value *value)
 EAPI void ender_value_set_simple(Ender *e, const char *name, Ender_Value *value);
 
 EAPI Enesim_Renderer * ender_renderer_get(Ender *e);
+
+EAPI void ender_event_listener_add(Ender *e, const char *event_name, Ender_Event_Callback cb, void *data);
+EAPI void ender_event_listener_remove(Ender *e, const char *event_name, Ender_Event_Callback cb);
+EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_data);
 
 /**
  * @}
