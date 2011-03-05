@@ -509,7 +509,16 @@ EAPI void ender_value_get_simple(Ender *e, const char *name, Ender_Value *value)
 
 	prop = _property_get(e->descriptor, name);
 	if (!prop) return;
-	prop->get(e->renderer, value);
+	switch (prop->prop->type)
+	{
+		case ENDER_MATRIX:
+		prop->get(e->renderer, &value);
+		break;
+
+		default:
+		prop->get(e->renderer, value);
+		break;
+	}
 }
 
 /**
@@ -524,7 +533,16 @@ EAPI void ender_value_set_simple(Ender *e, const char *name, Ender_Value *value)
 
 	prop = _property_get(e->descriptor, name);
 	if (!prop) return;
-	prop->set(e->renderer, *value);
+	switch (prop->prop->type)
+	{
+		case ENDER_MATRIX:
+		prop->set(e->renderer, value);
+		break;
+
+		default:
+		prop->set(e->renderer, *value);
+		break;
+	}
 }
 
 /**
