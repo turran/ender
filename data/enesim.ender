@@ -17,8 +17,8 @@ namespace enesim.renderer {
 	};
 
 	class rectangle : shape {
-		unsigned int width;
-		unsigned int height;
+		uint width;
+		uint height;
 		double corner_radius;
 	};
 
@@ -40,8 +40,8 @@ namespace enesim.renderer {
 	};
 
 	class checker : renderer {
-		unsigned int width;
-		unsigned int height;
+		uint width;
+		uint height;
 		argb even_color;
 		argb odd_color;
 	};
@@ -63,16 +63,16 @@ namespace enesim.renderer {
 	};
 
 	class grid : renderer {
-		unsigned int inside_width;
-		unsigned int inside_height;
+		uint inside_width;
+		uint inside_height;
 		argb inside_color;
-		unsigned int border_vthickness;
-		unsigned int border_hthickness;
+		uint border_vthickness;
+		uint border_hthickness;
 		argb border_color;
 	};
 
 	class perlin : renderer {
-		unsigned int octaves;
+		uint octaves;
 		double persistence;
 		double xfrequency;
 		double yfrequency;
@@ -80,8 +80,8 @@ namespace enesim.renderer {
 
 	class raddist : renderer {
 		surface src;
-		unsigned int x;
-		unsigned int y;
+		uint x;
+		uint y;
 		double radius;
 		double factor;
 	};

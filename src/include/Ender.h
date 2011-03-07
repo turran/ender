@@ -67,6 +67,7 @@ typedef enum _Ender_Property_Type
 	ENDER_MATRIX,
 	ENDER_RENDERER,
 	ENDER_SURFACE,
+	ENDER_ENDER,
 	/* compound types */
 	ENDER_LIST,
 	ENDER_VALUES,

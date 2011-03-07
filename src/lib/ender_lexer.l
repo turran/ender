@@ -34,7 +34,7 @@
 
 			    return STRING;
                     }}
-unsigned		return UNSIGNED;
+uint			return UINT;
 int			return INT;
 argb			return ARGB;
 double			return DOUBLE;
