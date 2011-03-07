@@ -44,6 +44,7 @@ path			return PATH;
 string			return STRING;
 matrix			return MATRIX;
 namespace		return NAMESPACE;
+ender			return ENDER;
 class			return CLASS;
 abstract		return ABSTRACT;
 using			BEGIN(using);

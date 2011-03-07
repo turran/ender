@@ -377,6 +377,7 @@ EAPI void ender_value_get(Ender *e, ...)
 		Enesim_Renderer **renderer;
 		Eina_List *list;
 		Enesim_Surface *surface;
+		Ender *ender;
 
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
@@ -417,6 +418,11 @@ EAPI void ender_value_get(Ender *e, ...)
 			renderer = va_arg(ap, Enesim_Renderer **);
 			prop->set(e->renderer, renderer);
 			break;
+
+			case ENDER_ENDER:
+			ender = va_arg(ap, Ender **);
+			prop->set(e->renderer, ender);
+			break;
 		}
 	}
 }
@@ -443,6 +449,7 @@ EAPI void ender_value_set(Ender *e, ...)
 		Enesim_Renderer *renderer;
 		Eina_List *list;
 		Enesim_Surface *surface;
+		Ender *ender;
 
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
@@ -487,6 +494,11 @@ EAPI void ender_value_set(Ender *e, ...)
 			case ENDER_RENDERER:
 			renderer = va_arg(ap, Enesim_Renderer *);
 			prop->set(e->renderer, renderer);
+			break;
+
+			case ENDER_ENDER:
+			ender = va_arg(ap, Ender *);
+			prop->set(e->renderer, ender);
 			break;
 
 			case ENDER_LIST:

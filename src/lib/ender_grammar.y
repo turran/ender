@@ -11,10 +11,11 @@
 
 #define YYSTYPE char *
 #define YYERROR_VERBOSE
+extern int ender_lineno;
 
 void ender_error(const char *str)
 {
-        fprintf(stderr,"error: %s\n",str);
+        ERR("Parsing error (%d) %s", ender_lineno, str);
 }
 
 int ender_wrap()
@@ -29,7 +30,7 @@ extern Eina_Array *properties;
 
 %}
 
-%token UINT INT ARGB DOUBLE IMAGE SURFACE COORD PATH STRING MATRIX
+%token UINT INT ARGB DOUBLE IMAGE SURFACE COORD PATH STRING MATRIX ENDER
 %token WORD OBRACE EBRACE SEMICOLON EQUAL QUOTE COLON DOT OBRACKET EBRACKET COMMA
 %token ABSTRACT CLASS NAMESPACE
 
@@ -160,12 +161,14 @@ type_specifier
 	| WORD
 	{
 		Ender_Property *prop;
-		Ender_Descriptor *external = NULL;
 
-		external = ender_descriptor_get($1);
-		/* TODO check that the propriptor exists */
 		prop = ender_property_new(ENDER_RENDERER);
-		//printf("renderer found\n");
+		eina_array_push(properties, prop);
+	}
+	| ENDER
+	{
+		Ender_Property *prop;
+		prop = ender_property_new(ENDER_ENDER);
 		eina_array_push(properties, prop);
 	}
 	| MATRIX
