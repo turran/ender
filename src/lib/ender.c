@@ -48,6 +48,7 @@ struct _Ender_Descriptor_Property
 	Ender_Remove remove;
 	Ender_Clear clear;
 	Ender_Property *prop;
+	Eina_Bool relative;
 };
 
 struct _Ender_Descriptor
@@ -64,6 +65,7 @@ struct _Ender
 	Ender_Descriptor *descriptor;
 	Enesim_Renderer *renderer;
 	Eina_Hash *listeners;
+	Ender *parent;
 };
 
 struct _Ender_Property
@@ -161,9 +163,8 @@ void ender_property_delete(Ender_Property *d)
 
 void ender_property_add(Ender_Property *d, Ender_Property *sub)
 {
-	//printf("adding sub property %p to %p\n", sub, d);
+	if (d->type != ENDER_LIST) return;
 	if (!d->sub) return;
-	//printf("pushing\n");
 	eina_array_push(d->sub, sub);
 }
 
@@ -367,6 +368,57 @@ EAPI const Eina_Array * ender_property_sub(Ender_Property *p)
 /**
  *
  */
+EAPI void ender_value_add(Ender *e, const char *name, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+	va_start(ap, name);
+	do
+	{
+		Ender_Descriptor_Property *prop;
+		uint32_t *u32;
+		int32_t *i32;
+		double *d;
+		Enesim_Color *color;
+		char **string;
+		Enesim_Matrix *matrix;
+		Enesim_Renderer **renderer;
+		Eina_List *list;
+		Enesim_Surface *surface;
+		Ender *ender;
+
+		prop = _property_get(e->descriptor, name);
+		if (!prop) break;
+		if (prop->prop->type != ENDER_LIST) break;
+		if (prop->add) prop->add(e->renderer, va_arg(ap, void *));
+	} while ((name = va_arg(ap, char *)));
+	va_end(ap);
+}
+
+/**
+ *
+ */
+EAPI void ender_value_clear(Ender *e, const char *name, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+	va_start(ap, name);
+	do
+	{
+		Ender_Descriptor_Property *prop;
+		prop = _property_get(e->descriptor, name);
+		if (!prop) break;
+		if (prop->prop->type != ENDER_LIST) break;
+		if (prop->clear) prop->clear(e->renderer);
+	} while ((name = va_arg(ap, char *)));
+	va_end(ap);
+}
+
+/**
+ *
+ */
 EAPI void ender_value_get(Ender *e, ...)
 {
 	va_list ap;
@@ -386,7 +438,7 @@ EAPI void ender_value_get(Ender *e, ...)
 		Enesim_Renderer **renderer;
 		Eina_List *list;
 		Enesim_Surface *surface;
-		Ender *ender;
+		Ender **ender;
 
 		prop = _property_get(e->descriptor, name);
 		if (!prop) return;
@@ -434,6 +486,7 @@ EAPI void ender_value_get(Ender *e, ...)
 			break;
 		}
 	}
+	va_end(ap);
 }
 
 /**
@@ -507,15 +560,20 @@ EAPI void ender_value_set(Ender *e, ...)
 
 			case ENDER_ENDER:
 			ender = va_arg(ap, Ender *);
+			ender->parent = e;
 			prop->set(e->renderer, ender);
 			break;
 
 			case ENDER_LIST:
+			/* TODO whenever we set a list of enders, the parent must be set
+			 * too
+			 */
 			list = va_arg(ap, Eina_List *);
 			prop->set(e->renderer, list);
 			break;
 		}
 	}
+	va_end(ap);
 }
 
 /**
@@ -560,6 +618,11 @@ EAPI void ender_value_set_simple(Ender *e, const char *name, Ender_Value *value)
 		prop->set(e->renderer, value);
 		break;
 
+		case ENDER_ENDER:
+		value->ender->parent = e;
+		prop->set(e->renderer, *value);
+		break;
+
 		default:
 		prop->set(e->renderer, *value);
 		break;
@@ -575,6 +638,15 @@ EAPI Enesim_Renderer * ender_renderer_get(Ender *e)
 {
 	ENDER_MAGIC_CHECK(e);
 	return e->renderer;
+}
+
+/**
+ *
+ */
+EAPI Ender * ender_parent_get(Ender *e)
+{
+	ENDER_MAGIC_CHECK(e);
+	return e->parent;
 }
 
 /**
@@ -641,3 +713,5 @@ EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_dat
 	eina_iterator_free(it);
 
 }
+
+

@@ -80,10 +80,11 @@ typedef union _Ender_Value
 	int32_t int32;
 	double d;
 	Enesim_Color color;
-	Enesim_Renderer *renderer;
 	char *string;
-	Enesim_Surface *surface;
 	Enesim_Matrix matrix;
+	Enesim_Renderer *renderer;
+	Enesim_Surface *surface;
+	Ender *ender;
 	/* compound types */
 	Eina_List *list;
 } Ender_Value;

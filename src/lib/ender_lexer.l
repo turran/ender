@@ -34,6 +34,7 @@
 
 			    return STRING;
                     }}
+rel			return REL;
 uint			return UINT;
 int			return INT;
 argb			return ARGB;

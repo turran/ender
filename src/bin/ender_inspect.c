@@ -28,6 +28,7 @@ static void _prop_cb(Ender *e, const char *name, void *data)
 	Ender_Property *p;
 
 	p = ender_property_get(e, name);
+	// ender_property_is_relative(p);
 	printf("- %s %d\n", name, ender_property_type(p));
 }
 

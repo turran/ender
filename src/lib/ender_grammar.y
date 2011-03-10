@@ -32,7 +32,7 @@ extern Eina_Array *properties;
 
 %token UINT INT ARGB DOUBLE IMAGE SURFACE COORD PATH STRING MATRIX ENDER
 %token WORD OBRACE EBRACE SEMICOLON EQUAL QUOTE COLON DOT OBRACKET EBRACKET COMMA
-%token ABSTRACT CLASS NAMESPACE
+%token ABSTRACT CLASS NAMESPACE REL
 
 %%
 
@@ -184,18 +184,22 @@ type_specifier
 
 		prop = ender_property_new(ENDER_LIST);
 		eina_array_push(properties, prop);
-		//printf("list found %p\n", prop);
 	}
 	types EBRACKET
 	;
 
+type_relative
+	:
+	| REL
+	;
+
 declaration
-	: type_specifier WORD SEMICOLON
+	: type_relative type_specifier WORD SEMICOLON
 	{
 		Ender_Property *prop;
 
 		prop = eina_array_pop(properties);
-		ender_parser_property_add(namespace, current, $2, prop);
+		ender_parser_property_add(namespace, current, $3, prop);
 	}
 	;
 
