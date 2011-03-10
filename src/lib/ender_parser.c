@@ -165,6 +165,9 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 {
 	Ender_Getter get;
 	Ender_Setter set;
+	Ender_Add add = NULL;
+	Ender_Remove remove = NULL;
+	Ender_Clear clear = NULL;
 	Ender_Namespace *namespace;
 	char prefix[PATH_MAX];
 	char func_name[PATH_MAX];
@@ -195,7 +198,35 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 	{
 		WRN("No setter %s for type %s", func_name, edesc_name);
 	}
-	ender_descriptor_property_add(edesc, name, prop, get, set);
+	/* in case of a compound property, also try to get the add/remove/clear */
+	if (ender_property_type(prop) == ENDER_LIST)
+	{
+		/* the add */
+		strncpy(func_name, prefix, PATH_MAX);
+		strncat(func_name, "add", PATH_MAX);
+		add = dlsym(namespace->lib->dl_handle, func_name);
+		if (!add)
+		{
+			WRN("No adder %s for type %s", func_name, edesc_name);
+		}
+		/* the remove */
+		strncpy(func_name, prefix, PATH_MAX);
+		strncat(func_name, "remove", PATH_MAX);
+		remove = dlsym(namespace->lib->dl_handle, func_name);
+		if (!remove)
+		{
+			WRN("No remove %s for type %s", func_name, edesc_name);
+		}
+		/* the clear */
+		strncpy(func_name, prefix, PATH_MAX);
+		strncat(func_name, "clear", PATH_MAX);
+		clear = dlsym(namespace->lib->dl_handle, func_name);
+		if (!clear)
+		{
+			WRN("No clear %s for type %s", func_name, edesc_name);
+		}
+	}
+	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear);
 }
 
 void ender_parser_init(void)

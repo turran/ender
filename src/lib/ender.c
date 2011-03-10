@@ -20,6 +20,8 @@
 /* TODO
  * - Add introspection functions: a way to know the properties, the
  * values, the parent, etc.
+ * - For compound types (lists, arrays) add a way to add/remove/clear
+ * the property
  */
 /*============================================================================*
  *                                  Local                                     *
@@ -42,6 +44,9 @@ struct _Ender_Descriptor_Property
 	char *name;
 	Ender_Getter get;
 	Ender_Setter set;
+	Ender_Add add;
+	Ender_Remove remove;
+	Ender_Clear clear;
 	Ender_Property *prop;
 };
 
@@ -163,7 +168,8 @@ void ender_property_add(Ender_Property *d, Ender_Property *sub)
 }
 
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
-	Ender_Property *prop, Ender_Getter get, Ender_Setter set)
+	Ender_Property *prop, Ender_Getter get, Ender_Setter set,
+	Ender_Add add, Ender_Remove remove, Ender_Clear clear)
 {
 	Ender_Descriptor_Property *dprop;
 
@@ -179,6 +185,9 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 	dprop->name = strdup(name);
 	dprop->get = get;
 	dprop->set = set;
+	dprop->add = add;
+	dprop->remove = remove;
+	dprop->clear = clear;
 	dprop->prop = prop;
 	eina_hash_add(edesc->properties, name, dprop);
 	DBG("Property %s (%d) added to %s", name, prop->type, edesc->name);

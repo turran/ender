@@ -23,6 +23,9 @@ void ender_property_add(Ender_Property *p, Ender_Property *sub);
 typedef Enesim_Renderer * (*Ender_Creator)(void);
 typedef void (*Ender_Getter)(Enesim_Renderer *r, ...);
 typedef void (*Ender_Setter)(Enesim_Renderer *r, ...);
+typedef void (*Ender_Add)(Enesim_Renderer *r, ...);
+typedef void (*Ender_Remove)(Enesim_Renderer *r, ...);
+typedef void (*Ender_Clear)(Enesim_Renderer *r);
 typedef void (*Ender_Init)(void);
 typedef void (*Ender_Shutdown)(void);
 
@@ -32,7 +35,8 @@ void ender_descriptor_unregister(Ender_Descriptor *edesc);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_get(const char *name);
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Property *p,
-	Ender_Getter get, Ender_Setter set);
+	Ender_Getter get, Ender_Setter set,
+	Ender_Add add, Ender_Remove remove, Ender_Clear clear);
 
 /* the parser */
 void ender_parser_init(void);
