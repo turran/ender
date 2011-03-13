@@ -42,6 +42,11 @@ typedef struct _Ender_Parser
 	char *file;
 } Ender_Parser;
 
+static Eina_Hash *_namespaces = NULL;
+static Eina_Hash *_libraries = NULL;
+static Eina_List *_files = NULL;
+extern FILE *ender_in;
+
 static void _library_unref(Ender_Library *lib)
 {
 	lib->ref--;
@@ -64,15 +69,10 @@ static void _dir_list_cb(const char *name, const char *path, void *data)
 	snprintf(file, PATH_MAX, "%s/%s", path, name);
 	ender_parser_parse(file);
 }
-
-static Eina_Hash *_namespaces = NULL;
-static Eina_Hash *_libraries = NULL;
-static Eina_List *_files = NULL;
-extern FILE *ender_in;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Eina_Array *properties = NULL;
+Eina_Array *pproperties = NULL;
 
 Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender_Descriptor * parent)
 {
@@ -226,7 +226,7 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 			WRN("No clear %s for type %s", func_name, edesc_name);
 		}
 	}
-	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear);
+	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear, EINA_FALSE);
 }
 
 void ender_parser_init(void)
@@ -237,7 +237,7 @@ void ender_parser_init(void)
 	_namespaces = eina_hash_string_superfast_new(NULL);
 	_libraries = eina_hash_string_superfast_new(NULL);
 	/* FIXME create a proper context */
-	properties = eina_array_new(1);
+	pproperties = eina_array_new(1);
 	/* iterate over the list of .ender files and parse them */
 	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
 	/* now that every ender is regsitered we can start initializing the libraries */

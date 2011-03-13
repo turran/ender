@@ -170,7 +170,8 @@ void ender_property_add(Ender_Property *d, Ender_Property *sub)
 
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 	Ender_Property *prop, Ender_Getter get, Ender_Setter set,
-	Ender_Add add, Ender_Remove remove, Ender_Clear clear)
+	Ender_Add add, Ender_Remove remove, Ender_Clear clear,
+	Eina_Bool relative)
 {
 	Ender_Descriptor_Property *dprop;
 
@@ -190,6 +191,7 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 	dprop->remove = remove;
 	dprop->clear = clear;
 	dprop->prop = prop;
+	dprop->relative = relative;
 	eina_hash_add(edesc->properties, name, dprop);
 	DBG("Property %s (%d) added to %s", name, prop->type, edesc->name);
 }
@@ -713,5 +715,3 @@ EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_dat
 	eina_iterator_free(it);
 
 }
-
-

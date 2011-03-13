@@ -26,7 +26,7 @@ int ender_wrap()
 static Ender_Descriptor *current = NULL;
 static char *name = NULL;
 static char *namespace = NULL;
-extern Eina_Array *properties;
+extern Eina_Array *pproperties;
 
 %}
 
@@ -102,21 +102,25 @@ renderer_inheritance
 types
 	: type_specifier
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
 		Ender_Property *parent;
-		prop = eina_array_pop(properties);
-		//printf("adding %d\n", ender_property_type(prop));
-		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
+		prop = eina_array_pop(pprop->properties);
+		parent = eina_array_data_get(pprop->properties, eina_array_count_get(pprop->properties) - 1);
 		ender_property_add(parent, prop);
 	}
 	COMMA types
 	| type_specifier
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
 		Ender_Property *parent;
-		prop = eina_array_pop(properties);
-		//printf("adding %d\n", ender_property_type(prop));
-		parent = eina_array_data_get(properties, eina_array_count_get(properties) - 1);
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
+		prop = eina_array_pop(pprop->properties);
+		parent = eina_array_data_get(pprop->properties, eina_array_count_get(pprop->properties) - 1);
 		ender_property_add(parent, prop);
 	}
 	;
@@ -124,66 +128,94 @@ types
 type_specifier
 	: UINT
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_UINT32);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| INT
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_INT32);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| ARGB
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_ARGB);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| DOUBLE
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_DOUBLE);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| STRING
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_STRING);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| SURFACE
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_SURFACE);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| WORD
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
 
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_RENDERER);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| ENDER
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_ENDER);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	| MATRIX
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
+
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_MATRIX);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 
 	}
 	| OBRACKET
 	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
 
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
 		prop = ender_property_new(ENDER_LIST);
-		eina_array_push(properties, prop);
+		eina_array_push(pprop->properties, prop);
 	}
 	types EBRACKET
 	;
@@ -191,15 +223,32 @@ type_specifier
 type_relative
 	:
 	| REL
+	{
+		Ender_Parser_Property *pprop;
+		pprop = eina_array_data_get(pproperties, eina_array_count_get(pproperties) - 1);
+		pprop->relative = EINA_TRUE;
+	}
 	;
 
 declaration
-	: type_relative type_specifier WORD SEMICOLON
+	: 
 	{
+		Ender_Parser_Property *pprop;
+
+		pprop = calloc(1, sizeof(Ender_Parser_Property));
+		pprop->properties = eina_array_new(1);
+		eina_array_push(pproperties, pprop);
+	}
+	type_relative type_specifier WORD SEMICOLON
+	{
+		Ender_Parser_Property *pprop;
 		Ender_Property *prop;
 
-		prop = eina_array_pop(properties);
+		pprop = eina_array_pop(pproperties);
+		prop = eina_array_pop(pprop->properties);
 		ender_parser_property_add(namespace, current, $3, prop);
+		eina_array_free(pprop->properties);
+		free(pprop);
 	}
 	;
 

@@ -31,10 +31,16 @@
  * The syntax of a description file (.ender) is:
  * @code
  * namespace [PREFIX.]NAME {
- *   [ABSTRACT | CLASS] NAME {
- *     [float | color | renderer | unsigned int] NAME;
+ *   (abstract | class) NAME {
+ *     PROPERTY NAME;
  *   }
  * }
+ * Where PROPERTY can be one of the following:
+ * uint | int | double | argb | surface | matrix | LIST
+
+ * Where LIST is defined as:
+ * (PROPERTY [, PROPERTY])
+ *
  * @endcode
  *
  * @section examples Examples

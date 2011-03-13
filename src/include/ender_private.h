@@ -36,9 +36,20 @@ const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_get(const char *name);
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Property *p,
 	Ender_Getter get, Ender_Setter set,
-	Ender_Add add, Ender_Remove remove, Ender_Clear clear);
+	Ender_Add add, Ender_Remove remove, Ender_Clear clear,
+	Eina_Bool relative);
 
 /* the parser */
+typedef struct _Ender_Parser_Property Ender_Parser_Property;
+
+struct _Ender_Parser_Property
+{
+	char *name;
+	Eina_Bool relative;
+	Eina_Array *properties;
+};
+
+Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender_Descriptor * parent);
 void ender_parser_init(void);
 void ender_parser_shutdown(void);
 void ender_parser_parse(const char *file);
