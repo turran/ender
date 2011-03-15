@@ -40,6 +40,7 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, En
 	Eina_Bool relative);
 
 /* the parser */
+typedef struct _Ender_Parser Ender_Parser;
 typedef struct _Ender_Parser_Property Ender_Parser_Property;
 
 struct _Ender_Parser_Property
