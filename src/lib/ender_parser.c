@@ -37,11 +37,6 @@ typedef struct _Ender_Namespace
 	Ender_Library *lib;
 } Ender_Namespace;
 
-struct _Ender_Parser
-{
-	char *file;
-};
-
 static Eina_Hash *_namespaces = NULL;
 static Eina_Hash *_libraries = NULL;
 static Eina_List *_files = NULL;
@@ -158,7 +153,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 }
 
 void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
-		const char *name, Ender_Property *prop)
+		const char *name, Ender_Property *prop, Eina_Bool rel)
 {
 	Ender_Getter get;
 	Ender_Setter set;
@@ -223,7 +218,7 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 			WRN("No clear %s for type %s", func_name, edesc_name);
 		}
 	}
-	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear, EINA_FALSE);
+	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear, rel);
 }
 
 void ender_parser_init(void)
@@ -321,10 +316,12 @@ void ender_parser_parse(const char *file)
 	if (!f) return;
 	/* TODO check that we haven't parsed the file already */
 
+	parser = malloc(sizeof(Ender_Parser));
 	ender_lex_init (&scanner);
 	ender_set_in(f, scanner);
-	ret = ender_parse(scanner, NULL);
+	ret = ender_parse(scanner, parser);
 	ender_lex_destroy(scanner);
+	free(parser);
 	if (!ret)
 	{
 
