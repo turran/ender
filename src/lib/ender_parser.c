@@ -66,7 +66,7 @@ static void _dir_list_cb(const char *name, const char *path, void *data)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender_Descriptor * parent)
+Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender_Descriptor * parent, Ender_Type type)
 {
 	Ender_Descriptor *desc;
 	Ender_Creator creator;
@@ -131,14 +131,20 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 		eina_hash_add(_namespaces, ns, namespace);
 	}
 	/* now the class itself */
-	snprintf(ctor_name, PATH_MAX, "%s_%s_new", namespace->prefix, name);
-	creator = dlsym(namespace->lib->dl_handle, ctor_name);
-	/* an interface? */
-	if (!creator)
+	if (type == ENDER_CLASS)
 	{
-		DBG("No creator found?");
+		snprintf(ctor_name, PATH_MAX, "%s_%s_new", namespace->prefix, name);
+		creator = dlsym(namespace->lib->dl_handle, ctor_name);
+		if (!creator)
+		{
+			DBG("No creator found?");
+		}
 	}
-	desc = ender_descriptor_register(name, creator, parent);
+	else
+	{
+		creator = NULL;
+	}
+	desc = ender_descriptor_register(name, creator, parent, type);
 	if (!desc)
 	{
 		free(namespace->name);

@@ -16,7 +16,8 @@
 %}
 
 %union {
-	Ender_Property_Type type;
+	Ender_Type etype;
+	Ender_Property_Type ptype;
 	Ender_Property *prop;
 	Ender_Descriptor *descriptor;
 	char *s;
@@ -24,19 +25,17 @@
 	Eina_List *list; // use this for every _list nonterminal
 }
 
-%token <type> UINT
-%token <type> INT
-%token <type> ARGB
-%token <type> DOUBLE
-%token <type> IMAGE
-%token <type> SURFACE
-%token <type> COORD
-%token <type> PATH
-%token <type> STRING
-%token <type> MATRIX
-%token <type> ENDER
-%token ABSTRACT
-%token CLASS
+%token <ptype> UINT
+%token <ptype> INT
+%token <ptype> ARGB
+%token <ptype> DOUBLE
+%token <ptype> IMAGE
+%token <ptype> SURFACE
+%token <ptype> STRING
+%token <ptype> MATRIX
+%token <ptype> ENDER
+%token <etype> ABSTRACT
+%token <etype> CLASS
 %token NAMESPACE
 %token REL
 %token USING
@@ -44,7 +43,8 @@
 %type <s>using
 %type <b> type_relative
 %type <prop> type_specifier
-%type <type> basic_type
+%type <ptype> basic_type
+%type <etype> definition
 %type <prop> compound_type
 %type <descriptor> renderer_inheritance
 %%
@@ -92,19 +92,19 @@ renderer_list
 	;
 
 definition
-	: CLASS
-	| ABSTRACT
+	: CLASS { $$ = $1; }
+	| ABSTRACT { $$ = $1; }
 	;
 
 renderer
 	: definition WORD renderer_inheritance
-	{ parser->descriptor = ender_parser_register(parser->ns, $2, $3); }
+	{ parser->descriptor = ender_parser_register(parser->ns, $2, $3, $1); }
 	'{' declaration_list '}' ';'
 	;
 
 renderer_inheritance
 	: { $$ = NULL; }
-	| ':' WORD { $$ = ender_descriptor_get($2); }
+	| ':' WORD { $$ = ender_descriptor_find($2); }
 	;
 
 types

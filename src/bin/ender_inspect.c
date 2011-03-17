@@ -23,13 +23,52 @@ static void _list_cb(const char *name, void *data)
 	printf("%s\n", name);
 }
 
-static void _prop_cb(Ender *e, const char *name, void *data)
+static void _prop_cb(Ender_Descriptor *e, const char *name, void *data)
 {
 	Ender_Property *p;
 
-	p = ender_property_get(e, name);
-	// ender_property_is_relative(p);
-	printf("- %s %d\n", name, ender_property_type(p));
+	p = ender_descriptor_property_get(e, name);
+	//ender_property_is_relative(p);
+	printf("\t%s %s\n", name, ender_property_type_name_get(ender_property_type(p)));
+}
+
+static void _inheritance_dump(Ender_Descriptor *e, int level)
+{
+	int i;
+
+	for (i = 0; i < level; i++)
+		printf("   ");
+	printf("+---- %s\n", ender_descriptor_name_get(e));
+}
+
+static void _descriptor_dump(const char *name)
+{
+	Ender_Descriptor *ed;
+	Ender_Descriptor *parent;
+	int level = 0;
+	Eina_Array *inheritance;
+
+	ed = ender_descriptor_find(name);
+	if (!ed) return;
+
+	printf("Inheritance:\n");
+	parent = ed;
+	inheritance = eina_array_new(1);
+	do 
+	{
+		eina_array_push(inheritance, parent);
+	}
+	while (parent = ender_descriptor_parent(parent));
+	while (parent = eina_array_pop(inheritance))
+	{
+		_inheritance_dump(parent, level);
+		level++;
+	}
+	eina_array_free(inheritance);
+	printf("Information:\n");
+	printf("\ttype = %s\n", ender_type_name_get(ender_descriptor_type(ed)));
+	printf("Properties:\n");
+	ender_descriptor_property_list(ed, _prop_cb, NULL);
 }
 
 int main(int argc, char **argv)
@@ -41,18 +80,11 @@ int main(int argc, char **argv)
 	ender_init();
 	if (argc < 2)
 	{
-		ender_list(_list_cb, NULL);
+		ender_descriptor_list(_list_cb, NULL);
 	}
 	else
 	{
-		Ender *e;
-
-		e = ender_new(argv[1]);
-		if (!e) goto end;
-		ender_property_list(e, _prop_cb, NULL);
-		/* create an ender for the given name, iterate over the
-		 * properties, get the descriptions, etc
-	 	*/
+		_descriptor_dump(argv[1]);
 	}
 end:
 	ender_shutdown();

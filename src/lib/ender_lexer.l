@@ -18,41 +18,48 @@ _operator [\[\]{}.,;=\:]
 
 rel			return REL;
 uint 			{ 
-				yylval_param->type = ENDER_UINT32;
+				yylval_param->ptype = ENDER_UINT32;
 				return UINT;
 			}
 int			{
-				yylval_param->type = ENDER_INT32;
+				yylval_param->ptype = ENDER_INT32;
 				return INT;
 			}
 argb			{
-				yylval_param->type = ENDER_ARGB;
+				yylval_param->ptype = ENDER_ARGB;
 				return ARGB;
 			}
 double			{
-				yylval_param->type = ENDER_DOUBLE;
+				yylval_param->ptype = ENDER_DOUBLE;
 				return DOUBLE;
 			}
-coord			return COORD;
 surface			{
 
-				yylval_param->type = ENDER_SURFACE;
+				yylval_param->ptype = ENDER_SURFACE;
 				return SURFACE;
 			}
 
-path			{ return PATH; }
 string			{
-				yylval_param->type = ENDER_STRING;
+				yylval_param->ptype = ENDER_STRING;
 				return STRING;
 			}
 matrix			{
-				yylval_param->type = ENDER_MATRIX;
+				yylval_param->ptype = ENDER_MATRIX;
 				return MATRIX;
 			}
+ender			{
+				yylval_param->ptype = ENDER_ENDER;
+				return ENDER;
+			}
 namespace		return NAMESPACE;
-ender			return ENDER;
-class			return CLASS;
-abstract		return ABSTRACT;
+class			{
+				yylval_param->etype = ENDER_CLASS;
+				return CLASS;
+			}
+abstract		{
+				yylval_param->etype = ENDER_ABSTRACT;
+				return ABSTRACT;
+			}
 using			return USING;
 [a-zA-Z0-9_]*           {
 				yylval_param->s = strdup(yytext);

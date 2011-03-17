@@ -18,7 +18,10 @@ lib_LTLIBRARIES = libender.la
 libender_la_YFLAGS = -d
 
 libender_la_SOURCES = \
-ender.c \
+ender_descriptor.c \
+ender_element.c \
+ender_main.c \
+ender_misc.c \
 ender_grammar.y \
 ender_lexer.l \
 ender_parser.c
