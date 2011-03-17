@@ -55,6 +55,7 @@ Ender_Property * ender_property_new(Ender_Property_Type t);
 void ender_property_delete(Ender_Property *p);
 void ender_property_add(Ender_Property *p, Ender_Property *sub);
 
+Ender_Descriptor_Property * ender_descriptor_property_get_internal(Ender_Descriptor *e, const char *name);
 Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type);
 void ender_descriptor_unregister(Ender_Descriptor *edesc);

@@ -27,8 +27,10 @@
  *                                  Local                                     *
  *============================================================================*/
 static Eina_Hash *_descriptors = NULL;
-
-static Ender_Descriptor_Property * _property_get(Ender_Descriptor *e, const char *name)
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Ender_Descriptor_Property * ender_descriptor_property_get_internal(Ender_Descriptor *e, const char *name)
 {
 	Ender_Descriptor_Property *prop;
 
@@ -36,11 +38,9 @@ static Ender_Descriptor_Property * _property_get(Ender_Descriptor *e, const char
 	if (prop) return prop;
 	if (!e->parent) return NULL;
 
-	return _property_get(e->parent, name);
+	return ender_descriptor_property_get_internal(e->parent, name);
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
+
 Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type)
 {
@@ -58,7 +58,7 @@ Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator cre
 	desc->parent = parent;
 	desc->create = creator;
 	desc->type = type;
-	desc->properties =  eina_hash_string_superfast_new(NULL);
+	desc->properties = eina_hash_string_superfast_new(NULL);
 
 	eina_hash_add(_descriptors, name, desc);
 	DBG("Descriptor %s added", name);
@@ -201,7 +201,7 @@ EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const 
 {
 	Ender_Descriptor_Property *dprop;
 
-	dprop = _property_get(ed, name);
+	dprop = ender_descriptor_property_get_internal(ed, name);
 	if (!dprop) return NULL;
 
 	return dprop->prop;

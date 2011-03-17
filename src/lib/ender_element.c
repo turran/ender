@@ -172,7 +172,7 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...)
 		Enesim_Surface *surface;
 		Ender *ender;
 
-		prop = ender_descriptor_property_get(e->descriptor, name);
+		prop = ender_descriptor_property_get_internal(e->descriptor, name);
 		if (!prop) break;
 		if (prop->prop->type != ENDER_LIST) break;
 		if (prop->add) prop->add(e->renderer, va_arg(ap, void *));
@@ -192,7 +192,7 @@ EAPI void ender_element_value_clear(Ender *e, const char *name, ...)
 	do
 	{
 		Ender_Descriptor_Property *prop;
-		prop = ender_descriptor_property_get(e->descriptor, name);
+		prop = ender_descriptor_property_get_internal(e->descriptor, name);
 		if (!prop) break;
 		if (prop->prop->type != ENDER_LIST) break;
 		if (prop->clear) prop->clear(e->renderer);
@@ -224,7 +224,7 @@ EAPI void ender_element_value_get(Ender *e, ...)
 		Enesim_Surface *surface;
 		Ender **ender;
 
-		prop = ender_descriptor_property_get(e->descriptor, name);
+		prop = ender_descriptor_property_get_internal(e->descriptor, name);
 		if (!prop) return;
 
 		switch (prop->prop->type)
@@ -297,7 +297,7 @@ EAPI void ender_element_value_set(Ender *e, ...)
 		Enesim_Surface *surface;
 		Ender *ender;
 
-		prop = ender_descriptor_property_get(e->descriptor, name);
+		prop = ender_descriptor_property_get_internal(e->descriptor, name);
 		if (!prop) return;
 
 		switch (prop->prop->type)
@@ -370,7 +370,7 @@ EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value
 	ENDER_MAGIC_CHECK(e);
 	if (!value) return;
 
-	prop = ender_descriptor_property_get(e->descriptor, name);
+	prop = ender_descriptor_property_get_internal(e->descriptor, name);
 	if (!prop) return;
 	switch (prop->prop->type)
 	{
@@ -394,7 +394,7 @@ EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value
 	ENDER_MAGIC_CHECK(e);
 	if (!value) return;
 
-	prop = ender_descriptor_property_get(e->descriptor, name);
+	prop = ender_descriptor_property_get_internal(e->descriptor, name);
 	if (!prop) return;
 	switch (prop->prop->type)
 	{
