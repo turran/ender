@@ -22,7 +22,9 @@ typedef void (*Ender_Clear)(Enesim_Renderer *r);
 typedef void (*Ender_Init)(void);
 typedef void (*Ender_Shutdown)(void);
 
-struct _Ender_Property
+typedef struct _Ender_Property_Container Ender_Property_Container;
+
+struct _Ender_Property_Container
 {
 	Ender_Property_Type type;
 	Eina_Array *sub;
@@ -37,7 +39,7 @@ struct _Ender_Descriptor
 	Eina_Hash *properties;
 };
 
-struct _Ender_Descriptor_Property
+struct _Ender_Property
 {
 	char *name;
 	Ender_Getter get;
@@ -45,26 +47,28 @@ struct _Ender_Descriptor_Property
 	Ender_Add add;
 	Ender_Remove remove;
 	Ender_Clear clear;
-	Ender_Property *prop;
+	Ender_Property_Container *prop;
 	Eina_Bool relative;
 };
 
-typedef struct _Ender_Descriptor_Property Ender_Descriptor_Property;
 
-Ender_Property * ender_property_new(Ender_Property_Type t);
-void ender_property_delete(Ender_Property *p);
-void ender_property_add(Ender_Property *p, Ender_Property *sub);
+Ender_Property * ender_descriptor_property_get_internal(Ender_Descriptor *e, const char *name);
 
-Ender_Descriptor_Property * ender_descriptor_property_get_internal(Ender_Descriptor *e, const char *name);
+/* descriptor */
 Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type);
 void ender_descriptor_unregister(Ender_Descriptor *edesc);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
-void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Property *p,
+void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Property_Container *p,
 	Ender_Getter get, Ender_Setter set,
 	Ender_Add add, Ender_Remove remove, Ender_Clear clear,
 	Eina_Bool relative);
+
+/* property */
+Ender_Property_Container * ender_property_container_new(Ender_Property_Type t);
+void ender_property_container_delete(Ender_Property_Container *p);
+void ender_property_container_add(Ender_Property_Container *p, Ender_Property_Container *sub);
 
 /* the parser */
 typedef struct _Ender_Parser Ender_Parser;

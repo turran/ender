@@ -117,6 +117,7 @@ typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender_Descriptor *e, const char *name, void *data);
 
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
+EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
 EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);
 EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed);
@@ -137,6 +138,14 @@ EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value
 EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value *value);
 
 EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
+
+/**
+ * @}
+ * @defgroup Ender_Property_Group Property Group
+ * @{
+ */
+EAPI Ender_Property_Type ender_property_type(Ender_Property *p);
+EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 
 /**
  * @}

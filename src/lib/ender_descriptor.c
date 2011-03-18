@@ -27,19 +27,22 @@
  *                                  Local                                     *
  *============================================================================*/
 static Eina_Hash *_descriptors = NULL;
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Ender_Descriptor_Property * ender_descriptor_property_get_internal(Ender_Descriptor *e, const char *name)
+
+static Ender_Property * _property_get(Ender_Descriptor *e, const char *name);
+
+static Ender_Property * _property_get(Ender_Descriptor *e, const char *name)
 {
-	Ender_Descriptor_Property *prop;
+	Ender_Property *prop;
 
 	prop = eina_hash_find(e->properties, name);
 	if (prop) return prop;
 	if (!e->parent) return NULL;
 
-	return ender_descriptor_property_get_internal(e->parent, name);
+	return _property_get(e->parent, name);
 }
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
 
 Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type)
@@ -73,11 +76,11 @@ void ender_descriptor_unregister(Ender_Descriptor *edesc)
 }
 
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
-	Ender_Property *prop, Ender_Getter get, Ender_Setter set,
+	Ender_Property_Container *prop, Ender_Getter get, Ender_Setter set,
 	Ender_Add add, Ender_Remove remove, Ender_Clear clear,
 	Eina_Bool relative)
 {
-	Ender_Descriptor_Property *dprop;
+	Ender_Property *dprop;
 
 	dprop = eina_hash_find(edesc->properties, name);
 	if (dprop)
@@ -87,7 +90,7 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 	}
 
 	/* get the getter/setter */
-	dprop = malloc(sizeof(Ender_Descriptor_Property));
+	dprop = malloc(sizeof(Ender_Property));
 	dprop->name = strdup(name);
 	dprop->get = get;
 	dprop->set = set;
@@ -199,10 +202,5 @@ EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
  */
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name)
 {
-	Ender_Descriptor_Property *dprop;
-
-	dprop = ender_descriptor_property_get_internal(ed, name);
-	if (!dprop) return NULL;
-
-	return dprop->prop;
+	return _property_get(ed, name);
 }

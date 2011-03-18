@@ -41,45 +41,9 @@ struct _Ender
 	Eina_Hash *listeners;
 	Ender *parent;
 };
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Property * ender_property_new(Ender_Property_Type t)
-{
-	Ender_Property *prop;
-
-	prop = malloc(sizeof(Ender_Property));
-	prop->type = t;
-	prop->sub = NULL;
-	switch (t)
-	{
-		case ENDER_LIST:
-		prop->sub = eina_array_new(1);
-		break;
-
-		default:
-		break;
-	}
-	return prop;
-}
-
-void ender_property_delete(Ender_Property *d)
-{
-	if (d->sub)
-	{
-		/* call the delete for each descriptor */
-	}
-	free(d);
-}
-
-void ender_property_add(Ender_Property *d, Ender_Property *sub)
-{
-	if (d->type != ENDER_LIST) return;
-	if (!d->sub) return;
-	eina_array_push(d->sub, sub);
-}
-
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -160,7 +124,7 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...)
 	va_start(ap, name);
 	do
 	{
-		Ender_Descriptor_Property *prop;
+		Ender_Property *prop;
 		uint32_t *u32;
 		int32_t *i32;
 		double *d;
@@ -172,7 +136,7 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...)
 		Enesim_Surface *surface;
 		Ender *ender;
 
-		prop = ender_descriptor_property_get_internal(e->descriptor, name);
+		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) break;
 		if (prop->prop->type != ENDER_LIST) break;
 		if (prop->add) prop->add(e->renderer, va_arg(ap, void *));
@@ -191,8 +155,8 @@ EAPI void ender_element_value_clear(Ender *e, const char *name, ...)
 	va_start(ap, name);
 	do
 	{
-		Ender_Descriptor_Property *prop;
-		prop = ender_descriptor_property_get_internal(e->descriptor, name);
+		Ender_Property *prop;
+		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) break;
 		if (prop->prop->type != ENDER_LIST) break;
 		if (prop->clear) prop->clear(e->renderer);
@@ -212,7 +176,7 @@ EAPI void ender_element_value_get(Ender *e, ...)
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{
-		Ender_Descriptor_Property *prop;
+		Ender_Property *prop;
 		uint32_t *u32;
 		int32_t *i32;
 		double *d;
@@ -224,7 +188,7 @@ EAPI void ender_element_value_get(Ender *e, ...)
 		Enesim_Surface *surface;
 		Ender **ender;
 
-		prop = ender_descriptor_property_get_internal(e->descriptor, name);
+		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) return;
 
 		switch (prop->prop->type)
@@ -285,7 +249,7 @@ EAPI void ender_element_value_set(Ender *e, ...)
 	va_start(ap, e);
 	while ((name = va_arg(ap, char *)))
 	{
-		Ender_Descriptor_Property *prop;
+		Ender_Property *prop;
 		uint32_t u32;
 		int32_t i32;
 		double d;
@@ -297,7 +261,7 @@ EAPI void ender_element_value_set(Ender *e, ...)
 		Enesim_Surface *surface;
 		Ender *ender;
 
-		prop = ender_descriptor_property_get_internal(e->descriptor, name);
+		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) return;
 
 		switch (prop->prop->type)
@@ -365,12 +329,12 @@ EAPI void ender_element_value_set(Ender *e, ...)
  */
 EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value *value)
 {
-	Ender_Descriptor_Property *prop;
+	Ender_Property *prop;
 
 	ENDER_MAGIC_CHECK(e);
 	if (!value) return;
 
-	prop = ender_descriptor_property_get_internal(e->descriptor, name);
+	prop = ender_descriptor_property_get(e->descriptor, name);
 	if (!prop) return;
 	switch (prop->prop->type)
 	{
@@ -389,12 +353,12 @@ EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value
  */
 EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value *value)
 {
-	Ender_Descriptor_Property *prop;
+	Ender_Property *prop;
 
 	ENDER_MAGIC_CHECK(e);
 	if (!value) return;
 
-	prop = ender_descriptor_property_get_internal(e->descriptor, name);
+	prop = ender_descriptor_property_get(e->descriptor, name);
 	if (!prop) return;
 	switch (prop->prop->type)
 	{
@@ -418,10 +382,18 @@ EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value
  */
 EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name)
 {
-	Ender_Descriptor_Property *dprop;
+	Ender_Property *prop;
 
 	ENDER_MAGIC_CHECK(e);
-	return ender_descriptor_property_get(e->descriptor, name);
+	prop = ender_descriptor_property_get(e->descriptor, name);
+	if (prop) return prop;
+	/* now check relative proprties */
+	if (!e->parent) return NULL;
+
+	prop = ender_descriptor_property_get(e->parent->descriptor, name);
+	if (!prop->relative) return NULL;
+
+	return prop;
 }
 
 /**
@@ -508,21 +480,3 @@ EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_dat
 	eina_iterator_free(it);
 
 }
-
-/**
- *
- */
-EAPI Ender_Property_Type ender_property_type(Ender_Property *p)
-{
-	return p->type;
-}
-
-/**
- *
- */
-EAPI const Eina_Array * ender_property_sub(Ender_Property *p)
-{
-	return p->sub;
-}
-
-

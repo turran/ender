@@ -21,6 +21,7 @@ libender_la_SOURCES = \
 ender_descriptor.c \
 ender_element.c \
 ender_main.c \
+ender_property.c \
 ender_misc.c \
 ender_grammar.y \
 ender_lexer.l \

@@ -159,7 +159,7 @@ Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender
 }
 
 void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
-		const char *name, Ender_Property *prop, Eina_Bool rel)
+		const char *name, Ender_Property_Container *prop, Eina_Bool rel)
 {
 	Ender_Getter get;
 	Ender_Setter set;
@@ -197,7 +197,7 @@ void ender_parser_property_add(const char *ns, Ender_Descriptor *edesc,
 		WRN("No setter %s for type %s", func_name, edesc_name);
 	}
 	/* in case of a compound property, also try to get the add/remove/clear */
-	if (ender_property_type(prop) == ENDER_LIST)
+	if (prop->type == ENDER_LIST)
 	{
 		/* the add */
 		strncpy(func_name, prefix, PATH_MAX);

@@ -18,7 +18,7 @@
 %union {
 	Ender_Type etype;
 	Ender_Property_Type ptype;
-	Ender_Property *prop;
+	Ender_Property_Container *prop;
 	Ender_Descriptor *descriptor;
 	char *s;
 	Eina_Bool b;
@@ -127,12 +127,12 @@ basic_type
 compound_type
 	: '[' types ']'
 	{
-		$$ = ender_property_new(ENDER_LIST);
+		$$ = ender_property_container_new(ENDER_LIST);
 	}
 	;
 
 type_specifier
-	: basic_type { $$ = ender_property_new($1); }
+	: basic_type { $$ = ender_property_container_new($1); }
 	| compound_type { $$ = $1; }
 	;
 

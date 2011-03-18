@@ -28,8 +28,7 @@ static void _prop_cb(Ender_Descriptor *e, const char *name, void *data)
 	Ender_Property *p;
 
 	p = ender_descriptor_property_get(e, name);
-	//ender_property_is_relative(p);
-	printf("\t%s %s\n", name, ender_property_type_name_get(ender_property_type(p)));
+	printf("\t%s%s %s\n", ender_property_is_relative(p) ? "rel " : "", name, ender_property_type_name_get(ender_property_type(p)));
 }
 
 static void _inheritance_dump(Ender_Descriptor *e, int level)
