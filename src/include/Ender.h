@@ -116,6 +116,7 @@ typedef struct _Ender_Descriptor Ender_Descriptor;
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender_Descriptor *e, const char *name, void *data);
 
+EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
 EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);
@@ -130,6 +131,7 @@ EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed);
 EAPI Ender * ender_element_new(const char *name);
 EAPI void ender_element_delete(Ender *e);
 EAPI const char * ender_element_name_get(Ender *e);
+EAPI Ender_Descriptor * ender_element_descriptor_get(Ender *e);
 
 EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name);
 EAPI void ender_element_value_get(Ender *e, ...);
@@ -146,6 +148,7 @@ EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
  */
 EAPI Ender_Property_Type ender_property_type(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
+EAPI const char * ender_property_name_get(Ender_Property *p);
 
 /**
  * @}

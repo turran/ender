@@ -84,4 +84,10 @@ EAPI const Eina_Array * ender_property_sub(Ender_Property *p)
 	return p->prop->sub;
 }
 
-
+/**
+ *
+ */
+EAPI const char * ender_property_name_get(Ender_Property *p)
+{
+	return p->name;
+}
