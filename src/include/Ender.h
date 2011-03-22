@@ -134,10 +134,12 @@ EAPI const char * ender_element_name_get(Ender *e);
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender *e);
 
 EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name);
-EAPI void ender_element_value_get(Ender *e, ...);
-EAPI void ender_element_value_set(Ender *e, ...);
+EAPI void ender_element_value_get(Ender *e, const char *name, ...);
 EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value *value);
+EAPI void ender_element_value_set(Ender *e, const char *name, ...);
 EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value *value);
+EAPI void ender_element_value_add(Ender *e, const char *name, ...);
+EAPI void ender_element_value_clear(Ender *e, const char *name);
 
 EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
 

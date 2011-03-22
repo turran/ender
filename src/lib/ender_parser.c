@@ -272,13 +272,26 @@ void ender_parser_shutdown(void)
 	/* TODO actually delete the hashes contents */
 	eina_hash_free(_libraries);
 	eina_hash_free(_namespaces);
+	/* TODO free the list of files */
 }
 
 FILE * ender_parser_locate(const char *file)
 {
+	Eina_List *l;
+	char *file_parsed;
 	FILE *f;
 	struct stat st;
 	char complete[PATH_MAX];
+
+#if 0
+	/* check that we haven't parse the file already */
+	EINA_LIST_FOREACH (_files, l, file_parsed)
+	{
+		printf("already located %s\n", file_parsed);
+		if (!strcmp(file, file_parsed))
+			return NULL;
+	}
+#endif
 
 	strcpy(complete, file);
 	if (strcmp(complete + strlen(complete) - 6, ".ender"))
@@ -320,18 +333,18 @@ void ender_parser_parse(const char *file)
 
 	f = ender_parser_locate(file);
 	if (!f) return;
-	/* TODO check that we haven't parsed the file already */
 
 	parser = malloc(sizeof(Ender_Parser));
 	ender_lex_init (&scanner);
 	ender_set_in(f, scanner);
-	ret = ender_parse(scanner, parser);
+	if (!ender_parse(scanner, parser))
+	{
+		DBG("Parsed file %s correctly", file);
+		_files = eina_list_append(_files, strdup(file));
+	}
+
 	ender_lex_destroy(scanner);
 	free(parser);
-	if (!ret)
-	{
-
-	}
 	fclose(f);
 }
 /*============================================================================*

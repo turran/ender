@@ -160,22 +160,6 @@ EAPI Eina_Bool ender_descriptor_exists(const char *name)
 /**
  *
  */
-EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data)
-{
-	Eina_Iterator *it;
-	char *name;
-
-	it = eina_hash_iterator_key_new(ed->properties);
-	while (eina_iterator_next(it, (void **)&name))
-	{
-		cb(ed, name, data);
-	}
-	eina_iterator_free(it);
-}
-
-/**
- *
- */
 EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed)
 {
 	return ed->type;
@@ -196,6 +180,23 @@ EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
 {
 	return edesc->parent;
 }
+
+/**
+ *
+ */
+EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data)
+{
+	Eina_Iterator *it;
+	char *name;
+
+	it = eina_hash_iterator_key_new(ed->properties);
+	while (eina_iterator_next(it, (void **)&name))
+	{
+		cb(ed, name, data);
+	}
+	eina_iterator_free(it);
+}
+
 
 /**
  *

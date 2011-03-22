@@ -41,6 +41,51 @@ struct _Ender
 	Eina_Hash *listeners;
 	Ender *parent;
 };
+
+static void _property_local_value_set(Ender *e, Ender_Property *p,
+		Ender_Value *v)
+{
+	switch (p->prop->type)
+	{
+		case ENDER_MATRIX:
+		p->set(e->renderer, v);
+		break;
+
+		case ENDER_ENDER:
+		v->ender->parent = e;
+		p->set(e->renderer, *v);
+		break;
+
+		default:
+		p->set(e->renderer, *v);
+		break;
+	}
+}
+
+static void _property_relative_value_set(Ender *e, Ender_Property *p,
+		Ender_Value *v)
+{
+	switch (p->prop->type)
+	{
+		case ENDER_MATRIX:
+		p->set(e->parent->renderer, e, v);
+		break;
+
+		case ENDER_ENDER:
+		p->set(e->parent->renderer, e, *v);
+		break;
+
+		default:
+		p->set(e->parent->renderer, e, *v);
+		break;
+	}
+}
+
+static void _property_value_set(Ender *e, Ender_Property *p, Ender_Value *v)
+{
+	if (p->relative) _property_relative_value_set(e, p, v);
+	else _property_local_value_set(e, p, v);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -78,7 +123,7 @@ EAPI Ender * ender_element_new(const char *name)
 		return NULL;
 	}
 
-	ender = malloc(sizeof(Ender));
+	ender = calloc(1, sizeof(Ender));
 	EINA_MAGIC_SET(ender, ENDER_MAGIC);
 	ender->renderer = renderer;
 	ender->descriptor = desc;
@@ -125,17 +170,6 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...)
 	do
 	{
 		Ender_Property *prop;
-		uint32_t *u32;
-		int32_t *i32;
-		double *d;
-		Enesim_Color *color;
-		char **string;
-		Enesim_Matrix *matrix;
-		Enesim_Renderer **renderer;
-		Eina_List *list;
-		Enesim_Surface *surface;
-		Ender *ender;
-
 		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) break;
 		if (prop->prop->type != ENDER_LIST) break;
@@ -147,34 +181,27 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...)
 /**
  *
  */
-EAPI void ender_element_value_clear(Ender *e, const char *name, ...)
+EAPI void ender_element_value_clear(Ender *e, const char *name)
+{
+	Ender_Property *prop;
+
+	ENDER_MAGIC_CHECK(e);
+	prop = ender_descriptor_property_get(e->descriptor, name);
+	if (!prop) return;
+	if (prop->prop->type != ENDER_LIST) return;
+	if (prop->clear) prop->clear(e->renderer);
+}
+
+/**
+ *
+ */
+EAPI void ender_element_value_get(Ender *e, const char *name, ...)
 {
 	va_list ap;
 
 	ENDER_MAGIC_CHECK(e);
 	va_start(ap, name);
 	do
-	{
-		Ender_Property *prop;
-		prop = ender_descriptor_property_get(e->descriptor, name);
-		if (!prop) break;
-		if (prop->prop->type != ENDER_LIST) break;
-		if (prop->clear) prop->clear(e->renderer);
-	} while ((name = va_arg(ap, char *)));
-	va_end(ap);
-}
-
-/**
- *
- */
-EAPI void ender_element_value_get(Ender *e, ...)
-{
-	va_list ap;
-	char *name;
-
-	ENDER_MAGIC_CHECK(e);
-	va_start(ap, e);
-	while ((name = va_arg(ap, char *)))
 	{
 		Ender_Property *prop;
 		uint32_t *u32;
@@ -232,24 +259,55 @@ EAPI void ender_element_value_get(Ender *e, ...)
 			ender = va_arg(ap, Ender **);
 			prop->set(e->renderer, ender);
 			break;
+
+			default:
+			ERR("Unsupported data type %d", prop->prop->type);
+			break;
+			
 		}
-	}
+	} while ((name = va_arg(ap, char *)));
 	va_end(ap);
 }
 
 /**
  *
  */
-EAPI void ender_element_value_set(Ender *e, ...)
+EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value *value)
 {
-	va_list ap;
-	char *name;
+	Ender_Property *prop;
 
 	ENDER_MAGIC_CHECK(e);
-	va_start(ap, e);
-	while ((name = va_arg(ap, char *)))
+	if (!value) return;
+
+	prop = ender_descriptor_property_get(e->descriptor, name);
+	if (!prop) return;
+	switch (prop->prop->type)
+	{
+		case ENDER_MATRIX:
+		prop->get(e->renderer, &value);
+		break;
+
+		default:
+		prop->get(e->renderer, value);
+		break;
+	}
+}
+
+
+/**
+ *
+ */
+EAPI void ender_element_value_set(Ender *e, const char *name, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+	va_start(ap, name);
+	do
 	{
 		Ender_Property *prop;
+		Ender_Value *v;
+
 		uint32_t u32;
 		int32_t i32;
 		double d;
@@ -261,7 +319,7 @@ EAPI void ender_element_value_set(Ender *e, ...)
 		Enesim_Surface *surface;
 		Ender *ender;
 
-		prop = ender_descriptor_property_get(e->descriptor, name);
+		prop = ender_element_property_get(e, name);
 		if (!prop) return;
 
 		switch (prop->prop->type)
@@ -319,33 +377,14 @@ EAPI void ender_element_value_set(Ender *e, ...)
 			list = va_arg(ap, Eina_List *);
 			prop->set(e->renderer, list);
 			break;
+
+			default:
+			ERR("Unsupported data type %d", prop->prop->type);
+			break;
 		}
-	}
+		//_property_value_set(e, prop, value);
+	} while ((name = va_arg(ap, char *)));
 	va_end(ap);
-}
-
-/**
- *
- */
-EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value *value)
-{
-	Ender_Property *prop;
-
-	ENDER_MAGIC_CHECK(e);
-	if (!value) return;
-
-	prop = ender_descriptor_property_get(e->descriptor, name);
-	if (!prop) return;
-	switch (prop->prop->type)
-	{
-		case ENDER_MATRIX:
-		prop->get(e->renderer, &value);
-		break;
-
-		default:
-		prop->get(e->renderer, value);
-		break;
-	}
 }
 
 /**
@@ -358,23 +397,9 @@ EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value
 	ENDER_MAGIC_CHECK(e);
 	if (!value) return;
 
-	prop = ender_descriptor_property_get(e->descriptor, name);
+	prop = ender_element_property_get(e, name);
 	if (!prop) return;
-	switch (prop->prop->type)
-	{
-		case ENDER_MATRIX:
-		prop->set(e->renderer, value);
-		break;
-
-		case ENDER_ENDER:
-		value->ender->parent = e;
-		prop->set(e->renderer, *value);
-		break;
-
-		default:
-		prop->set(e->renderer, *value);
-		break;
-	}
+	_property_value_set(e, prop, value);
 }
 
 /**
