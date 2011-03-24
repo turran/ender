@@ -47,9 +47,17 @@ matrix			{
 				yylval_param->ptype = ENDER_MATRIX;
 				return MATRIX;
 			}
+renderer		{
+				yylval_param->ptype = ENDER_RENDERER;
+				return RENDERER;
+			}
 ender			{
 				yylval_param->ptype = ENDER_ENDER;
 				return ENDER;
+			}
+struct			{
+				yylval_param->ptype = ENDER_STRUCT;
+				return STRUCT;
 			}
 namespace		return NAMESPACE;
 class			{
@@ -61,6 +69,32 @@ abstract		{
 				return ABSTRACT;
 			}
 using			return USING;
+
+(\"[^\"]*\")* {
+	char *tmp = NULL;
+	int i = 0;
+
+	yylval_param->s = (char *)calloc(yyleng - 1, sizeof(char));
+
+	for (i = 0; i < yyleng; i++) {
+		if (yytext[i] == '"') {
+			if (tmp != NULL) {
+				yytext[i] = '\0';
+				strcat(yylval_param->s, tmp);
+				tmp = NULL;
+			}
+			continue;
+		}
+
+		if (tmp == NULL)
+			tmp = yytext + i;
+	}
+	if (tmp != NULL)
+	    strcat(yylval_param->s, tmp);
+
+	return INLINE_STRING;
+}
+
 [a-zA-Z0-9_]*           {
 				yylval_param->s = strdup(yytext);
 				return WORD;

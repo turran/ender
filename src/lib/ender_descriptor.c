@@ -76,7 +76,7 @@ void ender_descriptor_unregister(Ender_Descriptor *edesc)
 }
 
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
-	Ender_Property_Container *prop, Ender_Getter get, Ender_Setter set,
+	Ender_Container *prop, Ender_Getter get, Ender_Setter set,
 	Ender_Add add, Ender_Remove remove, Ender_Clear clear,
 	Eina_Bool relative)
 {
@@ -110,6 +110,7 @@ void ender_descriptor_init(void)
 
 void ender_descriptor_shutdown(void)
 {
+	/* TODO remove every descriptor */
 	eina_hash_free(_descriptors);
 }
 /*============================================================================*

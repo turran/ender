@@ -1,3 +1,20 @@
+/* ENDER - Enesim's descriptor library
+ * Copyright (C) 2010 Jorge Luis Zapata
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef _ENDER_PRIVATE_H
 #define _ENDER_PRIVATE_H
 
@@ -22,12 +39,15 @@ typedef void (*Ender_Clear)(Enesim_Renderer *r);
 typedef void (*Ender_Init)(void);
 typedef void (*Ender_Shutdown)(void);
 
-typedef struct _Ender_Property_Container Ender_Property_Container;
-
-struct _Ender_Property_Container
+struct _Ender_Container
 {
+	/* common */
 	Ender_Property_Type type;
-	Eina_Array *sub;
+	/* structs */
+	int num_elements;
+	Eina_List *elements;
+	/* inner element */
+	ssize_t offset;
 };
 
 struct _Ender_Descriptor
@@ -47,7 +67,7 @@ struct _Ender_Property
 	Ender_Add add;
 	Ender_Remove remove;
 	Ender_Clear clear;
-	Ender_Property_Container *prop;
+	Ender_Container *prop;
 	Eina_Bool relative;
 };
 
@@ -60,15 +80,15 @@ Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator cre
 void ender_descriptor_unregister(Ender_Descriptor *edesc);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
-void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Property_Container *p,
+void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Container *p,
 	Ender_Getter get, Ender_Setter set,
 	Ender_Add add, Ender_Remove remove, Ender_Clear clear,
 	Eina_Bool relative);
 
 /* property */
-Ender_Property_Container * ender_property_container_new(Ender_Property_Type t);
-void ender_property_container_delete(Ender_Property_Container *p);
-void ender_property_container_add(Ender_Property_Container *p, Ender_Property_Container *sub);
+Ender_Container * ender_container_new(Ender_Property_Type t);
+void ender_property_container_delete(Ender_Container *p);
+void ender_container_add(Ender_Container *p, Ender_Container *sub);
 
 /* the parser */
 typedef struct _Ender_Parser Ender_Parser;

@@ -81,6 +81,7 @@ typedef enum _Ender_Property_Type
 	ENDER_ENDER,
 	/* compound types */
 	ENDER_LIST,
+	ENDER_STRUCT,
 	ENDER_PROPERTY_TYPES,
 } Ender_Property_Type;
 
@@ -113,6 +114,7 @@ EAPI void ender_shutdown(void);
  * @{
  */
 typedef struct _Ender_Descriptor Ender_Descriptor;
+
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender_Descriptor *e, const char *name, void *data);
 
@@ -122,7 +124,8 @@ EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const 
 EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);
 EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed);
-
+EAPI const char * ender_descriptor_name_get(Ender_Descriptor *ed);
+EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *ed);
 /**
  * @}
  * @defgroup Ender_Element_Group Element Group
@@ -154,6 +157,22 @@ EAPI const char * ender_property_name_get(Ender_Property *p);
 
 /**
  * @}
+ * @defgroup Ender_Container_Group Container Group
+ * @{
+ */
+
+typedef struct _Ender_Container Ender_Container;
+
+EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
+EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
+EAPI size_t ender_container_size_get(Ender_Container *ec);
+EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
+EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
+EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub);
+EAPI Ender_Property_Type ender_container_type(Ender_Container *c);
+
+/**
+ * @}
  * @defgroup Ender_Other_Group Other Group
  * @{
  */
@@ -161,9 +180,6 @@ EAPI const char * ender_property_name_get(Ender_Property *p);
 EAPI void ender_event_listener_add(Ender *e, const char *event_name, Ender_Event_Callback cb, void *data);
 EAPI void ender_event_listener_remove(Ender *e, const char *event_name, Ender_Event_Callback cb);
 EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_data);
-
-EAPI Ender_Property_Type ender_property_type(Ender_Property *p);
-EAPI const Eina_Array * ender_property_sub(Ender_Property *p);
 
 /**
  * @}

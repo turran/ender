@@ -42,6 +42,25 @@ struct _Ender
 	Ender *parent;
 };
 
+/* we only support or an ender or a list of enders */
+static void _property_sets_parent(Ender *e, Ender_Property *p,
+		Ender_Value *v)
+{
+	if (p->prop->type == ENDER_ENDER)
+	{
+		v->ender->parent = e;
+	}
+	else if (p->prop->type == ENDER_LIST)
+	{
+		Ender_Container *ec;
+
+		ec = ender_container_compound_get(p->prop, 0);
+		if (ec && ec->type == ENDER_ENDER)
+			v->ender->parent = e;
+		
+	}
+}
+
 static void _property_local_value_set(Ender *e, Ender_Property *p,
 		Ender_Value *v)
 {
@@ -49,11 +68,6 @@ static void _property_local_value_set(Ender *e, Ender_Property *p,
 	{
 		case ENDER_MATRIX:
 		p->set(e->renderer, v);
-		break;
-
-		case ENDER_ENDER:
-		v->ender->parent = e;
-		p->set(e->renderer, *v);
 		break;
 
 		default:
@@ -65,14 +79,13 @@ static void _property_local_value_set(Ender *e, Ender_Property *p,
 static void _property_relative_value_set(Ender *e, Ender_Property *p,
 		Ender_Value *v)
 {
+	/* first set the parent property */
+	_property_sets_parent(e, p, v);
+	/* now the value itself */
 	switch (p->prop->type)
 	{
 		case ENDER_MATRIX:
 		p->set(e->parent->renderer, e, v);
-		break;
-
-		case ENDER_ENDER:
-		p->set(e->parent->renderer, e, *v);
 		break;
 
 		default:
@@ -170,10 +183,66 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...)
 	do
 	{
 		Ender_Property *prop;
+		Ender_Container *ec;
+		uint32_t u32;
+		int32_t i32;
+		double d;
+		Enesim_Color color;
+		char *string;
+		Enesim_Matrix *matrix;
+		Enesim_Renderer *renderer;
+		Eina_List *list;
+		Enesim_Surface *surface;
+		Ender *ender;
+
 		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) break;
 		if (prop->prop->type != ENDER_LIST) break;
-		if (prop->add) prop->add(e->renderer, va_arg(ap, void *));
+
+		ec = ender_container_compound_get(prop->prop, 0);
+		switch (ec->type)
+		{
+			case ENDER_ENDER:
+			ender = va_arg(ap, Ender *);
+			ender->parent = e;
+			prop->add(e->renderer, ender);
+			break;
+
+			case ENDER_UINT32:
+			u32 = va_arg(ap, uint32_t);
+			prop->add(e->renderer, u32);
+			break;
+
+			case ENDER_INT32:
+			i32 = va_arg(ap, int32_t);
+			prop->add(e->renderer, i32);
+			break;
+
+			case ENDER_DOUBLE:
+			d = va_arg(ap, double);
+			prop->add(e->renderer, d);
+			break;
+
+			case ENDER_ARGB:
+			color = va_arg(ap, Enesim_Color);
+			prop->add(e->renderer, color);
+			break;
+
+			case ENDER_STRING:
+			string = va_arg(ap, char *);
+			prop->add(e->renderer, string);
+			break;
+
+			case ENDER_MATRIX:
+			matrix = va_arg(ap, Enesim_Matrix *);
+			prop->add(e->renderer, matrix);
+			break;
+
+			case ENDER_RENDERER:
+			renderer = va_arg(ap, Enesim_Renderer *);
+			prop->add(e->renderer, renderer);
+			break;
+		}
 	} while ((name = va_arg(ap, char *)));
 	va_end(ap);
 }
@@ -242,7 +311,7 @@ EAPI void ender_element_value_get(Ender *e, const char *name, ...)
 
 			case ENDER_STRING:
 			string = va_arg(ap, char **);
-			prop->set(e->renderer, string);
+			prop->get(e->renderer, string);
 			break;
 
 			case ENDER_MATRIX:
@@ -252,12 +321,12 @@ EAPI void ender_element_value_get(Ender *e, const char *name, ...)
 
 			case ENDER_RENDERER:
 			renderer = va_arg(ap, Enesim_Renderer **);
-			prop->set(e->renderer, renderer);
+			prop->get(e->renderer, renderer);
 			break;
 
 			case ENDER_ENDER:
 			ender = va_arg(ap, Ender **);
-			prop->set(e->renderer, ender);
+			prop->get(e->renderer, ender);
 			break;
 
 			default:
@@ -293,16 +362,8 @@ EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value
 	}
 }
 
-
-/**
- *
- */
-EAPI void ender_element_value_set(Ender *e, const char *name, ...)
+EAPI void ender_element_value_set_valist(Ender *e, const char *name, va_list var_args)
 {
-	va_list ap;
-
-	ENDER_MAGIC_CHECK(e);
-	va_start(ap, name);
 	do
 	{
 		Ender_Property *prop;
@@ -325,56 +386,53 @@ EAPI void ender_element_value_set(Ender *e, const char *name, ...)
 		switch (prop->prop->type)
 		{
 			case ENDER_UINT32:
-			u32 = va_arg(ap, uint32_t);
+			u32 = va_arg(var_args, uint32_t);
 			prop->set(e->renderer, u32);
 			break;
 
 			case ENDER_INT32:
-			i32 = va_arg(ap, int32_t);
+			i32 = va_arg(var_args, int32_t);
 			prop->set(e->renderer, i32);
 			break;
 
 			case ENDER_DOUBLE:
-			d = va_arg(ap, double);
+			d = va_arg(var_args, double);
 			prop->set(e->renderer, d);
 			break;
 
 			case ENDER_ARGB:
-			color = va_arg(ap, Enesim_Color);
+			color = va_arg(var_args, Enesim_Color);
 			prop->set(e->renderer, color);
 			break;
 
 			case ENDER_STRING:
-			string = va_arg(ap, char *);
+			string = va_arg(var_args, char *);
 			prop->set(e->renderer, string);
 			break;
 
 			case ENDER_SURFACE:
-			surface = va_arg(ap, Enesim_Surface *);
+			surface = va_arg(var_args, Enesim_Surface *);
 			prop->set(e->renderer, surface);
 			break;
 
 			case ENDER_MATRIX:
-			matrix = va_arg(ap, Enesim_Matrix *);
+			matrix = va_arg(var_args, Enesim_Matrix *);
 			prop->set(e->renderer, matrix);
 			break;
 
 			case ENDER_RENDERER:
-			renderer = va_arg(ap, Enesim_Renderer *);
+			renderer = va_arg(var_args, Enesim_Renderer *);
 			prop->set(e->renderer, renderer);
 			break;
 
 			case ENDER_ENDER:
-			ender = va_arg(ap, Ender *);
+			ender = va_arg(var_args, Ender *);
 			ender->parent = e;
 			prop->set(e->renderer, ender);
 			break;
 
 			case ENDER_LIST:
-			/* TODO whenever we set a list of enders, the parent must be set
-			 * too
-			 */
-			list = va_arg(ap, Eina_List *);
+			list = va_arg(var_args, Eina_List *);
 			prop->set(e->renderer, list);
 			break;
 
@@ -382,8 +440,19 @@ EAPI void ender_element_value_set(Ender *e, const char *name, ...)
 			ERR("Unsupported data type %d", prop->prop->type);
 			break;
 		}
-		//_property_value_set(e, prop, value);
-	} while ((name = va_arg(ap, char *)));
+	} while ((name = va_arg(var_args, char *)));
+}
+
+/**
+ *
+ */
+EAPI void ender_element_value_set(Ender *e, const char *name, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+	va_start(ap, name);
+	ender_element_value_set_valist(e, name, ap);
 	va_end(ap);
 }
 

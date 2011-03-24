@@ -18,7 +18,7 @@
 %union {
 	Ender_Type etype;
 	Ender_Property_Type ptype;
-	Ender_Property_Container *prop;
+	Ender_Container *prop;
 	Ender_Descriptor *descriptor;
 	char *s;
 	Eina_Bool b;
@@ -33,6 +33,8 @@
 %token <ptype> SURFACE
 %token <ptype> STRING
 %token <ptype> MATRIX
+%token <ptype> STRUCT
+%token <ptype> RENDERER
 %token <ptype> ENDER
 %token <etype> ABSTRACT
 %token <etype> CLASS
@@ -40,13 +42,16 @@
 %token REL
 %token USING
 %token <s> WORD
+%token <s> INLINE_STRING 
 %type <s>using
 %type <b> type_relative
 %type <prop> type_specifier
 %type <ptype> basic_type
 %type <etype> definition
-%type <prop> compound_type
+%type <prop> list_type
+%type <prop> struct_type
 %type <descriptor> renderer_inheritance
+%type <list> types
 %%
 
 main
@@ -60,15 +65,7 @@ main
 
 using
 	: { $$ = NULL; }
-	| USING WORD ';' using { $$ = $2; }
-	;
-
-namespace
-	: NAMESPACE WORD
-	{
-		strcpy(parser->ns, $2);
-	}
-	namespace_name '{' renderer_list '}' ';'
+	| USING INLINE_STRING ';' using { $$ = $2; }
 	;
 
 namespace_list
@@ -76,40 +73,61 @@ namespace_list
 	| namespace namespace_list
 	;
 
-namespace_name
-	:
-	| '.' WORD
+namespace
+	: NAMESPACE INLINE_STRING
 	{
-		strcat(parser->ns, ".");
-                strcat(parser->ns, $2);
+		strcpy(parser->ns, $2);
 	}
-	namespace_name
+	'{' definition_list '}' ';'
 	;
 
-renderer_list
+definition_list
 	:
-	| renderer renderer_list
+	| struct definition_list
+	| renderer definition_list
 	;
+
+struct
+	: STRUCT INLINE_STRING '{' types '}' ';'
+	{
+		Eina_List *l;
+		Ender_Container *c, *sub;
+
+		c = ender_container_new(ENDER_STRUCT);
+		EINA_LIST_FOREACH ($4, l, sub)
+		{
+			ender_container_add(c, sub);
+		}
+		ender_container_register($2, c);
+	}
+	;
+
+renderer
+	: definition INLINE_STRING renderer_inheritance
+	{ parser->descriptor = ender_parser_register(parser->ns, $2, $3, $1); }
+	'{' declaration_list '}' ';'
+	;
+
 
 definition
 	: CLASS { $$ = $1; }
 	| ABSTRACT { $$ = $1; }
 	;
 
-renderer
-	: definition WORD renderer_inheritance
-	{ parser->descriptor = ender_parser_register(parser->ns, $2, $3, $1); }
-	'{' declaration_list '}' ';'
-	;
-
 renderer_inheritance
 	: { $$ = NULL; }
-	| ':' WORD { $$ = ender_descriptor_find($2); }
+	| ':' INLINE_STRING { $$ = ender_descriptor_find($2); }
 	;
 
 types
 	: type_specifier ',' types
+	{
+		$$ = eina_list_prepend($3, $1);
+	}
 	| type_specifier
+	{
+		$$ = eina_list_append(NULL, $1);
+	}
 	;
 
 basic_type
@@ -119,21 +137,27 @@ basic_type
 	| DOUBLE { $$ = $1; }
 	| STRING { $$ = $1; }
 	| SURFACE { $$ = $1; }
-	| WORD { $$ = ENDER_RENDERER; }
+	| RENDERER { $$ = $1; }
 	| ENDER { $$ = $1; }
 	| MATRIX { $$ = $1; }
 	;
 
-compound_type
-	: '[' types ']'
+struct_type
+	: WORD { $$ = ender_container_find($1); }
+	;
+
+list_type
+	: '[' type_specifier ']'
 	{
-		$$ = ender_property_container_new(ENDER_LIST);
+		$$ = ender_container_new(ENDER_LIST);
+		ender_container_add($$, $2);
 	}
 	;
 
 type_specifier
-	: basic_type { $$ = ender_property_container_new($1); }
-	| compound_type { $$ = $1; }
+	: basic_type { $$ = ender_container_new($1); }
+	| struct_type { $$ = $1; }
+	| list_type { $$ = $1; }
 	;
 
 type_relative

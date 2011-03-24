@@ -78,6 +78,9 @@ EAPI const char * ender_property_type_name_get(Ender_Property_Type type)
 		case ENDER_LIST:
 		return "list";
 
+		case ENDER_STRUCT:
+		return "struct";
+
 		default:
 		return NULL;
 	}

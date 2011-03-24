@@ -23,43 +23,16 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Property_Container * ender_property_container_new(Ender_Property_Type t)
-{
-	Ender_Property_Container *prop;
-
-	prop = malloc(sizeof(Ender_Property));
-	prop->type = t;
-	prop->sub = NULL;
-	switch (t)
-	{
-		case ENDER_LIST:
-		prop->sub = eina_array_new(1);
-		break;
-
-		default:
-		break;
-	}
-	return prop;
-}
-
-void ender_property_container_delete(Ender_Property_Container *d)
-{
-	if (d->sub)
-	{
-		/* call the delete for each descriptor */
-	}
-	free(d);
-}
-
-void ender_property_container_add(Ender_Property_Container *d, Ender_Property_Container *sub)
-{
-	if (d->type != ENDER_LIST) return;
-	if (!d->sub) return;
-	eina_array_push(d->sub, sub);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ *
+ */
+EAPI Ender_Container * ender_property_container_get(Ender_Property *p)
+{
+	return p->prop;
+}
 /**
  *
  */
@@ -74,14 +47,6 @@ EAPI Ender_Property_Type ender_property_type(Ender_Property *p)
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p)
 {
 	return p->relative;
-}
-
-/**
- *
- */
-EAPI const Eina_Array * ender_property_sub(Ender_Property *p)
-{
-	return p->prop->sub;
 }
 
 /**

@@ -1,5 +1,5 @@
-namespace enesim {
-	abstract renderer {
+namespace "enesim" {
+	abstract "renderer" {
 		matrix transformation;
 		double x_origin;
 		double y_origin;
@@ -7,8 +7,8 @@ namespace enesim {
 	};
 };
 
-namespace enesim.renderer {
-	abstract shape : renderer {
+namespace "enesim.renderer" {
+	abstract "shape" : "renderer" {
 		double outline_weight;
 		argb outline_color;
 		argb fill_color;
@@ -16,37 +16,41 @@ namespace enesim.renderer {
 		int draw_mode;
 	};
 
-	class rectangle : shape {
+	class "rectangle" : "shape" {
 		uint width;
 		uint height;
 		double corner_radius;
 	};
 
-	class circle : shape {
+	class "circle" : "shape" {
 		double x;
 		double y;
 		double radius;
 	};
 
-	class ellipse : shape {
+	class "ellipse" : "shape" {
 		double x;
 		double y;
 		double x_radius;
 		double y_radius;
 	};
 
-	class figure : shape {
-		[[double, double]] polygon;
+	struct "point" {
+		double, double
 	};
 
-	class checker : renderer {
+	class "figure" : "shape" {
+		[[point]] polygon;
+	};
+
+	class "checker" : "renderer" {
 		uint width;
 		uint height;
 		argb even_color;
 		argb odd_color;
 	};
 
-	class image : renderer {
+	class "image" : "renderer" {
 		surface src;
 		int x;
 		int y;
@@ -54,7 +58,7 @@ namespace enesim.renderer {
 		int h;
 	};
 
-	class dispmap : renderer {
+	class "dispmap" : "renderer" {
 		surface map;
 		surface src;
 		int x_channel;
@@ -62,7 +66,7 @@ namespace enesim.renderer {
 		double factor;
 	};
 
-	class grid : renderer {
+	class "grid" : "renderer" {
 		uint inside_width;
 		uint inside_height;
 		argb inside_color;
@@ -71,14 +75,14 @@ namespace enesim.renderer {
 		argb border_color;
 	};
 
-	class perlin : renderer {
+	class "perlin" : "renderer" {
 		uint octaves;
 		double persistence;
 		double xfrequency;
 		double yfrequency;
 	};
 
-	class raddist : renderer {
+	class "raddist" : "renderer" {
 		surface src;
 		uint x;
 		uint y;
@@ -86,29 +90,33 @@ namespace enesim.renderer {
 		double factor;
 	};
 
-	class stripes : renderer {
+	class "stripes" : "renderer" {
 		double even_thickness;
 		argb even_color;
 		double odd_thickness;
 		argb odd_color;
 	};
 
-	class compound : renderer {
+	class "compound" : "renderer" {
 		[renderer] layer;
 	};
 
-	abstract gradient : renderer {
-		[argb, double] stop;
+	struct "stop" {
+		argb, double
 	};
 
-	class gradient_linear : gradient {
+	abstract "gradient" : "renderer" {
+		[stop] stop;
+	};
+
+	class "gradient_linear" : "gradient" {
 		double x0;
 		double y0;
 		double x1;
 		double y1;
 	};
 
-	class background : renderer {
+	class "background" : "renderer" {
 		argb color;
 	};
 };
