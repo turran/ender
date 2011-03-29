@@ -85,28 +85,56 @@ typedef enum _Ender_Property_Type
 	ENDER_PROPERTY_TYPES,
 } Ender_Property_Type;
 
-typedef union _Ender_Value
-{
-	/* basic types */
-	uint32_t uint32;
-	int32_t int32;
-	double d;
-	Enesim_Color color;
-	char *string;
-	Enesim_Matrix matrix;
-	Enesim_Renderer *renderer;
-	Enesim_Surface *surface;
-	Ender *ender;
-	/* compound types */
-	Eina_List *list;
-} Ender_Value;
-
 /*
  * @defgroup Ender_Main_Group Main
  * @{
  */
 EAPI void ender_init(void);
 EAPI void ender_shutdown(void);
+
+/**
+ * @}
+ * @defgroup Ender_Container_Group Container Group
+ * @{
+ */
+
+typedef struct _Ender_Container Ender_Container;
+
+EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
+EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
+EAPI size_t ender_container_size_get(Ender_Container *ec);
+EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
+EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
+EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub);
+EAPI Ender_Property_Type ender_container_type(Ender_Container *c);
+
+
+/**
+ * @}
+ * @defgroup Ender_Value_Group Value Group
+ * @{
+ */
+
+typedef struct _Ender_Value Ender_Value;
+
+EAPI Ender_Value * ender_basic_new(Ender_Property_Type type);
+EAPI Ender_Value * ender_new_container_from(Ender_Container *container);
+EAPI Ender_Value * ender_list_new(Ender_Property_Type child_type);
+
+EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32);
+EAPI void ender_value_uint32_set(Ender_Value *value, uint32_t u32);
+EAPI void ender_value_double_set(Ender_Value *value, double d);
+EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Color argb);
+EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix);
+EAPI void ender_value_string_set(Ender_Value *value, char * string);
+EAPI void ender_value_const_string_set(Ender_Value *value, const char * string);
+EAPI void ender_value_struct_set(Ender_Value *value, void * structure);
+EAPI void ender_value_const_struct_set(Ender_Value *value, void * structure);
+EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer);
+EAPI void ender_value_ender_set(Ender_Value *value, Ender *ender);
+EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface);
+EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child);
+EAPI void ender_value_free(Ender_Value *v);
 
 /**
  * @}
@@ -154,22 +182,6 @@ EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
 EAPI Ender_Property_Type ender_property_type(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
-
-/**
- * @}
- * @defgroup Ender_Container_Group Container Group
- * @{
- */
-
-typedef struct _Ender_Container Ender_Container;
-
-EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
-EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
-EAPI size_t ender_container_size_get(Ender_Container *ec);
-EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
-EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
-EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub);
-EAPI Ender_Property_Type ender_container_type(Ender_Container *c);
 
 /**
  * @}

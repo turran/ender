@@ -26,7 +26,8 @@ ender_property.c \
 ender_misc.c \
 ender_grammar.y \
 ender_lexer.l \
-ender_parser.c
+ender_parser.c \
+ender_value.c
 
 libender_la_LIBADD = \
 @ENDER_LIBS@ \

@@ -46,6 +46,7 @@ struct _Ender
 static void _property_sets_parent(Ender *e, Ender_Property *p,
 		Ender_Value *v)
 {
+#if 0
 	if (p->prop->type == ENDER_ENDER)
 	{
 		v->ender->parent = e;
@@ -59,11 +60,13 @@ static void _property_sets_parent(Ender *e, Ender_Property *p,
 			v->ender->parent = e;
 		
 	}
+#endif
 }
 
 static void _property_local_value_set(Ender *e, Ender_Property *p,
 		Ender_Value *v)
 {
+#if 0
 	switch (p->prop->type)
 	{
 		case ENDER_MATRIX:
@@ -74,11 +77,13 @@ static void _property_local_value_set(Ender *e, Ender_Property *p,
 		p->set(e->renderer, *v);
 		break;
 	}
+#endif
 }
 
 static void _property_relative_value_set(Ender *e, Ender_Property *p,
 		Ender_Value *v)
 {
+#if 0
 	/* first set the parent property */
 	_property_sets_parent(e, p, v);
 	/* now the value itself */
@@ -92,6 +97,7 @@ static void _property_relative_value_set(Ender *e, Ender_Property *p,
 		p->set(e->parent->renderer, e, *v);
 		break;
 	}
+#endif
 }
 
 static void _property_value_set(Ender *e, Ender_Property *p, Ender_Value *v)
@@ -550,7 +556,6 @@ EAPI void ender_event_listener_remove(Ender *e, const char *name,
 {
 	ENDER_MAGIC_CHECK(e);
 	Ender_Listener *listener;
-
 }
 
 /**
@@ -572,5 +577,4 @@ EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_dat
 		listener->callback(e, event_name, event_data, listener->data);
 	}
 	eina_iterator_free(it);
-
 }
