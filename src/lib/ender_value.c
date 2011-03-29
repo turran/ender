@@ -20,6 +20,11 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef void (*Ender_Value_Set)(Ender_Value *v, Ender_Setter set,
+		Ender *e, Ender *parent, va_list arg);
+typedef void (*Ender_Value_Get)(Ender_Value *v, Ender_Getter get,
+		Ender *e, Ender *parent, va_list arg);
+
 struct _Ender_Value
 {
 	Ender_Container *container;
@@ -40,6 +45,21 @@ static Ender_Value * _ender_value_new(Ender_Container *ec)
 
 	return ev;
 }
+
+
+static void _ender_value_uint32_set(Ender_Value *v, Ender *e, Ender *parent,
+		va_list arg)
+{
+	if (parent)
+		set(parent, e, va_arg(arg, uint32_t));
+}
+
+static _setters[ENDER_PROPERTY_TYPES] = {
+};
+
+static _getters[ENDER_PROPERTY_TYPES] = {
+};
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
