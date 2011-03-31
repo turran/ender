@@ -20,22 +20,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef void (*Ender_Value_Set)(Ender_Value *v, Ender_Setter set,
-		Ender *e, Ender *parent, va_list arg);
-typedef void (*Ender_Value_Get)(Ender_Value *v, Ender_Getter get,
-		Ender *e, Ender *parent, va_list arg);
-
-struct _Ender_Value
-{
-	Ender_Container *container;
-	union {
-		int32_t i32;
-		uint32_t u32;
-		double d;
-		void *ptr;
-	} data;
-};
-
 static Ender_Value * _ender_value_new(Ender_Container *ec)
 {
 	Ender_Value *ev;
@@ -45,28 +29,13 @@ static Ender_Value * _ender_value_new(Ender_Container *ec)
 
 	return ev;
 }
-
-
-static void _ender_value_uint32_set(Ender_Value *v, Ender *e, Ender *parent,
-		va_list arg)
-{
-	if (parent)
-		set(parent, e, va_arg(arg, uint32_t));
-}
-
-static _setters[ENDER_PROPERTY_TYPES] = {
-};
-
-static _getters[ENDER_PROPERTY_TYPES] = {
-};
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Ender_Value * ender_basic_new(Ender_Property_Type type)
+EAPI Ender_Value * ender_value_basic_new(Ender_Property_Type type)
 {
 	Ender_Container *ec;
 	Ender_Value *ev;
@@ -78,14 +47,24 @@ EAPI Ender_Value * ender_basic_new(Ender_Property_Type type)
 	return _ender_value_new(ec);
 }
 
-EAPI Ender_Value * ender_new_container_from(Ender_Container *ec)
+EAPI Ender_Value * ender_value_new_container_from(Ender_Container *ec)
 {
 	return _ender_value_new(ec);	
 }
 
-EAPI Ender_Value * ender_list_new(Ender_Property_Type child_type)
+EAPI Ender_Value * ender_value_list_new(Ender_Property_Type child_type)
 {
 
+}
+
+EAPI Ender_Container * ender_value_container_get(Ender_Value *value)
+{
+	return value->container;
+}
+
+EAPI Ender_Property_Type ender_value_type_get(Ender_Value *value)
+{
+	return value->container->type;
 }
 
 EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32)
@@ -116,12 +95,18 @@ EAPI uint32_t ender_value_uint32_get(Ender_Value *value)
 	return value->data.u32;
 }
 
-
 EAPI void ender_value_double_set(Ender_Value *value, double d)
 {
 	if (value->container->type != ENDER_DOUBLE)
 		return;
 	value->data.d = d;
+}
+
+EAPI double ender_value_double_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_DOUBLE)
+		return 0;
+	return value->data.d;
 }
 
 EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Color argb)
@@ -131,19 +116,55 @@ EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Color argb)
 	value->data.u32 = argb;
 }
 
+EAPI Enesim_Color ender_value_argb_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_ARGB)
+		return 0;
+	return value->data.u32;
+}
+
 EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix)
 {
+	if (value->container->type != ENDER_MATRIX)
+		return;
 
+	value->data.ptr = matrix;
 }
+
+EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix *matrix)
+{
+	Enesim_Matrix *m;
+
+	if (value->container->type != ENDER_MATRIX)
+		return;
+
+	m = malloc(sizeof(Enesim_Matrix));
+	*m = *matrix;
+	value->data.ptr = m;
+	value->owned = EINA_TRUE;
+}
+
+EAPI Enesim_Matrix * ender_value_matrix_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_MATRIX)
+		return NULL;
+
+	return value->data.ptr;
+} 
 
 EAPI void ender_value_string_set(Ender_Value *value, char * string)
 {
-
+	if (value->container->type != ENDER_STRING)
+		return;
+	value->data.ptr = string;
 }
 
-EAPI void ender_value_const_string_set(Ender_Value *value, const char * string)
+EAPI void ender_value_static_string_set(Ender_Value *value, const char * string)
 {
-
+	if (value->container->type != ENDER_STRING)
+		return;
+	value->data.ptr = strdup(string);
+	value->owned = EINA_TRUE;
 }
 
 EAPI void ender_value_struct_set(Ender_Value *value, void * structure)
@@ -176,7 +197,14 @@ EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 
 }
 
-EAPI void ender_value_free(Ender_Value *v)
+EAPI void ender_value_free(Ender_Value *value)
 {
-	free(v);
+	if (value->owned)
+	{
+		if (value->free_cb)
+			value->free_cb(value, value->free_cb_data);
+		else
+			free(value->data.ptr);
+	}
+	free(value);
 }

@@ -31,10 +31,11 @@
 extern int ender_log_dom;
 
 typedef Enesim_Renderer * (*Ender_Creator)(void);
-typedef void (*Ender_Getter)(Enesim_Renderer *r, ...);
-typedef void (*Ender_Setter)(Enesim_Renderer *r, ...);
-typedef void (*Ender_Add)(Enesim_Renderer *r, ...);
-typedef void (*Ender_Remove)(Enesim_Renderer *r, ...);
+typedef void (*Ender_Accessor)(Enesim_Renderer *r, ...);
+typedef Ender_Accessor Ender_Getter;
+typedef Ender_Accessor Ender_Setter;
+typedef Ender_Accessor Ender_Add;
+typedef Ender_Accessor Ender_Remove;
 typedef void (*Ender_Clear)(Enesim_Renderer *r);
 typedef void (*Ender_Init)(void);
 typedef void (*Ender_Shutdown)(void);
@@ -48,6 +49,22 @@ struct _Ender_Container
 	Eina_List *elements;
 	/* inner element */
 	ssize_t offset;
+};
+
+typedef void (*Ender_Value_Free)(Ender_Value *value, void *data);
+
+struct _Ender_Value
+{
+	Ender_Container *container;
+	Ender_Value_Free free_cb;
+	void *free_cb_data;
+	Eina_Bool owned;
+	union {
+		int32_t i32;
+		uint32_t u32;
+		double d;
+		void *ptr;
+	} data;
 };
 
 struct _Ender_Descriptor

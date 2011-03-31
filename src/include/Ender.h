@@ -57,6 +57,7 @@
 
 typedef struct _Ender Ender;
 typedef struct _Ender_Property Ender_Property;
+typedef struct _Ender_Container Ender_Container;
 
 typedef void (*Ender_Event_Callback)(Ender *e, const char *event_name, void *event_data, void *data);
 
@@ -98,8 +99,6 @@ EAPI void ender_shutdown(void);
  * @{
  */
 
-typedef struct _Ender_Container Ender_Container;
-
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
 EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
 EAPI size_t ender_container_size_get(Ender_Container *ec);
@@ -117,23 +116,48 @@ EAPI Ender_Property_Type ender_container_type(Ender_Container *c);
 
 typedef struct _Ender_Value Ender_Value;
 
-EAPI Ender_Value * ender_basic_new(Ender_Property_Type type);
-EAPI Ender_Value * ender_new_container_from(Ender_Container *container);
-EAPI Ender_Value * ender_list_new(Ender_Property_Type child_type);
+EAPI Ender_Value * ender_value_basic_new(Ender_Property_Type type);
+EAPI Ender_Value * ender_value_list_new(Ender_Property_Type child_type);
+EAPI Ender_Value * ender_value_new_container_from(Ender_Container *container);
+EAPI Ender_Container * ender_value_container_get(Ender_Value *value);
+EAPI Ender_Property_Type ender_value_type_get(Ender_Value *value);
 
 EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32);
+EAPI int32_t ender_value_int32_get(Ender_Value *value);
+
 EAPI void ender_value_uint32_set(Ender_Value *value, uint32_t u32);
+EAPI uint32_t ender_value_uint32_get(Ender_Value *value);
+
 EAPI void ender_value_double_set(Ender_Value *value, double d);
+EAPI double ender_value_double_get(Ender_Value *value);
+
 EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Color argb);
+EAPI Enesim_Color ender_value_argb_get(Ender_Value *value);
+
 EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix);
+EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix *matrix);
+EAPI Enesim_Matrix * ender_value_matrix_get(Ender_Value *value);
+
 EAPI void ender_value_string_set(Ender_Value *value, char * string);
-EAPI void ender_value_const_string_set(Ender_Value *value, const char * string);
+EAPI void ender_value_static_string_set(Ender_Value *value, const char * string);
+EAPI char * ender_value_string_get(Ender_Value *value);
+
 EAPI void ender_value_struct_set(Ender_Value *value, void * structure);
 EAPI void ender_value_const_struct_set(Ender_Value *value, void * structure);
+EAPI const void * ender_value_struct_get(Ender_Value *value);
+
 EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer);
+EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value);
+
 EAPI void ender_value_ender_set(Ender_Value *value, Ender *ender);
+EAPI Ender * ender_value_ender_get(Ender_Value *value);
+
 EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface);
+EAPI Enesim_Surface * ender_value_surface_get(Ender_Value *value);
+
 EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child);
+
+
 EAPI void ender_value_free(Ender_Value *v);
 
 /**
@@ -165,11 +189,18 @@ EAPI const char * ender_element_name_get(Ender *e);
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender *e);
 
 EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name);
+
 EAPI void ender_element_value_get(Ender *e, const char *name, ...);
 EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value *value);
+
 EAPI void ender_element_value_set(Ender *e, const char *name, ...);
+EAPI void ender_element_value_set_valist(Ender *e, const char *name, va_list var_args);
 EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value *value);
+
 EAPI void ender_element_value_add(Ender *e, const char *name, ...);
+EAPI void ender_element_value_add_valist(Ender *e, const char *name, va_list var_args);
+EAPI void ender_element_value_add_simple(Ender *e, const char *name, Ender_Value *value);
+
 EAPI void ender_element_value_clear(Ender *e, const char *name);
 
 EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
