@@ -27,9 +27,8 @@
 			EINA_MAGIC_FAIL(d, ENDER_MAGIC);		\
 	} while(0)
 
-#define ENDER_VALUE_COLLECT(v, cnt, thiz, parent, args)			\
+#define ENDER_VALUE_COLLECT(v, cnt, args)				\
 	{								\
-									\
 		v.container = cnt;					\
 		switch (cnt->type)					\
 		{							\
@@ -167,10 +166,18 @@ static Ender_Value_Accessor _relative_accessors[ENDER_PROPERTY_TYPES] = {
 	[ENDER_STRUCT] = _ender_relative_pointer_set,
 };
 
-static void _value_set(Ender_Value *v, Ender_Setter set, Ender *e, Ender *parent)
+static void _value_set(Ender_Value *v, Ender_Setter set, Ender *e,
+		Ender *parent, Eina_Bool relative)
 {
-	if (parent) _relative_accessors[v->container->type](v, set, e, NULL);
-	else _accessors[v->container->type](v, set, e, parent);
+	if (relative)
+	{
+		if (parent) _relative_accessors[v->container->type](v, set, e, parent);
+		else WRN("Trying to set a relative property with no parent");
+	}
+	else
+	{
+		_accessors[v->container->type](v, set, e, NULL);
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -261,8 +268,8 @@ EAPI void ender_element_value_add_valist(Ender *e, const char *name, va_list var
 		if (prop->prop->type != ENDER_LIST) break;
 		ec = ender_container_compound_get(prop->prop, 0);
 
-		ENDER_VALUE_COLLECT(v, ec, e, e->parent, var_args);
-		_value_set(&v, prop->add, e, e->parent);
+		ENDER_VALUE_COLLECT(v, ec, var_args);
+		_value_set(&v, prop->add, e, e->parent, prop->relative);
 		name = va_arg(var_args, char *);
 	} 
 }
@@ -293,7 +300,7 @@ EAPI void ender_element_value_add_simple(Ender *e, const char *name, Ender_Value
 
 	prop = ender_element_property_get(e, name);
 	if (!prop) return;
-	_value_set(value, prop->add, e, e->parent);
+	_value_set(value, prop->add, e, e->parent, prop->relative);
 }
 
 /**
@@ -426,8 +433,8 @@ EAPI void ender_element_value_set_valist(Ender *e, const char *name, va_list var
 		prop = ender_element_property_get(e, name);
 		if (!prop) return;
 
-		ENDER_VALUE_COLLECT(v, prop->prop, e, e->parent, var_args);
-		_value_set(&v, prop->set, e, e->parent);
+		ENDER_VALUE_COLLECT(v, prop->prop, var_args);
+		_value_set(&v, prop->set, e, e->parent, prop->relative);
 		name = va_arg(var_args, char *);
 	} 
 }
@@ -458,7 +465,7 @@ EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value
 
 	prop = ender_element_property_get(e, name);
 	if (!prop) return;
-	_value_set(value, prop->set, e, e->parent);
+	_value_set(value, prop->set, e, e->parent, prop->relative);
 }
 
 /**
