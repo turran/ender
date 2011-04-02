@@ -49,7 +49,7 @@ EAPI void ender_init(void)
  */
 EAPI void ender_shutdown(void)
 {
-	if (!_init == 1)
+	if (_init == 1)
 	{
 		ender_parser_shutdown();
 		ender_container_shutdown();

@@ -3,6 +3,7 @@ namespace "enesim" {
 		matrix transformation;
 		double x_origin;
 		double y_origin;
+		argb color;
 		int rop;
 	};
 };

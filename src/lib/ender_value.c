@@ -167,6 +167,13 @@ EAPI void ender_value_static_string_set(Ender_Value *value, const char * string)
 	value->owned = EINA_TRUE;
 }
 
+EAPI char * ender_value_string_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_STRING)
+		return NULL;
+	return value->data.ptr;
+}
+
 EAPI void ender_value_struct_set(Ender_Value *value, void * structure)
 {
 
