@@ -320,13 +320,10 @@ EAPI void ender_element_value_clear(Ender *e, const char *name)
 /**
  *
  */
-EAPI void ender_element_value_get(Ender *e, const char *name, ...)
+EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var_args)
 {
-	va_list ap;
-
 	ENDER_MAGIC_CHECK(e);
-	va_start(ap, name);
-	do
+	while (name)
 	{
 		Ender_Property *prop;
 		uint32_t *u32;
@@ -346,42 +343,42 @@ EAPI void ender_element_value_get(Ender *e, const char *name, ...)
 		switch (prop->prop->type)
 		{
 			case ENDER_UINT32:
-			u32 = va_arg(ap, uint32_t *);
+			u32 = va_arg(var_args, uint32_t *);
 			prop->get(e->renderer, u32);
 			break;
 
 			case ENDER_INT32:
-			i32 = va_arg(ap, int32_t *);
+			i32 = va_arg(var_args, int32_t *);
 			prop->get(e->renderer, i32);
 			break;
 
 			case ENDER_DOUBLE:
-			d = va_arg(ap, double *);
+			d = va_arg(var_args, double *);
 			prop->get(e->renderer, d);
 			break;
 
 			case ENDER_ARGB:
-			color = va_arg(ap, Enesim_Color *);
+			color = va_arg(var_args, Enesim_Color *);
 			prop->get(e->renderer, color);
 			break;
 
 			case ENDER_STRING:
-			string = va_arg(ap, char **);
+			string = va_arg(var_args, char **);
 			prop->get(e->renderer, string);
 			break;
 
 			case ENDER_MATRIX:
-			matrix = va_arg(ap, Enesim_Matrix *);
+			matrix = va_arg(var_args, Enesim_Matrix *);
 			prop->get(e->renderer, matrix);
 			break;
 
 			case ENDER_RENDERER:
-			renderer = va_arg(ap, Enesim_Renderer **);
+			renderer = va_arg(var_args, Enesim_Renderer **);
 			prop->get(e->renderer, renderer);
 			break;
 
 			case ENDER_ENDER:
-			ender = va_arg(ap, Ender **);
+			ender = va_arg(var_args, Ender **);
 			prop->get(e->renderer, ender);
 			break;
 
@@ -390,7 +387,21 @@ EAPI void ender_element_value_get(Ender *e, const char *name, ...)
 			break;
 			
 		}
-	} while ((name = va_arg(ap, char *)));
+		name = va_arg(var_args, char *);
+	}
+}
+
+
+/**
+ *
+ */
+EAPI void ender_element_value_get(Ender *e, const char *name, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+	va_start(ap, name);
+	ender_element_value_get_valist(e, name, ap);
 	va_end(ap);
 }
 

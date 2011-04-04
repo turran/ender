@@ -191,6 +191,7 @@ EAPI Ender_Descriptor * ender_element_descriptor_get(Ender *e);
 EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name);
 
 EAPI void ender_element_value_get(Ender *e, const char *name, ...);
+EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var_args);
 EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value *value);
 
 EAPI void ender_element_value_set(Ender *e, const char *name, ...);
