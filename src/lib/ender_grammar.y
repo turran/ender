@@ -43,7 +43,7 @@
 %token USING
 %token <s> WORD
 %token <s> INLINE_STRING 
-%type <s>using
+%type <list>using
 %type <b> type_relative
 %type <prop> type_specifier
 %type <ptype> basic_type
@@ -57,15 +57,20 @@
 main
 	: using
 	{
-		if ($1 != NULL)
-			ender_parser_parse($1);
+		Eina_List *l;
+		char *str;
+
+		EINA_LIST_FOREACH ($1, l, str)
+		{
+			ender_parser_parse(str);
+		}
 	}
 	namespace_list
 	;
 
 using
 	: { $$ = NULL; }
-	| USING INLINE_STRING ';' using { $$ = $2; }
+	| USING INLINE_STRING ';' using { $$ = eina_list_append($4, $2); }
 	;
 
 namespace_list
