@@ -169,6 +169,8 @@ static Ender_Value_Accessor _relative_accessors[ENDER_PROPERTY_TYPES] = {
 static void _value_set(Ender_Value *v, Ender_Setter set, Ender *e,
 		Ender *parent, Eina_Bool relative)
 {
+	Ender_Event_Mutation event_data;
+
 	if (relative)
 	{
 		if (parent) _relative_accessors[v->container->type](v, set, e, parent);
@@ -178,6 +180,7 @@ static void _value_set(Ender_Value *v, Ender_Setter set, Ender *e,
 	{
 		_accessors[v->container->type](v, set, e, NULL);
 	}
+	ender_event_dispatch(e, "Mutation", &event_data);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -493,6 +496,7 @@ EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name)
 	if (!e->parent) return NULL;
 
 	prop = ender_descriptor_property_get(e->parent->descriptor, name);
+	if (!prop) return NULL;
 	if (!prop->relative) return NULL;
 
 	return prop;
