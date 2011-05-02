@@ -309,6 +309,59 @@ EAPI void ender_element_value_add_simple(Ender *e, const char *name, Ender_Value
 /**
  *
  */
+EAPI void ender_element_value_remove_valist(Ender *e, const char *name, va_list var_args)
+{
+	ENDER_MAGIC_CHECK(e);
+
+	while (name)
+	{
+		Ender_Property *prop;
+		Ender_Container *ec;
+		Ender_Value v;
+
+		prop = ender_descriptor_property_get(e->descriptor, name);
+		if (!prop) break;
+		if (prop->prop->type != ENDER_LIST) break;
+		ec = ender_container_compound_get(prop->prop, 0);
+
+		ENDER_VALUE_COLLECT(v, ec, var_args);
+		_value_set(&v, prop->remove, e, e->parent, prop->relative);
+		name = va_arg(var_args, char *);
+	} 
+}
+
+/**
+ *
+ */
+EAPI void ender_element_value_remove(Ender *e, const char *name, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+
+	va_start(ap, name);
+	ender_element_value_remove_valist(e, name, ap);
+	va_end(ap);
+}
+
+/**
+ *
+ */
+EAPI void ender_element_value_remove_simple(Ender *e, const char *name, Ender_Value *value)
+{
+	Ender_Property *prop;
+
+	ENDER_MAGIC_CHECK(e);
+	if (!value) return;
+
+	prop = ender_element_property_get(e, name);
+	if (!prop) return;
+	_value_set(value, prop->remove, e, e->parent, prop->relative);
+}
+
+/**
+ *
+ */
 EAPI void ender_element_value_clear(Ender *e, const char *name)
 {
 	Ender_Property *prop;

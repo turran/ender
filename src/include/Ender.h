@@ -202,6 +202,10 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...);
 EAPI void ender_element_value_add_valist(Ender *e, const char *name, va_list var_args);
 EAPI void ender_element_value_add_simple(Ender *e, const char *name, Ender_Value *value);
 
+EAPI void ender_element_value_remove(Ender *e, const char *name, ...);
+EAPI void ender_element_value_remove_valist(Ender *e, const char *name, va_list var_args);
+EAPI void ender_element_value_remove_simple(Ender *e, const char *name, Ender_Value *value);
+
 EAPI void ender_element_value_clear(Ender *e, const char *name);
 
 EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
