@@ -60,6 +60,7 @@ typedef struct _Ender_Property Ender_Property;
 typedef struct _Ender_Container Ender_Container;
 
 typedef void (*Ender_Event_Callback)(Ender *e, const char *event_name, void *event_data, void *data);
+typedef void (*Ender_New_Callback)(Ender *e, void *data);
 
 typedef enum _Ender_Type
 {
@@ -209,6 +210,10 @@ EAPI void ender_element_value_remove_simple(Ender *e, const char *name, Ender_Va
 EAPI void ender_element_value_clear(Ender *e, const char *name);
 
 EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
+EAPI Ender * ender_element_renderer_from(Enesim_Renderer *r);
+
+EAPI void ender_element_new_listener_add(Ender_New_Callback cb, void *data);
+EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data);
 
 /**
  * @}

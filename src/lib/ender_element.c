@@ -58,15 +58,23 @@
 		}							\
 	}								\
 
+static Eina_List *_new_callbacks = NULL;
 
 typedef void (*Ender_Value_Accessor)(Ender_Value *v, Ender_Accessor acc,
 		Ender *e, Ender *parent);
 
+/* TODO rename this */
 typedef struct _Ender_Listener
 {
 	Ender_Event_Callback callback;
 	void *data;
 } Ender_Listener;
+
+typedef struct _Ender_New_Listener
+{
+	Ender_New_Callback callback;
+	void *data;
+} Ender_New_Listener;
 
 struct _Ender
 {
@@ -197,7 +205,9 @@ EAPI Ender * ender_element_new(const char *name)
 {
 	Ender *ender;
 	Ender_Descriptor *desc;
+	Ender_New_Listener *listener;
 	Enesim_Renderer *renderer;
+	Eina_List *l;
 
 	DBG("Creating new ender \"%s\"", name);
 	desc = ender_descriptor_find(name);
@@ -225,6 +235,11 @@ EAPI Ender * ender_element_new(const char *name)
 	ender->descriptor = desc;
 	ender->listeners = eina_hash_string_superfast_new(NULL);
 	enesim_renderer_private_set(renderer, "ender", ender);
+	/* call the constructor callback */
+	EINA_LIST_FOREACH(_new_callbacks, l, listener)
+	{
+		listener->callback(ender, listener->data);
+	}
 
 	return ender;
 }
@@ -636,4 +651,36 @@ EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_dat
 		listener->callback(e, event_name, event_data, listener->data);
 	}
 	eina_iterator_free(it);
+}
+
+/**
+ *
+ */
+EAPI void ender_element_new_listener_add(Ender_New_Callback cb, void *data)
+{
+	Ender_New_Listener *listener;
+
+	listener = calloc(1, sizeof(Ender_New_Listener));
+	listener->callback = cb;
+	listener->data = data;
+
+	_new_callbacks = eina_list_append(_new_callbacks, listener);
+}
+
+/**
+ *
+ */
+EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data)
+{
+	Ender_New_Listener *listener;
+	Eina_List *l;
+
+	EINA_LIST_FOREACH(_new_callbacks, l, listener)
+	{
+		if (listener->callback == cb && listener->data == data)
+		{
+			_new_callbacks = eina_list_remove(l, listener);
+			break;
+		}
+	} 
 }
