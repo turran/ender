@@ -196,7 +196,16 @@ EAPI void ender_value_ender_set(Ender_Value *value, Ender *ender)
 
 EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface)
 {
+	if (value->container->type != ENDER_SURFACE)
+		return;
+	value->data.ptr = surface;
+}
 
+EAPI Enesim_Surface * ender_value_surface_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_SURFACE)
+		return NULL;
+	return value->data.ptr;
 }
 
 EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Free free_cb, void *user_data)
