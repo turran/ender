@@ -81,6 +81,7 @@ typedef enum _Ender_Property_Type
 	ENDER_RENDERER,
 	ENDER_SURFACE,
 	ENDER_ENDER,
+	ENDER_POINTER,
 	/* compound types */
 	ENDER_LIST,
 	ENDER_STRUCT,
@@ -116,6 +117,7 @@ EAPI Ender_Property_Type ender_container_type(Ender_Container *c);
  */
 
 typedef struct _Ender_Value Ender_Value;
+typedef void (*Ender_Value_Free)(Ender_Value *value, void *data);
 
 EAPI Ender_Value * ender_value_basic_new(Ender_Property_Type type);
 EAPI Ender_Value * ender_value_list_new(Ender_Property_Type child_type);
@@ -156,6 +158,9 @@ EAPI Ender * ender_value_ender_get(Ender_Value *value);
 EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface);
 EAPI Enesim_Surface * ender_value_surface_get(Ender_Value *value);
 
+EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Free free_cb, void *user_data);
+EAPI void * ender_value_pointer_get(Ender_Value *value);
+
 EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child);
 
 
@@ -190,6 +195,9 @@ EAPI const char * ender_element_name_get(Ender *e);
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender *e);
 
 EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name);
+EAPI void ender_element_property_value_set_valist(Ender *e, Ender_Property *prop, va_list va_args);
+EAPI void ender_element_property_value_set(Ender *e, Ender_Property *prop, ...);
+EAPI void ender_element_property_value_set_simple(Ender *e, Ender_Property *prop, Ender_Value *value);
 
 EAPI void ender_element_value_get(Ender *e, const char *name, ...);
 EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var_args);
@@ -221,6 +229,7 @@ EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data);
  * @{
  */
 EAPI Ender_Property_Type ender_property_type(Ender_Property *p);
+EAPI Ender_Container * ender_property_container_get(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
 

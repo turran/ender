@@ -199,6 +199,23 @@ EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface)
 
 }
 
+EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Free free_cb, void *user_data)
+{
+	if (value->container->type != ENDER_POINTER)
+		return;
+	value->data.ptr = ptr;
+	value->owned = EINA_TRUE;
+	value->free_cb = free_cb;
+	value->free_cb_data = user_data;
+}
+
+EAPI void * ender_value_pointer_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_POINTER)
+		return NULL;
+	return value->data.ptr;
+}
+
 EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 {
 

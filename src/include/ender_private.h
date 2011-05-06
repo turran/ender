@@ -51,8 +51,6 @@ struct _Ender_Container
 	ssize_t offset;
 };
 
-typedef void (*Ender_Value_Free)(Ender_Value *value, void *data);
-
 struct _Ender_Value
 {
 	Ender_Container *container;

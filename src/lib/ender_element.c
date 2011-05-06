@@ -571,6 +571,47 @@ EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name)
 }
 
 /**
+ *
+ */
+EAPI void ender_element_property_value_set_valist(Ender *e, Ender_Property *prop, va_list var_args)
+{
+	ENDER_MAGIC_CHECK(e);
+
+	while (prop)
+	{
+		Ender_Value v;
+
+		ENDER_VALUE_COLLECT(v, prop->prop, var_args);
+		_value_set(&v, prop->set, e, e->parent, prop->relative);
+		prop = va_arg(var_args, Ender_Property *);
+	} 
+}
+
+/**
+ *
+ */
+EAPI void ender_element_property_value_set(Ender *e, Ender_Property *prop, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+
+	va_start(ap, prop);
+	ender_element_property_value_set_valist(e, prop, ap);
+	va_end(ap);
+}
+
+/**
+ *
+ */
+EAPI void ender_element_property_value_set_simple(Ender *e, Ender_Property *prop, Ender_Value *value)
+{
+	ENDER_MAGIC_CHECK(e);
+
+	_value_set(value, prop->set, e, e->parent, prop->relative);
+}
+
+/**
  * Get the enesim renderer associated with an ender
  * @param e
  * @return
