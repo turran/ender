@@ -42,7 +42,7 @@
 %token REL
 %token USING
 %token <s> WORD
-%token <s> INLINE_STRING 
+%token <s> INLINE_STRING
 %type <list>using
 %type <b> type_relative
 %type <prop> type_specifier
@@ -170,11 +170,11 @@ type_relative
 	| REL { $$=EINA_TRUE; }
 	;
 declaration
-	: 
+	:
 	type_relative type_specifier WORD ';'
 	{
 		ender_parser_property_add(parser->ns, parser->descriptor, $3, $2, $1);
-	} 
+	}
 	;
 
 declaration_list
@@ -185,5 +185,5 @@ declaration_list
 
 void ender_error(YYLTYPE *lloc, void *scanner, Ender_Parser *parser, const char *str)
 {
-        ERR("Parsing error at %d: %d.%d %s", lloc->last_line, lloc->first_column, lloc->last_column, str);
+        ERR("Parsing error at %s %d: %d.%d %s", parser->file, lloc->last_line, lloc->first_column, lloc->last_column, str);
 }

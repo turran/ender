@@ -150,7 +150,7 @@ EAPI Enesim_Matrix * ender_value_matrix_get(Ender_Value *value)
 		return NULL;
 
 	return value->data.ptr;
-} 
+}
 
 EAPI void ender_value_string_set(Ender_Value *value, char * string)
 {
@@ -186,12 +186,30 @@ EAPI void ender_value_const_struct_set(Ender_Value *value, void * structure)
 
 EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer)
 {
+	if (value->container->type != ENDER_RENDERER)
+		return;
+	value->data.ptr = renderer;
+}
 
+EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_RENDERER)
+		return NULL;
+	return value->data.ptr;
 }
 
 EAPI void ender_value_ender_set(Ender_Value *value, Ender *ender)
 {
+	if (value->container->type != ENDER_ENDER)
+		return;
+	value->data.ptr = ender;
+}
 
+EAPI Ender * ender_value_ender_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_ENDER)
+		return NULL;
+	return value->data.ptr;
 }
 
 EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface)
@@ -213,7 +231,6 @@ EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Fre
 	if (value->container->type != ENDER_POINTER)
 		return;
 	value->data.ptr = ptr;
-	value->owned = EINA_TRUE;
 	value->free_cb = free_cb;
 	value->free_cb_data = user_data;
 }
@@ -234,10 +251,11 @@ EAPI void ender_value_free(Ender_Value *value)
 {
 	if (value->owned)
 	{
-		if (value->free_cb)
-			value->free_cb(value, value->free_cb_data);
-		else
-			free(value->data.ptr);
+		free(value->data.ptr);
+	}
+	else if (value->free_cb)
+	{
+		value->free_cb(value, value->free_cb_data);
 	}
 	free(value);
 }
