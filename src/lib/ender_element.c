@@ -136,8 +136,8 @@ static void _ender_ender_set(Ender_Value *v, Ender_Setter set,
 
 	child = v->data.ptr;
 	/* TODO check if it is an ender */
-	child->parent = e;
 	set(e->renderer, v->data.ptr);
+	child->parent = e;
 }
 
 static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
