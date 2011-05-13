@@ -220,6 +220,8 @@ EAPI void ender_element_value_clear(Ender *e, const char *name);
 EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e);
 EAPI Ender * ender_element_renderer_from(Enesim_Renderer *r);
 
+EAPI Ender * ender_element_parent_get(Ender *e);
+
 EAPI void ender_element_new_listener_add(Ender_New_Callback cb, void *data);
 EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data);
 
