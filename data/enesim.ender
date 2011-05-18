@@ -130,4 +130,10 @@ namespace "enesim.renderer" {
 		renderer source;
 		renderer target;
 	};
+
+	class "clipper" : "renderer" {
+		double width;
+		double height;
+		renderer content;
+	};
 };
