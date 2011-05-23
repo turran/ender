@@ -275,63 +275,63 @@ void ender_parser_shutdown(void)
 	/* TODO free the list of files */
 }
 
-FILE * ender_parser_locate(const char *file)
+Eina_Bool ender_parser_locate(const char *file, char *real_file)
 {
-	Eina_List *l;
-	char *file_parsed;
-	FILE *f;
 	struct stat st;
-	char complete[PATH_MAX];
 
-#if 0
-	/* check that we haven't parse the file already */
-	EINA_LIST_FOREACH (_files, l, file_parsed)
+	strcpy(real_file, file);
+	if (strcmp(real_file + strlen(real_file) - 6, ".ender"))
 	{
-		printf("already located %s\n", file_parsed);
-		if (!strcmp(file, file_parsed))
-			return NULL;
-	}
-#endif
-
-	strcpy(complete, file);
-	if (strcmp(complete + strlen(complete) - 6, ".ender"))
-	{
-		strcat(complete, ".ender");
+		strcat(real_file, ".ender");
 	}
 	/* check for files on DATADIR */
-	f = fopen(complete, "r");
-	if (!f)
+	if (stat(real_file, &st) < 0)
 	{
-		char real_file[PATH_MAX];
+		char *tmp;
 
+		tmp = strdup(real_file);
 		/* TODO check if the file is relative or absolute */
 		strncpy(real_file, PACKAGE_DATA_DIR, PATH_MAX);
 		strncat(real_file, "/", PATH_MAX - strlen(real_file));
-		strncat(real_file, complete, PATH_MAX - strlen(real_file));
+		strncat(real_file, tmp, PATH_MAX - strlen(real_file));
+		free(tmp);
 
-		f = fopen(real_file, "r");
-		if (!f)
+		if (stat(real_file, &st) < 0)
 		{
-			ERR("File %s not found at . or %s", complete, real_file);
-			return NULL;
+			ERR("File %s.ender not found at . or %s", file, real_file);
+			return EINA_FALSE;
 		}
-		DBG("Parsing file %s", real_file);
 	}
-	else
-	{
-		DBG("Parsing file %s", file);
-	}
-	return f;
+
+	DBG("Parsing file %s", real_file);
+	return EINA_TRUE;
 }
 
 void ender_parser_parse(const char *file)
 {
 	Ender_Parser *parser;
+	Eina_List *l;
+	char *file_parsed;
+	char real_file[PATH_MAX];
 	FILE *f;
 	int ret;
 	void *scanner;
 
-	f = ender_parser_locate(file);
+
+	if (!ender_parser_locate(file, real_file))
+		return;
+
+	/* check that we haven't parse the file already */
+	EINA_LIST_FOREACH (_files, l, file_parsed)
+	{
+		if (!strcmp(real_file, file_parsed))
+		{
+			DBG("File already parsed %s", real_file);
+			return;
+		}
+	}
+
+	f = fopen(real_file, "r");
 	if (!f) return;
 
 	parser = malloc(sizeof(Ender_Parser));
@@ -339,8 +339,8 @@ void ender_parser_parse(const char *file)
 	ender_set_in(f, scanner);
 	if (!ender_parse(scanner, parser))
 	{
-		DBG("Parsed file %s correctly", file);
-		_files = eina_list_append(_files, strdup(file));
+		DBG("Parsed file %s correctly", real_file);
+		_files = eina_list_append(_files, strdup(real_file));
 	}
 
 	ender_lex_destroy(scanner);
