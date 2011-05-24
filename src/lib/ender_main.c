@@ -17,6 +17,12 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
+
+/**
+ * @todo
+ *  - We need a way to register enders without the *need* of parsing,
+ *  that is, do it programmatically
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
