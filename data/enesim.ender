@@ -121,6 +121,13 @@ namespace "enesim.renderer" {
 		double y1;
 	};
 
+	class "gradient_radial" : "gradient" {
+		double center_x;
+		double center_y;
+		double radius_x;
+		double radius_y;
+	};
+
 	class "background" : "renderer" {
 		argb color;
 	};
