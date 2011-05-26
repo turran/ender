@@ -49,6 +49,7 @@
 			case ENDER_RENDERER:				\
 			case ENDER_ENDER:				\
 			case ENDER_LIST:				\
+			case ENDER_VALUE:				\
 			v.data.ptr = va_arg(var_args, void *);		\
 			break;						\
 									\
@@ -193,6 +194,16 @@ static void _value_set(Ender_Value *v, Ender_Setter set, Ender *e,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+/* placeholder to initialize all the C99 structs */
+void ender_element_init(void)
+{
+
+}
+
+void ender_element_shutdown(void)
+{
+
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

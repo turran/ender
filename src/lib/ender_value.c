@@ -54,7 +54,14 @@ EAPI Ender_Value * ender_value_new_container_from(Ender_Container *ec)
 
 EAPI Ender_Value * ender_value_list_new(Ender_Property_Type child_type)
 {
+	Ender_Container *ec;
+	Ender_Container *sub;
 
+	ec = ender_container_new(ENDER_LIST);
+	sub = ender_container_new(child_type);
+	ender_container_add(ec, sub);
+
+	return _ender_value_new(ec);	
 }
 
 EAPI Ender_Container * ender_value_container_get(Ender_Value *value)
@@ -244,7 +251,27 @@ EAPI void * ender_value_pointer_get(Ender_Value *value)
 
 EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 {
+	Ender_Container *sub;
 
+	if (value->container->type != ENDER_LIST)
+		return;
+
+	sub = ender_container_compound_get(value->container, 0);
+	if (sub->type == ENDER_VALUE)
+	{
+		value->data.ptr = eina_list_append(value->data.ptr, child);	
+	}
+	else
+	{
+		printf("TODO\n");
+	}
+}
+
+EAPI const Eina_List * ender_value_list_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_LIST)
+		return NULL;
+	return value->data.ptr;
 }
 
 EAPI void ender_value_free(Ender_Value *value)

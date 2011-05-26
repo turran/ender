@@ -160,6 +160,10 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 	size_t prev_size = 0;
 
 	if (!ender_container_is_compound(ec))
+		return;
+	/* FIXME for list type, only limit the number
+	 * of child to one
+	 */
 	if (ec->elements)
 	{
 		Ender_Container *prev;
