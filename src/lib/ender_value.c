@@ -267,6 +267,13 @@ EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 	}
 }
 
+EAPI void ender_value_list_set(Ender_Value *value, Eina_List *list)
+{
+	if (value->container->type != ENDER_LIST)
+		return;
+	value->data.ptr = list;
+}
+
 EAPI const Eina_List * ender_value_list_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_LIST)
