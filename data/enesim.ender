@@ -111,6 +111,7 @@ namespace "enesim.renderer" {
 	};
 
 	abstract "gradient" : "renderer" {
+		uint mode;
 		[stop] stop;
 	};
 
