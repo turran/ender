@@ -10,8 +10,8 @@ namespace "enesim" {
 
 namespace "enesim.renderer" {
 	abstract "shape" : "renderer" {
-		double outline_weight;
-		argb outline_color;
+		double stroke_weight;
+		argb stroke_color;
 		argb fill_color;
 		renderer fill_renderer;
 		int draw_mode;
