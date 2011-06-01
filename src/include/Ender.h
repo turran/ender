@@ -75,6 +75,7 @@ typedef enum _Ender_Property_Type
 	ENDER_UINT32,
 	ENDER_INT32,
 	ENDER_DOUBLE,
+	ENDER_COLOR,
 	ENDER_ARGB,
 	ENDER_STRING,
 	ENDER_MATRIX,
@@ -135,8 +136,11 @@ EAPI uint32_t ender_value_uint32_get(Ender_Value *value);
 EAPI void ender_value_double_set(Ender_Value *value, double d);
 EAPI double ender_value_double_get(Ender_Value *value);
 
-EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Color argb);
-EAPI Enesim_Color ender_value_argb_get(Ender_Value *value);
+EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb);
+EAPI Enesim_Argb ender_value_argb_get(Ender_Value *value);
+
+EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color argb);
+EAPI Enesim_Color ender_value_color_get(Ender_Value *value);
 
 EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix);
 EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix *matrix);

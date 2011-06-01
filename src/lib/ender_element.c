@@ -32,6 +32,7 @@
 		v.container = cnt;					\
 		switch (cnt->type)					\
 		{							\
+			case ENDER_COLOR:				\
 			case ENDER_ARGB:				\
 			case ENDER_UINT32:				\
 			case ENDER_INT32:				\
@@ -152,6 +153,7 @@ static Ender_Value_Accessor _accessors[ENDER_PROPERTY_TYPES] = {
 	[ENDER_INT32] = _ender_int32_set,
 	[ENDER_DOUBLE] = _ender_double_set,
 	[ENDER_ARGB] = _ender_int32_set,
+	[ENDER_COLOR] = _ender_int32_set,
 	[ENDER_STRING] = _ender_pointer_set,
 	[ENDER_MATRIX] = _ender_pointer_set,
 	[ENDER_RENDERER] = _ender_pointer_set,
@@ -166,6 +168,7 @@ static Ender_Value_Accessor _relative_accessors[ENDER_PROPERTY_TYPES] = {
 	[ENDER_INT32] = _ender_relative_int32_set,
 	[ENDER_DOUBLE] = _ender_relative_double_set,
 	[ENDER_ARGB] = _ender_relative_int32_set,
+	[ENDER_COLOR] = _ender_relative_int32_set,
 	[ENDER_STRING] = _ender_relative_pointer_set,
 	[ENDER_MATRIX] = _ender_relative_pointer_set,
 	[ENDER_RENDERER] = _ender_relative_pointer_set,
@@ -440,6 +443,7 @@ EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var
 			break;
 
 			case ENDER_ARGB:
+			case ENDER_COLOR:
 			color = va_arg(var_args, Enesim_Color *);
 			prop->get(e->renderer, color);
 			break;

@@ -99,6 +99,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 	{
 		case ENDER_INT32:
 		case ENDER_UINT32:
+		case ENDER_COLOR:
 		case ENDER_ARGB:
 		size = sizeof(int32_t);
 		break;
@@ -160,6 +161,8 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 	size_t prev_size = 0;
 
 	if (!ender_container_is_compound(ec))
+		return;
+	if (!sub)
 		return;
 	/* FIXME for list type, only limit the number
 	 * of child to one

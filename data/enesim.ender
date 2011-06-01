@@ -1,43 +1,43 @@
 namespace "enesim" {
 	abstract "renderer" {
-		matrix transformation;
-		double x_origin;
-		double y_origin;
-		argb color;
-		int rop;
+		matrix "transformation";
+		double "x_origin";
+		double "y_origin";
+		color "color";
+		int "rop";
 	};
 };
 
 namespace "enesim.renderer" {
 	abstract "shape" : "renderer" {
-		double stroke_weight;
-		argb stroke_color;
-		argb fill_color;
-		renderer fill_renderer;
-		int draw_mode;
+		double "stroke_weight";
+		color "stroke_color";
+		color "fill_color";
+		renderer "fill_renderer";
+		int "draw_mode";
 	};
 
 	class "rectangle" : "shape" {
-		uint width;
-		uint height;
-		double corner_radius;
-		int top_left_corner;
-		int top_right_corner;
-		int bottom_left_corner;
-		int bottom_right_corner;
+		uint "width";
+		uint "height";
+		double "corner_radius";
+		int "top_left_corner";
+		int "top_right_corner";
+		int "bottom_left_corner";
+		int "bottom_right_corner";
 	};
 
 	class "circle" : "shape" {
-		double x;
-		double y;
-		double radius;
+		double "x";
+		double "y";
+		double "radius";
 	};
 
 	class "ellipse" : "shape" {
-		double x;
-		double y;
-		double x_radius;
-		double y_radius;
+		double "x";
+		double "y";
+		double "x_radius";
+		double "y_radius";
 	};
 
 	struct "point" {
@@ -45,65 +45,65 @@ namespace "enesim.renderer" {
 	};
 
 	class "figure" : "shape" {
-		[[point]] polygon;
+		[[point]] "polygon";
 	};
 
 	class "checker" : "renderer" {
-		uint width;
-		uint height;
-		argb even_color;
-		argb odd_color;
+		uint "width";
+		uint "height";
+		color "even_color";
+		color "odd_color";
 	};
 
 	class "image" : "renderer" {
-		surface src;
-		int x;
-		int y;
-		int w;
-		int h;
+		surface "src";
+		int "x";
+		int "y";
+		int "w";
+		int "h";
 	};
 
 	class "dispmap" : "renderer" {
-		surface map;
-		surface src;
-		int x_channel;
-		int y_channel;
-		double factor;
+		surface "map";
+		surface "src";
+		int "x_channel";
+		int "y_channel";
+		double "factor";
 	};
 
 	class "grid" : "renderer" {
-		uint inside_width;
-		uint inside_height;
-		argb inside_color;
-		uint border_vthickness;
-		uint border_hthickness;
-		argb border_color;
+		uint "inside_width";
+		uint "inside_height";
+		color "inside_color";
+		uint "border_vthickness";
+		uint "border_hthickness";
+		color "border_color";
 	};
 
 	class "perlin" : "renderer" {
-		uint octaves;
-		double persistence;
-		double xfrequency;
-		double yfrequency;
+		uint "octaves";
+		double "persistence";
+		double "xfrequency";
+		double "yfrequency";
 	};
 
 	class "raddist" : "renderer" {
-		surface src;
-		uint x;
-		uint y;
-		double radius;
-		double factor;
+		surface "src";
+		uint "x";
+		uint "y";
+		double "radius";
+		double "factor";
 	};
 
 	class "stripes" : "renderer" {
-		double even_thickness;
-		argb even_color;
-		double odd_thickness;
-		argb odd_color;
+		double "even_thickness";
+		color "even_color";
+		double "odd_thickness";
+		color "odd_color";
 	};
 
 	class "compound" : "renderer" {
-		[renderer] layer;
+		[renderer] "layer";
 	};
 
 	struct "stop" {
@@ -111,37 +111,37 @@ namespace "enesim.renderer" {
 	};
 
 	abstract "gradient" : "renderer" {
-		uint mode;
-		[stop] stop;
+		uint "mode";
+		[stop] "stop";
 	};
 
 	class "gradient_linear" : "gradient" {
-		double x0;
-		double y0;
-		double x1;
-		double y1;
+		double "x0";
+		double "y0";
+		double "x1";
+		double "y1";
 	};
 
 	class "gradient_radial" : "gradient" {
-		double center_x;
-		double center_y;
-		double radius_x;
-		double radius_y;
+		double "center_x";
+		double "center_y";
+		double "radius_x";
+		double "radius_y";
 	};
 
 	class "background" : "renderer" {
-		argb color;
+		color "color";
 	};
 
 	class "transition" : "renderer" {
-		double level;
-		renderer source;
-		renderer target;
+		double "level";
+		renderer "source";
+		renderer "target";
 	};
 
 	class "clipper" : "renderer" {
-		double width;
-		double height;
-		renderer content;
+		double "width";
+		double "height";
+		renderer "content";
 	};
 };

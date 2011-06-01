@@ -22,9 +22,6 @@
  * @todo
  *  - We need a way to register enders without the *need* of parsing,
  *  that is, do it programmatically
- *  - Add a color property, rename the current argb property to color
- *  and be able to parse both Enesim_Color and Enesim_Argb this is useful
- *  for the gradient case where the input MUST be on argb unpremultiplied
  */
 /*============================================================================*
  *                                  Local                                     *

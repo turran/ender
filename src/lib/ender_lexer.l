@@ -29,6 +29,10 @@ argb			{
 				yylval_param->ptype = ENDER_ARGB;
 				return ARGB;
 			}
+color			{
+				yylval_param->ptype = ENDER_COLOR;
+				return COLOR;
+			}
 double			{
 				yylval_param->ptype = ENDER_DOUBLE;
 				return DOUBLE;

@@ -27,6 +27,7 @@
 
 %token <ptype> UINT
 %token <ptype> INT
+%token <ptype> COLOR
 %token <ptype> ARGB
 %token <ptype> DOUBLE
 %token <ptype> IMAGE
@@ -138,6 +139,7 @@ types
 basic_type
 	: UINT { $$ = $1; }
 	| INT { $$ = $1; }
+	| COLOR { $$ = $1; }
 	| ARGB { $$ = $1; }
 	| DOUBLE { $$ = $1; }
 	| STRING { $$ = $1; }
@@ -171,7 +173,7 @@ type_relative
 	;
 declaration
 	:
-	type_relative type_specifier WORD ';'
+	type_relative type_specifier INLINE_STRING ';'
 	{
 		ender_parser_property_add(parser->ns, parser->descriptor, $3, $2, $1);
 	}

@@ -57,6 +57,9 @@ EAPI const char * ender_property_type_name_get(Ender_Property_Type type)
 		case ENDER_DOUBLE:
 		return "double";
 
+		case ENDER_COLOR:
+		return "color";
+
 		case ENDER_ARGB:
 		return "argb";
 

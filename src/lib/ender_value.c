@@ -116,16 +116,30 @@ EAPI double ender_value_double_get(Ender_Value *value)
 	return value->data.d;
 }
 
-EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Color argb)
+EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb)
 {
 	if (value->container->type != ENDER_ARGB)
 		return;
 	value->data.u32 = argb;
 }
 
-EAPI Enesim_Color ender_value_argb_get(Ender_Value *value)
+EAPI Enesim_Argb ender_value_argb_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_ARGB)
+		return 0;
+	return value->data.u32;
+}
+
+EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color color)
+{
+	if (value->container->type != ENDER_COLOR)
+		return;
+	value->data.u32 = color;
+}
+
+EAPI Enesim_Color ender_value_color_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_COLOR)
 		return 0;
 	return value->data.u32;
 }
