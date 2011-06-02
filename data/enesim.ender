@@ -71,6 +71,14 @@ namespace "enesim.renderer" {
 		double "factor";
 	};
 
+	class "hswitch" : "renderer" {
+		uint "w";
+		uint "h";
+		renderer "left";
+		renderer "right";
+		double "step";
+	};
+
 	class "grid" : "renderer" {
 		uint "inside_width";
 		uint "inside_height";
