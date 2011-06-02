@@ -36,7 +36,7 @@ EAPI Ender_Container * ender_property_container_get(Ender_Property *p)
 /**
  *
  */
-EAPI Ender_Property_Type ender_property_type(Ender_Property *p)
+EAPI Ender_Value_Type ender_property_type(Ender_Property *p)
 {
 	return p->prop->type;
 }

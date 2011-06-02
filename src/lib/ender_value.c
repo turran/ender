@@ -35,7 +35,7 @@ static Ender_Value * _ender_value_new(Ender_Container *ec)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Ender_Value * ender_value_basic_new(Ender_Property_Type type)
+EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type)
 {
 	Ender_Container *ec;
 	Ender_Value *ev;
@@ -52,7 +52,7 @@ EAPI Ender_Value * ender_value_new_container_from(Ender_Container *ec)
 	return _ender_value_new(ec);	
 }
 
-EAPI Ender_Value * ender_value_list_new(Ender_Property_Type child_type)
+EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
 {
 	Ender_Container *ec;
 	Ender_Container *sub;
@@ -69,7 +69,7 @@ EAPI Ender_Container * ender_value_container_get(Ender_Value *value)
 	return value->container;
 }
 
-EAPI Ender_Property_Type ender_value_type_get(Ender_Value *value)
+EAPI Ender_Value_Type ender_value_type_get(Ender_Value *value)
 {
 	return value->container->type;
 }
@@ -219,14 +219,14 @@ EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
-EAPI void ender_value_ender_set(Ender_Value *value, Ender *ender)
+EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender)
 {
 	if (value->container->type != ENDER_ENDER)
 		return;
 	value->data.ptr = ender;
 }
 
-EAPI Ender * ender_value_ender_get(Ender_Value *value)
+EAPI Ender_Element * ender_value_ender_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_ENDER)
 		return NULL;

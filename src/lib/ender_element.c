@@ -63,7 +63,7 @@
 static Eina_List *_new_callbacks = NULL;
 
 typedef void (*Ender_Value_Accessor)(Ender_Value *v, Ender_Accessor acc,
-		Ender *e, Ender *parent);
+		Ender_Element *e, Ender_Element *parent);
 
 /* TODO rename this */
 typedef struct _Ender_Listener
@@ -78,39 +78,39 @@ typedef struct _Ender_New_Listener
 	void *data;
 } Ender_New_Listener;
 
-struct _Ender
+struct _Ender_Element
 {
 	EINA_MAGIC;
 	Ender_Descriptor *descriptor;
 	Enesim_Renderer *renderer;
 	Eina_Hash *listeners;
-	Ender *parent;
+	Ender_Element *parent;
 };
 /*----------------------------------------------------------------------------*
  *                           uint32 / in32 / argb                             *
  *----------------------------------------------------------------------------*/
-static void _ender_int32_set(Ender_Value *v, Ender_Setter set, Ender *e,
-		Ender *parent)
+static void _ender_int32_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
+		Ender_Element *parent)
 {
 	set(e->renderer, v->data.i32);
 }
 
 static void _ender_relative_int32_set(Ender_Value *v, Ender_Setter set,
-		Ender *e, Ender *parent)
+		Ender_Element *e, Ender_Element *parent)
 {
 	set(parent->renderer, e, v->data.i32);
 }
 /*----------------------------------------------------------------------------*
  *                                   double                                   *
  *----------------------------------------------------------------------------*/
-static void _ender_double_set(Ender_Value *v, Ender_Setter set, Ender *e,
-		Ender *parent)
+static void _ender_double_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
+		Ender_Element *parent)
 {
 	set(e->renderer, v->data.d);
 }
 
-static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender *e,
-		Ender *parent)
+static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
+		Ender_Element *parent)
 {
 	set(parent->renderer, e, v->data.d);
 }
@@ -118,13 +118,13 @@ static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender *
  *                  string / surface / struct / matrix / renderer             *
  *----------------------------------------------------------------------------*/
 static void _ender_pointer_set(Ender_Value *v, Ender_Setter set,
-		Ender *e, Ender *parent)
+		Ender_Element *e, Ender_Element *parent)
 {
 	set(e->renderer, v->data.ptr);
 }
 
 static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
-		Ender *e, Ender *parent)
+		Ender_Element *e, Ender_Element *parent)
 {
 	set(parent->renderer, e, v->data.ptr);
 }
@@ -132,9 +132,9 @@ static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
  *                                   ender                                    *
  *----------------------------------------------------------------------------*/
 static void _ender_ender_set(Ender_Value *v, Ender_Setter set,
-		Ender *e, Ender *parent)
+		Ender_Element *e, Ender_Element *parent)
 {
-	Ender *child;
+	Ender_Element *child;
 
 	child = v->data.ptr;
 	/* TODO check if it is an ender */
@@ -143,7 +143,7 @@ static void _ender_ender_set(Ender_Value *v, Ender_Setter set,
 }
 
 static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
-		Ender *e, Ender *parent)
+		Ender_Element *e, Ender_Element *parent)
 {
 	set(parent->renderer, e, v->data.ptr);
 }
@@ -178,8 +178,8 @@ static Ender_Value_Accessor _relative_accessors[ENDER_PROPERTY_TYPES] = {
 	[ENDER_STRUCT] = _ender_relative_pointer_set,
 };
 
-static void _value_set(Ender_Value *v, Ender_Setter set, Ender *e,
-		Ender *parent, Eina_Bool relative)
+static void _value_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
+		Ender_Element *parent, Eina_Bool relative)
 {
 	Ender_Event_Mutation event_data;
 
@@ -215,9 +215,9 @@ void ender_element_shutdown(void)
  * @param name
  * @return
  */
-EAPI Ender * ender_element_new(const char *name)
+EAPI Ender_Element * ender_element_new(const char *name)
 {
-	Ender *ender;
+	Ender_Element *ender;
 	Ender_Descriptor *desc;
 	Ender_New_Listener *listener;
 	Enesim_Renderer *renderer;
@@ -243,7 +243,7 @@ EAPI Ender * ender_element_new(const char *name)
 		return NULL;
 	}
 
-	ender = calloc(1, sizeof(Ender));
+	ender = calloc(1, sizeof(Ender_Element));
 	EINA_MAGIC_SET(ender, ENDER_MAGIC);
 	ender->renderer = renderer;
 	ender->descriptor = desc;
@@ -261,14 +261,14 @@ EAPI Ender * ender_element_new(const char *name)
 /**
  * Delete an ender
  */
-EAPI void ender_element_delete(Ender *e)
+EAPI void ender_element_delete(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
 	enesim_renderer_delete(e->renderer);
 	free(e);
 }
 
-EAPI Ender_Descriptor * ender_element_descriptor_get(Ender *e)
+EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e)
 {
 	return e->descriptor;
 }
@@ -276,7 +276,7 @@ EAPI Ender_Descriptor * ender_element_descriptor_get(Ender *e)
 /**
  *
  */
-EAPI const char * ender_element_name_get(Ender *e)
+EAPI const char * ender_element_name_get(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
 	return ender_descriptor_name_get(e->descriptor);
@@ -285,7 +285,7 @@ EAPI const char * ender_element_name_get(Ender *e)
 /**
  *
  */
-EAPI void ender_element_value_add_valist(Ender *e, const char *name, va_list var_args)
+EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_list var_args)
 {
 	ENDER_MAGIC_CHECK(e);
 
@@ -309,7 +309,7 @@ EAPI void ender_element_value_add_valist(Ender *e, const char *name, va_list var
 /**
  *
  */
-EAPI void ender_element_value_add(Ender *e, const char *name, ...)
+EAPI void ender_element_value_add(Ender_Element *e, const char *name, ...)
 {
 	va_list ap;
 
@@ -323,7 +323,7 @@ EAPI void ender_element_value_add(Ender *e, const char *name, ...)
 /**
  *
  */
-EAPI void ender_element_value_add_simple(Ender *e, const char *name, Ender_Value *value)
+EAPI void ender_element_value_add_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
 	Ender_Property *prop;
 
@@ -338,7 +338,7 @@ EAPI void ender_element_value_add_simple(Ender *e, const char *name, Ender_Value
 /**
  *
  */
-EAPI void ender_element_value_remove_valist(Ender *e, const char *name, va_list var_args)
+EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, va_list var_args)
 {
 	ENDER_MAGIC_CHECK(e);
 
@@ -362,7 +362,7 @@ EAPI void ender_element_value_remove_valist(Ender *e, const char *name, va_list 
 /**
  *
  */
-EAPI void ender_element_value_remove(Ender *e, const char *name, ...)
+EAPI void ender_element_value_remove(Ender_Element *e, const char *name, ...)
 {
 	va_list ap;
 
@@ -376,7 +376,7 @@ EAPI void ender_element_value_remove(Ender *e, const char *name, ...)
 /**
  *
  */
-EAPI void ender_element_value_remove_simple(Ender *e, const char *name, Ender_Value *value)
+EAPI void ender_element_value_remove_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
 	Ender_Property *prop;
 
@@ -391,7 +391,7 @@ EAPI void ender_element_value_remove_simple(Ender *e, const char *name, Ender_Va
 /**
  *
  */
-EAPI void ender_element_value_clear(Ender *e, const char *name)
+EAPI void ender_element_value_clear(Ender_Element *e, const char *name)
 {
 	Ender_Property *prop;
 
@@ -405,7 +405,7 @@ EAPI void ender_element_value_clear(Ender *e, const char *name)
 /**
  *
  */
-EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var_args)
+EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_list var_args)
 {
 	ENDER_MAGIC_CHECK(e);
 	while (name)
@@ -420,7 +420,7 @@ EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var
 		Enesim_Renderer **renderer;
 		Eina_List *list;
 		Enesim_Surface *surface;
-		Ender **ender;
+		Ender_Element **ender;
 
 		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) return;
@@ -464,7 +464,7 @@ EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var
 			break;
 
 			case ENDER_ENDER:
-			ender = va_arg(var_args, Ender **);
+			ender = va_arg(var_args, Ender_Element **);
 			prop->get(e->renderer, ender);
 			break;
 
@@ -481,7 +481,7 @@ EAPI void ender_element_value_get_valist(Ender *e, const char *name, va_list var
 /**
  *
  */
-EAPI void ender_element_value_get(Ender *e, const char *name, ...)
+EAPI void ender_element_value_get(Ender_Element *e, const char *name, ...)
 {
 	va_list ap;
 
@@ -494,7 +494,7 @@ EAPI void ender_element_value_get(Ender *e, const char *name, ...)
 /**
  *
  */
-EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value *value)
+EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
 	Ender_Property *prop;
 
@@ -518,7 +518,7 @@ EAPI void ender_element_value_get_simple(Ender *e, const char *name, Ender_Value
 /**
  *
  */
-EAPI void ender_element_value_set_valist(Ender *e, const char *name, va_list var_args)
+EAPI void ender_element_value_set_valist(Ender_Element *e, const char *name, va_list var_args)
 {
 	ENDER_MAGIC_CHECK(e);
 
@@ -539,7 +539,7 @@ EAPI void ender_element_value_set_valist(Ender *e, const char *name, va_list var
 /**
  *
  */
-EAPI void ender_element_value_set(Ender *e, const char *name, ...)
+EAPI void ender_element_value_set(Ender_Element *e, const char *name, ...)
 {
 	va_list ap;
 
@@ -553,7 +553,7 @@ EAPI void ender_element_value_set(Ender *e, const char *name, ...)
 /**
  *
  */
-EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value *value)
+EAPI void ender_element_value_set_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
 	Ender_Property *prop;
 
@@ -568,7 +568,7 @@ EAPI void ender_element_value_set_simple(Ender *e, const char *name, Ender_Value
 /**
  *
  */
-EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name)
+EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *name)
 {
 	Ender_Property *prop;
 
@@ -588,7 +588,7 @@ EAPI Ender_Property * ender_element_property_get(Ender *e, const char *name)
 /**
  *
  */
-EAPI void ender_element_property_value_set_valist(Ender *e, Ender_Property *prop, va_list var_args)
+EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Property *prop, va_list var_args)
 {
 	ENDER_MAGIC_CHECK(e);
 
@@ -605,7 +605,7 @@ EAPI void ender_element_property_value_set_valist(Ender *e, Ender_Property *prop
 /**
  *
  */
-EAPI void ender_element_property_value_set(Ender *e, Ender_Property *prop, ...)
+EAPI void ender_element_property_value_set(Ender_Element *e, Ender_Property *prop, ...)
 {
 	va_list ap;
 
@@ -619,7 +619,7 @@ EAPI void ender_element_property_value_set(Ender *e, Ender_Property *prop, ...)
 /**
  *
  */
-EAPI void ender_element_property_value_set_simple(Ender *e, Ender_Property *prop, Ender_Value *value)
+EAPI void ender_element_property_value_set_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value)
 {
 	ENDER_MAGIC_CHECK(e);
 
@@ -631,7 +631,7 @@ EAPI void ender_element_property_value_set_simple(Ender *e, Ender_Property *prop
  * @param e
  * @return
  */
-EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e)
+EAPI Enesim_Renderer * ender_element_renderer_get(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
 	return e->renderer;
@@ -640,7 +640,7 @@ EAPI Enesim_Renderer * ender_element_renderer_get(Ender *e)
 /**
  *
  */
-EAPI Ender * ender_element_parent_get(Ender *e)
+EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
 	return e->parent;
@@ -651,7 +651,7 @@ EAPI Ender * ender_element_parent_get(Ender *e)
  * @param r
  * @return
  */
-EAPI Ender * ender_element_renderer_from(Enesim_Renderer *r)
+EAPI Ender_Element * ender_element_renderer_from(Enesim_Renderer *r)
 {
 	return enesim_renderer_private_get(r, "ender");
 }
@@ -659,7 +659,7 @@ EAPI Ender * ender_element_renderer_from(Enesim_Renderer *r)
 /**
  *
  */
-EAPI void ender_event_listener_add(Ender *e, const char *event_name,
+EAPI void ender_event_listener_add(Ender_Element *e, const char *event_name,
 		Ender_Event_Callback cb, void *data)
 {
 	Ender_Listener *listener;
@@ -681,7 +681,7 @@ EAPI void ender_event_listener_add(Ender *e, const char *event_name,
 /**
  *
  */
-EAPI void ender_event_listener_remove(Ender *e, const char *name,
+EAPI void ender_event_listener_remove(Ender_Element *e, const char *name,
 		Ender_Event_Callback cb)
 {
 	ENDER_MAGIC_CHECK(e);
@@ -691,7 +691,7 @@ EAPI void ender_event_listener_remove(Ender *e, const char *name,
 /**
  *
  */
-EAPI void ender_event_dispatch(Ender *e, const char *event_name, void *event_data)
+EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *event_data)
 {
 	Ender_Listener *listener;
 	Eina_List *listeners;

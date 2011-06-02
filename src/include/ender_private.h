@@ -43,7 +43,7 @@ typedef void (*Ender_Shutdown)(void);
 struct _Ender_Container
 {
 	/* common */
-	Ender_Property_Type type;
+	Ender_Value_Type type;
 	/* structs */
 	int num_elements;
 	Eina_List *elements;
@@ -101,7 +101,7 @@ void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, En
 	Eina_Bool relative);
 
 /* property */
-Ender_Container * ender_container_new(Ender_Property_Type t);
+Ender_Container * ender_container_new(Ender_Value_Type t);
 void ender_property_container_delete(Ender_Container *p);
 void ender_container_add(Ender_Container *p, Ender_Container *sub);
 

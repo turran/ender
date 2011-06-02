@@ -24,7 +24,7 @@ static Eina_Hash *_structs = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Container * ender_container_new(Ender_Property_Type t)
+Ender_Container * ender_container_new(Ender_Value_Type t)
 {
 	Ender_Container *prop;
 
@@ -179,7 +179,7 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 	sub->offset = prev_offset + prev_size;
 }
 
-EAPI Ender_Property_Type ender_container_type(Ender_Container *c)
+EAPI Ender_Value_Type ender_container_type(Ender_Container *c)
 {
 	return c->type;
 }
