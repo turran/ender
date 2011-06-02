@@ -18,49 +18,49 @@ _operator [\[\]{}.,;=\:]
 
 rel			return REL;
 uint 			{ 
-				yylval_param->ptype = ENDER_UINT32;
+				yylval_param->vtype = ENDER_UINT32;
 				return UINT;
 			}
 int			{
-				yylval_param->ptype = ENDER_INT32;
+				yylval_param->vtype = ENDER_INT32;
 				return INT;
 			}
 argb			{
-				yylval_param->ptype = ENDER_ARGB;
+				yylval_param->vtype = ENDER_ARGB;
 				return ARGB;
 			}
 color			{
-				yylval_param->ptype = ENDER_COLOR;
+				yylval_param->vtype = ENDER_COLOR;
 				return COLOR;
 			}
 double			{
-				yylval_param->ptype = ENDER_DOUBLE;
+				yylval_param->vtype = ENDER_DOUBLE;
 				return DOUBLE;
 			}
 surface			{
 
-				yylval_param->ptype = ENDER_SURFACE;
+				yylval_param->vtype = ENDER_SURFACE;
 				return SURFACE;
 			}
 
 string			{
-				yylval_param->ptype = ENDER_STRING;
+				yylval_param->vtype = ENDER_STRING;
 				return STRING;
 			}
 matrix			{
-				yylval_param->ptype = ENDER_MATRIX;
+				yylval_param->vtype = ENDER_MATRIX;
 				return MATRIX;
 			}
 renderer		{
-				yylval_param->ptype = ENDER_RENDERER;
+				yylval_param->vtype = ENDER_RENDERER;
 				return RENDERER;
 			}
 ender			{
-				yylval_param->ptype = ENDER_ENDER;
+				yylval_param->vtype = ENDER_ENDER;
 				return ENDER;
 			}
 struct			{
-				yylval_param->ptype = ENDER_STRUCT;
+				yylval_param->vtype = ENDER_STRUCT;
 				return STRUCT;
 			}
 namespace		return NAMESPACE;

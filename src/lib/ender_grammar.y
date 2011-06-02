@@ -17,7 +17,7 @@
 
 %union {
 	Ender_Type etype;
-	Ender_Property_Type ptype;
+	Ender_Value_Type vtype;
 	Ender_Container *prop;
 	Ender_Descriptor *descriptor;
 	char *s;
@@ -25,18 +25,18 @@
 	Eina_List *list; // use this for every _list nonterminal
 }
 
-%token <ptype> UINT
-%token <ptype> INT
-%token <ptype> COLOR
-%token <ptype> ARGB
-%token <ptype> DOUBLE
-%token <ptype> IMAGE
-%token <ptype> SURFACE
-%token <ptype> STRING
-%token <ptype> MATRIX
-%token <ptype> STRUCT
-%token <ptype> RENDERER
-%token <ptype> ENDER
+%token <vtype> UINT
+%token <vtype> INT
+%token <vtype> COLOR
+%token <vtype> ARGB
+%token <vtype> DOUBLE
+%token <vtype> IMAGE
+%token <vtype> SURFACE
+%token <vtype> STRING
+%token <vtype> MATRIX
+%token <vtype> STRUCT
+%token <vtype> RENDERER
+%token <vtype> ENDER
 %token <etype> ABSTRACT
 %token <etype> CLASS
 %token NAMESPACE
@@ -47,7 +47,7 @@
 %type <list>using
 %type <b> type_relative
 %type <prop> type_specifier
-%type <ptype> basic_type
+%type <vtype> basic_type
 %type <etype> definition
 %type <prop> list_type
 %type <prop> struct_type
