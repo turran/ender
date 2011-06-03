@@ -101,6 +101,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 		case ENDER_UINT32:
 		case ENDER_COLOR:
 		case ENDER_ARGB:
+		case ENDER_BOOL:
 		size = sizeof(int32_t);
 		break;
 

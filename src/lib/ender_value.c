@@ -295,6 +295,20 @@ EAPI const Eina_List * ender_value_list_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+EAPI Eina_Bool ender_value_bool_get(Ender_Value *value)
+{
+	if (value->container->type != ENDER_BOOL)
+		return EINA_FALSE;
+	return value->data.u32;
+}
+
+EAPI void ender_value_bool_set(Ender_Value *value, Eina_Bool boolean)
+{
+	if (value->container->type != ENDER_BOOL)
+		return;
+	value->data.u32 = boolean;
+}
+
 EAPI void ender_value_free(Ender_Value *value)
 {
 	if (value->owned)

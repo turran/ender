@@ -17,6 +17,10 @@ _operator [\[\]{}.,;=\:]
 %%
 
 rel			return REL;
+bool			{
+				yylval_param->vtype = ENDER_BOOL;
+				return BOOL;
+			}
 uint 			{ 
 				yylval_param->vtype = ENDER_UINT32;
 				return UINT;

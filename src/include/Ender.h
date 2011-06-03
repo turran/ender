@@ -69,6 +69,7 @@ typedef enum _Ender_Type
 typedef enum _Ender_Value_Type
 {
 	/* basic types */
+	ENDER_BOOL,
 	ENDER_UINT32,
 	ENDER_INT32,
 	ENDER_DOUBLE,

@@ -36,6 +36,7 @@
 			case ENDER_ARGB:				\
 			case ENDER_UINT32:				\
 			case ENDER_INT32:				\
+			case ENDER_BOOL:				\
 			v.data.u32 = va_arg(var_args, uint32_t);	\
 			break;						\
 									\
@@ -87,7 +88,7 @@ struct _Ender_Element
 	Ender_Element *parent;
 };
 /*----------------------------------------------------------------------------*
- *                           uint32 / in32 / argb                             *
+ *                     uint32 / in32 / argb / bool                            *
  *----------------------------------------------------------------------------*/
 static void _ender_int32_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
 		Ender_Element *parent)
@@ -149,6 +150,7 @@ static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
 }
 
 static Ender_Value_Accessor _accessors[ENDER_PROPERTY_TYPES] = {
+	[ENDER_BOOL] = _ender_int32_set,
 	[ENDER_UINT32] = _ender_int32_set,
 	[ENDER_INT32] = _ender_int32_set,
 	[ENDER_DOUBLE] = _ender_double_set,
@@ -164,6 +166,7 @@ static Ender_Value_Accessor _accessors[ENDER_PROPERTY_TYPES] = {
 };
 
 static Ender_Value_Accessor _relative_accessors[ENDER_PROPERTY_TYPES] = {
+	[ENDER_BOOL] = _ender_relative_int32_set,
 	[ENDER_UINT32] = _ender_relative_int32_set,
 	[ENDER_INT32] = _ender_relative_int32_set,
 	[ENDER_DOUBLE] = _ender_relative_double_set,
@@ -421,12 +424,18 @@ EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_
 		Eina_List *list;
 		Enesim_Surface *surface;
 		Ender_Element **ender;
+		Eina_Bool b;
 
 		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) return;
 
 		switch (prop->prop->type)
 		{
+			case ENDER_BOOL:
+			b = va_arg(var_args, Eina_Bool *);
+			prop->get(e->renderer, b);
+			break;
+
 			case ENDER_UINT32:
 			u32 = va_arg(var_args, uint32_t *);
 			prop->get(e->renderer, u32);

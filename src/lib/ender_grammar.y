@@ -25,6 +25,7 @@
 	Eina_List *list; // use this for every _list nonterminal
 }
 
+%token <vtype> BOOL 
 %token <vtype> UINT
 %token <vtype> INT
 %token <vtype> COLOR
@@ -137,7 +138,8 @@ types
 	;
 
 basic_type
-	: UINT { $$ = $1; }
+	: BOOL { $$ = $1; }
+	| UINT { $$ = $1; }
 	| INT { $$ = $1; }
 	| COLOR { $$ = $1; }
 	| ARGB { $$ = $1; }
