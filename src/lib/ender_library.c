@@ -20,10 +20,28 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct  _Ender_Library
+{
+	int ref;
+	void *dl_handle;
+	char *name;
+} Ender_Library;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI Ender_Library * ender_library_new(const char *name)
+{
 
+}
+
+EAPI Ender_Namespace * ender_library_namespace_add(Ender_Library *el, const char *name)
+{
+	Ender_Namespace *ens;
+
+	ens = ender_namespace_new(el, name, NULL);
+
+	return ens;
+}

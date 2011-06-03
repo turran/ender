@@ -30,13 +30,13 @@
  * @section syntax Syntax
  * The syntax of a description file (.ender) is:
  * @code
- * namespace [PREFIX.]NAME {
- *   (abstract | class) NAME {
- *     PROPERTY NAME;
+ * namespace "[PREFIX.]NAME" {
+ *   (abstract | class) "NAME" {
+ *     PROPERTY "NAME";
  *   }
  * }
  * Where PROPERTY can be one of the following:
- * uint | int | double | argb | surface | matrix | LIST
+ * uint | int | double | argb | color | surface | matrix | renderer | ender | LIST
 
  * Where LIST is defined as:
  * (PROPERTY [, PROPERTY])
@@ -48,9 +48,6 @@
  * @section dependencies Dependencies
  * - Eina
  * - Enesim
- *
- * @defgroup Ender_Group API
- * @{
  *
  * @todo
  */
@@ -99,7 +96,7 @@ EAPI void ender_shutdown(void);
 
 /**
  * @}
- * @defgroup Ender_Container_Group Container Group
+ * @defgroup Ender_Container_Group Container
  * @{
  */
 
@@ -114,7 +111,7 @@ EAPI Ender_Value_Type ender_container_type(Ender_Container *c);
 
 /**
  * @}
- * @defgroup Ender_Value_Group Value Group
+ * @defgroup Ender_Value_Group Value
  * @{
  */
 
@@ -174,7 +171,7 @@ EAPI void ender_value_free(Ender_Value *v);
 
 /**
  * @}
- * @defgroup Ender_Descriptor_Group Descriptor Group
+ * @defgroup Ender_Descriptor_Group Descriptor
  * @{
  */
 typedef struct _Ender_Descriptor Ender_Descriptor;
@@ -192,7 +189,7 @@ EAPI const char * ender_descriptor_name_get(Ender_Descriptor *ed);
 EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *ed);
 /**
  * @}
- * @defgroup Ender_Element_Group Element Group
+ * @defgroup Ender_Element_Group Element
  * @{
  */
 EAPI Ender_Element * ender_element_new(const char *name);
@@ -233,7 +230,7 @@ EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data);
 
 /**
  * @}
- * @defgroup Ender_Property_Group Property Group
+ * @defgroup Ender_Property_Group Property
  * @{
  */
 EAPI Ender_Value_Type ender_property_type(Ender_Property *p);
@@ -243,7 +240,7 @@ EAPI const char * ender_property_name_get(Ender_Property *p);
 
 /**
  * @}
- * @defgroup Ender_Other_Group Other Group
+ * @defgroup Ender_Other_Group Other
  * @{
  */
 
@@ -258,7 +255,7 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
 
 /**
  * @}
- * @defgroup Ender_Helper_Group Helper Group
+ * @defgroup Ender_Helper_Group Helper
  * @{
  */
 EAPI const char * ender_property_type_name_get(Ender_Value_Type type);
