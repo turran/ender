@@ -119,6 +119,6 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 
 void ender_parser_init(void);
 void ender_parser_shutdown(void);
-void ender_parser_parse(const char *file);
+void ender_parser_load(const char *file);
 
 #endif

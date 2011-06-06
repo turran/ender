@@ -60,7 +60,7 @@ static void _dir_list_cb(const char *name, const char *path, void *data)
 	char file[PATH_MAX];
 
 	snprintf(file, PATH_MAX, "%s/%s", path, name);
-	ender_parser_parse(file);
+	ender_parser_load(file);
 }
 
 static Ender_Library * _library_new(const char *name, void *dl_handle)
@@ -73,6 +73,38 @@ static Ender_Library * _library_new(const char *name, void *dl_handle)
 	library->ref = 0;
 
 	return library;
+}
+
+static Eina_Bool _file_locate(const char *file, char *real_file)
+{
+	struct stat st;
+
+	strcpy(real_file, file);
+	if (strcmp(real_file + strlen(real_file) - 6, ".ender"))
+	{
+		strcat(real_file, ".ender");
+	}
+	/* check for files on DATADIR */
+	if (stat(real_file, &st) < 0)
+	{
+		char *tmp;
+
+		tmp = strdup(real_file);
+		/* TODO check if the file is relative or absolute */
+		strncpy(real_file, PACKAGE_DATA_DIR, PATH_MAX);
+		strncat(real_file, "/", PATH_MAX - strlen(real_file));
+		strncat(real_file, tmp, PATH_MAX - strlen(real_file));
+		free(tmp);
+
+		if (stat(real_file, &st) < 0)
+		{
+			ERR("File %s.ender not found at . or %s", file, real_file);
+			return EINA_FALSE;
+		}
+	}
+
+	DBG("Parsing file %s", real_file);
+	return EINA_TRUE;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -291,39 +323,7 @@ void ender_parser_shutdown(void)
 	/* TODO free the list of files */
 }
 
-Eina_Bool ender_parser_locate(const char *file, char *real_file)
-{
-	struct stat st;
-
-	strcpy(real_file, file);
-	if (strcmp(real_file + strlen(real_file) - 6, ".ender"))
-	{
-		strcat(real_file, ".ender");
-	}
-	/* check for files on DATADIR */
-	if (stat(real_file, &st) < 0)
-	{
-		char *tmp;
-
-		tmp = strdup(real_file);
-		/* TODO check if the file is relative or absolute */
-		strncpy(real_file, PACKAGE_DATA_DIR, PATH_MAX);
-		strncat(real_file, "/", PATH_MAX - strlen(real_file));
-		strncat(real_file, tmp, PATH_MAX - strlen(real_file));
-		free(tmp);
-
-		if (stat(real_file, &st) < 0)
-		{
-			ERR("File %s.ender not found at . or %s", file, real_file);
-			return EINA_FALSE;
-		}
-	}
-
-	DBG("Parsing file %s", real_file);
-	return EINA_TRUE;
-}
-
-void ender_parser_parse(const char *file)
+void ender_parser_load(const char *file)
 {
 	Ender_Parser *parser;
 	Eina_List *l;
@@ -334,7 +334,7 @@ void ender_parser_parse(const char *file)
 	void *scanner;
 
 
-	if (!ender_parser_locate(file, real_file))
+	if (!_file_locate(file, real_file))
 		return;
 
 	/* check that we haven't parse the file already */
@@ -363,6 +363,7 @@ void ender_parser_parse(const char *file)
 	free(parser);
 	fclose(f);
 }
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
