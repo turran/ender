@@ -38,6 +38,9 @@ EAPI const char * ender_type_name_get(Ender_Type type)
 
 		case ENDER_CLASS:
 		return "class";
+
+		default:
+		return NULL;
 	}
 }
 

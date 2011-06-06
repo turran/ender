@@ -45,6 +45,7 @@ EAPI void ender_init(void)
 		ender_log_dom = eina_log_domain_register("ender", NULL);
 		enesim_init();
 		ender_descriptor_init();
+		ender_namespace_init();
 		ender_container_init();
 		ender_parser_init();
 	}
@@ -59,6 +60,7 @@ EAPI void ender_shutdown(void)
 	{
 		ender_parser_shutdown();
 		ender_container_shutdown();
+		ender_namespace_shutdown();
 		ender_descriptor_shutdown();
 		enesim_shutdown();
 		eina_log_domain_unregister(ender_log_dom);

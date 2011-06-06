@@ -38,7 +38,6 @@ static Ender_Value * _ender_value_new(Ender_Container *ec)
 EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type)
 {
 	Ender_Container *ec;
-	Ender_Value *ev;
 
 	if (type == ENDER_LIST || type == ENDER_STRUCT)
 		return NULL;

@@ -43,20 +43,12 @@ static Ender_Property * _property_get(Ender_Descriptor *e, const char *name)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-
-Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
+Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type)
 {
 	Ender_Descriptor *desc;
 
-	desc = eina_hash_find(_descriptors, name);
-	if (desc)
-	{
-		/* already exists */
-		return desc;
-	}
-
-	desc = malloc(sizeof(Ender_Descriptor));
+	desc = calloc(1, sizeof(Ender_Descriptor));
 	desc->name = strdup(name);
 	desc->parent = parent;
 	desc->create = creator;
@@ -64,16 +56,10 @@ Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator cre
 	desc->properties = eina_hash_string_superfast_new(NULL);
 
 	eina_hash_add(_descriptors, name, desc);
-	DBG("Descriptor %s added", name);
 
 	return desc;
 }
 
-void ender_descriptor_unregister(Ender_Descriptor *edesc)
-{
-	/* TODO remove every property */
-	//eina_hash_remove(_descriptors, ..);
-}
 
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 	Ender_Container *prop, Ender_Getter get, Ender_Setter set,
@@ -145,6 +131,16 @@ EAPI Ender_Descriptor * ender_descriptor_find(const char *name)
 	return ed;
 }
 
+EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns_name)
+{
+	Ender_Namespace *ns;
+	Ender_Descriptor *ed;
+
+	ns = ender_namespace_find(ns_name);
+	if (!ns) return NULL;
+	return ender_namespace_descriptor_find(ns, name);
+}
+
 /**
  * Check if an ender with name @name exists on the library
  * @param name
@@ -163,6 +159,7 @@ EAPI Eina_Bool ender_descriptor_exists(const char *name)
  */
 EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed)
 {
+	if (!ed) return 0;
 	return ed->type;
 }
 
@@ -171,6 +168,8 @@ EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed)
  */
 EAPI const char * ender_descriptor_name_get(Ender_Descriptor *edesc)
 {
+	if (!edesc) return NULL;
+
 	return edesc->name;
 }
 
@@ -179,6 +178,8 @@ EAPI const char * ender_descriptor_name_get(Ender_Descriptor *edesc)
  */
 EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
 {
+	if (!edesc) return NULL;
+
 	return edesc->parent;
 }
 
@@ -189,6 +190,8 @@ EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_Li
 {
 	Eina_Iterator *it;
 	char *name;
+
+	if (!ed || !cb) return;
 
 	it = eina_hash_iterator_key_new(ed->properties);
 	while (eina_iterator_next(it, (void **)&name))
@@ -204,5 +207,6 @@ EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_Li
  */
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name)
 {
+	if (!ed) return NULL;
 	return _property_get(ed, name);
 }

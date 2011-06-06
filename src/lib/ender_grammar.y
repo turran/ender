@@ -83,7 +83,7 @@ namespace_list
 namespace
 	: NAMESPACE INLINE_STRING
 	{
-		strcpy(parser->ns, $2);
+		parser->lns = ender_parser_namespace_new($2);
 	}
 	'{' definition_list '}' ';'
 	;
@@ -111,7 +111,7 @@ struct
 
 renderer
 	: definition INLINE_STRING renderer_inheritance
-	{ parser->descriptor = ender_parser_register(parser->ns, $2, $3, $1); }
+	{ parser->descriptor = ender_parser_descriptor_new(parser->lns, $2, $3, $1); }
 	'{' declaration_list '}' ';'
 	;
 
@@ -177,7 +177,7 @@ declaration
 	:
 	type_relative type_specifier INLINE_STRING ';'
 	{
-		ender_parser_property_add(parser->ns, parser->descriptor, $3, $2, $1);
+		ender_parser_descriptor_property_add(parser->lns, parser->descriptor, $3, $2, $1);
 	}
 	;
 

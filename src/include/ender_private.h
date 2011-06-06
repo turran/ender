@@ -30,13 +30,6 @@
 #define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
 extern int ender_log_dom;
 
-typedef Enesim_Renderer * (*Ender_Creator)(void);
-typedef void (*Ender_Accessor)(Enesim_Renderer *r, ...);
-typedef Ender_Accessor Ender_Getter;
-typedef Ender_Accessor Ender_Setter;
-typedef Ender_Accessor Ender_Add;
-typedef Ender_Accessor Ender_Remove;
-typedef void (*Ender_Clear)(Enesim_Renderer *r);
 typedef void (*Ender_Init)(void);
 typedef void (*Ender_Shutdown)(void);
 
@@ -90,9 +83,8 @@ struct _Ender_Property
 Ender_Property * ender_descriptor_property_get_internal(Ender_Descriptor *e, const char *name);
 
 /* descriptor */
-Ender_Descriptor * ender_descriptor_register(const char *name, Ender_Creator creator,
+Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type);
-void ender_descriptor_unregister(Ender_Descriptor *edesc);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
 void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Container *p,
@@ -105,25 +97,26 @@ Ender_Container * ender_container_new(Ender_Value_Type t);
 void ender_property_container_delete(Ender_Container *p);
 void ender_container_add(Ender_Container *p, Ender_Container *sub);
 
+/* namespace */
+void ender_namespace_init(void);
+void ender_namespace_shutdown(void);
+
 /* the parser */
 typedef struct _Ender_Parser Ender_Parser;
-typedef struct _Ender_Parser_Property Ender_Parser_Property;
+typedef struct _Ender_Library_Namespace  Ender_Library_Namespace;
 
 struct _Ender_Parser
 {
 	char *file;
-	char ns[PATH_MAX];
+	Ender_Library_Namespace *lns;
 	Ender_Descriptor *descriptor;
 };
 
-struct _Ender_Parser_Property
-{
-	char *name;
-	Eina_Bool relative;
-	Eina_Array *properties;
-};
+Ender_Library_Namespace * ender_parser_namespace_new(const char *name);
+Ender_Descriptor * ender_parser_descriptor_new(Ender_Library_Namespace *lns, const char *name, Ender_Descriptor *parent, Ender_Type type);
+void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_Descriptor *edesc,
+		const char *name, Ender_Container *prop, Eina_Bool rel);
 
-Ender_Descriptor * ender_parser_register(const char *ns, const char *name, Ender_Descriptor * parent, Ender_Type type);
 void ender_parser_init(void);
 void ender_parser_shutdown(void);
 void ender_parser_parse(const char *file);

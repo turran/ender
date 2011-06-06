@@ -20,20 +20,83 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Ender_Namespace
+struct _Ender_Namespace
 {
-	Ender_Library *lib;
 	char *name;
-	char *prefix;
-} Ender_Namespace;
+	Eina_Hash *descriptors;
+};
+
+/* TODO */
+typedef void (*Ender_Namespace_Init)(void);
+
+static Eina_Hash *_namespaces = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Namespace * ender_namespace_new(Ender_Library *lib, const char *name, const char *prefix)
+void ender_namespace_init(void)
 {
-
+	_namespaces = eina_hash_string_superfast_new(NULL);
 }
+
+void ender_namespace_shutdown(void)
+{
+	/* TODO remove every namespace */
+	eina_hash_free(_namespaces);
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI Ender_Namespace * ender_namespace_new(const char *name)
+{
+	Ender_Namespace *namespace;
 
+	if (!name) return NULL;
+
+	/* check if we already have the namespace */
+	namespace = eina_hash_find(_namespaces, name);
+	if (!namespace)
+	{
+		namespace = malloc(sizeof(Ender_Namespace));
+		namespace->name = strdup(name);
+		namespace->descriptors = eina_hash_string_superfast_new(NULL);
+		eina_hash_add(_namespaces, name, namespace);
+	}
+	return namespace;
+}
+
+EAPI Ender_Namespace * ender_namespace_find(const char *name)
+{
+	Ender_Namespace *namespace;
+
+	if (!name) return NULL;
+
+	namespace = eina_hash_find(_namespaces, name);
+	return namespace;
+}
+
+EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name)
+{
+	if (!ns || !name) return NULL;
+
+	return eina_hash_find(ns->descriptors, name);
+}
+
+EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Type type)
+{
+	Ender_Descriptor *desc;
+
+	if (!name || !ens) return NULL;
+	desc = ender_descriptor_new(name, creator, parent, type);
+	if (!desc) return NULL;
+	DBG("class %s@%s registered correctly %p", name, ens->name, desc);
+	eina_hash_add(ens->descriptors, name, desc);
+
+	return desc;
+}
+
+EAPI const char * ender_namespace_name_get(Ender_Namespace *ns)
+{
+	if (!ns) return NULL;
+	return ns->name;
+}

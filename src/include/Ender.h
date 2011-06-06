@@ -55,6 +55,16 @@
 typedef struct _Ender_Element Ender_Element;
 typedef struct _Ender_Property Ender_Property;
 typedef struct _Ender_Container Ender_Container;
+typedef struct _Ender_Descriptor Ender_Descriptor;
+typedef struct _Ender_Namespace Ender_Namespace;
+
+typedef Enesim_Renderer * (*Ender_Creator)(void);
+typedef void (*Ender_Accessor)(Enesim_Renderer *r, ...);
+typedef Ender_Accessor Ender_Getter;
+typedef Ender_Accessor Ender_Setter;
+typedef Ender_Accessor Ender_Add;
+typedef Ender_Accessor Ender_Remove;
+typedef void (*Ender_Clear)(Enesim_Renderer *r);
 
 typedef void (*Ender_Event_Callback)(Ender_Element *e, const char *event_name, void *event_data, void *data);
 typedef void (*Ender_New_Callback)(Ender_Element *e, void *data);
@@ -175,12 +185,22 @@ EAPI void ender_value_free(Ender_Value *v);
  * @defgroup Ender_Descriptor_Group Descriptor
  * @{
  */
-typedef struct _Ender_Descriptor Ender_Descriptor;
+EAPI Ender_Namespace * ender_namespace_new(const char *name);
+EAPI Ender_Namespace * ender_namespace_find(const char *name);
+EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name);
+EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Type type);
+EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
 
+/**
+ * @}
+ * @defgroup Ender_Descriptor_Group Descriptor
+ * @{
+ */
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender_Descriptor *e, const char *name, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
+EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns);
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
 EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);

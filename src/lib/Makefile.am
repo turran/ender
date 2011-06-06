@@ -26,6 +26,7 @@ ender_property.c \
 ender_misc.c \
 ender_grammar.y \
 ender_lexer.l \
+ender_namespace.c \
 ender_parser.c \
 ender_value.c
 
