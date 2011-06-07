@@ -21,10 +21,10 @@ namespace "enesim.renderer" {
 		uint "width";
 		uint "height";
 		double "corner_radius";
-		int "top_left_corner";
-		int "top_right_corner";
-		int "bottom_left_corner";
-		int "bottom_right_corner";
+		bool "top_left_corner";
+		bool "top_right_corner";
+		bool "bottom_left_corner";
+		bool "bottom_right_corner";
 	};
 
 	class "circle" : "shape" {

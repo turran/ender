@@ -87,6 +87,9 @@ EAPI const char * ender_property_type_name_get(Ender_Value_Type type)
 		case ENDER_STRUCT:
 		return "struct";
 
+		case ENDER_BOOL:
+		return "bool";
+
 		default:
 		return NULL;
 	}
