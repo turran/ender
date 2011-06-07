@@ -64,7 +64,7 @@ main
 
 		EINA_LIST_FOREACH ($1, l, str)
 		{
-			ender_parser_parse(str);
+			ender_parser_load(str);
 		}
 	}
 	namespace_list

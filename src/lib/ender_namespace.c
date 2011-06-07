@@ -43,6 +43,26 @@ void ender_namespace_shutdown(void)
 	/* TODO remove every namespace */
 	eina_hash_free(_namespaces);
 }
+
+void ender_namespace_dump(Ender_Namespace *ns)
+{
+	Eina_Iterator *it;
+	Ender_Descriptor *descriptor;
+
+	it = eina_hash_iterator_data_new(ns->descriptors);
+	printf("namespace \"%s\" {\n", ns->name);
+
+	while (eina_iterator_next(it, (void **)&descriptor))
+	{
+		Ender_Type type;
+
+		type = ender_descriptor_type(descriptor);
+		printf("\t %s \"%s\" {\n", ender_type_name_get(type), ender_descriptor_name_get(descriptor));
+		printf("\t};\n");
+	}
+	printf("};\n");
+	eina_iterator_free(it);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
