@@ -17,6 +17,13 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
+/**
+ * @todo
+ * - Add dynamic properties, we must export the property_add function for
+ * descriptors given that those *must* be fixed always and impossible to remove
+ * but properties that are added through a element_property_add/remove must
+ * be available
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -78,7 +85,7 @@ typedef struct _Ender_New_Listener
 	Ender_New_Callback callback;
 	void *data;
 } Ender_New_Listener;
-	
+
 typedef struct _Ender_Element_Property_List_Data
 {
 	Ender_Property_List_Callback cb;
