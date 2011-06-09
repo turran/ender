@@ -50,13 +50,13 @@ static void _container_dump(Ender_Container *c)
 	printf("\n");
 }
 
-static void _prop_cb(Ender_Descriptor *e, const char *name, void *data)
+static void _prop_cb(Ender_Property *p, void *data)
 {
-	Ender_Property *p;
 	Ender_Container *c;
+	const char *name;
 
-	p = ender_descriptor_property_get(e, name);
 	c = ender_property_container_get(p);
+	name = ender_property_name_get(p);
 	printf("\t%s%s: ", ender_property_is_relative(p) ? "rel " : "", name);
 	_container_dump(c);
 }
@@ -97,7 +97,7 @@ static void _descriptor_dump(const char *name)
 	printf("Information:\n");
 	printf("\ttype = %s\n", ender_type_name_get(ender_descriptor_type(ed)));
 	printf("Properties:\n");
-	ender_descriptor_property_list(ed, _prop_cb, NULL);
+	ender_descriptor_property_list(ed, _prop_cb, ed);
 }
 
 int main(int argc, char **argv)

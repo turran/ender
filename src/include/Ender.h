@@ -197,7 +197,7 @@ EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
  * @{
  */
 typedef void (*Ender_List_Callback)(const char *name, void *data);
-typedef void (*Ender_Property_List_Callback)(Ender_Descriptor *e, const char *name, void *data);
+typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
 EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns);
@@ -219,6 +219,7 @@ EAPI const char * ender_element_name_get(Ender_Element *e);
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e);
 
 EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *name);
+EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Property *prop, va_list va_args);
 EAPI void ender_element_property_value_set(Ender_Element *e, Ender_Property *prop, ...);
 EAPI void ender_element_property_value_set_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value);

@@ -78,6 +78,12 @@ typedef struct _Ender_New_Listener
 	Ender_New_Callback callback;
 	void *data;
 } Ender_New_Listener;
+	
+typedef struct _Ender_Element_Property_List_Data
+{
+	Ender_Property_List_Callback cb;
+	void *data;
+} Ender_Element_Property_List_Data;
 
 struct _Ender_Element
 {
@@ -87,6 +93,14 @@ struct _Ender_Element
 	Eina_Hash *listeners;
 	Ender_Element *parent;
 };
+
+static void _property_is_relative_cb(Ender_Property *prop, void *data)
+{
+	Ender_Element_Property_List_Data *new_data = data;
+
+	if (ender_property_is_relative(prop))
+		new_data->cb(prop, new_data->data);
+}
 /*----------------------------------------------------------------------------*
  *                     uint32 / in32 / argb / bool                            *
  *----------------------------------------------------------------------------*/
@@ -592,6 +606,31 @@ EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *n
 	if (!prop->relative) return NULL;
 
 	return prop;
+}
+
+/**
+ *
+ */
+EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Callback cb, void *data)
+{
+	Ender_Element_Property_List_Data new_data;
+	Ender_Descriptor *desc;
+
+	ENDER_MAGIC_CHECK(e);
+
+	/* we first list all the local properties */
+	desc = e->descriptor;
+	/* now the parent descriptor */
+	do
+	{
+		ender_descriptor_property_list(desc, cb, data);
+	}
+	while (desc = ender_descriptor_parent(desc));
+	/* now let's lis the relative properties from the parent */
+	if (!e->parent) return;
+	new_data.data = data;
+	new_data.cb = cb;
+	ender_descriptor_property_list(e->parent->descriptor, _property_is_relative_cb, &new_data);
 }
 
 /**

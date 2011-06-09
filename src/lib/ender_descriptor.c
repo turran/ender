@@ -188,19 +188,18 @@ EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
  */
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data)
 {
+	Ender_Property *prop;
 	Eina_Iterator *it;
-	char *name;
 
 	if (!ed || !cb) return;
 
-	it = eina_hash_iterator_key_new(ed->properties);
-	while (eina_iterator_next(it, (void **)&name))
+	it = eina_hash_iterator_data_new(ed->properties);
+	while (eina_iterator_next(it, (void **)&prop))
 	{
-		cb(ed, name, data);
+		cb(prop, data);
 	}
 	eina_iterator_free(it);
 }
-
 
 /**
  *
