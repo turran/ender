@@ -50,9 +50,10 @@ static void _remove_option(int idx, int *argc, char ***argv)
 static void _parse(int *argc, char ***argv)
 {
 	int i;
-	char **option = *argv;
+	char **option;
 
 	if (!argc || !argv) return;
+	option = *argv;
 	for (i = 0; i < *argc; i++)
 	{
 		if (!strcmp("--disable-parse", option[i]))
