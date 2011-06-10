@@ -119,7 +119,11 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 		case ENDER_ENDER:
 		case ENDER_LIST:
 		case ENDER_STRUCT:
+		case ENDER_POINTER:
 		size = sizeof(void *);
+		break;
+
+		default:
 		break;
 	}
 	return size;

@@ -191,7 +191,6 @@ static void _property_remove(Ender_Property *p, Ender_Element *e, Ender_Value *v
 static void _property_get(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
-	Ender_Container *ec;
 	Enesim_Renderer *renderer;
 
 	renderer = ender_element_renderer_get(e);
@@ -348,7 +347,6 @@ EAPI Ender_Descriptor * ender_descriptor_find(const char *name)
 EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns_name)
 {
 	Ender_Namespace *ns;
-	Ender_Descriptor *ed;
 
 	ns = ender_namespace_find(ns_name);
 	if (!ns) return NULL;

@@ -47,7 +47,7 @@ EAPI const char * ender_type_name_get(Ender_Type type)
 /**
  *
  */
-EAPI const char * ender_property_type_name_get(Ender_Value_Type type)
+EAPI const char * ender_value_type_name_get(Ender_Value_Type type)
 {
 	switch (type)
 	{

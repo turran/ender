@@ -277,26 +277,8 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 
 void ender_parser_init(void)
 {
-	Eina_Iterator *it;
-	Ender_Library *lib;
-
 	_library_namespaces = eina_hash_string_superfast_new(NULL);
 	_libraries = eina_hash_string_superfast_new(NULL);
-	/* iterate over the list of .ender files and parse them */
-	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
-	/* now that every ender is regsitered we can start initializing the libraries */
-	it = eina_hash_iterator_data_new(_libraries);
-	while (eina_iterator_next(it, (void **)&lib))
-	{
-		Ender_Init init;
-		char sym_name[PATH_MAX];
-
-		/* initialize the library */
-		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
-		init = dlsym(lib->dl_handle, sym_name);
-		if (init) init();
-	}
-	eina_iterator_free(it);
 }
 
 void ender_parser_shutdown(void)
@@ -364,6 +346,27 @@ void ender_parser_load(const char *file)
 	fclose(f);
 }
 
+void ender_parser_parse(void)
+{
+	Eina_Iterator *it;
+	Ender_Library *lib;
+
+	/* iterate over the list of .ender files and parse them */
+	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
+	/* now that every ender is regsitered we can start initializing the libraries */
+	it = eina_hash_iterator_data_new(_libraries);
+	while (eina_iterator_next(it, (void **)&lib))
+	{
+		Ender_Init init;
+		char sym_name[PATH_MAX];
+
+		/* initialize the library */
+		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
+		init = dlsym(lib->dl_handle, sym_name);
+		if (init) init();
+	}
+	eina_iterator_free(it);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -558,11 +558,23 @@ EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *n
 	prop = ender_descriptor_property_get(e->descriptor, name);
 	if (prop) return prop;
 	/* now check relative proprties */
-	if (!e->parent) return NULL;
+	if (!e->parent)
+	{
+		WRN("Property %s not found and it has no parent", name);
+		return NULL;
+	}
 
 	prop = ender_descriptor_property_get(e->parent->descriptor, name);
-	if (!prop) return NULL;
-	if (!ender_property_is_relative(prop)) return NULL;
+	if (!prop)
+	{
+		WRN("Parent does not have the property %s", name);
+		return NULL;
+	}
+	if (!ender_property_is_relative(prop))
+	{
+		WRN("Parent do have the property %s but is not marked as relative", name);
+		return NULL;
+	}
 
 	return prop;
 }
@@ -584,7 +596,7 @@ EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Call
 	{
 		ender_descriptor_property_list(desc, cb, data);
 	}
-	while (desc = ender_descriptor_parent(desc));
+	while ((desc = ender_descriptor_parent(desc)));
 	/* now let's lis the relative properties from the parent */
 	if (!e->parent) return;
 	new_data.data = data;
@@ -694,7 +706,6 @@ EAPI void ender_event_listener_remove(Ender_Element *e, const char *name,
 		Ender_Event_Callback cb)
 {
 	ENDER_MAGIC_CHECK(e);
-	Ender_Listener *listener;
 }
 
 /**

@@ -67,13 +67,13 @@ struct _Ender_Descriptor
 	Eina_Hash *properties;
 };
 
-//typedef void (*Ender_Property_Accessor)(Ender *e, Ender_Property *prop, void *data, ...);
-
 /* descriptor */
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
+void ender_descriptor_init(void);
+void ender_descriptor_shutdown(void);
 
 /* property */
 typedef void (*Ender_Property_Accessor)(Ender_Property *ep, Ender_Element *e, Ender_Value *v, void *data);
@@ -105,10 +105,15 @@ void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e);
 Ender_Container * ender_container_new(Ender_Value_Type t);
 void ender_property_container_delete(Ender_Container *p);
 void ender_container_add(Ender_Container *p, Ender_Container *sub);
+void ender_container_init(void);
+void ender_container_shutdown(void);
 
 /* namespace */
 void ender_namespace_init(void);
 void ender_namespace_shutdown(void);
+
+/* element */
+void ender_element_parent_set(Ender_Element *e, Ender_Element *parent);
 
 /* the parser */
 typedef struct _Ender_Parser Ender_Parser;
@@ -129,5 +134,6 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 void ender_parser_init(void);
 void ender_parser_shutdown(void);
 void ender_parser_load(const char *file);
+void ender_parser_parse(void);
 
 #endif

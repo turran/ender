@@ -94,7 +94,7 @@ typedef enum _Ender_Value_Type
  * @defgroup Ender_Main_Group Main
  * @{
  */
-EAPI void ender_init(void);
+EAPI void ender_init(int *argc, char ***argv);
 EAPI void ender_shutdown(void);
 
 /**
@@ -110,7 +110,6 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
 EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
 EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub);
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
-
 
 /**
  * @}
@@ -300,7 +299,7 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
  * @defgroup Ender_Helper_Group Helper
  * @{
  */
-EAPI const char * ender_property_type_name_get(Ender_Value_Type type);
+EAPI const char * ender_value_type_name_get(Ender_Value_Type type);
 EAPI const char * ender_type_name_get(Ender_Type type);
 
 /**

@@ -16,7 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Ender.h"
-#include "Ender.h"
+#include "ender_private.h"
 
 /* The idea here is to generate the .c code from an ender descriptor
  * file  (.ender). This way we can avoid the need to parse the file
@@ -24,10 +24,33 @@
  * namespaces statically
  */
 
+static void help(void)
+{
+	printf("Run: ender_generator INPUT OUTPUT\n");
+	printf("Where INPUT is the ender file to load\n");
+	printf("and OUTPUT is the c file to save\n");
+}
+
 int main(int argc, char **argv)
 {
-	ender_init();
-		
+	int myargc;
+	char **myargv;
+
+	/* append the disable-parse option */
+	myargc = argc + 1;
+	myargv = malloc(sizeof(char *) * myargc);
+	memcpy(myargv, argv, argc * sizeof(char *));
+	myargv[myargc - 1] = strdup("--disable-parse");
+	/* we force to disable the parse */
+	ender_init(&myargc, &myargv);
+	/* now parse the file input output */
+	if (argc < 3)
+	{
+		help();
+		return -1;
+	}
+	ender_parser_load(argv[1]);
+
 	ender_shutdown();
 
 	return 0;

@@ -35,7 +35,7 @@ static void _container_compound_dump(Ender_Container *c)
 		sub = ender_container_compound_get(c, i);
 		if (i != 0)
 			printf(", ");
-		printf("%s", ender_property_type_name_get(ender_container_type_get(sub)));
+		printf("%s", ender_value_type_name_get(ender_container_type_get(sub)));
 		if (ender_container_is_compound(sub))
 			_container_compound_dump(sub);
 	}
@@ -44,7 +44,7 @@ static void _container_compound_dump(Ender_Container *c)
 
 static void _container_dump(Ender_Container *c)
 {
-	printf("%s", ender_property_type_name_get(ender_container_type_get(c)));
+	printf("%s", ender_value_type_name_get(ender_container_type_get(c)));
 	if (ender_container_is_compound(c))
 		_container_compound_dump(c);
 	printf("\n");
@@ -87,8 +87,8 @@ static void _descriptor_dump(const char *name)
 	{
 		eina_array_push(inheritance, parent);
 	}
-	while (parent = ender_descriptor_parent(parent));
-	while (parent = eina_array_pop(inheritance))
+	while ((parent = ender_descriptor_parent(parent)));
+	while ((parent = eina_array_pop(inheritance)))
 	{
 		_inheritance_dump(parent, level);
 		level++;
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 	/* if we have an ender name, first try to match a renderer
 	 * then an abstract and then a namespace
 	 */
-	ender_init();
+	ender_init(&argc, &argv);
 	if (argc < 2)
 	{
 		ender_descriptor_list(_list_cb, NULL);
@@ -115,7 +115,6 @@ int main(int argc, char **argv)
 	{
 		_descriptor_dump(argv[1]);
 	}
-end:
 	ender_shutdown();
 	return 0;
 }
