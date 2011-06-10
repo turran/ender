@@ -68,10 +68,40 @@
 		}							\
 	}								\
 
-static Eina_List *_new_callbacks = NULL;
+#define ENDER_VALUE_TO_DATA(v, cnt, args)				\
+	{								\
+		switch (cnt->type)					\
+		{							\
+			case ENDER_COLOR:				\
+			case ENDER_ARGB:				\
+			case ENDER_UINT32:				\
+			case ENDER_INT32:				\
+			case ENDER_BOOL:				\
+			*(va_arg(var_args, uint32_t*)) = v.data.u32;	\
+			break;						\
+									\
+			case ENDER_DOUBLE:				\
+			*(va_arg(var_args, double*)) = v.data.u32;	\
+			break;						\
+									\
+			case ENDER_STRUCT:				\
+			case ENDER_STRING:				\
+			case ENDER_SURFACE:				\
+			case ENDER_RENDERER:				\
+			case ENDER_ENDER:				\
+			case ENDER_LIST:				\
+			case ENDER_VALUE:				\
+			*(va_arg(var_args, void**)) = v.data.ptr;	\
+			break;						\
+									\
+			case ENDER_MATRIX:				\
+			default:					\
+			ERR("Unsupported data type %d", cnt->type);	\
+			break;						\
+		}							\
+	}								\
 
-typedef void (*Ender_Value_Accessor)(Ender_Value *v, Ender_Accessor acc,
-		Ender_Element *e, Ender_Element *parent);
+static Eina_List *_new_callbacks = NULL;
 
 /* TODO rename this */
 typedef struct _Ender_Listener
@@ -92,6 +122,16 @@ typedef struct _Ender_Element_Property_List_Data
 	void *data;
 } Ender_Element_Property_List_Data;
 
+typedef struct _Ender_Element_Property
+{
+	Ender_Element_Getter get;
+	Ender_Element_Setter set;
+	Ender_Element_Add add;
+	Ender_Element_Remove remove;
+	Ender_Element_Clear clear;
+	void *data;
+} Ender_Element_Property;
+
 struct _Ender_Element
 {
 	EINA_MAGIC;
@@ -99,6 +139,7 @@ struct _Ender_Element
 	Enesim_Renderer *renderer;
 	Eina_Hash *listeners;
 	Ender_Element *parent;
+	Eina_Hash *properties;
 };
 
 static void _property_is_relative_cb(Ender_Property *prop, void *data)
@@ -108,128 +149,50 @@ static void _property_is_relative_cb(Ender_Property *prop, void *data)
 	if (ender_property_is_relative(prop))
 		new_data->cb(prop, new_data->data);
 }
+
 /*----------------------------------------------------------------------------*
- *                     uint32 / in32 / argb / bool                            *
+ *                        The property interface                              *
  *----------------------------------------------------------------------------*/
-static void _ender_int32_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
-		Ender_Element *parent)
+static void _property_set(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
 {
-	set(e->renderer, v->data.i32);
+	Ender_Element_Property *eprop = data;
+
+	eprop->set(e, p, v, eprop->data);
 }
 
-static void _ender_relative_int32_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Ender_Element *parent)
+static void _property_get(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
 {
-	set(parent->renderer, e, v->data.i32);
-}
-/*----------------------------------------------------------------------------*
- *                                   double                                   *
- *----------------------------------------------------------------------------*/
-static void _ender_double_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
-		Ender_Element *parent)
-{
-	set(e->renderer, v->data.d);
+	Ender_Element_Property *eprop = data;
+
+	eprop->get(e, p, v, eprop->data);
 }
 
-static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
-		Ender_Element *parent)
+static void _property_add(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
 {
-	set(parent->renderer, e, v->data.d);
-}
-/*----------------------------------------------------------------------------*
- *                  string / surface / struct / matrix / renderer             *
- *----------------------------------------------------------------------------*/
-static void _ender_pointer_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Ender_Element *parent)
-{
-	set(e->renderer, v->data.ptr);
+	Ender_Element_Property *eprop = data;
+
+	eprop->add(e, p, v, eprop->data);
 }
 
-static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Ender_Element *parent)
+static void _property_remove(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
 {
-	set(parent->renderer, e, v->data.ptr);
-}
-/*----------------------------------------------------------------------------*
- *                                   ender                                    *
- *----------------------------------------------------------------------------*/
-static void _ender_ender_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Ender_Element *parent)
-{
-	Ender_Element *child;
+	Ender_Element_Property *eprop = data;
 
-	child = v->data.ptr;
-	/* TODO check if it is an ender */
-	set(e->renderer, v->data.ptr);
-	child->parent = e;
+	eprop->remove(e, p, v, eprop->data);
 }
 
-static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Ender_Element *parent)
+static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
 {
-	set(parent->renderer, e, v->data.ptr);
-}
+	Ender_Element_Property *eprop = data;
 
-static Ender_Value_Accessor _accessors[ENDER_PROPERTY_TYPES] = {
-	[ENDER_BOOL] = _ender_int32_set,
-	[ENDER_UINT32] = _ender_int32_set,
-	[ENDER_INT32] = _ender_int32_set,
-	[ENDER_DOUBLE] = _ender_double_set,
-	[ENDER_ARGB] = _ender_int32_set,
-	[ENDER_COLOR] = _ender_int32_set,
-	[ENDER_STRING] = _ender_pointer_set,
-	[ENDER_MATRIX] = _ender_pointer_set,
-	[ENDER_RENDERER] = _ender_pointer_set,
-	[ENDER_SURFACE] = _ender_pointer_set,
-	[ENDER_ENDER] = _ender_ender_set,
-	[ENDER_LIST] = _ender_pointer_set,
-	[ENDER_STRUCT] = _ender_pointer_set,
-};
-
-static Ender_Value_Accessor _relative_accessors[ENDER_PROPERTY_TYPES] = {
-	[ENDER_BOOL] = _ender_relative_int32_set,
-	[ENDER_UINT32] = _ender_relative_int32_set,
-	[ENDER_INT32] = _ender_relative_int32_set,
-	[ENDER_DOUBLE] = _ender_relative_double_set,
-	[ENDER_ARGB] = _ender_relative_int32_set,
-	[ENDER_COLOR] = _ender_relative_int32_set,
-	[ENDER_STRING] = _ender_relative_pointer_set,
-	[ENDER_MATRIX] = _ender_relative_pointer_set,
-	[ENDER_RENDERER] = _ender_relative_pointer_set,
-	[ENDER_SURFACE] = _ender_relative_pointer_set,
-	[ENDER_ENDER] = _ender_relative_ender_set,
-	[ENDER_LIST] = _ender_relative_pointer_set,
-	[ENDER_STRUCT] = _ender_relative_pointer_set,
-};
-
-static void _value_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
-		Ender_Element *parent, Eina_Bool relative)
-{
-	Ender_Event_Mutation event_data;
-
-	if (relative)
-	{
-		if (parent) _relative_accessors[v->container->type](v, set, e, parent);
-		else WRN("Trying to set a relative property with no parent");
-	}
-	else
-	{
-		_accessors[v->container->type](v, set, e, NULL);
-	}
-	ender_event_dispatch(e, "Mutation", &event_data);
+	eprop->clear(e, p, eprop->data);
 }
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/* placeholder to initialize all the C99 structs */
-void ender_element_init(void)
+void ender_element_parent_set(Ender_Element *e, Ender_Element *parent)
 {
-
-}
-
-void ender_element_shutdown(void)
-{
-
+	e->parent = parent;
 }
 /*============================================================================*
  *                                   API                                      *
@@ -272,6 +235,7 @@ EAPI Ender_Element * ender_element_new(const char *name)
 	ender->renderer = renderer;
 	ender->descriptor = desc;
 	ender->listeners = eina_hash_string_superfast_new(NULL);
+	ender->properties = eina_hash_string_superfast_new(NULL);
 	enesim_renderer_private_set(renderer, "ender", ender);
 	/* call the constructor callback */
 	EINA_LIST_FOREACH(_new_callbacks, l, listener)
@@ -292,6 +256,9 @@ EAPI void ender_element_delete(Ender_Element *e)
 	free(e);
 }
 
+/**
+ *
+ */
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e)
 {
 	return e->descriptor;
@@ -321,11 +288,12 @@ EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_
 
 		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) break;
-		if (prop->prop->type != ENDER_LIST) break;
-		ec = ender_container_compound_get(prop->prop, 0);
+		ec = ender_property_container_get(prop);
+		if (ender_container_type_get(ec) != ENDER_LIST) break;
+		ec = ender_container_compound_get(ec, 0);
 
 		ENDER_VALUE_COLLECT(v, ec, var_args);
-		_value_set(&v, prop->add, e, e->parent, prop->relative);
+		ender_property_element_value_add(prop, e, &v);
 		name = va_arg(var_args, char *);
 	} 
 }
@@ -356,7 +324,7 @@ EAPI void ender_element_value_add_simple(Ender_Element *e, const char *name, End
 
 	prop = ender_element_property_get(e, name);
 	if (!prop) return;
-	_value_set(value, prop->add, e, e->parent, prop->relative);
+	ender_property_element_value_add(prop, e, value);
 }
 
 /**
@@ -374,11 +342,12 @@ EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, 
 
 		prop = ender_descriptor_property_get(e->descriptor, name);
 		if (!prop) break;
-		if (prop->prop->type != ENDER_LIST) break;
-		ec = ender_container_compound_get(prop->prop, 0);
+		ec = ender_property_container_get(prop);
+		if (ender_container_type_get(ec) != ENDER_LIST) break;
+		ec = ender_container_compound_get(ec, 0);
 
 		ENDER_VALUE_COLLECT(v, ec, var_args);
-		_value_set(&v, prop->remove, e, e->parent, prop->relative);
+		ender_property_element_value_remove(prop, e, &v);
 		name = va_arg(var_args, char *);
 	} 
 }
@@ -409,7 +378,7 @@ EAPI void ender_element_value_remove_simple(Ender_Element *e, const char *name, 
 
 	prop = ender_element_property_get(e, name);
 	if (!prop) return;
-	_value_set(value, prop->remove, e, e->parent, prop->relative);
+	ender_property_element_value_remove(prop, e, value);
 }
 
 /**
@@ -418,12 +387,14 @@ EAPI void ender_element_value_remove_simple(Ender_Element *e, const char *name, 
 EAPI void ender_element_value_clear(Ender_Element *e, const char *name)
 {
 	Ender_Property *prop;
+	Ender_Container *ec;
 
 	ENDER_MAGIC_CHECK(e);
 	prop = ender_descriptor_property_get(e->descriptor, name);
 	if (!prop) return;
-	if (prop->prop->type != ENDER_LIST) return;
-	if (prop->clear) prop->clear(e->renderer);
+	ec = ender_property_container_get(prop);
+	if (ender_container_type_get(ec) != ENDER_LIST) return;
+	ender_property_element_value_clear(prop, e);
 }
 
 /**
@@ -434,79 +405,20 @@ EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_
 	ENDER_MAGIC_CHECK(e);
 	while (name)
 	{
+		Ender_Value v;
 		Ender_Property *prop;
-		uint32_t *u32;
-		int32_t *i32;
-		double *d;
-		Enesim_Color *color;
-		char **string;
-		Enesim_Matrix *matrix;
-		Enesim_Renderer **renderer;
-		Eina_List *list;
-		Enesim_Surface *surface;
-		Ender_Element **ender;
-		Eina_Bool b;
+		Ender_Container *ec;
 
-		prop = ender_descriptor_property_get(e->descriptor, name);
+		prop = ender_element_property_get(e, name);
 		if (!prop) return;
 
-		switch (prop->prop->type)
-		{
-			case ENDER_BOOL:
-			b = va_arg(var_args, Eina_Bool *);
-			prop->get(e->renderer, b);
-			break;
-
-			case ENDER_UINT32:
-			u32 = va_arg(var_args, uint32_t *);
-			prop->get(e->renderer, u32);
-			break;
-
-			case ENDER_INT32:
-			i32 = va_arg(var_args, int32_t *);
-			prop->get(e->renderer, i32);
-			break;
-
-			case ENDER_DOUBLE:
-			d = va_arg(var_args, double *);
-			prop->get(e->renderer, d);
-			break;
-
-			case ENDER_ARGB:
-			case ENDER_COLOR:
-			color = va_arg(var_args, Enesim_Color *);
-			prop->get(e->renderer, color);
-			break;
-
-			case ENDER_STRING:
-			string = va_arg(var_args, char **);
-			prop->get(e->renderer, string);
-			break;
-
-			case ENDER_MATRIX:
-			matrix = va_arg(var_args, Enesim_Matrix *);
-			prop->get(e->renderer, matrix);
-			break;
-
-			case ENDER_RENDERER:
-			renderer = va_arg(var_args, Enesim_Renderer **);
-			prop->get(e->renderer, renderer);
-			break;
-
-			case ENDER_ENDER:
-			ender = va_arg(var_args, Ender_Element **);
-			prop->get(e->renderer, ender);
-			break;
-
-			default:
-			ERR("Unsupported data type %d", prop->prop->type);
-			break;
-			
-		}
+		ec = ender_property_container_get(prop);
+		v.container = ec;
+		ender_property_element_value_get(prop, e, &v);
+		ENDER_VALUE_TO_DATA(v, ec, var_args);
 		name = va_arg(var_args, char *);
 	}
 }
-
 
 /**
  *
@@ -522,7 +434,7 @@ EAPI void ender_element_value_get(Ender_Element *e, const char *name, ...)
 }
 
 /**
- *
+ * HERE
  */
 EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
@@ -533,16 +445,7 @@ EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, End
 
 	prop = ender_descriptor_property_get(e->descriptor, name);
 	if (!prop) return;
-	switch (prop->prop->type)
-	{
-		case ENDER_MATRIX:
-		prop->get(e->renderer, &value);
-		break;
-
-		default:
-		prop->get(e->renderer, value);
-		break;
-	}
+	ender_property_element_value_get(prop, e, value);
 }
 
 /**
@@ -555,13 +458,15 @@ EAPI void ender_element_value_set_valist(Ender_Element *e, const char *name, va_
 	while (name)
 	{
 		Ender_Property *prop;
+		Ender_Container *ec;
 		Ender_Value v;
 
 		prop = ender_element_property_get(e, name);
 		if (!prop) return;
+		ec = ender_property_container_get(prop);
 
-		ENDER_VALUE_COLLECT(v, prop->prop, var_args);
-		_value_set(&v, prop->set, e, e->parent, prop->relative);
+		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ender_property_element_value_set(prop, e, &v);
 		name = va_arg(var_args, char *);
 	} 
 }
@@ -592,7 +497,50 @@ EAPI void ender_element_value_set_simple(Ender_Element *e, const char *name, End
 
 	prop = ender_element_property_get(e, name);
 	if (!prop) return;
-	_value_set(value, prop->set, e, e->parent, prop->relative);
+	ender_property_element_value_set(prop, e, value);
+}
+
+/**
+ *
+ */
+EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *name,
+		Ender_Container *ec,
+		Ender_Element_Getter get,
+		Ender_Element_Setter set,
+		Ender_Element_Add add,
+		Ender_Element_Remove remove,
+		Ender_Element_Clear clear,
+		Eina_Bool relative, void *data)
+{
+	Ender_Property *prop;
+	Ender_Element_Property *eprop;
+
+	ENDER_MAGIC_CHECK(e);
+	prop = ender_element_property_get(e, name);
+	if (prop)
+	{
+		WRN("Property %s already found. Not adding it", name);
+		return NULL;
+	}
+	eprop = calloc(1, sizeof(Ender_Element_Property));
+	eprop->get = get;
+	eprop->set = set;
+	eprop->add = add;
+	eprop->remove = remove;
+	eprop->clear = clear;
+	eprop->data = data;
+
+	prop = ender_property_new(name, ec,
+			_property_get,
+			_property_set,
+			_property_add,
+			_property_remove,
+			_property_clear,
+			relative, eprop);
+	eina_hash_add(e->properties, name, prop);
+	DBG("Property %s added", name);
+
+	return prop;
 }
 
 /**
@@ -603,6 +551,10 @@ EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *n
 	Ender_Property *prop;
 
 	ENDER_MAGIC_CHECK(e);
+	/* first check dynamic properties */
+	prop = eina_hash_find(e->properties, name);
+	if (prop) return prop;
+	/* now the static properties */
 	prop = ender_descriptor_property_get(e->descriptor, name);
 	if (prop) return prop;
 	/* now check relative proprties */
@@ -610,7 +562,7 @@ EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *n
 
 	prop = ender_descriptor_property_get(e->parent->descriptor, name);
 	if (!prop) return NULL;
-	if (!prop->relative) return NULL;
+	if (!ender_property_is_relative(prop)) return NULL;
 
 	return prop;
 }
@@ -650,9 +602,11 @@ EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Proper
 	while (prop)
 	{
 		Ender_Value v;
+		Ender_Container *ec;
 
-		ENDER_VALUE_COLLECT(v, prop->prop, var_args);
-		_value_set(&v, prop->set, e, e->parent, prop->relative);
+		ec = ender_property_container_get(prop);
+		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ender_property_element_value_set(prop, e, &v);
 		prop = va_arg(var_args, Ender_Property *);
 	} 
 }
@@ -678,7 +632,7 @@ EAPI void ender_element_property_value_set_simple(Ender_Element *e, Ender_Proper
 {
 	ENDER_MAGIC_CHECK(e);
 
-	_value_set(value, prop->set, e, e->parent, prop->relative);
+	ender_property_element_value_set(prop, e, value);
 }
 
 /**

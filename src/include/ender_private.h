@@ -67,32 +67,41 @@ struct _Ender_Descriptor
 	Eina_Hash *properties;
 };
 
-struct _Ender_Property
-{
-	char *name;
-	Ender_Getter get;
-	Ender_Setter set;
-	Ender_Add add;
-	Ender_Remove remove;
-	Ender_Clear clear;
-	Ender_Container *prop;
-	Eina_Bool relative;
-};
-
-
-Ender_Property * ender_descriptor_property_get_internal(Ender_Descriptor *e, const char *name);
+//typedef void (*Ender_Property_Accessor)(Ender *e, Ender_Property *prop, void *data, ...);
 
 /* descriptor */
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
-void ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name, Ender_Container *p,
-	Ender_Getter get, Ender_Setter set,
-	Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-	Eina_Bool relative);
 
 /* property */
+typedef void (*Ender_Property_Accessor)(Ender_Property *ep, Ender_Element *e, Ender_Value *v, void *data);
+typedef Ender_Property_Accessor Ender_Property_Getter;
+typedef Ender_Property_Accessor Ender_Property_Setter;
+typedef Ender_Property_Accessor Ender_Property_Add;
+typedef Ender_Property_Accessor Ender_Property_Remove;
+typedef void (*Ender_Property_Clear)(Ender_Property *ep, Ender_Element *e, void *data);
+
+Ender_Property * ender_property_new(const char *name,
+		Ender_Container *ec,
+		Ender_Property_Getter get,
+		Ender_Property_Setter set,
+		Ender_Property_Add add,
+		Ender_Property_Remove remove,
+		Ender_Property_Clear clear,
+		Eina_Bool relative, void *data);
+
+void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v);
+void ender_property_element_value_get(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v);
+void ender_property_element_value_add(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v);
+void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v);
+void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e);
+/* container */
 Ender_Container * ender_container_new(Ender_Value_Type t);
 void ender_property_container_delete(Ender_Container *p);
 void ender_container_add(Ender_Container *p, Ender_Container *sub);

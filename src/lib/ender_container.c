@@ -26,12 +26,12 @@ static Eina_Hash *_structs = NULL;
  *============================================================================*/
 Ender_Container * ender_container_new(Ender_Value_Type t)
 {
-	Ender_Container *prop;
+	Ender_Container *ec;
 
-	prop = malloc(sizeof(Ender_Property));
-	prop->type = t;
-	prop->elements = NULL;
-	return prop;
+	ec = malloc(sizeof(Ender_Container));
+	ec->type = t;
+	ec->elements = NULL;
+	return ec;
 }
 
 void ender_container_delete(Ender_Container *d)
@@ -180,7 +180,7 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 	sub->offset = prev_offset + prev_size;
 }
 
-EAPI Ender_Value_Type ender_container_type(Ender_Container *c)
+EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
 {
 	return c->type;
 }

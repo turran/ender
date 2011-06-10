@@ -35,7 +35,7 @@ static void _container_compound_dump(Ender_Container *c)
 		sub = ender_container_compound_get(c, i);
 		if (i != 0)
 			printf(", ");
-		printf("%s", ender_property_type_name_get(ender_container_type(sub)));
+		printf("%s", ender_property_type_name_get(ender_container_type_get(sub)));
 		if (ender_container_is_compound(sub))
 			_container_compound_dump(sub);
 	}
@@ -44,7 +44,7 @@ static void _container_compound_dump(Ender_Container *c)
 
 static void _container_dump(Ender_Container *c)
 {
-	printf("%s", ender_property_type_name_get(ender_container_type(c)));
+	printf("%s", ender_property_type_name_get(ender_container_type_get(c)));
 	if (ender_container_is_compound(c))
 		_container_compound_dump(c);
 	printf("\n");

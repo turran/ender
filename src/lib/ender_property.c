@@ -20,9 +20,87 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+struct _Ender_Property
+{
+	char *name;
+	Ender_Property_Getter get;
+	Ender_Property_Setter set;
+	Ender_Property_Add add;
+	Ender_Property_Remove remove;
+	Ender_Property_Clear clear;
+	Ender_Container *container;
+	Eina_Bool relative;
+	void *data;
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Ender_Property * ender_property_new(const char *name,
+		Ender_Container *ec,
+		Ender_Property_Getter get,
+		Ender_Property_Setter set,
+		Ender_Property_Add add,
+		Ender_Property_Remove remove,
+		Ender_Property_Clear clear,
+		Eina_Bool relative, void *data)
+{
+	Ender_Property *prop;
+
+	prop = calloc(1, sizeof(Ender_Property));
+	prop->name = strdup(name);
+	prop->get = get;
+	prop->set = set;
+	prop->add = add;
+	prop->remove = remove;
+	prop->clear = clear;
+	prop->container = ec;
+	prop->relative = relative;
+	prop->data = data;
+
+	return prop;
+}
+
+/* TODO add guards, the value type must be equal to the property type */
+void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v)
+{
+	Ender_Event_Mutation event_data;
+
+	ep->set(ep, e, v, ep->data);
+	ender_event_dispatch(e, "Mutation", &event_data);
+}
+
+void ender_property_element_value_get(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v)
+{
+	ep->get(ep, e, v, ep->data);
+}
+
+void ender_property_element_value_add(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v)
+{
+	Ender_Event_Mutation event_data;
+
+	ep->add(ep, e, v, ep->data);
+	ender_event_dispatch(e, "Mutation", &event_data);
+}
+
+void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
+		Ender_Value *v)
+{
+	Ender_Event_Mutation event_data;
+
+	ep->remove(ep, e, v, ep->data);
+	ender_event_dispatch(e, "Mutation", &event_data);
+}
+
+void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
+{
+	Ender_Event_Mutation event_data;
+
+	ep->clear(ep, e, ep->data);
+	ender_event_dispatch(e, "Mutation", &event_data);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -31,14 +109,14 @@
  */
 EAPI Ender_Container * ender_property_container_get(Ender_Property *p)
 {
-	return p->prop;
+	return p->container;
 }
 /**
  *
  */
-EAPI Ender_Value_Type ender_property_type(Ender_Property *p)
+EAPI Ender_Value_Type ender_property_type_get(Ender_Property *p)
 {
-	return p->prop->type;
+	return p->container->type;
 }
 
 /**

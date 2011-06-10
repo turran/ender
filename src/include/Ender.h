@@ -58,14 +58,6 @@ typedef struct _Ender_Container Ender_Container;
 typedef struct _Ender_Descriptor Ender_Descriptor;
 typedef struct _Ender_Namespace Ender_Namespace;
 
-typedef Enesim_Renderer * (*Ender_Creator)(void);
-typedef void (*Ender_Accessor)(Enesim_Renderer *r, ...);
-typedef Ender_Accessor Ender_Getter;
-typedef Ender_Accessor Ender_Setter;
-typedef Ender_Accessor Ender_Add;
-typedef Ender_Accessor Ender_Remove;
-typedef void (*Ender_Clear)(Enesim_Renderer *r);
-
 typedef void (*Ender_Event_Callback)(Ender_Element *e, const char *event_name, void *event_data, void *data);
 typedef void (*Ender_New_Callback)(Ender_Element *e, void *data);
 
@@ -117,7 +109,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec);
 EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
 EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
 EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub);
-EAPI Ender_Value_Type ender_container_type(Ender_Container *c);
+EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
 
 
 /**
@@ -185,6 +177,8 @@ EAPI void ender_value_free(Ender_Value *v);
  * @defgroup Ender_Descriptor_Group Descriptor
  * @{
  */
+typedef Enesim_Renderer * (*Ender_Creator)(void);
+
 EAPI Ender_Namespace * ender_namespace_new(const char *name);
 EAPI Ender_Namespace * ender_namespace_find(const char *name);
 EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name);
@@ -196,11 +190,22 @@ EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
  * @defgroup Ender_Descriptor_Group Descriptor
  * @{
  */
+typedef void (*Ender_Accessor)(Enesim_Renderer *r, ...);
+typedef Ender_Accessor Ender_Getter;
+typedef Ender_Accessor Ender_Setter;
+typedef Ender_Accessor Ender_Add;
+typedef Ender_Accessor Ender_Remove;
+typedef void (*Ender_Clear)(Enesim_Renderer *r);
+
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
 EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns);
+Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
+		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
+		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
+		Eina_Bool relative);
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
 EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);
@@ -213,11 +218,26 @@ EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *ed);
  * @defgroup Ender_Element_Group Element
  * @{
  */
+typedef void (*Ender_Element_Accessor)(Ender_Element *e, Ender_Property *ep, Ender_Value *v, void *data);
+typedef Ender_Element_Accessor Ender_Element_Getter;
+typedef Ender_Element_Accessor Ender_Element_Setter;
+typedef Ender_Element_Accessor Ender_Element_Add;
+typedef Ender_Element_Accessor Ender_Element_Remove;
+typedef void (*Ender_Element_Clear)(Ender_Element *e, Ender_Property *ep, void *data);
+
 EAPI Ender_Element * ender_element_new(const char *name);
 EAPI void ender_element_delete(Ender_Element *e);
 EAPI const char * ender_element_name_get(Ender_Element *e);
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e);
 
+EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *name,
+		Ender_Container *ec,
+		Ender_Element_Getter get,
+		Ender_Element_Setter set,
+		Ender_Element_Add add,
+		Ender_Element_Remove remove,
+		Ender_Element_Clear clear,
+		Eina_Bool relative, void *data);
 EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *name);
 EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Property *prop, va_list va_args);
@@ -255,7 +275,7 @@ EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data);
  * @defgroup Ender_Property_Group Property
  * @{
  */
-EAPI Ender_Value_Type ender_property_type(Ender_Property *p);
+EAPI Ender_Value_Type ender_property_type_get(Ender_Property *p);
 EAPI Ender_Container * ender_property_container_get(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
