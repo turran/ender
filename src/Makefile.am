@@ -1,2 +1,2 @@
-SUBDIRS = lib include bin
+SUBDIRS = lib include bin tests
 MAINTAINERCLEANFILES = Makefile.in

@@ -73,6 +73,7 @@ src/Makefile
 src/lib/Makefile
 src/include/Makefile
 src/bin/Makefile
+src/tests/Makefile
 ],[
 ])
 
