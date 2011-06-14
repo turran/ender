@@ -24,16 +24,6 @@ static Eina_Hash *_structs = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Container * ender_container_new(Ender_Value_Type t)
-{
-	Ender_Container *ec;
-
-	ec = malloc(sizeof(Ender_Container));
-	ec->type = t;
-	ec->elements = NULL;
-	return ec;
-}
-
 void ender_container_delete(Ender_Container *d)
 {
 	/* FIXME call the delete for each descriptor */
@@ -54,6 +44,7 @@ Ender_Container * ender_container_find(const char *name)
 	return ec;
 }
 
+
 void ender_container_init(void)
 {
 	_structs = eina_hash_string_superfast_new(NULL);
@@ -67,6 +58,19 @@ void ender_container_shutdown(void)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ *
+ */
+EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
+{
+	Ender_Container *ec;
+
+	ec = malloc(sizeof(Ender_Container));
+	ec->type = t;
+	ec->elements = NULL;
+	return ec;
+}
+
 /**
  *
  */

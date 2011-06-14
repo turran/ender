@@ -102,7 +102,7 @@ EAPI void ender_shutdown(void);
  * @defgroup Ender_Container_Group Container
  * @{
  */
-
+EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
 EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
 EAPI size_t ender_container_size_get(Ender_Container *ec);
@@ -125,6 +125,9 @@ EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type);
 EAPI Ender_Value * ender_value_new_container_from(Ender_Container *container);
 EAPI Ender_Container * ender_value_container_get(Ender_Value *value);
 EAPI Ender_Value_Type ender_value_type_get(Ender_Value *value);
+
+EAPI Eina_Bool ender_value_bool_get(Ender_Value *value);
+EAPI void ender_value_bool_set(Ender_Value *value, Eina_Bool boolean);
 
 EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32);
 EAPI int32_t ender_value_int32_get(Ender_Value *value);
@@ -195,6 +198,12 @@ typedef Ender_Accessor Ender_Setter;
 typedef Ender_Accessor Ender_Add;
 typedef Ender_Accessor Ender_Remove;
 typedef void (*Ender_Clear)(Enesim_Renderer *r);
+
+#define ENDER_GETTER(f) ((Ender_Getter)(f))
+#define ENDER_SETTER(f) ((Ender_Setter)(f))
+#define ENDER_ADD(f) ((Ender_Add)(f))
+#define ENDER_REMOVE(f) ((Ender_Remove)(f))
+#define ENDER_CLEAR(f) ((Ender_Clear)(f))
 
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
