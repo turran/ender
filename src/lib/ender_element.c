@@ -81,7 +81,7 @@
 			break;						\
 									\
 			case ENDER_DOUBLE:				\
-			*(va_arg(var_args, double*)) = v.data.u32;	\
+			*(va_arg(var_args, double*)) = v.data.d;	\
 			break;						\
 									\
 			case ENDER_STRUCT:				\
