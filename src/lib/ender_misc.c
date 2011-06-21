@@ -34,10 +34,10 @@ EAPI const char * ender_type_name_get(Ender_Type type)
 	switch (type)
 	{
 		case ENDER_ABSTRACT:
-		return "abstract";
+		return "ABSTRACT";
 
 		case ENDER_CLASS:
-		return "class";
+		return "CLASS";
 
 		default:
 		return NULL;
@@ -52,43 +52,43 @@ EAPI const char * ender_value_type_name_get(Ender_Value_Type type)
 	switch (type)
 	{
 		case ENDER_UINT32:
-		return "uint32";
+		return "UINT32";
 
 		case ENDER_INT32:
-		return "int32";
+		return "INT32";
 
 		case ENDER_DOUBLE:
-		return "double";
+		return "DOUBLE";
 
 		case ENDER_COLOR:
-		return "color";
+		return "COLOR";
 
 		case ENDER_ARGB:
-		return "argb";
+		return "ARGB";
 
 		case ENDER_STRING:
-		return "string";
+		return "STRING";
 
 		case ENDER_MATRIX:
-		return "matrix";
+		return "MATRIX";
 
 		case ENDER_RENDERER:
-		return "renderer";
+		return "RENDERER";
 
 		case ENDER_SURFACE:
-		return "surface";
+		return "SURFACE";
 
 		case ENDER_ENDER:
-		return "ender";
+		return "ENDER";
 
 		case ENDER_LIST:
-		return "list";
+		return "LIST";
 
 		case ENDER_STRUCT:
-		return "struct";
+		return "STRUCT";
 
 		case ENDER_BOOL:
-		return "bool";
+		return "BOOL";
 
 		default:
 		return NULL;

@@ -90,6 +90,15 @@ typedef enum _Ender_Value_Type
 	ENDER_PROPERTY_TYPES,
 } Ender_Value_Type;
 
+typedef enum _Ender_Property_Flag
+{
+	ENDER_GET = (1 << 0),
+	ENDER_SET = (1 << 1),
+	ENDER_ADD = (1 << 2),
+	ENDER_REMOVE = (1 << 3),
+	ENDER_CLEAR = (1 << 4),
+} Ender_Property_Flag;
+
 /*
  * @defgroup Ender_Main_Group Main
  * @{
@@ -221,6 +230,7 @@ EAPI Eina_Bool ender_descriptor_exists(const char *name);
 EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed);
 EAPI const char * ender_descriptor_name_get(Ender_Descriptor *ed);
 EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *ed);
+EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed);
 /**
  * @}
  * @defgroup Ender_Element_Group Element
@@ -287,6 +297,7 @@ EAPI Ender_Value_Type ender_property_type_get(Ender_Property *p);
 EAPI Ender_Container * ender_property_container_get(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
+EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p);
 
 /**
  * @}

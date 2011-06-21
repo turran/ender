@@ -208,7 +208,8 @@ static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Creator creator,
+Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
+		Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type)
 {
 	Ender_Descriptor *desc;
@@ -218,6 +219,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Creator creator,
 	desc->parent = parent;
 	desc->create = creator;
 	desc->type = type;
+	desc->ns = ns;
 	desc->properties = eina_hash_string_superfast_new(NULL);
 
 	eina_hash_add(_descriptors, name, desc);
@@ -247,11 +249,11 @@ Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const ch
 	dprop->clear = clear;
 
 	prop = ender_property_new(name, ec,
-			_property_get,
-			_property_set,
-			_property_add,
-			_property_remove,
-			_property_clear,
+			get ? _property_get : NULL,
+			set ? _property_set : NULL,
+			add ? _property_add : NULL,
+			remove ? _property_remove : NULL,
+			clear ? _property_clear : NULL,
 			relative, dprop);
 	eina_hash_add(edesc->properties, name, prop);
 	DBG("Property %s added to %s", name, edesc->name);
@@ -420,4 +422,13 @@ EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const 
 {
 	if (!ed) return NULL;
 	return _descriptor_property_get(ed, name);
+}
+
+/**
+ *
+ */
+EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed)
+{
+	if (!ed) return NULL;
+	return ed->ns;
 }

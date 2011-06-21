@@ -66,6 +66,7 @@ void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
 {
 	Ender_Event_Mutation event_data;
 
+	if (!ep->set) return;
 	ep->set(ep, e, v, ep->data);
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
@@ -73,6 +74,7 @@ void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
 void ender_property_element_value_get(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v)
 {
+	if (!ep->get) return;
 	ep->get(ep, e, v, ep->data);
 }
 
@@ -81,6 +83,7 @@ void ender_property_element_value_add(Ender_Property *ep, Ender_Element *e,
 {
 	Ender_Event_Mutation event_data;
 
+	if (!ep->add) return;
 	ep->add(ep, e, v, ep->data);
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
@@ -90,6 +93,7 @@ void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
 {
 	Ender_Event_Mutation event_data;
 
+	if (!ep->remove) return;
 	ep->remove(ep, e, v, ep->data);
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
@@ -98,6 +102,7 @@ void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
 {
 	Ender_Event_Mutation event_data;
 
+	if (!ep->clear) return;
 	ep->clear(ep, e, ep->data);
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
@@ -133,4 +138,18 @@ EAPI Eina_Bool ender_property_is_relative(Ender_Property *p)
 EAPI const char * ender_property_name_get(Ender_Property *p)
 {
 	return p->name;
+}
+
+EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p)
+{
+	Ender_Property_Flag flags = 0;
+
+	if (!p) return flags;
+	if (p->get) flags |= ENDER_GET;
+	if (p->set) flags |= ENDER_SET;
+	if (p->add) flags |= ENDER_ADD;
+	if (p->remove) flags |= ENDER_REMOVE;
+	if (p->clear) flags |= ENDER_CLEAR;
+
+	return flags;
 }

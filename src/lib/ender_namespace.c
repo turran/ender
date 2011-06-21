@@ -106,7 +106,7 @@ EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, con
 	Ender_Descriptor *desc;
 
 	if (!name || !ens) return NULL;
-	desc = ender_descriptor_new(name, creator, parent, type);
+	desc = ender_descriptor_new(name, ens, creator, parent, type);
 	if (!desc) return NULL;
 	DBG("class %s@%s registered correctly %p", name, ens->name, desc);
 	eina_hash_add(ens->descriptors, name, desc);

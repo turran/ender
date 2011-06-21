@@ -65,10 +65,12 @@ struct _Ender_Descriptor
 	Ender_Descriptor *parent;
 	Ender_Creator create;
 	Eina_Hash *properties;
+	Ender_Namespace *ns;
 };
 
 /* descriptor */
-Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Creator creator,
+Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
+		Ender_Creator creator,
 		Ender_Descriptor *parent, Ender_Type type);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
