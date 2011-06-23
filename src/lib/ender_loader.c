@@ -1,5 +1,5 @@
 /* ENDER - Enesim's descriptor library
- * Copyright (C) 2010 Jorge Luis Zapata
+ * Copyright (C) 2010 - 2011 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,11 +30,18 @@ typedef struct  _Ender_Library
 	char *name;
 } Ender_Library;
 
-struct _Ender_Library_Namespace
+typedef struct _Ender_Library_Namespace
 {
 	Ender_Library *lib;
 	Ender_Namespace *ns;
-};
+} Ender_Library_Namespace;
+
+typedef struct _Ender_Loader
+{
+	char *file;
+	Ender_Library_Namespace *namespace;
+	Ender_Descriptor *descriptor;
+} Ender_Loader;
 
 static Eina_Hash *_libraries = NULL;
 static Eina_Hash *_library_namespaces = NULL;
@@ -60,7 +67,7 @@ static void _dir_list_cb(const char *name, const char *path, void *data)
 	char file[PATH_MAX];
 
 	snprintf(file, PATH_MAX, "%s/%s", path, name);
-	ender_parser_load(file);
+	ender_loader_load(file);
 }
 
 static Ender_Library * _library_new(const char *name, void *dl_handle)
@@ -106,12 +113,10 @@ static Eina_Bool _file_locate(const char *file, char *real_file)
 	DBG("Parsing file %s", real_file);
 	return EINA_TRUE;
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Ender_Library_Namespace * ender_parser_namespace_new(const char *name)
+
+static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 {
-	Ender_Library_Namespace *lns;
+	Ender_Library_Namespace *namespace;
 	Ender_Namespace *ns;
 	Ender_Library *library;
 	char tmp1[PATH_MAX];
@@ -120,8 +125,8 @@ Ender_Library_Namespace * ender_parser_namespace_new(const char *name)
 	if (!name) return NULL;
 	DBG("Registering new namespace %s", name);
 	/* check if we already have the namespace */
-	lns = eina_hash_find(_library_namespaces, name);
-	if (lns) return lns;
+	namespace = eina_hash_find(_library_namespaces, name);
+	if (namespace) return namespace;
 
 	/* first we need to split the namespace by the dot 
 	 * the string before the first dot is the library name 
@@ -169,29 +174,29 @@ Ender_Library_Namespace * ender_parser_namespace_new(const char *name)
 		ns = ender_namespace_new(tmp1);
 	}
 
-	lns = malloc(sizeof(Ender_Library_Namespace));
-	lns->ns = ns;
-	lns->lib = library;
+	namespace = malloc(sizeof(Ender_Library_Namespace));
+	namespace->ns = ns;
+	namespace->lib = library;
 
-	return lns;
+	return namespace;
 }
 
-Ender_Descriptor * ender_parser_descriptor_new(Ender_Library_Namespace *lns, const char *name, Ender_Descriptor *parent, Ender_Type type)
+Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, const char *name, Ender_Descriptor *parent, Ender_Type type)
 {
 	Ender_Descriptor *desc;
 	Ender_Creator creator;
 	const char *ns_name;
 
-	if (!lns) return NULL;
+	if (!namespace) return NULL;
 
-	ns_name = ender_namespace_name_get(lns->ns);
+	ns_name = ender_namespace_name_get(namespace->ns);
 	/* now the class itself */
 	if (type == ENDER_CLASS)
 	{
 		char ctor_name[PATH_MAX];
 		
 		snprintf(ctor_name, PATH_MAX, "%s_%s_new", ns_name, name);
-		creator = dlsym(lns->lib->dl_handle, ctor_name);
+		creator = dlsym(namespace->lib->dl_handle, ctor_name);
 		if (!creator)
 		{
 			DBG("No creator found?");
@@ -201,14 +206,14 @@ Ender_Descriptor * ender_parser_descriptor_new(Ender_Library_Namespace *lns, con
 	{
 		creator = NULL;
 	}
-	desc = ender_namespace_descriptor_add(lns->ns, name, creator, parent, type);
+	desc = ender_namespace_descriptor_add(namespace->ns, name, creator, parent, type);
 	if (!desc) return NULL;
 	DBG("class %s@%s registered correctly %p", name, ns_name, desc);
 
 	return desc;
 }
 
-void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_Descriptor *edesc,
+void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_Descriptor *edesc,
 		const char *name, Ender_Container *prop, Eina_Bool rel)
 {
 	Ender_Getter get;
@@ -221,9 +226,9 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 	const char *edesc_name;
 	const char *ns_name;
 
-	if (!lns || !lns->ns || !lns->lib) return;
+	if (!namespace || !namespace->ns || !namespace->lib) return;
 
-	ns_name = ender_namespace_name_get(lns->ns);
+	ns_name = ender_namespace_name_get(namespace->ns);
 	edesc_name = ender_descriptor_name_get(edesc);
 	DBG("Adding property %s to %s", name, edesc_name);
 	snprintf(prefix, PATH_MAX, "%s_%s_%s_", ns_name, edesc_name, name);
@@ -231,7 +236,7 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 	/* the getter */
 	strncpy(func_name, prefix, PATH_MAX);
 	strncat(func_name, "get", PATH_MAX);
-	get = dlsym(lns->lib->dl_handle, func_name);
+	get = dlsym(namespace->lib->dl_handle, func_name);
 	if (!get)
 	{
 		WRN("No getter %s for type %s", func_name, edesc_name);
@@ -239,7 +244,7 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 	/* the setter */
 	strncpy(func_name, prefix, PATH_MAX);
 	strncat(func_name, "set", PATH_MAX);
-	set = dlsym(lns->lib->dl_handle, func_name);
+	set = dlsym(namespace->lib->dl_handle, func_name);
 	if (!set)
 	{
 		WRN("No setter %s for type %s", func_name, edesc_name);
@@ -250,7 +255,7 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 		/* the add */
 		strncpy(func_name, prefix, PATH_MAX);
 		strncat(func_name, "add", PATH_MAX);
-		add = dlsym(lns->lib->dl_handle, func_name);
+		add = dlsym(namespace->lib->dl_handle, func_name);
 		if (!add)
 		{
 			WRN("No adder %s for type %s", func_name, edesc_name);
@@ -258,7 +263,7 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 		/* the remove */
 		strncpy(func_name, prefix, PATH_MAX);
 		strncat(func_name, "remove", PATH_MAX);
-		remove = dlsym(lns->lib->dl_handle, func_name);
+		remove = dlsym(namespace->lib->dl_handle, func_name);
 		if (!remove)
 		{
 			WRN("No remove %s for type %s", func_name, edesc_name);
@@ -266,7 +271,7 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 		/* the clear */
 		strncpy(func_name, prefix, PATH_MAX);
 		strncat(func_name, "clear", PATH_MAX);
-		clear = dlsym(lns->lib->dl_handle, func_name);
+		clear = dlsym(namespace->lib->dl_handle, func_name);
 		if (!clear)
 		{
 			WRN("No clear %s for type %s", func_name, edesc_name);
@@ -275,13 +280,61 @@ void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_De
 	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear, rel);
 }
 
-void ender_parser_init(void)
+/*----------------------------------------------------------------------------*
+ *                           The parser insterface                            *
+ *----------------------------------------------------------------------------*/
+static void _loader_on_using(void *data, const char *file)
+{
+	ender_loader_load(file);
+}
+
+static void _loader_on_namespace(void *data, const char *name)
+{
+	Ender_Loader *thiz;
+
+	thiz = data;
+	thiz->namespace = _loader_namespace_new(name);
+}
+
+static void _loader_on_renderer(void *data, const char *name, Ender_Type type, const char *parent)
+{
+	Ender_Loader *thiz;
+	Ender_Descriptor *parent_descriptor = NULL;
+
+	thiz = data;
+	if (parent)
+	{
+		parent_descriptor = ender_descriptor_find(parent);
+		if (!parent_descriptor) return;
+	}
+	thiz->descriptor = _loader_descriptor_new(thiz->namespace, name, parent_descriptor, type);
+}
+
+static void _loader_on_property(void *data, const char *name, Eina_Bool relative, Ender_Container *container)
+{
+	Ender_Loader *thiz;
+
+	thiz = data;
+	_loader_descriptor_property_add(thiz->namespace, thiz->descriptor, name, container, relative);
+
+}
+
+static Ender_Parser_Descriptor _loader_parser = {
+	.on_using = _loader_on_using,
+	.on_namespace = _loader_on_namespace,
+	.on_renderer = _loader_on_renderer,
+	.on_property = _loader_on_property,
+};
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+void ender_loader_init(void)
 {
 	_library_namespaces = eina_hash_string_superfast_new(NULL);
 	_libraries = eina_hash_string_superfast_new(NULL);
 }
 
-void ender_parser_shutdown(void)
+void ender_loader_shutdown(void)
 {
 	Eina_Iterator *it;
 	Ender_Library *lib;
@@ -305,48 +358,7 @@ void ender_parser_shutdown(void)
 	/* TODO free the list of files */
 }
 
-void ender_parser_load(const char *file)
-{
-	Ender_Parser *parser;
-	Eina_List *l;
-	char *file_parsed;
-	char real_file[PATH_MAX];
-	FILE *f;
-	int ret;
-	void *scanner;
-
-
-	if (!_file_locate(file, real_file))
-		return;
-
-	/* check that we haven't parse the file already */
-	EINA_LIST_FOREACH (_files, l, file_parsed)
-	{
-		if (!strcmp(real_file, file_parsed))
-		{
-			DBG("File already parsed %s", real_file);
-			return;
-		}
-	}
-
-	f = fopen(real_file, "r");
-	if (!f) return;
-
-	parser = malloc(sizeof(Ender_Parser));
-	ender_lex_init (&scanner);
-	ender_set_in(f, scanner);
-	if (!ender_parse(scanner, parser))
-	{
-		DBG("Parsed file %s correctly", real_file);
-		_files = eina_list_append(_files, strdup(real_file));
-	}
-
-	ender_lex_destroy(scanner);
-	free(parser);
-	fclose(f);
-}
-
-void ender_parser_parse(void)
+void ender_loader_parse(void)
 {
 	Eina_Iterator *it;
 	Ender_Library *lib;
@@ -370,4 +382,30 @@ void ender_parser_parse(void)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI void ender_loader_load(const char *in)
+{
+	Ender_Loader loader;
+	Eina_List *l;
+	char *file_parsed;
+	char real_file[PATH_MAX];
 
+	loader.namespace = NULL;
+	loader.descriptor = NULL;
+	if (!_file_locate(in, real_file))
+		return;
+
+	/* check that we haven't parse the file already */
+	EINA_LIST_FOREACH (_files, l, file_parsed)
+	{
+		if (!strcmp(real_file, file_parsed))
+		{
+			DBG("File already parsed %s", real_file);
+			return;
+		}
+	}
+	if (ender_parser_parse(real_file, &_loader_parser, &loader))
+	{
+		DBG("Parsed file %s correctly", real_file);
+		_files = eina_list_append(_files, strdup(real_file));
+	}
+}

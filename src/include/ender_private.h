@@ -118,24 +118,22 @@ void ender_namespace_shutdown(void);
 void ender_element_parent_set(Ender_Element *e, Ender_Element *parent);
 
 /* the parser */
-typedef struct _Ender_Parser Ender_Parser;
-typedef struct _Ender_Library_Namespace  Ender_Library_Namespace;
-
-struct _Ender_Parser
+typedef struct _Ender_Parser_Descriptor
 {
-	char *file;
-	Ender_Library_Namespace *lns;
-	Ender_Descriptor *descriptor;
-};
+	/* using */
+	void (*on_using)(void *data, const char *file);
+	/* namespace */
+	void (*on_namespace)(void *data, const char *name);
+	/* renderer */
+	void (*on_renderer)(void *data, const char *name, Ender_Type type, const char *parent);
+	/* property */
+	void (*on_property)(void *data, const char *name, Eina_Bool relative, Ender_Container *container); 
+} Ender_Parser_Descriptor;
 
-Ender_Library_Namespace * ender_parser_namespace_new(const char *name);
-Ender_Descriptor * ender_parser_descriptor_new(Ender_Library_Namespace *lns, const char *name, Ender_Descriptor *parent, Ender_Type type);
-void ender_parser_descriptor_property_add(Ender_Library_Namespace *lns, Ender_Descriptor *edesc,
-		const char *name, Ender_Container *prop, Eina_Bool rel);
+Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data);
 
-void ender_parser_init(void);
-void ender_parser_shutdown(void);
-void ender_parser_load(const char *file);
-void ender_parser_parse(void);
+/* the loader */
+void ender_loader_init(void);
+void ender_loader_shutdown(void);
 
 #endif

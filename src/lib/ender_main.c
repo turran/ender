@@ -85,9 +85,9 @@ EAPI void ender_init(int *argc, char ***argv)
 		ender_descriptor_init();
 		ender_namespace_init();
 		ender_container_init();
-		ender_parser_init();
+		ender_loader_init();
 		if (_enable_parse)
-			ender_parser_parse();
+			ender_loader_parse();
 	}
 }
 
@@ -98,7 +98,7 @@ EAPI void ender_shutdown(void)
 {
 	if (_init == 1)
 	{
-		ender_parser_shutdown();
+		ender_loader_shutdown();
 		ender_container_shutdown();
 		ender_namespace_shutdown();
 		ender_descriptor_shutdown();

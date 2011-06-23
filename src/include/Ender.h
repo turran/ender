@@ -324,6 +324,13 @@ EAPI const char * ender_type_name_get(Ender_Type type);
 
 /**
  * @}
+ * @defgroup Ender_Loader_Group Loader
+ * @{
+ */
+EAPI void ender_loader_load(const char *in);
+
+/**
+ * @}
  */
 
 #endif /*_ENDER_H*/

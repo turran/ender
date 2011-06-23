@@ -21,13 +21,14 @@ libender_la_SOURCES = \
 ender_container.c \
 ender_descriptor.c \
 ender_element.c \
-ender_main.c \
-ender_property.c \
-ender_misc.c \
+ender_generator.c \
 ender_grammar.y \
 ender_lexer.l \
+ender_loader.c \
+ender_main.c \
+ender_misc.c \
 ender_namespace.c \
-ender_parser.c \
+ender_property.c \
 ender_value.c
 
 libender_la_LIBADD = \

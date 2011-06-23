@@ -8,10 +8,49 @@
 %lex-param { void * scanner }
 
 %{
-#include <stdio.h>
-#include <string.h>
 #include "Ender.h"
 #include "ender_private.h"
+#include <stdio.h>
+#include <string.h>
+
+typedef struct _Ender_Parser
+{
+	const char *file;
+	Ender_Parser_Descriptor *descriptor;
+	void *data;
+} Ender_Parser;
+
+static inline void _on_using(Ender_Parser *parser, Eina_List *list)
+{
+	Eina_List *l;
+	char *str;
+
+		
+	if (!parser->descriptor->on_using)
+		return;
+	EINA_LIST_FOREACH (list, l, str)
+	{
+		parser->descriptor->on_using(parser->data, str);
+	}
+}
+
+static inline void _on_namespace(Ender_Parser *parser, const char *name)
+{
+	if (parser->descriptor->on_namespace)
+		parser->descriptor->on_namespace(parser->data, name);
+}
+
+static inline void _on_renderer(Ender_Parser *parser, const char *name, Ender_Type type, const char *parent)
+{
+	if (parser->descriptor->on_renderer)
+		parser->descriptor->on_renderer(parser->data, name, type, parent);
+}
+
+static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Bool relative, Ender_Container *container)
+{
+	if (parser->descriptor->on_property)
+		parser->descriptor->on_property(parser->data, name, relative, container);
+}
 
 %}
 
@@ -19,7 +58,6 @@
 	Ender_Type etype;
 	Ender_Value_Type vtype;
 	Ender_Container *prop;
-	Ender_Descriptor *descriptor;
 	char *s;
 	Eina_Bool b;
 	Eina_List *list; // use this for every _list nonterminal
@@ -52,20 +90,14 @@
 %type <etype> definition
 %type <prop> list_type
 %type <prop> struct_type
-%type <descriptor> renderer_inheritance
+%type <s> renderer_inheritance
 %type <list> types
 %%
 
 main
 	: using
 	{
-		Eina_List *l;
-		char *str;
-
-		EINA_LIST_FOREACH ($1, l, str)
-		{
-			ender_parser_load(str);
-		}
+		_on_using(parser, $1);
 	}
 	namespace_list
 	;
@@ -83,7 +115,7 @@ namespace_list
 namespace
 	: NAMESPACE INLINE_STRING
 	{
-		parser->lns = ender_parser_namespace_new($2);
+		_on_namespace(parser, $2);
 	}
 	'{' definition_list '}' ';'
 	;
@@ -111,7 +143,9 @@ struct
 
 renderer
 	: definition INLINE_STRING renderer_inheritance
-	{ parser->descriptor = ender_parser_descriptor_new(parser->lns, $2, $3, $1); }
+	{
+		_on_renderer(parser, $2, $1, $3);
+	}
 	'{' declaration_list '}' ';'
 	;
 
@@ -123,7 +157,7 @@ definition
 
 renderer_inheritance
 	: { $$ = NULL; }
-	| ':' INLINE_STRING { $$ = ender_descriptor_find($2); }
+	| ':' INLINE_STRING { $$ = $2; }
 	;
 
 types
@@ -177,7 +211,7 @@ declaration
 	:
 	type_relative type_specifier INLINE_STRING ';'
 	{
-		ender_parser_descriptor_property_add(parser->lns, parser->descriptor, $3, $2, $1);
+		_on_property(parser, $3, $1, $2);
 	}
 	;
 
@@ -191,3 +225,31 @@ void ender_error(YYLTYPE *lloc, void *scanner, Ender_Parser *parser, const char 
 {
         ERR("Parsing error at %s %d: %d.%d %s", parser->file, lloc->last_line, lloc->first_column, lloc->last_column, str);
 }
+
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data)
+{
+	Ender_Parser parser;
+	void *scanner;
+	FILE *f;
+	int ret;
+
+	f = fopen(file, "r");
+	if (!f) return;
+
+	parser.descriptor = descriptor;
+	parser.file = file;
+	parser.data = data;
+
+	ender_lex_init(&scanner);
+	ender_set_in(f, scanner);
+	ret = ender_parse(scanner, &parser);
+
+	ender_lex_destroy(scanner);
+	fclose(f);
+
+	return !ret;
+}
+
