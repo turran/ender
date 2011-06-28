@@ -46,7 +46,7 @@ static void _dump_container_recursive(Ender_Generator *thiz, Ender_Container *co
 	_tabs(thiz, level);
 	fprintf(thiz->out, "Ender_Container *tmp%d;\n", level);
 	_tabs(thiz, level);
-	fprintf(thiz->out, "tmp = ender_container_new(ENDER_%s);\n", ender_value_type_name_get(type));
+	fprintf(thiz->out, "tmp%d = ender_container_new(ENDER_%s);\n", level, ender_value_type_name_get(type));
 	if (ender_container_is_compound(container))
 	{
 		Ender_Container *sub;
@@ -132,13 +132,23 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	_dump_container_recursive(thiz, container, 2);
 	fprintf(thiz->out, "\t\tec = tmp2;\n");
 	fprintf(thiz->out, "\t}\n");
-	fprintf(thiz->out, "\tp = ender_descriptor_property_add(d, \"%s\",\n", name);
+	fprintf(thiz->out, "\tep = ender_descriptor_property_add(d, \"%s\",\n", name);
 	fprintf(thiz->out, "\t\t\tec,\n");
-	fprintf(thiz->out, "\t\t\t%s_%s_%s_get\n", thiz->ns_name, thiz->name, name);
-	fprintf(thiz->out, "\t\t\t%s_%s_%s_set\n", thiz->ns_name, thiz->name, name);
-	fprintf(thiz->out, "\t\t\t%s_%s_%s_add\n", thiz->ns_name, thiz->name, name);
-	fprintf(thiz->out, "\t\t\t%s_%s_%s_remove\n", thiz->ns_name, thiz->name, name);
-	fprintf(thiz->out, "\t\t\t%s_%s_%s_clear\n", thiz->ns_name, thiz->name, name);
+	fprintf(thiz->out, "\t\t\t%s_%s_%s_get,\n", thiz->ns_name, thiz->name, name);
+	fprintf(thiz->out, "\t\t\t%s_%s_%s_set,\n", thiz->ns_name, thiz->name, name);
+	if (ender_container_is_compound(container))
+	{
+		fprintf(thiz->out, "\t\t\t%s_%s_%s_add,\n", thiz->ns_name, thiz->name, name);
+		fprintf(thiz->out, "\t\t\t%s_%s_%s_remove,\n", thiz->ns_name, thiz->name, name);
+		fprintf(thiz->out, "\t\t\t%s_%s_%s_clear,\n", thiz->ns_name, thiz->name, name);
+	}
+	else
+	{
+		fprintf(thiz->out, "\t\t\tNULL,\n");
+		fprintf(thiz->out, "\t\t\tNULL,\n");
+		fprintf(thiz->out, "\t\t\tNULL,\n");
+	}
+	fprintf(thiz->out, "\t\t\t%s\n", relative ? "EINA_TRUE" : "EINA_FALSE");
 	fprintf(thiz->out, "\t\t\t);\n");
 }
 
