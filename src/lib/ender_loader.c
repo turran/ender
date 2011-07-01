@@ -114,6 +114,39 @@ static Eina_Bool _file_locate(const char *file, char *real_file)
 	return EINA_TRUE;
 }
 
+/* a name is the name used on "using" and "namespace", that is, somthing like
+ * enesim.renderer which should be translated to
+ * lib = enesim
+ * ns = renderer
+ */
+static void _name_split(char *name, char **lib, char **ns)
+{
+	char *tmp;
+
+	tmp = strchr(name, '.');
+	if (tmp)
+	{
+		printf("dot found %s\n", tmp);
+	}
+	/* no dot found, everythgin is the same */
+	else
+	{
+		*lib = tmp;
+		*ns = tmp;
+	}
+}
+
+/* replace every dot with underscores */
+static void _name_to_c(char *name)
+{
+	char *tmp;
+
+	while ((tmp = strchr(name, '.')))
+	{
+		*tmp = '_';
+	}
+}
+
 static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 {
 	Ender_Library_Namespace *namespace;
@@ -285,7 +318,15 @@ void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_D
  *----------------------------------------------------------------------------*/
 static void _loader_on_using(void *data, const char *file)
 {
-	ender_loader_load(file);
+	char *c_name;
+
+	char *lib;
+	char *ns;
+
+	c_name = strdup(file);
+	_name_to_c(c_name);
+	ender_loader_load(c_name);
+	free(c_name);
 }
 
 static void _loader_on_namespace(void *data, const char *name)
@@ -305,7 +346,11 @@ static void _loader_on_renderer(void *data, const char *name, Ender_Type type, c
 	if (parent)
 	{
 		parent_descriptor = ender_descriptor_find(parent);
-		if (!parent_descriptor) return;
+		if (!parent_descriptor)
+		{
+			ERR("No parent %s found for desriptor %s", parent, name);
+			return;
+		}
 	}
 	thiz->descriptor = _loader_descriptor_new(thiz->namespace, name, parent_descriptor, type);
 }
@@ -346,7 +391,7 @@ void ender_loader_shutdown(void)
 		Ender_Init shutdown;
 		char sym_name[PATH_MAX];
 
-		/* initialize the library */
+		/* shutdown the library */
 		snprintf(sym_name, PATH_MAX, "%s_shutdown", lib->name);
 		shutdown = dlsym(lib->dl_handle, sym_name);
 		if (shutdown) shutdown();
@@ -357,31 +402,12 @@ void ender_loader_shutdown(void)
 	eina_hash_free(_library_namespaces);
 	/* TODO free the list of files */
 }
-
-void ender_loader_parse(void)
-{
-	Eina_Iterator *it;
-	Ender_Library *lib;
-
-	/* iterate over the list of .ender files and parse them */
-	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
-	/* now that every ender is regsitered we can start initializing the libraries */
-	it = eina_hash_iterator_data_new(_libraries);
-	while (eina_iterator_next(it, (void **)&lib))
-	{
-		Ender_Init init;
-		char sym_name[PATH_MAX];
-
-		/* initialize the library */
-		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
-		init = dlsym(lib->dl_handle, sym_name);
-		if (init) init();
-	}
-	eina_iterator_free(it);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ *
+ */
 EAPI void ender_loader_load(const char *in)
 {
 	Ender_Loader loader;
@@ -408,4 +434,29 @@ EAPI void ender_loader_load(const char *in)
 		DBG("Parsed file %s correctly", real_file);
 		_files = eina_list_append(_files, strdup(real_file));
 	}
+}
+
+/**
+ *
+ */
+EAPI void ender_loader_load_all(void)
+{
+	Eina_Iterator *it;
+	Ender_Library *lib;
+
+	/* iterate over the list of .ender files and parse them */
+	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
+	/* now that every ender is regsitered we can start initializing the libraries */
+	it = eina_hash_iterator_data_new(_libraries);
+	while (eina_iterator_next(it, (void **)&lib))
+	{
+		Ender_Init init;
+		char sym_name[PATH_MAX];
+
+		/* initialize the library */
+		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
+		init = dlsym(lib->dl_handle, sym_name);
+		if (init) init();
+	}
+	eina_iterator_free(it);
 }

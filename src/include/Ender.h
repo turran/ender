@@ -328,7 +328,7 @@ EAPI const char * ender_type_name_get(Ender_Type type);
  * @{
  */
 EAPI void ender_loader_load(const char *in);
-
+EAPI void ender_loader_load_all(void);
 /**
  * @}
  */

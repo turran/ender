@@ -100,8 +100,6 @@ static void _generator_on_renderer(void *data, const char *name, Ender_Type type
 	fprintf(thiz->out, "void %s_%s_init(void)\n", thiz->ns_name, thiz->name);
 	fprintf(thiz->out, "{\n");
 	fprintf(thiz->out, "\tEnder_Namespace *ns;\n");
-	fprintf(thiz->out, "\tEnder_Container *ec;\n");
-	fprintf(thiz->out, "\tEnder_Property *ep;\n");
 	fprintf(thiz->out, "\tEnder_Descriptor *parent = NULL;\n");
 	fprintf(thiz->out, "\tstatic Ender_Descriptor *d = NULL;\n");
 	fprintf(thiz->out, "\tif (d) return;\n");
@@ -110,11 +108,12 @@ static void _generator_on_renderer(void *data, const char *name, Ender_Type type
 	if (parent)
 	{
 		fprintf(thiz->out, "\tparent = ender_descriptor_find(\"%s\");\n", parent);
+		fprintf(thiz->out, "\tif (!parent) return;\n");
 	}
 	if (type == ENDER_ABSTRACT)
-		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", NULL, parent, ENDER_%s);\n", thiz->ns_name, ender_type_name_get(type));
+		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", NULL, parent, ENDER_%s);\n", thiz->name, ender_type_name_get(type));
 	else
-		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", %s_%s_new, parent, ENDER_%s);\n", thiz->ns_name, thiz->ns_name, name, ender_type_name_get(type));
+		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", _%s_%s_new, parent, ENDER_%s);\n", thiz->name, thiz->ns_name, name, ender_type_name_get(type));
 	fprintf(thiz->out, "\tif (!d) return;\n");
 	/* the properties */
 	//ender_descriptor_property_list(descriptor, _dump_property, descriptor);
@@ -129,27 +128,29 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	if (!thiz->name_matched) return;
 	/* first the container */
 	fprintf(thiz->out, "\t{\n");
+	fprintf(thiz->out, "\t\tEnder_Container *ec;\n");
+	fprintf(thiz->out, "\t\tEnder_Property *ep;\n");
 	_dump_container_recursive(thiz, container, 2);
 	fprintf(thiz->out, "\t\tec = tmp2;\n");
-	fprintf(thiz->out, "\t}\n");
-	fprintf(thiz->out, "\tep = ender_descriptor_property_add(d, \"%s\",\n", name);
-	fprintf(thiz->out, "\t\t\tec,\n");
-	fprintf(thiz->out, "\t\t\t%s_%s_%s_get,\n", thiz->ns_name, thiz->name, name);
-	fprintf(thiz->out, "\t\t\t%s_%s_%s_set,\n", thiz->ns_name, thiz->name, name);
+	fprintf(thiz->out, "\t\tep = ender_descriptor_property_add(d, \"%s\",\n", name);
+	fprintf(thiz->out, "\t\t\t\tec,\n");
+	fprintf(thiz->out, "\t\t\t\tENDER_GETTER(_%s_%s_%s_get),\n", thiz->ns_name, thiz->name, name);
+	fprintf(thiz->out, "\t\t\t\tENDER_SETTER(_%s_%s_%s_set),\n", thiz->ns_name, thiz->name, name);
 	if (ender_container_is_compound(container))
 	{
-		fprintf(thiz->out, "\t\t\t%s_%s_%s_add,\n", thiz->ns_name, thiz->name, name);
-		fprintf(thiz->out, "\t\t\t%s_%s_%s_remove,\n", thiz->ns_name, thiz->name, name);
-		fprintf(thiz->out, "\t\t\t%s_%s_%s_clear,\n", thiz->ns_name, thiz->name, name);
+		fprintf(thiz->out, "\t\t\t\tENDER_ADD(_%s_%s_%s_add),\n", thiz->ns_name, thiz->name, name);
+		fprintf(thiz->out, "\t\t\t\tENDER_REMOVE(_%s_%s_%s_remove),\n", thiz->ns_name, thiz->name, name);
+		fprintf(thiz->out, "\t\t\t\tENDER_CLEAR(_%s_%s_%s_clear),\n", thiz->ns_name, thiz->name, name);
 	}
 	else
 	{
-		fprintf(thiz->out, "\t\t\tNULL,\n");
-		fprintf(thiz->out, "\t\t\tNULL,\n");
-		fprintf(thiz->out, "\t\t\tNULL,\n");
+		fprintf(thiz->out, "\t\t\t\tNULL,\n");
+		fprintf(thiz->out, "\t\t\t\tNULL,\n");
+		fprintf(thiz->out, "\t\t\t\tNULL,\n");
 	}
-	fprintf(thiz->out, "\t\t\t%s\n", relative ? "EINA_TRUE" : "EINA_FALSE");
-	fprintf(thiz->out, "\t\t\t);\n");
+	fprintf(thiz->out, "\t\t\t\t%s\n", relative ? "EINA_TRUE" : "EINA_FALSE");
+	fprintf(thiz->out, "\t\t\t\t);\n");
+	fprintf(thiz->out, "\t}\n");
 }
 
 static Ender_Parser_Descriptor _generator_parser = {

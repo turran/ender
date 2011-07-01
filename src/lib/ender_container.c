@@ -188,6 +188,9 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 	sub->offset = prev_offset + prev_size;
 }
 
+/**
+ *
+ */
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
 {
 	return c->type;

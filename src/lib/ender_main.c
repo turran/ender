@@ -26,16 +26,6 @@ static Eina_Bool _enable_parse = EINA_TRUE;
 
 /* TODO something to do on the future */
 #if 0
-typedef void (*Ender_Option_Callback)(Ender_Option *eo, char *arg);
-typedef struct _Ender_Option
-{
-	const char *short_name;
-	const char *long_name;
-	const char *description;
-	Eina_Bool needs_argument;
-	Ender_Option_Callback callback;	
-} Ender_Option;
-#endif
 
 static void _remove_option(int idx, int *argc, char ***argv)
 {
@@ -64,6 +54,7 @@ static void _parse(int *argc, char ***argv)
 		}
 	}
 }
+#endif
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -79,15 +70,12 @@ EAPI void ender_init(int *argc, char ***argv)
 	if (!_init++)
 	{
 		eina_init();
-		_parse(argc, argv);
 		ender_log_dom = eina_log_domain_register("ender", NULL);
 		enesim_init();
 		ender_descriptor_init();
 		ender_namespace_init();
 		ender_container_init();
 		ender_loader_init();
-		if (_enable_parse)
-			ender_loader_parse();
 	}
 }
 
