@@ -68,6 +68,8 @@ void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
 
 	if (!ep->set) return;
 	ep->set(ep, e, v, ep->data);
+
+	event_data.name = ep->name;
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
 

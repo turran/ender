@@ -307,7 +307,7 @@ EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p);
 
 typedef struct _Ender_Event_Mutation
 {
-	
+	const char *name;
 } Ender_Event_Mutation;
 
 EAPI void ender_event_listener_add(Ender_Element *e, const char *event_name, Ender_Event_Callback cb, void *data);
