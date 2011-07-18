@@ -48,7 +48,7 @@ EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type)
 
 EAPI Ender_Value * ender_value_new_container_from(Ender_Container *ec)
 {
-	return _ender_value_new(ec);	
+	return _ender_value_new(ec);
 }
 
 EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
@@ -60,7 +60,7 @@ EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
 	sub = ender_container_new(child_type);
 	ender_container_add(ec, sub);
 
-	return _ender_value_new(ec);	
+	return _ender_value_new(ec);
 }
 
 EAPI Ender_Container * ender_value_container_get(Ender_Value *value)
@@ -272,11 +272,11 @@ EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 	sub = ender_container_compound_get(value->container, 0);
 	if (sub->type == ENDER_VALUE)
 	{
-		value->data.ptr = eina_list_append(value->data.ptr, child);	
+		value->data.ptr = eina_list_append(value->data.ptr, child);
 	}
 	else
 	{
-		printf("TODO\n");
+		printf("%s TODO\n", __FILE__);
 	}
 }
 

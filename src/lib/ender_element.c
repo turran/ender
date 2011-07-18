@@ -295,7 +295,7 @@ EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_
 		ENDER_VALUE_COLLECT(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
 		name = va_arg(var_args, char *);
-	} 
+	}
 }
 
 /**
@@ -349,7 +349,7 @@ EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, 
 		ENDER_VALUE_COLLECT(v, ec, var_args);
 		ender_property_element_value_remove(prop, e, &v);
 		name = va_arg(var_args, char *);
-	} 
+	}
 }
 
 /**
@@ -758,5 +758,5 @@ EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data)
 			_new_callbacks = eina_list_remove(l, listener);
 			break;
 		}
-	} 
+	}
 }
