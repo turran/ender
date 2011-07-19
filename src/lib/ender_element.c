@@ -715,18 +715,16 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
 {
 	Ender_Listener *listener;
 	Eina_List *listeners;
-	Eina_Iterator *it;
+	Eina_List *l;
 
 	ENDER_MAGIC_CHECK(e);
 	listeners = eina_hash_find(e->listeners, event_name);
 	if (!listeners) return;
 
-	it = eina_list_iterator_new(listeners);
-	while (eina_iterator_next(it, (void **)&listener))
+	EINA_LIST_FOREACH(listeners, l, listener)
 	{
 		listener->callback(e, event_name, event_data, listener->data);
 	}
-	eina_iterator_free(it);
 }
 
 /**
