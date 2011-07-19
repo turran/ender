@@ -620,7 +620,7 @@ EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Proper
 		ENDER_VALUE_COLLECT(v, ec, var_args);
 		ender_property_element_value_set(prop, e, &v);
 		prop = va_arg(var_args, Ender_Property *);
-	} 
+	}
 }
 
 /**
