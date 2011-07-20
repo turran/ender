@@ -142,6 +142,51 @@ struct _Ender_Element
 	Eina_Hash *properties;
 };
 
+static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
+{
+	Ender_Element *ender;
+	Ender_New_Listener *listener;
+	Enesim_Renderer *renderer;
+	Ender_Descriptor *desc;
+	Eina_List *l;
+
+	desc = ender_descriptor_find_with_namespace(name, ns_name);
+	DBG("Creating new ender \"%s\" for namesapce \"%s\"", name, ns_name);
+	if (!desc)
+	{
+		ERR("No such descriptor for name \"%s.%s\"", ns_name, name);
+		return NULL;
+	}
+	if (!desc->create)
+	{
+		ERR("The descriptor for name \"%s.%s\" does not have a creator", ns_name, name);
+		return NULL;
+	}
+
+	renderer = desc->create();
+	if (!renderer)
+	{
+		ERR("For some reason the creator for \"%s.%s\" failed", ns_name, name);
+		return NULL;
+	}
+
+	ender = calloc(1, sizeof(Ender_Element));
+	EINA_MAGIC_SET(ender, ENDER_MAGIC);
+	ender->renderer = renderer;
+	ender->descriptor = desc;
+	ender->listeners = eina_hash_string_superfast_new(NULL);
+	ender->properties = eina_hash_string_superfast_new(NULL);
+	enesim_renderer_private_set(renderer, "ender", ender);
+	/* call the constructor callback */
+	EINA_LIST_FOREACH(_new_callbacks, l, listener)
+	{
+		listener->callback(ender, listener->data);
+	}
+
+	return ender;
+
+}
+
 static void _property_is_relative_cb(Ender_Property *prop, void *data)
 {
 	Ender_Element_Property_List_Data *new_data = data;
@@ -204,46 +249,15 @@ void ender_element_parent_set(Ender_Element *e, Ender_Element *parent)
  */
 EAPI Ender_Element * ender_element_new(const char *name)
 {
-	Ender_Element *ender;
-	Ender_Descriptor *desc;
-	Ender_New_Listener *listener;
-	Enesim_Renderer *renderer;
-	Eina_List *l;
+	return ender_element_new_with_namespace(name, NULL);
+}
 
-	DBG("Creating new ender \"%s\"", name);
-	desc = ender_descriptor_find(name);
-	if (!desc)
-	{
-		ERR("No such descriptor for name \"%s\"", name);
-		return NULL;
-	}
-	if (!desc->create)
-	{
-		ERR("The descriptor for name \"%s\" does not have a creator", name);
-		return NULL;
-	}
-
-	renderer = desc->create();
-	if (!renderer)
-	{
-		ERR("For some reason the creator for \"%s\" failed", name);
-		return NULL;
-	}
-
-	ender = calloc(1, sizeof(Ender_Element));
-	EINA_MAGIC_SET(ender, ENDER_MAGIC);
-	ender->renderer = renderer;
-	ender->descriptor = desc;
-	ender->listeners = eina_hash_string_superfast_new(NULL);
-	ender->properties = eina_hash_string_superfast_new(NULL);
-	enesim_renderer_private_set(renderer, "ender", ender);
-	/* call the constructor callback */
-	EINA_LIST_FOREACH(_new_callbacks, l, listener)
-	{
-		listener->callback(ender, listener->data);
-	}
-
-	return ender;
+/**
+ *
+ */
+EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name)
+{
+	return _ender_element_new(name, ns_name);
 }
 
 /**

@@ -213,6 +213,18 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Descriptor *parent, Ender_Type type)
 {
 	Ender_Descriptor *desc;
+	Eina_Bool found = EINA_FALSE;
+
+	desc = eina_hash_find(_descriptors, name);
+	/* we have already added a new descriptor with this name */
+	if (desc)
+	{
+		WRN("Descriptor \"%s\" already found", name);
+		found = EINA_TRUE;
+		/* same namespace, then return previous one */
+		if (desc->ns == ns) return desc;
+	}
+	
 
 	desc = calloc(1, sizeof(Ender_Descriptor));
 	desc->name = strdup(name);
@@ -222,7 +234,8 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	desc->ns = ns;
 	desc->properties = eina_hash_string_superfast_new(NULL);
 
-	eina_hash_add(_descriptors, name, desc);
+	if (!found)
+		eina_hash_add(_descriptors, name, desc);
 
 	return desc;
 }
@@ -350,6 +363,7 @@ EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, c
 {
 	Ender_Namespace *ns;
 
+	if (!ns_name) return ender_descriptor_find(name);
 	ns = ender_namespace_find(ns_name);
 	if (!ns) return NULL;
 	return ender_namespace_descriptor_find(ns, name);

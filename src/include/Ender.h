@@ -244,6 +244,7 @@ typedef Ender_Element_Accessor Ender_Element_Remove;
 typedef void (*Ender_Element_Clear)(Ender_Element *e, Ender_Property *ep, void *data);
 
 EAPI Ender_Element * ender_element_new(const char *name);
+EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name);
 EAPI void ender_element_delete(Ender_Element *e);
 EAPI const char * ender_element_name_get(Ender_Element *e);
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e);
