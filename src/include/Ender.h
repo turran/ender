@@ -306,9 +306,19 @@ EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p);
  * @{
  */
 
+typedef enum _Ender_Event_Mutation_Type
+{
+	ENDER_EVENT_MUTATION_SET,
+	ENDER_EVENT_MUTATION_ADD,
+	ENDER_EVENT_MUTATION_REMOVE,
+	ENDER_EVENT_MUTATION_CLEAR,
+} Ender_Event_Mutation_Type;
+
 typedef struct _Ender_Event_Mutation
 {
 	const char *name;
+	const Ender_Value *value;
+	Ender_Event_Mutation_Type type;
 } Ender_Event_Mutation;
 
 EAPI void ender_event_listener_add(Ender_Element *e, const char *event_name, Ender_Event_Callback cb, void *data);

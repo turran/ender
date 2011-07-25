@@ -70,6 +70,8 @@ void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
 	ep->set(ep, e, v, ep->data);
 
 	event_data.name = ep->name;
+	event_data.value = v;
+	event_data.type = ENDER_EVENT_MUTATION_SET;
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
 
@@ -87,6 +89,10 @@ void ender_property_element_value_add(Ender_Property *ep, Ender_Element *e,
 
 	if (!ep->add) return;
 	ep->add(ep, e, v, ep->data);
+
+	event_data.name = ep->name;
+	event_data.value = v;
+	event_data.type = ENDER_EVENT_MUTATION_ADD;
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
 
@@ -97,6 +103,10 @@ void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
 
 	if (!ep->remove) return;
 	ep->remove(ep, e, v, ep->data);
+
+	event_data.name = ep->name;
+	event_data.value = v;
+	event_data.type = ENDER_EVENT_MUTATION_REMOVE;
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
 
@@ -106,6 +116,10 @@ void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
 
 	if (!ep->clear) return;
 	ep->clear(ep, e, ep->data);
+
+	event_data.name = ep->name;
+	event_data.value = NULL;
+	event_data.type = ENDER_EVENT_MUTATION_CLEAR;
 	ender_event_dispatch(e, "Mutation", &event_data);
 }
 /*============================================================================*
