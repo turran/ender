@@ -21,6 +21,17 @@
  *                                  Local                                     *
  *============================================================================*/
 static Eina_Hash *_structs = NULL;
+static Ender_Container *_basic_containers[ENDER_LIST - ENDER_BOOL];
+
+static Ender_Container * _ender_container_new(Ender_Value_Type t)
+{
+	Ender_Container *ec;
+
+	ec = malloc(sizeof(Ender_Container));
+	ec->type = t;
+	ec->elements = NULL;
+	return ec;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -47,7 +58,14 @@ Ender_Container * ender_container_find(const char *name)
 
 void ender_container_init(void)
 {
+	int i;
+
 	_structs = eina_hash_string_superfast_new(NULL);
+	/* define the common (basic) containers here */
+	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
+	{
+		_basic_containers[i] = _ender_container_new(i);
+	}
 }
 
 void ender_container_shutdown(void)
@@ -65,10 +83,12 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 {
 	Ender_Container *ec;
 
-	ec = malloc(sizeof(Ender_Container));
-	ec->type = t;
-	ec->elements = NULL;
-	return ec;
+	/* if it is a basic type, just get it from the list */
+	if (t >= ENDER_BOOL && t < ENDER_LIST)
+	{
+		return _basic_containers[t];
+	}
+	return _ender_container_new(t);
 }
 
 /**
