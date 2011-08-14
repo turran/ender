@@ -266,7 +266,7 @@ EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const ch
 EAPI void ender_element_delete(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
-	enesim_renderer_delete(e->renderer);
+	enesim_renderer_unref(e->renderer);
 	free(e);
 }
 
