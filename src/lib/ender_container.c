@@ -215,3 +215,13 @@ EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
 {
 	return c->type;
 }
+
+EAPI Ender_Container * ender_container_ref(Ender_Container *c)
+{
+
+}
+
+EAPI void ender_container_unref(Ender_Container *c)
+{
+
+}
