@@ -1,5 +1,6 @@
 namespace "enesim" {
 	abstract "renderer" {
+		string "name";
 		matrix "transformation";
 		double "x_origin";
 		double "y_origin";

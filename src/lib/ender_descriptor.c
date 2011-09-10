@@ -224,7 +224,6 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		/* same namespace, then return previous one */
 		if (desc->ns == ns) return desc;
 	}
-	
 
 	desc = calloc(1, sizeof(Ender_Descriptor));
 	desc->name = strdup(name);
