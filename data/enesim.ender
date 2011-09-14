@@ -19,8 +19,8 @@ namespace "enesim.renderer" {
 	};
 
 	class "rectangle" : "shape" {
-		uint "width";
-		uint "height";
+		double "width";
+		double "height";
 		double "corner_radius";
 		bool "top_left_corner";
 		bool "top_right_corner";
