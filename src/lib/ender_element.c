@@ -134,7 +134,7 @@ typedef struct _Ender_Element_Property
 
 struct _Ender_Element
 {
-	EINA_MAGIC;
+	EINA_MAGIC
 	Ender_Descriptor *descriptor;
 	Enesim_Renderer *renderer;
 	Eina_Hash *listeners;

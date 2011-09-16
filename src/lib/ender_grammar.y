@@ -20,6 +20,8 @@ typedef struct _Ender_Parser
 	void *data;
 } Ender_Parser;
 
+void ender_error(void *lloc, void *scanner, Ender_Parser *parser, const char *str);
+
 static inline void _on_using(Ender_Parser *parser, Eina_List *list)
 {
 	Eina_List *l;
@@ -63,26 +65,26 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 	Eina_List *list; // use this for every _list nonterminal
 }
 
-%token <vtype> BOOL 
-%token <vtype> UINT
-%token <vtype> INT
-%token <vtype> COLOR
-%token <vtype> ARGB
-%token <vtype> DOUBLE
-%token <vtype> IMAGE
-%token <vtype> SURFACE
-%token <vtype> STRING
-%token <vtype> MATRIX
-%token <vtype> STRUCT
-%token <vtype> RENDERER
-%token <vtype> ENDER
-%token <etype> ABSTRACT
-%token <etype> CLASS
-%token NAMESPACE
-%token REL
-%token USING
-%token <s> WORD
-%token <s> INLINE_STRING
+%token <vtype> T_BOOL
+%token <vtype> T_UINT
+%token <vtype> T_INT
+%token <vtype> T_COLOR
+%token <vtype> T_ARGB
+%token <vtype> T_DOUBLE
+%token <vtype> T_IMAGE
+%token <vtype> T_SURFACE
+%token <vtype> T_STRING
+%token <vtype> T_MATRIX
+%token <vtype> T_STRUCT
+%token <vtype> T_RENDERER
+%token <vtype> T_ENDER
+%token <etype> T_ABSTRACT
+%token <etype> T_CLASS
+%token T_NAMESPACE
+%token T_REL
+%token T_USING
+%token <s> T_WORD
+%token <s> T_INLINE_STRING
 %type <list>using
 %type <b> type_relative
 %type <prop> type_specifier
@@ -104,7 +106,7 @@ main
 
 using
 	: { $$ = NULL; }
-	| USING INLINE_STRING ';' using { $$ = eina_list_append($4, $2); }
+	| T_USING T_INLINE_STRING ';' using { $$ = eina_list_append($4, $2); }
 	;
 
 namespace_list
@@ -113,7 +115,7 @@ namespace_list
 	;
 
 namespace
-	: NAMESPACE INLINE_STRING
+	: T_NAMESPACE T_INLINE_STRING
 	{
 		_on_namespace(parser, $2);
 	}
@@ -127,7 +129,7 @@ definition_list
 	;
 
 struct
-	: STRUCT INLINE_STRING '{' types '}' ';'
+	: T_STRUCT T_INLINE_STRING '{' types '}' ';'
 	{
 		Eina_List *l;
 		Ender_Container *c, *sub;
@@ -142,7 +144,7 @@ struct
 	;
 
 renderer
-	: definition INLINE_STRING renderer_inheritance
+	: definition T_INLINE_STRING renderer_inheritance
 	{
 		_on_renderer(parser, $2, $1, $3);
 	}
@@ -151,13 +153,13 @@ renderer
 
 
 definition
-	: CLASS { $$ = $1; }
-	| ABSTRACT { $$ = $1; }
+	: T_CLASS { $$ = $1; }
+	| T_ABSTRACT { $$ = $1; }
 	;
 
 renderer_inheritance
 	: { $$ = NULL; }
-	| ':' INLINE_STRING { $$ = $2; }
+	| ':' T_INLINE_STRING { $$ = $2; }
 	;
 
 types
@@ -172,21 +174,21 @@ types
 	;
 
 basic_type
-	: BOOL { $$ = $1; }
-	| UINT { $$ = $1; }
-	| INT { $$ = $1; }
-	| COLOR { $$ = $1; }
-	| ARGB { $$ = $1; }
-	| DOUBLE { $$ = $1; }
-	| STRING { $$ = $1; }
-	| SURFACE { $$ = $1; }
-	| RENDERER { $$ = $1; }
-	| ENDER { $$ = $1; }
-	| MATRIX { $$ = $1; }
+	: T_BOOL { $$ = $1; }
+	| T_UINT { $$ = $1; }
+	| T_INT { $$ = $1; }
+	| T_COLOR { $$ = $1; }
+	| T_ARGB { $$ = $1; }
+	| T_DOUBLE { $$ = $1; }
+	| T_STRING { $$ = $1; }
+	| T_SURFACE { $$ = $1; }
+	| T_RENDERER { $$ = $1; }
+	| T_ENDER { $$ = $1; }
+	| T_MATRIX { $$ = $1; }
 	;
 
 struct_type
-	: WORD { $$ = ender_container_find($1); }
+	: T_WORD { $$ = ender_container_find($1); }
 	;
 
 list_type
@@ -205,11 +207,11 @@ type_specifier
 
 type_relative
 	: {$$=EINA_FALSE; }
-	| REL { $$=EINA_TRUE; }
+	| T_REL { $$=EINA_TRUE; }
 	;
 declaration
 	:
-	type_relative type_specifier INLINE_STRING ';'
+	type_relative type_specifier T_INLINE_STRING ';'
 	{
 		_on_property(parser, $3, $1, $2);
 	}
@@ -221,9 +223,10 @@ declaration_list
 	;
 %%
 
-void ender_error(YYLTYPE *lloc, void *scanner, Ender_Parser *parser, const char *str)
+void ender_error(void *data, void *scanner, Ender_Parser *parser, const char *str)
 {
-        ERR("Parsing error at %s %d: %d.%d %s", parser->file, lloc->last_line, lloc->first_column, lloc->last_column, str);
+	YYLTYPE *lloc = (YYLTYPE *)data;
+	ERR("Parsing error at %s %d: %d.%d %s", parser->file, lloc->last_line, lloc->first_column, lloc->last_column, str);
 }
 
 /*============================================================================*

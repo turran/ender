@@ -1,0 +1,1 @@
+#define PACKAGE_DATA_DIR ""

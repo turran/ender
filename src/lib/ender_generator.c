@@ -154,10 +154,10 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 }
 
 static Ender_Parser_Descriptor _generator_parser = {
-	.on_using = _generator_on_using,
-	.on_namespace = _generator_on_namespace,
-	.on_renderer = _generator_on_renderer,
-	.on_property = _generator_on_property,
+	/* on_using = */ _generator_on_using,
+	/* on_namespace = */ _generator_on_namespace,
+	/* on_renderer = */ _generator_on_renderer,
+	/* on_property = */ _generator_on_property,
 };
 /*============================================================================*
  *                                 Global                                     *

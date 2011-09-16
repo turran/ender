@@ -19,7 +19,9 @@
 #include "ender_private.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -365,10 +367,10 @@ static void _loader_on_property(void *data, const char *name, Eina_Bool relative
 }
 
 static Ender_Parser_Descriptor _loader_parser = {
-	.on_using = _loader_on_using,
-	.on_namespace = _loader_on_namespace,
-	.on_renderer = _loader_on_renderer,
-	.on_property = _loader_on_property,
+	/* on_using = */ _loader_on_using,
+	/* on_namespace = */ _loader_on_namespace,
+	/* on_renderer = */ _loader_on_renderer,
+	/* on_property = */ _loader_on_property,
 };
 /*============================================================================*
  *                                 Global                                     *

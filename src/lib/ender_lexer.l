@@ -10,73 +10,74 @@
 #include "Ender.h"
 #include "ender_private.h"
 #include "libender_la-ender_grammar.h"
+#define YY_NO_UNISTD_H
 %}
 
 _operator [\[\]{}.,;=\:]
 
 %%
 
-rel			return REL;
+rel			return T_REL;
 bool			{
 				yylval_param->vtype = ENDER_BOOL;
-				return BOOL;
+				return T_BOOL;
 			}
 uint 			{ 
 				yylval_param->vtype = ENDER_UINT32;
-				return UINT;
+				return T_UINT;
 			}
 int			{
 				yylval_param->vtype = ENDER_INT32;
-				return INT;
+				return T_INT;
 			}
 argb			{
 				yylval_param->vtype = ENDER_ARGB;
-				return ARGB;
+				return T_ARGB;
 			}
 color			{
 				yylval_param->vtype = ENDER_COLOR;
-				return COLOR;
+				return T_COLOR;
 			}
 double			{
 				yylval_param->vtype = ENDER_DOUBLE;
-				return DOUBLE;
+				return T_DOUBLE;
 			}
 surface			{
 
 				yylval_param->vtype = ENDER_SURFACE;
-				return SURFACE;
+				return T_SURFACE;
 			}
 
 string			{
 				yylval_param->vtype = ENDER_STRING;
-				return STRING;
+				return T_STRING;
 			}
 matrix			{
 				yylval_param->vtype = ENDER_MATRIX;
-				return MATRIX;
+				return T_MATRIX;
 			}
 renderer		{
 				yylval_param->vtype = ENDER_RENDERER;
-				return RENDERER;
+				return T_RENDERER;
 			}
 ender			{
 				yylval_param->vtype = ENDER_ENDER;
-				return ENDER;
+				return T_ENDER;
 			}
 struct			{
 				yylval_param->vtype = ENDER_STRUCT;
-				return STRUCT;
+				return T_STRUCT;
 			}
-namespace		return NAMESPACE;
+namespace		return T_NAMESPACE;
 class			{
 				yylval_param->etype = ENDER_CLASS;
-				return CLASS;
+				return T_CLASS;
 			}
 abstract		{
 				yylval_param->etype = ENDER_ABSTRACT;
-				return ABSTRACT;
+				return T_ABSTRACT;
 			}
-using			return USING;
+using			return T_USING;
 
 (\"[^\"]*\")* {
 	char *tmp = NULL;
@@ -100,12 +101,12 @@ using			return USING;
 	if (tmp != NULL)
 	    strcat(yylval_param->s, tmp);
 
-	return INLINE_STRING;
+	return T_INLINE_STRING;
 }
 
 [a-zA-Z0-9_]*           {
 				yylval_param->s = strdup(yytext);
-				return WORD;
+				return T_WORD;
 			}
 {_operator}		{ return *yytext; }
 \n                      /* ignore end of line */
