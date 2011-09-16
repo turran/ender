@@ -185,7 +185,7 @@ EAPI void ender_value_free(Ender_Value *v);
 
 /**
  * @}
- * @defgroup Ender_Descriptor_Group Descriptor
+ * @defgroup Ender_Namespace_Group Namespace
  * @{
  */
 typedef Enesim_Renderer * (*Ender_Creator)(void);

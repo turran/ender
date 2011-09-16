@@ -66,6 +66,10 @@ void ender_namespace_dump(Ender_Namespace *ns)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Namespace * ender_namespace_new(const char *name)
 {
 	Ender_Namespace *namespace;
@@ -84,6 +88,10 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name)
 	return namespace;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Namespace * ender_namespace_find(const char *name)
 {
 	Ender_Namespace *namespace;
@@ -94,6 +102,10 @@ EAPI Ender_Namespace * ender_namespace_find(const char *name)
 	return namespace;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name)
 {
 	if (!ns || !name) return NULL;
@@ -101,6 +113,10 @@ EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, con
 	return eina_hash_find(ns->descriptors, name);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Type type)
 {
 	Ender_Descriptor *desc;
@@ -114,6 +130,10 @@ EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, con
 	return desc;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI const char * ender_namespace_name_get(Ender_Namespace *ns)
 {
 	if (!ns) return NULL;

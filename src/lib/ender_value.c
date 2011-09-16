@@ -35,6 +35,10 @@ static Ender_Value * _ender_value_new(Ender_Container *ec)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type)
 {
 	Ender_Container *ec;
@@ -46,11 +50,19 @@ EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type)
 	return _ender_value_new(ec);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Value * ender_value_new_container_from(Ender_Container *ec)
 {
 	return _ender_value_new(ec);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
 {
 	Ender_Container *ec;
@@ -63,16 +75,28 @@ EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
 	return _ender_value_new(ec);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Container * ender_value_container_get(Ender_Value *value)
 {
 	return value->container;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Value_Type ender_value_type_get(Ender_Value *value)
 {
 	return value->container->type;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32)
 {
 	if (value->container->type != ENDER_INT32)
@@ -80,6 +104,10 @@ EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32)
 	value->data.i32 = i32;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI int32_t ender_value_int32_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_INT32)
@@ -87,6 +115,10 @@ EAPI int32_t ender_value_int32_get(Ender_Value *value)
 	return value->data.i32;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_uint32_set(Ender_Value *value, uint32_t u32)
 {
 	if (value->container->type != ENDER_UINT32)
@@ -94,6 +126,10 @@ EAPI void ender_value_uint32_set(Ender_Value *value, uint32_t u32)
 	value->data.u32 = u32;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI uint32_t ender_value_uint32_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_UINT32)
@@ -101,6 +137,10 @@ EAPI uint32_t ender_value_uint32_get(Ender_Value *value)
 	return value->data.u32;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_double_set(Ender_Value *value, double d)
 {
 	if (value->container->type != ENDER_DOUBLE)
@@ -108,6 +148,10 @@ EAPI void ender_value_double_set(Ender_Value *value, double d)
 	value->data.d = d;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI double ender_value_double_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_DOUBLE)
@@ -115,6 +159,10 @@ EAPI double ender_value_double_get(Ender_Value *value)
 	return value->data.d;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb)
 {
 	if (value->container->type != ENDER_ARGB)
@@ -122,6 +170,10 @@ EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb)
 	value->data.u32 = argb;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Argb ender_value_argb_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_ARGB)
@@ -129,6 +181,10 @@ EAPI Enesim_Argb ender_value_argb_get(Ender_Value *value)
 	return value->data.u32;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color color)
 {
 	if (value->container->type != ENDER_COLOR)
@@ -136,6 +192,10 @@ EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color color)
 	value->data.u32 = color;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Color ender_value_color_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_COLOR)
@@ -143,6 +203,10 @@ EAPI Enesim_Color ender_value_color_get(Ender_Value *value)
 	return value->data.u32;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix)
 {
 	if (value->container->type != ENDER_MATRIX)
@@ -151,6 +215,10 @@ EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix)
 	value->data.ptr = matrix;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix *matrix)
 {
 	Enesim_Matrix *m;
@@ -164,6 +232,10 @@ EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix 
 	value->owned = EINA_TRUE;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Matrix * ender_value_matrix_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_MATRIX)
@@ -172,6 +244,10 @@ EAPI Enesim_Matrix * ender_value_matrix_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_string_set(Ender_Value *value, char * string)
 {
 	if (value->container->type != ENDER_STRING)
@@ -179,6 +255,10 @@ EAPI void ender_value_string_set(Ender_Value *value, char * string)
 	value->data.ptr = string;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_static_string_set(Ender_Value *value, const char * string)
 {
 	if (value->container->type != ENDER_STRING)
@@ -187,6 +267,10 @@ EAPI void ender_value_static_string_set(Ender_Value *value, const char * string)
 	value->owned = EINA_TRUE;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI char * ender_value_string_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_STRING)
@@ -194,16 +278,28 @@ EAPI char * ender_value_string_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_struct_set(Ender_Value *value, void * structure)
 {
 
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_const_struct_set(Ender_Value *value, void * structure)
 {
 
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer)
 {
 	if (value->container->type != ENDER_RENDERER)
@@ -211,6 +307,10 @@ EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer
 	value->data.ptr = renderer;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_RENDERER)
@@ -218,6 +318,10 @@ EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender)
 {
 	if (value->container->type != ENDER_ENDER)
@@ -225,6 +329,10 @@ EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender)
 	value->data.ptr = ender;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Element * ender_value_ender_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_ENDER)
@@ -232,6 +340,10 @@ EAPI Ender_Element * ender_value_ender_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface)
 {
 	if (value->container->type != ENDER_SURFACE)
@@ -239,6 +351,10 @@ EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface)
 	value->data.ptr = surface;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Surface * ender_value_surface_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_SURFACE)
@@ -246,6 +362,10 @@ EAPI Enesim_Surface * ender_value_surface_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Free free_cb, void *user_data)
 {
 	if (value->container->type != ENDER_POINTER)
@@ -255,6 +375,10 @@ EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Fre
 	value->free_cb_data = user_data;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void * ender_value_pointer_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_POINTER)
@@ -262,6 +386,10 @@ EAPI void * ender_value_pointer_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 {
 	Ender_Container *sub;
@@ -280,6 +408,10 @@ EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 	}
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_list_set(Ender_Value *value, Eina_List *list)
 {
 	if (value->container->type != ENDER_LIST)
@@ -287,6 +419,10 @@ EAPI void ender_value_list_set(Ender_Value *value, Eina_List *list)
 	value->data.ptr = list;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI const Eina_List * ender_value_list_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_LIST)
@@ -294,6 +430,10 @@ EAPI const Eina_List * ender_value_list_get(Ender_Value *value)
 	return value->data.ptr;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Eina_Bool ender_value_bool_get(Ender_Value *value)
 {
 	if (value->container->type != ENDER_BOOL)
@@ -301,6 +441,10 @@ EAPI Eina_Bool ender_value_bool_get(Ender_Value *value)
 	return value->data.u32;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_bool_set(Ender_Value *value, Eina_Bool boolean)
 {
 	if (value->container->type != ENDER_BOOL)
@@ -308,6 +452,10 @@ EAPI void ender_value_bool_set(Ender_Value *value, Eina_Bool boolean)
 	value->data.u32 = boolean;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_free(Ender_Value *value)
 {
 	if (value->owned)

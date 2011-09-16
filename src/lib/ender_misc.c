@@ -27,7 +27,8 @@
  *                                   API                                      *
  *============================================================================*/
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI const char * ender_type_name_get(Ender_Type type)
 {
@@ -45,7 +46,8 @@ EAPI const char * ender_type_name_get(Ender_Type type)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI const char * ender_value_type_name_get(Ender_Value_Type type)
 {

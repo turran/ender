@@ -253,7 +253,8 @@ EAPI Ender_Element * ender_element_new(const char *name)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name)
 {
@@ -271,7 +272,8 @@ EAPI void ender_element_delete(Ender_Element *e)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e)
 {
@@ -279,7 +281,8 @@ EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI const char * ender_element_name_get(Ender_Element *e)
 {
@@ -288,7 +291,8 @@ EAPI const char * ender_element_name_get(Ender_Element *e)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_list var_args)
 {
@@ -313,7 +317,8 @@ EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_add(Ender_Element *e, const char *name, ...)
 {
@@ -327,7 +332,8 @@ EAPI void ender_element_value_add(Ender_Element *e, const char *name, ...)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_add_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
@@ -342,7 +348,8 @@ EAPI void ender_element_value_add_simple(Ender_Element *e, const char *name, End
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, va_list var_args)
 {
@@ -367,7 +374,8 @@ EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, 
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_remove(Ender_Element *e, const char *name, ...)
 {
@@ -381,7 +389,8 @@ EAPI void ender_element_value_remove(Ender_Element *e, const char *name, ...)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_remove_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
@@ -396,7 +405,8 @@ EAPI void ender_element_value_remove_simple(Ender_Element *e, const char *name, 
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_clear(Ender_Element *e, const char *name)
 {
@@ -412,7 +422,8 @@ EAPI void ender_element_value_clear(Ender_Element *e, const char *name)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_list var_args)
 {
@@ -435,7 +446,8 @@ EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_get(Ender_Element *e, const char *name, ...)
 {
@@ -448,7 +460,8 @@ EAPI void ender_element_value_get(Ender_Element *e, const char *name, ...)
 }
 
 /**
- * HERE
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
@@ -463,7 +476,8 @@ EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, End
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_set_valist(Ender_Element *e, const char *name, va_list var_args)
 {
@@ -486,7 +500,8 @@ EAPI void ender_element_value_set_valist(Ender_Element *e, const char *name, va_
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_set(Ender_Element *e, const char *name, ...)
 {
@@ -500,7 +515,8 @@ EAPI void ender_element_value_set(Ender_Element *e, const char *name, ...)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_value_set_simple(Ender_Element *e, const char *name, Ender_Value *value)
 {
@@ -515,7 +531,8 @@ EAPI void ender_element_value_set_simple(Ender_Element *e, const char *name, End
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *name,
 		Ender_Container *ec,
@@ -558,7 +575,8 @@ EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *n
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *name)
 {
@@ -594,7 +612,8 @@ EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *n
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Callback cb, void *data)
 {
@@ -619,7 +638,8 @@ EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Call
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Property *prop, va_list var_args)
 {
@@ -638,7 +658,8 @@ EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Proper
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_property_value_set(Ender_Element *e, Ender_Property *prop, ...)
 {
@@ -652,7 +673,8 @@ EAPI void ender_element_property_value_set(Ender_Element *e, Ender_Property *pro
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_property_value_set_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value)
 {
@@ -673,7 +695,8 @@ EAPI Enesim_Renderer * ender_element_renderer_get(Ender_Element *e)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
 {
@@ -692,7 +715,8 @@ EAPI Ender_Element * ender_element_renderer_from(Enesim_Renderer *r)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_event_listener_add(Ender_Element *e, const char *event_name,
 		Ender_Event_Callback cb, void *data)
@@ -714,7 +738,8 @@ EAPI void ender_event_listener_add(Ender_Element *e, const char *event_name,
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_event_listener_remove(Ender_Element *e, const char *name,
 		Ender_Event_Callback cb)
@@ -723,7 +748,8 @@ EAPI void ender_event_listener_remove(Ender_Element *e, const char *name,
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *event_data)
 {
@@ -742,7 +768,8 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_new_listener_add(Ender_New_Callback cb, void *data)
 {
@@ -756,7 +783,8 @@ EAPI void ender_element_new_listener_add(Ender_New_Callback cb, void *data)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data)
 {

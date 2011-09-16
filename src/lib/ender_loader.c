@@ -406,7 +406,8 @@ void ender_loader_shutdown(void)
  *                                   API                                      *
  *============================================================================*/
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_loader_load(const char *in)
 {
@@ -437,7 +438,8 @@ EAPI void ender_loader_load(const char *in)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_loader_load_all(void)
 {

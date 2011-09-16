@@ -165,6 +165,10 @@ static Ender_Parser_Descriptor _generator_parser = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_generator_run(const char *in, const char *element, FILE *out)
 {
 	Ender_Generator thiz;

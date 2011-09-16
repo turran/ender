@@ -348,7 +348,8 @@ EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name)
 {
@@ -358,6 +359,10 @@ EAPI Ender_Descriptor * ender_descriptor_find(const char *name)
 	return ed;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns_name)
 {
 	Ender_Namespace *ns;
@@ -382,7 +387,8 @@ EAPI Eina_Bool ender_descriptor_exists(const char *name)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed)
 {
@@ -391,7 +397,8 @@ EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI const char * ender_descriptor_name_get(Ender_Descriptor *edesc)
 {
@@ -401,7 +408,8 @@ EAPI const char * ender_descriptor_name_get(Ender_Descriptor *edesc)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
 {
@@ -411,7 +419,8 @@ EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data)
 {
@@ -429,7 +438,8 @@ EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_Li
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name)
 {
@@ -438,7 +448,8 @@ EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const 
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed)
 {

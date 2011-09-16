@@ -77,7 +77,8 @@ void ender_container_shutdown(void)
  *                                   API                                      *
  *============================================================================*/
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 {
@@ -92,7 +93,8 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec)
 {
@@ -103,7 +105,8 @@ EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx)
 {
@@ -113,7 +116,8 @@ EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigne
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI size_t ender_container_size_get(Ender_Container *ec)
 {
@@ -154,7 +158,8 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 {
@@ -172,7 +177,8 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
 {
@@ -182,7 +188,8 @@ EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 {
@@ -209,18 +216,27 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
 {
 	return c->type;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Container * ender_container_ref(Ender_Container *c)
 {
 
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_container_unref(Ender_Container *c)
 {
 

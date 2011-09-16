@@ -126,14 +126,16 @@ void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
  *                                   API                                      *
  *============================================================================*/
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Container * ender_property_container_get(Ender_Property *p)
 {
 	return p->container;
 }
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Ender_Value_Type ender_property_type_get(Ender_Property *p)
 {
@@ -141,7 +143,8 @@ EAPI Ender_Value_Type ender_property_type_get(Ender_Property *p)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p)
 {
@@ -149,13 +152,18 @@ EAPI Eina_Bool ender_property_is_relative(Ender_Property *p)
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI const char * ender_property_name_get(Ender_Property *p)
 {
 	return p->name;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p)
 {
 	Ender_Property_Flag flags = 0;
