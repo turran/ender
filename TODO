@@ -1,1 +1,2 @@
 Add ref/unref here too
+Add constraints to properties, this way we can define enums and ranges

@@ -57,6 +57,7 @@ typedef struct _Ender_Property Ender_Property;
 typedef struct _Ender_Container Ender_Container;
 typedef struct _Ender_Descriptor Ender_Descriptor;
 typedef struct _Ender_Namespace Ender_Namespace;
+typedef struct _Ender_Constraint Ender_Constraint;
 
 typedef void (*Ender_Event_Callback)(Ender_Element *e, const char *event_name, void *event_data, void *data);
 typedef void (*Ender_New_Callback)(Ender_Element *e, void *data);
@@ -299,6 +300,12 @@ EAPI Ender_Container * ender_property_container_get(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
 EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p);
+EAPI Ender_Constraint * ender_property_constraint_get(Ender_Property *p);
+/**
+ * @}
+ * @defgroup Ender_Constraint_Group Constraint
+ * @{
+ */
 
 /**
  * @}

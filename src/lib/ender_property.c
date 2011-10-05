@@ -30,6 +30,7 @@ struct _Ender_Property
 	Ender_Property_Clear clear;
 	Ender_Container *container;
 	Eina_Bool relative;
+	Ender_Constraint *constraint;
 	void *data;
 };
 /*============================================================================*
@@ -176,4 +177,15 @@ EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p)
 	if (p->clear) flags |= ENDER_CLEAR;
 
 	return flags;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Constraint * ender_property_constraint_get(Ender_Property *p)
+{
+	if (!p) return NULL;
+
+	return p->constraint;
 }
