@@ -25,7 +25,16 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct  _Ender_Library
+static Eina_List *_pre_registry = NULL;
+static int _init = 0;
+
+typedef struct _Ender_Loader_Registry_Data
+{
+	Ender_Loader_Registry_Callback cb;
+	void *data;
+} Ender_Loader_Registry_Data;
+
+typedef struct _Ender_Library
 {
 	int ref;
 	void *dl_handle;
@@ -187,7 +196,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 		void *dl_handle;
 
 		snprintf(real_lib, PATH_MAX, "lib%s.so", tmp1);
-		dl_handle = dlopen(real_lib, RTLD_LAZY);
+		dl_handle = dlopen(real_lib, RTLD_NOW);
 		if (!dl_handle)
 		{
 			ERR("The library %s can not be found", real_lib);
@@ -377,32 +386,68 @@ static Ender_Parser_Descriptor _loader_parser = {
  *============================================================================*/
 void ender_loader_init(void)
 {
-	_library_namespaces = eina_hash_string_superfast_new(NULL);
-	_libraries = eina_hash_string_superfast_new(NULL);
+	if (!_init++)
+	{
+		_library_namespaces = eina_hash_string_superfast_new(NULL);
+		_libraries = eina_hash_string_superfast_new(NULL);
+	}
 }
 
 void ender_loader_shutdown(void)
 {
-	Eina_Iterator *it;
-	Ender_Library *lib;
+	if (_init-- == 1)
+	{
+		Eina_Iterator *it;
+		Ender_Library *lib;
+		/* call the shutdown on every library */
+		it = eina_hash_iterator_data_new(_libraries);
+		while (eina_iterator_next(it, (void **)&lib))
+		{
+			Ender_Init shutdown;
+			char sym_name[PATH_MAX];
 
-	/* call the shutdown on every library */
+			/* shutdown the library */
+			snprintf(sym_name, PATH_MAX, "%s_shutdown", lib->name);
+			shutdown = dlsym(lib->dl_handle, sym_name);
+			if (shutdown) shutdown();
+		}
+		eina_iterator_free(it);
+		/* TODO actually delete the hashes contents */
+		eina_hash_free(_libraries);
+		eina_hash_free(_library_namespaces);
+		/* TODO free the list of files */
+	}
+}
+
+void ender_loader_load_all(void)
+{
+	Ender_Library *lib;
+	Ender_Loader_Registry_Data *data;
+	Eina_Iterator *it;
+	Eina_List *l;
+
+
+	/* first call the pre callbacks */
+	EINA_LIST_FOREACH(_pre_registry, l, data)
+	{
+		data->cb(data->data);
+	}
+
+	/* iterate over the list of .ender files and parse them */
+	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
+	/* now that every ender is regsitered we can start initializing the libraries */
 	it = eina_hash_iterator_data_new(_libraries);
 	while (eina_iterator_next(it, (void **)&lib))
 	{
-		Ender_Init shutdown;
+		Ender_Init init;
 		char sym_name[PATH_MAX];
 
-		/* shutdown the library */
-		snprintf(sym_name, PATH_MAX, "%s_shutdown", lib->name);
-		shutdown = dlsym(lib->dl_handle, sym_name);
-		if (shutdown) shutdown();
+		/* initialize the library */
+		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
+		init = dlsym(lib->dl_handle, sym_name);
+		if (init) init();
 	}
 	eina_iterator_free(it);
-	/* TODO actually delete the hashes contents */
-	eina_hash_free(_libraries);
-	eina_hash_free(_library_namespaces);
-	/* TODO free the list of files */
 }
 /*============================================================================*
  *                                   API                                      *
@@ -443,24 +488,15 @@ EAPI void ender_loader_load(const char *in)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_loader_load_all(void)
+EAPI void ender_loader_registry_callback_add(Ender_Loader_Registry_Callback cb, void *data)
 {
-	Eina_Iterator *it;
-	Ender_Library *lib;
+	Ender_Loader_Registry_Data *pre;
 
-	/* iterate over the list of .ender files and parse them */
-	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
-	/* now that every ender is regsitered we can start initializing the libraries */
-	it = eina_hash_iterator_data_new(_libraries);
-	while (eina_iterator_next(it, (void **)&lib))
-	{
-		Ender_Init init;
-		char sym_name[PATH_MAX];
+	ender_loader_init();
 
-		/* initialize the library */
-		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
-		init = dlsym(lib->dl_handle, sym_name);
-		if (init) init();
-	}
-	eina_iterator_free(it);
+	pre = calloc(1, sizeof(Ender_Loader_Registry_Data));
+	pre->cb = cb;
+	pre->data = data;
+
+	_pre_registry = eina_list_append(_pre_registry, pre);
 }

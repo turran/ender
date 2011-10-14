@@ -345,8 +345,11 @@ EAPI const char * ender_type_name_get(Ender_Type type);
  * @defgroup Ender_Loader_Group Loader
  * @{
  */
+
+typedef void (*Ender_Loader_Registry_Callback)(void *data);
+
 EAPI void ender_loader_load(const char *in);
-EAPI void ender_loader_load_all(void);
+EAPI void ender_loader_registry_callback_add(Ender_Loader_Registry_Callback cb, void *data);
 
 /**
  * @}

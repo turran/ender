@@ -76,6 +76,7 @@ EAPI void ender_init(int *argc, char ***argv)
 		ender_namespace_init();
 		ender_container_init();
 		ender_loader_init();
+		ender_loader_load_all();
 	}
 }
 

@@ -135,5 +135,6 @@ Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descript
 /* the loader */
 void ender_loader_init(void);
 void ender_loader_shutdown(void);
+void ender_loader_load_all(void);
 
 #endif
