@@ -347,6 +347,25 @@ EAPI const char * ender_type_name_get(Ender_Type type);
  */
 EAPI void ender_loader_load(const char *in);
 EAPI void ender_loader_load_all(void);
+
+/**
+ * @}
+ * @defgroup Eina_Ordered_Hash_Group Eina Ordered Hash
+ * @{
+ */
+
+typedef struct _Eina_Ordered_Hash
+{
+	Eina_List *order;
+	Eina_Hash *hash;
+} Eina_Ordered_Hash;
+
+EAPI Eina_Ordered_Hash * eina_ordered_hash_new();
+EAPI void * eina_ordered_hash_nth_get(Eina_Ordered_Hash *thiz, int nth);
+EAPI void * eina_ordered_hash_find(Eina_Ordered_Hash *thiz, const char *key);
+EAPI void eina_ordered_hash_add(Eina_Ordered_Hash *thiz, const char *name, void *data);
+EAPI void eina_ordered_hash_del(Eina_Ordered_Hash *thiz, const char *name, void *data);
+
 /**
  * @}
  */

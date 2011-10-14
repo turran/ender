@@ -51,7 +51,7 @@ static Ender_Property * _descriptor_property_get(Ender_Descriptor *e, const char
 {
 	Ender_Property *prop;
 
-	prop = eina_hash_find(e->properties, name);
+	prop = eina_ordered_hash_find(e->properties, name);
 	if (prop) return prop;
 	if (!e->parent) return NULL;
 
@@ -231,7 +231,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	desc->create = creator;
 	desc->type = type;
 	desc->ns = ns;
-	desc->properties = eina_hash_string_superfast_new(NULL);
+	desc->properties = eina_ordered_hash_new();
 
 	if (!found)
 		eina_hash_add(_descriptors, name, desc);
@@ -247,7 +247,7 @@ Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const ch
 	Ender_Property *prop;
 	Ender_Descriptor_Property *dprop;
 
-	prop = eina_hash_find(edesc->properties, name);
+	prop = eina_ordered_hash_find(edesc->properties, name);
 	if (prop)
 	{
 		WRN("Property %s already found on %s. Not adding it", name, edesc->name);
@@ -267,7 +267,7 @@ Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const ch
 			remove ? _property_remove : NULL,
 			clear ? _property_clear : NULL,
 			relative, dprop);
-	eina_hash_add(edesc->properties, name, prop);
+	eina_ordered_hash_add(edesc->properties, name, prop);
 	DBG("Property %s added to %s", name, edesc->name);
 
 	return prop;
@@ -425,16 +425,14 @@ EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data)
 {
 	Ender_Property *prop;
-	Eina_Iterator *it;
+	Eina_List *l;
 
 	if (!ed || !cb) return;
 
-	it = eina_hash_iterator_data_new(ed->properties);
-	while (eina_iterator_next(it, (void **)&prop))
+	EINA_LIST_FOREACH(ed->properties->order, l, prop)
 	{
 		cb(prop, data);
 	}
-	eina_iterator_free(it);
 }
 
 /**

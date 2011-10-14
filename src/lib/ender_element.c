@@ -624,13 +624,12 @@ EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Call
 
 	/* we first list all the local properties */
 	desc = e->descriptor;
-	/* now the parent descriptor */
 	do
 	{
 		ender_descriptor_property_list(desc, cb, data);
 	}
 	while ((desc = ender_descriptor_parent(desc)));
-	/* now let's lis the relative properties from the parent */
+	/* now let's list the relative properties from the parent */
 	if (!e->parent) return;
 	new_data.data = data;
 	new_data.cb = cb;

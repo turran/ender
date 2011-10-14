@@ -64,7 +64,7 @@ struct _Ender_Descriptor
 	Ender_Type type;
 	Ender_Descriptor *parent;
 	Ender_Creator create;
-	Eina_Hash *properties;
+	Eina_Ordered_Hash *properties;
 	Ender_Namespace *ns;
 };
 

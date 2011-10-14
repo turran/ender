@@ -18,6 +18,7 @@ lib_LTLIBRARIES = libender.la
 libender_la_YFLAGS = -d
 
 libender_la_SOURCES = \
+eina_ordered_hash.c \
 ender_container.c \
 ender_constraint.c \
 ender_descriptor.c \
