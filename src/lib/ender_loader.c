@@ -196,7 +196,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 		void *dl_handle;
 
 		snprintf(real_lib, PATH_MAX, "lib%s.so", tmp1);
-		dl_handle = dlopen(real_lib, RTLD_NOW);
+		dl_handle = dlopen(real_lib, RTLD_LAZY);
 		if (!dl_handle)
 		{
 			ERR("The library %s can not be found", real_lib);

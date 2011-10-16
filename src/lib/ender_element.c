@@ -275,6 +275,36 @@ EAPI void ender_element_delete(Ender_Element *e)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void * ender_element_data_set(Ender_Element *e, const char *key, void *data)
+{
+	void *old_data;
+
+	if (!key) return NULL;
+
+	ENDER_MAGIC_CHECK(e);
+	old_data = enesim_renderer_private_get(e->renderer, key);
+	enesim_renderer_private_set(e->renderer, key, data);
+
+	return old_data;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_element_data_get(Ender_Element *e, const char *key)
+{
+	if (!key) return NULL;
+
+	ENDER_MAGIC_CHECK(e);
+	return enesim_renderer_private_get(e->renderer, key);
+}
+
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Descriptor * ender_element_descriptor_get(Ender_Element *e)
 {
 	return e->descriptor;
