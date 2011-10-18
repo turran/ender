@@ -95,6 +95,10 @@
 			break;						\
 									\
 			case ENDER_MATRIX:				\
+			*(va_arg(var_args, Enesim_Matrix*)) = 		\
+					v.data.matrix;			\
+			break;						\
+									\
 			default:					\
 			ERR("Unsupported data type %d", cnt->type);	\
 			break;						\
@@ -710,6 +714,57 @@ EAPI void ender_element_property_value_set_simple(Ender_Element *e, Ender_Proper
 	ENDER_MAGIC_CHECK(e);
 
 	ender_property_element_value_set(prop, e, value);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_element_property_value_get_valist(Ender_Element *e, Ender_Property *prop, va_list var_args)
+{
+	ENDER_MAGIC_CHECK(e);
+
+	while (prop)
+	{
+		Ender_Value v;
+		Ender_Container *ec;
+
+		ec = ender_property_container_get(prop);
+		v.container = ec;
+		ender_property_element_value_get(prop, e, &v);
+		ENDER_VALUE_TO_DATA(v, ec, var_args);
+		prop = va_arg(var_args, Ender_Property *);
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_element_property_value_get(Ender_Element *e, Ender_Property *prop, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+	if (!prop) return;
+
+	va_start(ap, prop);
+	ender_element_property_value_get_valist(e, prop, ap);
+	va_end(ap);
+}
+
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value)
+{
+	ENDER_MAGIC_CHECK(e);
+	if (!prop) return;
+	if (!value) return;
+
+	ender_property_element_value_get(prop, e, value);
 }
 
 /**

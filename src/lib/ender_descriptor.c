@@ -121,6 +121,32 @@ static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender_E
 	set(parent, e, v->data.d);
 }
 /*----------------------------------------------------------------------------*
+ *                                   matrix                                   *
+ *----------------------------------------------------------------------------*/
+/* the matrix case is different and might be similar to the struct case
+ * basically you just pass a pointer for both the get/set, the values are
+ * *copied* so you need to have the requested alloced data in the ender value
+ */
+static void _ender_matrix_get(Ender_Value *v, Ender_Getter get,
+		Enesim_Renderer *e)
+{
+	get(e, &v->data.matrix);
+}
+
+/* used for string, surface, struct, matrix, renderer */
+static void _ender_matrix_set(Ender_Value *v, Ender_Setter set,
+		Enesim_Renderer *e)
+{
+	set(e, v->data.matrix);
+}
+
+/* used for string, surface, struct, matrix, renderer */
+static void _ender_relative_matrix_set(Ender_Value *v, Ender_Setter set,
+		Ender_Element *e, Enesim_Renderer *parent)
+{
+	set(parent, e, v->data.matrix);
+}
+/*----------------------------------------------------------------------------*
  *                                  pointer                                   *
  *----------------------------------------------------------------------------*/
 /* used for string, surface, renderer, ender */
@@ -298,13 +324,13 @@ void ender_descriptor_init(void)
 	_getters[ENDER_ARGB] = _ender_int32_get;
 	_getters[ENDER_COLOR] = _ender_int32_get;
 	_getters[ENDER_STRING] = _ender_pointer_get;
-	/* TODO handle the matrix case correctly */
-	_getters[ENDER_MATRIX] = _ender_pointer_get;
-	_getters[ENDER_RENDERER] = _ender_pointer_get;
-	_getters[ENDER_SURFACE] = _ender_pointer_get;
-	_getters[ENDER_ENDER] = _ender_pointer_get;
-	_getters[ENDER_LIST] = _ender_pointer_get;
-	_getters[ENDER_STRUCT] = _ender_pointer_get;
+	/* the special matrix case */
+	_getters[ENDER_MATRIX] = _ender_matrix_get;
+	_getters[ENDER_RENDERER] = _ender_matrix_get;
+	_getters[ENDER_SURFACE] = _ender_matrix_get;
+	_getters[ENDER_ENDER] = _ender_matrix_get;
+	_getters[ENDER_LIST] = _ender_matrix_get;
+	_getters[ENDER_STRUCT] = _ender_matrix_get;
 	/* relative setters */
 	_relative_accessors[ENDER_BOOL] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_UINT32] = _ender_relative_int32_set;

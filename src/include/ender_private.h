@@ -55,6 +55,7 @@ struct _Ender_Value
 		uint32_t u32;
 		double d;
 		void *ptr;
+		Enesim_Matrix matrix;
 	} data;
 };
 
