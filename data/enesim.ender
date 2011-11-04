@@ -4,6 +4,8 @@ namespace "enesim" {
 		matrix "transformation";
 		double "x_origin";
 		double "y_origin";
+		double "x_scale";
+		double "y_scale";
 		color "color";
 		int "rop";
 	};
@@ -19,6 +21,8 @@ namespace "enesim.renderer" {
 	};
 
 	class "rectangle" : "shape" {
+		double "x";
+		double "y";
 		double "width";
 		double "height";
 		double "corner_radius";
