@@ -92,6 +92,23 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void ender_namespace_list(Ender_List_Callback cb, void *data)
+{
+	Eina_Iterator *it;
+	char *name;
+
+	it = eina_hash_iterator_key_new(_namespaces);
+	while (eina_iterator_next(it, (void **)&name))
+	{
+		cb(name, data);
+	}
+	eina_iterator_free(it);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Namespace * ender_namespace_find(const char *name)
 {
 	Ender_Namespace *namespace;
@@ -111,6 +128,25 @@ EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, con
 	if (!ns || !name) return NULL;
 
 	return eina_hash_find(ns->descriptors, name);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns, Ender_List_Callback cb, void *data)
+{
+	Eina_Iterator *it;
+	char *name;
+
+	if (!ns) return;
+
+	it = eina_hash_iterator_key_new(ns->descriptors);
+	while (eina_iterator_next(it, (void **)&name))
+	{
+		cb(name, data);
+	}
+	eina_iterator_free(it);
 }
 
 /**

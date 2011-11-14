@@ -189,10 +189,13 @@ EAPI void ender_value_free(Ender_Value *v);
  * @defgroup Ender_Namespace_Group Namespace
  * @{
  */
+typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef Enesim_Renderer * (*Ender_Creator)(void);
 
+EAPI void ender_namespace_list(Ender_List_Callback cb, void *data);
 EAPI Ender_Namespace * ender_namespace_new(const char *name);
 EAPI Ender_Namespace * ender_namespace_find(const char *name);
+EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns, Ender_List_Callback cb, void *data);
 EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name);
 EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Type type);
 EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
@@ -215,7 +218,6 @@ typedef void (*Ender_Clear)(Enesim_Renderer *r);
 #define ENDER_REMOVE(f) ((Ender_Remove)(f))
 #define ENDER_CLEAR(f) ((Ender_Clear)(f))
 
-typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
