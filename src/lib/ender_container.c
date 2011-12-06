@@ -43,7 +43,7 @@ void ender_container_delete(Ender_Container *d)
 
 void ender_container_register(const char *name, Ender_Container *ec)
 {
-	if (ec->type != ENDER_STRUCT) return;
+	if (ec->type != ENDER_STRUCT && ec->type != ENDER_UNION) return;
 	eina_hash_add(_structs, name, ec);
 }
 
@@ -98,8 +98,7 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
  */
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec)
 {
-	//printf("is %d compound (%d %d)\n", ec->type, ENDER_LIST, ENDER_STRUCT);
-	if (ec->type == ENDER_LIST || ec->type == ENDER_STRUCT)
+	if (ec->type == ENDER_LIST || ec->type == ENDER_STRUCT || ec->type == ENDER_UNION)
 		return EINA_TRUE;
 	return EINA_FALSE;
 }
@@ -147,6 +146,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 		case ENDER_ENDER:
 		case ENDER_LIST:
 		case ENDER_STRUCT:
+		case ENDER_UNION:
 		case ENDER_POINTER:
 		size = sizeof(void *);
 		break;
@@ -167,11 +167,34 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 	Eina_List *l;
 	size_t size = 0;
 
-	if (!ender_container_is_compound(ec))
-		return size;
-	EINA_LIST_FOREACH(ec->elements, l, sub)
+	switch (ec->type)
 	{
-		size += ender_container_size_get(sub);
+		case ENDER_STRUCT:
+		EINA_LIST_FOREACH(ec->elements, l, sub)
+		{
+			size += ender_container_size_get(sub);
+		}
+		break;
+
+		case ENDER_LIST:
+		if (!ec->elements) break;
+		sub = eina_list_data_get(ec->elements);
+		size = ender_container_size_get(sub);
+		break;
+
+		case ENDER_UNION:
+		EINA_LIST_FOREACH(ec->elements, l, sub)
+		{
+			size_t new_size;
+
+			new_size = ender_container_size_get(sub);
+			if (new_size > size)
+				size = new_size;
+		}
+		break;
+
+		default:
+		return 0;
 	}
 	return size;
 }
@@ -184,6 +207,7 @@ EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
 {
 	if (!ender_container_is_compound(ec))
 		return 0;
+	if (!ec->elements) return 0;
 	return eina_list_count(ec->elements);
 }
 
@@ -196,23 +220,40 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 	ssize_t prev_offset = 0;
 	size_t prev_size = 0;
 
-	if (!ender_container_is_compound(ec))
-		return;
-	if (!sub)
-		return;
-	/* FIXME for list type, only limit the number
-	 * of child to one
-	 */
-	if (ec->elements)
-	{
-		Ender_Container *prev;
+	if (!ec) return;
+	if (!sub) return;
 
-		prev = eina_list_data_get(eina_list_last(ec->elements));
-		prev_offset = prev->offset;
-		prev_size = ender_container_size_get(prev);
+	switch (ec->type)
+	{
+		case ENDER_STRUCT:
+		if (ec->elements)
+		{
+			Ender_Container *prev;
+
+			prev = eina_list_data_get(eina_list_last(ec->elements));
+			prev_offset = prev->offset;
+			prev_size = ender_container_size_get(prev);
+		}
+		ec->elements = eina_list_append(ec->elements, sub);
+		sub->offset = prev_offset + prev_size;
+		break;
+
+		case ENDER_UNION:
+		ec->elements = eina_list_append(ec->elements, sub);
+		sub->offset = 0;
+		break;
+
+		case ENDER_LIST:
+		/* for list type, only limit the number
+		 * of child to one  */
+		if (ec->elements) return;
+		ec->elements = eina_list_append(ec->elements, sub);
+		sub->offset = 0;
+		break;
+
+		default:
+		return;
 	}
-	ec->elements = eina_list_append(ec->elements, sub);
-	sub->offset = prev_offset + prev_size;
 }
 
 /**

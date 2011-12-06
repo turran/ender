@@ -61,6 +61,46 @@ namespace "enesim.renderer" {
 		[[point]] "polygon";
 	};
 
+	struct "move_to" {
+		double, double
+	};
+
+	struct "line_to" {
+		double, double
+	};
+
+	struct "squadratic_to" {
+		double, double
+	};
+
+	struct "quadratic_to" {
+		double, double, double, double
+	};
+
+	struct "cubic_to" {
+		double, double, double, double, double, double
+	};
+
+	struct "scubic_to" {
+		double, double, double, double
+	};
+
+	struct "arc_to" {
+		double, double, double, double, double, bool, bool
+	};
+
+	union "command_definition" {
+		move_to, line_to, squadratic_to, quadratic_to, cubic_to, scubic_to, arc_to
+	};
+
+	struct "command" {
+		int, command_definition
+	};
+
+	class "path" : "shape" {
+		[command] "command";
+	};
+
 	class "checker" : "renderer" {
 		uint "width";
 		uint "height";

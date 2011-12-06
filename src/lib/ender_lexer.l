@@ -22,7 +22,7 @@ bool			{
 				yylval_param->vtype = ENDER_BOOL;
 				return T_BOOL;
 			}
-uint 			{ 
+uint 			{
 				yylval_param->vtype = ENDER_UINT32;
 				return T_UINT;
 			}
@@ -67,6 +67,10 @@ ender			{
 struct			{
 				yylval_param->vtype = ENDER_STRUCT;
 				return T_STRUCT;
+			}
+union			{
+				yylval_param->vtype = ENDER_UNION;
+				return T_UNION;
 			}
 namespace		return T_NAMESPACE;
 class			{

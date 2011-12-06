@@ -27,7 +27,6 @@ static inline void _on_using(Ender_Parser *parser, Eina_List *list)
 	Eina_List *l;
 	char *str;
 
-		
 	if (!parser->descriptor->on_using)
 		return;
 	EINA_LIST_FOREACH (list, l, str)
@@ -76,6 +75,7 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 %token <vtype> T_STRING
 %token <vtype> T_MATRIX
 %token <vtype> T_STRUCT
+%token <vtype> T_UNION
 %token <vtype> T_RENDERER
 %token <vtype> T_ENDER
 %token <etype> T_ABSTRACT
@@ -91,7 +91,7 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 %type <vtype> basic_type
 %type <etype> definition
 %type <prop> list_type
-%type <prop> struct_type
+%type <prop> struct_union_type
 %type <s> renderer_inheritance
 %type <list> types
 %%
@@ -125,6 +125,7 @@ namespace
 definition_list
 	:
 	| struct definition_list
+	| union definition_list
 	| renderer definition_list
 	;
 
@@ -135,6 +136,21 @@ struct
 		Ender_Container *c, *sub;
 
 		c = ender_container_new(ENDER_STRUCT);
+		EINA_LIST_FOREACH ($4, l, sub)
+		{
+			ender_container_add(c, sub);
+		}
+		ender_container_register($2, c);
+	}
+	;
+
+union
+	: T_UNION T_INLINE_STRING '{' types '}' ';'
+	{
+		Eina_List *l;
+		Ender_Container *c, *sub;
+
+		c = ender_container_new(ENDER_UNION);
 		EINA_LIST_FOREACH ($4, l, sub)
 		{
 			ender_container_add(c, sub);
@@ -187,7 +203,7 @@ basic_type
 	| T_MATRIX { $$ = $1; }
 	;
 
-struct_type
+struct_union_type
 	: T_WORD { $$ = ender_container_find($1); }
 	;
 
@@ -201,7 +217,7 @@ list_type
 
 type_specifier
 	: basic_type { $$ = ender_container_new($1); }
-	| struct_type { $$ = $1; }
+	| struct_union_type { $$ = $1; }
 	| list_type { $$ = $1; }
 	;
 

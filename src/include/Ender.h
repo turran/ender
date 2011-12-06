@@ -88,6 +88,7 @@ typedef enum _Ender_Value_Type
 	/* compound types */
 	ENDER_LIST,
 	ENDER_STRUCT,
+	ENDER_UNION,
 	ENDER_PROPERTY_TYPES,
 } Ender_Value_Type;
 

@@ -83,7 +83,7 @@ static void _descriptor_dump(const char *name)
 	printf("Inheritance:\n");
 	parent = ed;
 	inheritance = eina_array_new(1);
-	do 
+	do
 	{
 		eina_array_push(inheritance, parent);
 	}

@@ -89,6 +89,9 @@ EAPI const char * ender_value_type_name_get(Ender_Value_Type type)
 		case ENDER_STRUCT:
 		return "STRUCT";
 
+		case ENDER_UNION:
+		return "UNION";
+
 		case ENDER_BOOL:
 		return "BOOL";
 
