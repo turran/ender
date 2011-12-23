@@ -8,6 +8,7 @@ namespace "enesim" {
 		double "y_scale";
 		color "color";
 		int "rop";
+		renderer "mask";
 	};
 };
 
