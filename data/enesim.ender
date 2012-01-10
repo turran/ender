@@ -161,8 +161,10 @@ namespace "enesim.renderer" {
 	class "stripes" : "renderer" {
 		double "even_thickness";
 		color "even_color";
+		renderer "even_renderer";
 		double "odd_thickness";
 		color "odd_color";
+		renderer "odd_renderer";
 	};
 
 	class "compound" : "renderer" {
