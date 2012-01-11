@@ -2,6 +2,7 @@ namespace "enesim" {
 	abstract "renderer" {
 		string "name";
 		matrix "transformation";
+		matrix "geometry_transformation";
 		double "x_origin";
 		double "y_origin";
 		double "x_scale";
