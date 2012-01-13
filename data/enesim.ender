@@ -20,6 +20,7 @@ namespace "enesim.renderer" {
 		color "fill_color";
 		renderer "fill_renderer";
 		renderer "stroke_renderer";
+		int "stroke_location";
 		int "draw_mode";
 	};
 
