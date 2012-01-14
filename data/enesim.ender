@@ -15,13 +15,15 @@ namespace "enesim" {
 
 namespace "enesim.renderer" {
 	abstract "shape" : "renderer" {
+		int "draw_mode";
 		double "stroke_weight";
 		color "stroke_color";
-		color "fill_color";
-		renderer "fill_renderer";
 		renderer "stroke_renderer";
 		int "stroke_location";
-		int "draw_mode";
+		int "stroke_cap";
+		int "stroke_join";
+		color "fill_color";
+		renderer "fill_renderer";
 	};
 
 	class "line" : "shape" {
@@ -29,7 +31,6 @@ namespace "enesim.renderer" {
 		double "y0";
 		double "x1";
 		double "y1";
-		int "stroke_cap";
 	};
 
 	class "rectangle" : "shape" {
