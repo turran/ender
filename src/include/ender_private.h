@@ -62,7 +62,7 @@ struct _Ender_Value
 struct _Ender_Descriptor
 {
 	char *name;
-	Ender_Type type;
+	Ender_Descriptor_Type type;
 	Ender_Descriptor *parent;
 	Ender_Creator create;
 	Eina_Ordered_Hash *properties;
@@ -72,7 +72,7 @@ struct _Ender_Descriptor
 /* descriptor */
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
-		Ender_Descriptor *parent, Ender_Type type);
+		Ender_Descriptor *parent, Ender_Descriptor_Type type);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
 void ender_descriptor_init(void);
@@ -105,9 +105,7 @@ void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v);
 void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e);
 /* container */
-Ender_Container * ender_container_new(Ender_Value_Type t);
 void ender_property_container_delete(Ender_Container *p);
-void ender_container_add(Ender_Container *p, Ender_Container *sub);
 void ender_container_init(void);
 void ender_container_shutdown(void);
 
@@ -126,7 +124,7 @@ typedef struct _Ender_Parser_Descriptor
 	/* namespace */
 	void (*on_namespace)(void *data, const char *name);
 	/* renderer */
-	void (*on_renderer)(void *data, const char *name, Ender_Type type, const char *parent);
+	void (*on_renderer)(void *data, const char *name, Ender_Descriptor_Type type, const char *parent);
 	/* property */
 	void (*on_property)(void *data, const char *name, Eina_Bool relative, Ender_Container *container); 
 } Ender_Parser_Descriptor;

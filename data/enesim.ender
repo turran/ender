@@ -8,7 +8,7 @@ namespace "enesim" {
 		double "x_scale";
 		double "y_scale";
 		color "color";
-		int "rop";
+		int "rop" [ "blend", "fill" ];
 		renderer "mask";
 	};
 };
@@ -59,7 +59,8 @@ namespace "enesim.renderer" {
 	};
 
 	struct "point" {
-		double, double
+		double "x";
+		double "y";
 	};
 
 	class "figure" : "shape" {
@@ -67,39 +68,66 @@ namespace "enesim.renderer" {
 	};
 
 	struct "move_to" {
-		double, double
+		double "x";
+		double "y";
 	};
 
 	struct "line_to" {
-		double, double
+		double "x";
+		double "y";
 	};
 
 	struct "squadratic_to" {
-		double, double
+		double "x";
+		double "y";
 	};
 
 	struct "quadratic_to" {
-		double, double, double, double
+		double "x";
+		double "y";
+		double "ctrl_x";
+		double "ctrl_y";
 	};
 
 	struct "cubic_to" {
-		double, double, double, double, double, double
+		double "x";
+		double "y";
+		double "ctrl_x0";
+		double "ctrl_y0";
+		double "ctrl_x1";
+		double "ctrl_y1";
 	};
 
 	struct "scubic_to" {
-		double, double, double, double
+		double "x";
+		double "y";
+		double "ctrl_x";
+		double "ctrl_y";
 	};
 
 	struct "arc_to" {
-		double, double, double, double, double, bool, bool
+		double "rx";
+		double "ry";
+		double "angle";
+		double "x";
+		double "y";
+		bool "large";
+		bool "sweep";
 	};
 
 	union "command_definition" {
-		move_to, line_to, squadratic_to, quadratic_to, cubic_to, scubic_to, arc_to
+		move_to "m";
+		line_to "l";
+		squadratic_to "sq";
+		quadratic_to "q";
+		cubic_to "c";
+		scubic_to "sc";
+		arc_to "a";
 	};
 
 	struct "command" {
-		int, command_definition
+		int "type";
+		command_definition "cmd";
 	};
 
 	class "path" : "shape" {
@@ -175,7 +203,8 @@ namespace "enesim.renderer" {
 	};
 
 	struct "stop" {
-		argb, double
+		argb "color";
+		double "pos";
 	};
 
 	abstract "gradient" : "renderer" {

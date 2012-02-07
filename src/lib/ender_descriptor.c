@@ -236,7 +236,7 @@ static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
  *============================================================================*/
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
-		Ender_Descriptor *parent, Ender_Type type)
+		Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
 	Eina_Bool found = EINA_FALSE;
@@ -416,7 +416,7 @@ EAPI Eina_Bool ender_descriptor_exists(const char *name)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed)
+EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed)
 {
 	if (!ed) return 0;
 	return ed->type;

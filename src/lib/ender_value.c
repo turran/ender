@@ -70,7 +70,7 @@ EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
 
 	ec = ender_container_new(ENDER_LIST);
 	sub = ender_container_new(child_type);
-	ender_container_add(ec, sub);
+	ender_container_add(ec, NULL, sub);
 
 	return _ender_value_new(ec);
 }

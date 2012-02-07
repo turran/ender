@@ -39,6 +39,18 @@ EAPI Eina_Ordered_Hash * eina_ordered_hash_new()
 	return thiz;
 }
 
+EAPI void eina_ordered_hash_free(Eina_Ordered_Hash *thiz)
+{
+	/* TODO destroy them */
+	//eina_hash_free(thiz->hash);
+	//eina_list_free(thiz->order);
+}
+
+EAPI int eina_ordered_hash_count(Eina_Ordered_Hash *thiz)
+{
+	return eina_list_count(thiz->order);
+}
+
 EAPI void * eina_ordered_hash_nth_get(Eina_Ordered_Hash *thiz, int nth)
 {
 	return eina_list_nth(thiz->order, nth);

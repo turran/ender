@@ -225,7 +225,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 	return namespace;
 }
 
-Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, const char *name, Ender_Descriptor *parent, Ender_Type type)
+Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, const char *name, Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
 	Ender_Creator creator;
@@ -348,7 +348,7 @@ static void _loader_on_namespace(void *data, const char *name)
 	thiz->namespace = _loader_namespace_new(name);
 }
 
-static void _loader_on_renderer(void *data, const char *name, Ender_Type type, const char *parent)
+static void _loader_on_renderer(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Loader *thiz;
 	Ender_Descriptor *parent_descriptor = NULL;

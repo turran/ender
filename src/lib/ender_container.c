@@ -20,6 +20,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Ender_Container_Sub
+{
+	const char *name;
+	Ender_Container *c;
+} Ender_Container_Sub;
+
 static Eina_Hash *_structs = NULL;
 static Ender_Container *_basic_containers[ENDER_LIST - ENDER_BOOL];
 
@@ -109,9 +115,31 @@ EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec)
  */
 EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx)
 {
+	Ender_Container_Sub *sub;
+
 	if (!ender_container_is_compound(ec))
 		return NULL;
-	return eina_list_nth(ec->elements, idx);
+	sub = eina_list_nth(ec->elements, idx);
+	return sub->c;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_container_compound_get_extended(Ender_Container *ec, unsigned int idx, Ender_Container **c, const char **name)
+{
+	Ender_Container_Sub *sub;
+
+	if (!ender_container_is_compound(ec))
+	{
+		if (c) *c = NULL;
+		if (name) *name = NULL;
+		return;
+	}
+	sub = eina_list_nth(ec->elements, idx);
+	if (c) *c = sub->c;
+	if (name) *name = sub->name;
 }
 
 /**
@@ -163,7 +191,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
  */
 EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 {
-	Ender_Container *sub;
+	Ender_Container_Sub *sub;
 	Eina_List *l;
 	size_t size = 0;
 
@@ -172,14 +200,14 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 		case ENDER_STRUCT:
 		EINA_LIST_FOREACH(ec->elements, l, sub)
 		{
-			size += ender_container_size_get(sub);
+			size += ender_container_size_get(sub->c);
 		}
 		break;
 
 		case ENDER_LIST:
 		if (!ec->elements) break;
 		sub = eina_list_data_get(ec->elements);
-		size = ender_container_size_get(sub);
+		size = ender_container_size_get(sub->c);
 		break;
 
 		case ENDER_UNION:
@@ -187,7 +215,7 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 		{
 			size_t new_size;
 
-			new_size = ender_container_size_get(sub);
+			new_size = ender_container_size_get(sub->c);
 			if (new_size > size)
 				size = new_size;
 		}
@@ -215,32 +243,40 @@ EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
+EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Container *s)
 {
+	Ender_Container_Sub *sub;
 	ssize_t prev_offset = 0;
 	size_t prev_size = 0;
 
 	if (!ec) return;
-	if (!sub) return;
+	if (!s) return;
 
+	if (!ender_container_is_compound(ec))
+		return;
+
+	sub = calloc(1, sizeof(Ender_Container_Sub));
+	if (name)
+		sub->name = strdup(name);
+	sub->c = s;
 	switch (ec->type)
 	{
 		case ENDER_STRUCT:
 		if (ec->elements)
 		{
-			Ender_Container *prev;
+			Ender_Container_Sub *prev;
 
 			prev = eina_list_data_get(eina_list_last(ec->elements));
-			prev_offset = prev->offset;
-			prev_size = ender_container_size_get(prev);
+			prev_offset = prev->c->offset;
+			prev_size = ender_container_size_get(prev->c);
 		}
 		ec->elements = eina_list_append(ec->elements, sub);
-		sub->offset = prev_offset + prev_size;
+		sub->c->offset = prev_offset + prev_size;
 		break;
 
 		case ENDER_UNION:
 		ec->elements = eina_list_append(ec->elements, sub);
-		sub->offset = 0;
+		sub->c->offset = 0;
 		break;
 
 		case ENDER_LIST:
@@ -248,7 +284,7 @@ EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub)
 		 * of child to one  */
 		if (ec->elements) return;
 		ec->elements = eina_list_append(ec->elements, sub);
-		sub->offset = 0;
+		sub->c->offset = 0;
 		break;
 
 		default:
@@ -279,6 +315,24 @@ EAPI Ender_Container * ender_container_ref(Ender_Container *c)
  * FIXME: To be fixed
  */
 EAPI void ender_container_unref(Ender_Container *c)
+{
+
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint *c)
+{
+
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *thiz)
 {
 
 }

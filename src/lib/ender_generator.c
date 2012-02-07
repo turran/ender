@@ -49,19 +49,25 @@ static void _dump_container_recursive(Ender_Generator *thiz, Ender_Container *co
 	fprintf(thiz->out, "tmp%d = ender_container_new(ENDER_%s);\n", level, ender_value_type_name_get(type));
 	if (ender_container_is_compound(container))
 	{
-		Ender_Container *sub;
 		int i;
 
 		_tabs(thiz, level);
 		fprintf(thiz->out, "{\n");
 		for (i = 0; i < ender_container_compound_count(container); i++)
 		{
-			sub = ender_container_compound_get(container, i);
+			Ender_Container *sub;
+			const char *name;
+
+			ender_container_compound_get_extended(container, i, &sub, &name);
 			_tabs(thiz, level + 1);
 			fprintf(thiz->out, "{\n");
 			_dump_container_recursive(thiz, sub, level + 2);
 			_tabs(thiz, level + 2);
-			fprintf(thiz->out, "ender_container_add(tmp%d, tmp%d);\n", level, level + 2);
+			if (name)
+				fprintf(thiz->out, "ender_container_add(tmp%d, \"%s\", tmp%d);\n", level, name, level + 2);
+			else
+				fprintf(thiz->out, "ender_container_add(tmp%d, NULL, tmp%d);\n", level, level + 2);
+				
 			_tabs(thiz, level + 1);
 			fprintf(thiz->out, "}\n");
 		}
@@ -84,7 +90,7 @@ static void _generator_on_namespace(void *data, const char *name)
 	thiz->ns_name = name;
 }
 
-static void _generator_on_renderer(void *data, const char *name, Ender_Type type, const char *parent)
+static void _generator_on_renderer(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Generator *thiz;
 
@@ -111,9 +117,9 @@ static void _generator_on_renderer(void *data, const char *name, Ender_Type type
 		fprintf(thiz->out, "\tif (!parent) return;\n");
 	}
 	if (type == ENDER_ABSTRACT)
-		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", NULL, parent, ENDER_%s);\n", thiz->name, ender_type_name_get(type));
+		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", NULL, parent, ENDER_%s);\n", thiz->name, ender_descriptor_type_name_get(type));
 	else
-		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", _%s_%s_new, parent, ENDER_%s);\n", thiz->name, thiz->ns_name, name, ender_type_name_get(type));
+		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", _%s_%s_new, parent, ENDER_%s);\n", thiz->name, thiz->ns_name, name, ender_descriptor_type_name_get(type));
 	fprintf(thiz->out, "\tif (!d) return;\n");
 	/* the properties */
 	//ender_descriptor_property_list(descriptor, _dump_property, descriptor);

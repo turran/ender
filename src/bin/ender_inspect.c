@@ -23,30 +23,43 @@ static void _list_cb(const char *name, void *data)
 	printf("%s\n", name);
 }
 
-static void _container_compound_dump(Ender_Container *c)
+static void _container_compound_dump(Ender_Container *c, int level)
 {
+	int j;
 	int i;
 
-	printf(" { ");
+	printf(" {\n");
 	for (i = 0; i < ender_container_compound_count(c); i++)
 	{
 		Ender_Container *sub;
+		const char *name;
 
-		sub = ender_container_compound_get(c, i);
-		if (i != 0)
-			printf(", ");
+		ender_container_compound_get_extended(c, i, &sub, &name);
+		printf("\t");
+		for (j = 0; j < level; j++)
+			printf("   ");
 		printf("%s", ender_value_type_name_get(ender_container_type_get(sub)));
+		if (name)
+			printf(" %s", name);
+
 		if (ender_container_is_compound(sub))
-			_container_compound_dump(sub);
+			_container_compound_dump(sub, level + 1);
+		else
+		{
+			printf(";\n");
+		}
 	}
-	printf(" }");
+	printf("\t");
+	for (i = 0; i < level - 1; i++)
+		printf("   ");
+	printf("};\n");
 }
 
-static void _container_dump(Ender_Container *c)
+static void _container_dump(Ender_Container *c, int level)
 {
 	printf("%s", ender_value_type_name_get(ender_container_type_get(c)));
 	if (ender_container_is_compound(c))
-		_container_compound_dump(c);
+		_container_compound_dump(c, level + 1);
 	printf("\n");
 }
 
@@ -58,7 +71,7 @@ static void _prop_cb(Ender_Property *p, void *data)
 	c = ender_property_container_get(p);
 	name = ender_property_name_get(p);
 	printf("\t%s%s: ", ender_property_is_relative(p) ? "rel " : "", name);
-	_container_dump(c);
+	_container_dump(c, 0);
 }
 
 static void _inheritance_dump(Ender_Descriptor *e, int level)
@@ -95,7 +108,7 @@ static void _descriptor_dump(const char *name)
 	}
 	eina_array_free(inheritance);
 	printf("Information:\n");
-	printf("\ttype = %s\n", ender_type_name_get(ender_descriptor_type(ed)));
+	printf("\ttype = %s\n", ender_descriptor_type_name_get(ender_descriptor_type(ed)));
 	printf("Properties:\n");
 	ender_descriptor_property_list(ed, _prop_cb, ed);
 }

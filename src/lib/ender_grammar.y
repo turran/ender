@@ -20,6 +20,12 @@ typedef struct _Ender_Parser
 	void *data;
 } Ender_Parser;
 
+typedef struct _Ender_Type
+{
+	char *name;
+	Ender_Container *container;
+} Ender_Type;
+
 void ender_error(void *lloc, void *scanner, Ender_Parser *parser, const char *str);
 
 static inline void _on_using(Ender_Parser *parser, Eina_List *list)
@@ -41,7 +47,7 @@ static inline void _on_namespace(Ender_Parser *parser, const char *name)
 		parser->descriptor->on_namespace(parser->data, name);
 }
 
-static inline void _on_renderer(Ender_Parser *parser, const char *name, Ender_Type type, const char *parent)
+static inline void _on_renderer(Ender_Parser *parser, const char *name, Ender_Descriptor_Type type, const char *parent)
 {
 	if (parser->descriptor->on_renderer)
 		parser->descriptor->on_renderer(parser->data, name, type, parent);
@@ -53,12 +59,15 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 		parser->descriptor->on_property(parser->data, name, relative, container);
 }
 
+
+
 %}
 
 %union {
-	Ender_Type etype;
+	Ender_Descriptor_Type dtype;
 	Ender_Value_Type vtype;
-	Ender_Container *prop;
+	Ender_Container *container;
+	Ender_Type *type;
 	char *s;
 	Eina_Bool b;
 	Eina_List *list; // use this for every _list nonterminal
@@ -78,8 +87,8 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 %token <vtype> T_UNION
 %token <vtype> T_RENDERER
 %token <vtype> T_ENDER
-%token <etype> T_ABSTRACT
-%token <etype> T_CLASS
+%token <dtype> T_ABSTRACT
+%token <dtype> T_CLASS
 %token T_NAMESPACE
 %token T_REL
 %token T_USING
@@ -87,13 +96,15 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 %token <s> T_INLINE_STRING
 %type <list>using
 %type <b> type_relative
-%type <prop> type_specifier
+%type <container> type_specifier
 %type <vtype> basic_type
-%type <etype> definition
-%type <prop> list_type
-%type <prop> struct_union_type
+%type <dtype> definition
+%type <container> list_type
+%type <container> struct_union_type
 %type <s> renderer_inheritance
 %type <list> types
+%type <type> type
+
 %%
 
 main
@@ -132,13 +143,17 @@ definition_list
 struct
 	: T_STRUCT T_INLINE_STRING '{' types '}' ';'
 	{
+		Ender_Container *c;
+		Ender_Type *t;
 		Eina_List *l;
-		Ender_Container *c, *sub;
+		Eina_List *ll;
 
 		c = ender_container_new(ENDER_STRUCT);
-		EINA_LIST_FOREACH ($4, l, sub)
+		EINA_LIST_FOREACH_SAFE($4, l, ll, t)
 		{
-			ender_container_add(c, sub);
+			ender_container_add(c, t->name, t->container);
+			free(t);
+ 			$4 = eina_list_remove_list($4, l);
 		}
 		ender_container_register($2, c);
 	}
@@ -147,13 +162,17 @@ struct
 union
 	: T_UNION T_INLINE_STRING '{' types '}' ';'
 	{
+		Ender_Container *c;
+		Ender_Type *t;
 		Eina_List *l;
-		Ender_Container *c, *sub;
+		Eina_List *ll;
 
 		c = ender_container_new(ENDER_UNION);
-		EINA_LIST_FOREACH ($4, l, sub)
+		EINA_LIST_FOREACH_SAFE($4, l, ll, t)
 		{
-			ender_container_add(c, sub);
+			ender_container_add(c, t->name, t->container);
+			free(t);
+ 			$4 = eina_list_remove_list($4, l);
 		}
 		ender_container_register($2, c);
 	}
@@ -179,11 +198,11 @@ renderer_inheritance
 	;
 
 types
-	: type_specifier ',' types
+	: type ';' types
 	{
 		$$ = eina_list_prepend($3, $1);
 	}
-	| type_specifier
+	| type ';'
 	{
 		$$ = eina_list_append(NULL, $1);
 	}
@@ -211,8 +230,27 @@ list_type
 	: '[' type_specifier ']'
 	{
 		$$ = ender_container_new(ENDER_LIST);
-		ender_container_add($$, $2);
+		ender_container_add($$, NULL, $2);
 	}
+	;
+
+constraint_range
+	:
+	;
+
+constraint_enum
+	: T_INLINE_STRING
+	| T_INLINE_STRING ',' constraint_enum
+	;
+
+constraint_definition
+	: constraint_enum
+	| constraint_range
+	;
+
+constraint
+	: '[' constraint_definition ']'
+	|
 	;
 
 type_specifier
@@ -222,14 +260,28 @@ type_specifier
 	;
 
 type_relative
-	: {$$=EINA_FALSE; }
-	| T_REL { $$=EINA_TRUE; }
+	: { $$ = EINA_FALSE; }
+	| T_REL { $$ = EINA_TRUE; }
 	;
+
+type
+	: type_specifier T_INLINE_STRING
+	{
+		Ender_Type *type = malloc(sizeof(Ender_Type));
+		
+		type->container = $1;
+		type->name = $2;
+
+		$$ = type;
+	}
+	;
+
 declaration
 	:
-	type_relative type_specifier T_INLINE_STRING ';'
+	type_relative type constraint ';'
 	{
-		_on_property(parser, $3, $1, $2);
+		_on_property(parser, $2->name, $1, $2->container);
+		free($2);
 	}
 	;
 

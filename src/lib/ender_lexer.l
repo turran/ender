@@ -9,6 +9,15 @@
 #include <stdio.h>
 #include "Ender.h"
 #include "ender_private.h"
+
+#define YY_USER_ACTION { yylloc->first_line = yylineno; yylloc->last_line = yylineno; }
+
+typedef struct _Ender_Type
+{
+	char *name;
+	Ender_Container *container;
+} Ender_Type;
+
 #include "libender_la-ender_grammar.h"
 #define YY_NO_UNISTD_H
 %}
@@ -74,11 +83,11 @@ union			{
 			}
 namespace		return T_NAMESPACE;
 class			{
-				yylval_param->etype = ENDER_CLASS;
+				yylval_param->dtype = ENDER_CLASS;
 				return T_CLASS;
 			}
 abstract		{
-				yylval_param->etype = ENDER_ABSTRACT;
+				yylval_param->dtype = ENDER_ABSTRACT;
 				return T_ABSTRACT;
 			}
 using			return T_USING;

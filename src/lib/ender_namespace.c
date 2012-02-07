@@ -54,10 +54,10 @@ void ender_namespace_dump(Ender_Namespace *ns)
 
 	while (eina_iterator_next(it, (void **)&descriptor))
 	{
-		Ender_Type type;
+		Ender_Descriptor_Type type;
 
 		type = ender_descriptor_type(descriptor);
-		printf("\t %s \"%s\" {\n", ender_type_name_get(type), ender_descriptor_name_get(descriptor));
+		printf("\t %s \"%s\" {\n", ender_descriptor_type_name_get(type), ender_descriptor_name_get(descriptor));
 		printf("\t};\n");
 	}
 	printf("};\n");
@@ -153,7 +153,7 @@ EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns, Ender_List_Callba
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Type type)
+EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
 

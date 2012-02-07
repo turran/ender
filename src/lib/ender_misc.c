@@ -30,7 +30,7 @@
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * ender_type_name_get(Ender_Type type)
+EAPI const char * ender_descriptor_type_name_get(Ender_Descriptor_Type type)
 {
 	switch (type)
 	{

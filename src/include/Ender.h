@@ -62,12 +62,12 @@ typedef struct _Ender_Constraint Ender_Constraint;
 typedef void (*Ender_Event_Callback)(Ender_Element *e, const char *event_name, void *event_data, void *data);
 typedef void (*Ender_New_Callback)(Ender_Element *e, void *data);
 
-typedef enum _Ender_Type
+typedef enum _Ender_Descriptor_Type
 {
 	ENDER_ABSTRACT,
 	ENDER_CLASS,
 	ENDER_TYPES,
-} Ender_Type;
+} Ender_Descriptor_Type;
 
 typedef enum _Ender_Value_Type
 {
@@ -116,10 +116,11 @@ EAPI void ender_shutdown(void);
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
 EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
+EAPI void ender_container_compound_get_extended(Ender_Container *ec, unsigned int idx, Ender_Container **c, const char **name);
 EAPI size_t ender_container_size_get(Ender_Container *ec);
 EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
 EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
-EAPI void ender_container_add(Ender_Container *ec, Ender_Container *sub);
+EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Container *sub);
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
 
 /**
@@ -198,7 +199,7 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name);
 EAPI Ender_Namespace * ender_namespace_find(const char *name);
 EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns, Ender_List_Callback cb, void *data);
 EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name);
-EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Type type);
+EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Descriptor_Type type);
 EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
 
 /**
@@ -231,7 +232,7 @@ EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_Li
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
 EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);
-EAPI Ender_Type ender_descriptor_type(Ender_Descriptor *ed);
+EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed);
 EAPI const char * ender_descriptor_name_get(Ender_Descriptor *ed);
 EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *ed);
 EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed);
@@ -317,6 +318,17 @@ EAPI Ender_Constraint * ender_property_constraint_get(Ender_Property *p);
  * @{
  */
 
+typedef enum _Ender_Constraint_Type
+{
+	ENDER_CONSTRAINT_RANGE,
+	ENDER_CONSTRAINT_ENUM,
+} Ender_Constraint_Type;
+
+EAPI Ender_Constraint_Type ender_constraint_type_get(Ender_Constraint *thiz);
+EAPI Ender_Constraint * ender_constraint_range_new(Ender_Value_Type type);
+EAPI Ender_Constraint * ender_constraint_enum_new(void);
+EAPI void ender_constraint_enum_append(Ender_Constraint *thiz, const char *name, int value);
+
 /**
  * @}
  * @defgroup Ender_Other_Group Other
@@ -347,8 +359,9 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
  * @defgroup Ender_Helper_Group Helper
  * @{
  */
+/* TODO rename this to _to_string(): we are not getting the name from the Type */
 EAPI const char * ender_value_type_name_get(Ender_Value_Type type);
-EAPI const char * ender_type_name_get(Ender_Type type);
+EAPI const char * ender_descriptor_type_name_get(Ender_Descriptor_Type type);
 
 /**
  * @}
@@ -374,6 +387,8 @@ typedef struct _Eina_Ordered_Hash
 } Eina_Ordered_Hash;
 
 EAPI Eina_Ordered_Hash * eina_ordered_hash_new();
+EAPI void eina_ordered_hash_free(Eina_Ordered_Hash *thiz);
+EAPI int eina_ordered_hash_count(Eina_Ordered_Hash *thiz);
 EAPI void * eina_ordered_hash_nth_get(Eina_Ordered_Hash *thiz, int nth);
 EAPI void * eina_ordered_hash_find(Eina_Ordered_Hash *thiz, const char *key);
 EAPI void eina_ordered_hash_add(Eina_Ordered_Hash *thiz, const char *name, void *data);
