@@ -63,8 +63,12 @@ namespace "enesim.renderer" {
 		double "y";
 	};
 
+	struct "polygon" {
+		[point] "points";
+	};
+
 	class "figure" : "shape" {
-		[[point]] "polygon";
+		[polygon] "polygon";
 	};
 
 	struct "move_to" {
