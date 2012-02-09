@@ -63,7 +63,7 @@ static void _dump_container_recursive(Ender_Generator *thiz, Ender_Container *co
 			fprintf(thiz->out, "{\n");
 			_dump_container_recursive(thiz, sub, level + 2);
 			_tabs(thiz, level + 2);
-			if (name)
+			if (name && *name)
 				fprintf(thiz->out, "ender_container_add(tmp%d, \"%s\", tmp%d);\n", level, name, level + 2);
 			else
 				fprintf(thiz->out, "ender_container_add(tmp%d, NULL, tmp%d);\n", level, level + 2);
@@ -129,6 +129,7 @@ static void _generator_on_renderer(void *data, const char *name, Ender_Descripto
 static void _generator_on_property(void *data, const char *name, Eina_Bool relative, Ender_Container *container)
 {
 	Ender_Generator *thiz;
+	Ender_Value_Type type;
 
 	thiz = data;
 	if (!thiz->name_matched) return;
@@ -142,7 +143,8 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	fprintf(thiz->out, "\t\t\t\tec,\n");
 	fprintf(thiz->out, "\t\t\t\tENDER_GETTER(_%s_%s_%s_get),\n", thiz->ns_name, thiz->name, name);
 	fprintf(thiz->out, "\t\t\t\tENDER_SETTER(_%s_%s_%s_set),\n", thiz->ns_name, thiz->name, name);
-	if (ender_container_is_compound(container))
+	type = ender_container_type_get(container);
+	if (type == ENDER_LIST)
 	{
 		fprintf(thiz->out, "\t\t\t\tENDER_ADD(_%s_%s_%s_add),\n", thiz->ns_name, thiz->name, name);
 		fprintf(thiz->out, "\t\t\t\tENDER_REMOVE(_%s_%s_%s_remove),\n", thiz->ns_name, thiz->name, name);

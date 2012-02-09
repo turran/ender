@@ -156,14 +156,14 @@ static void _ender_pointer_get(Ender_Value *v, Ender_Getter get,
 	get(e, &v->data.ptr);
 }
 
-/* used for string, surface, struct, matrix, renderer */
+/* used for string, surface, struct, union, matrix, renderer */
 static void _ender_pointer_set(Ender_Value *v, Ender_Setter set,
 		Enesim_Renderer *e)
 {
 	set(e, v->data.ptr);
 }
 
-/* used for string, surface, struct, matrix, renderer */
+/* used for string, surface, struct, union, matrix, renderer */
 static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
 		Ender_Element *e, Enesim_Renderer *parent)
 {
@@ -187,7 +187,26 @@ static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
 {
 	set(parent, e, v->data.ptr);
 }
+/*----------------------------------------------------------------------------*
+ *                                   dummy                                    *
+ *----------------------------------------------------------------------------*/
+static void _ender_dummy_set(Ender_Value *v, Ender_Setter set,
+		Enesim_Renderer *r)
+{
 
+}
+
+static void _ender_dummy_get(Ender_Value *v, Ender_Setter set,
+		Enesim_Renderer *r)
+{
+
+}
+
+static void _ender_relative_dummy_set(Ender_Value *v, Ender_Setter set,
+		Enesim_Renderer *r, Enesim_Renderer *parent)
+{
+
+}
 /*----------------------------------------------------------------------------*
  *                        The property interface                              *
  *----------------------------------------------------------------------------*/
@@ -301,7 +320,16 @@ Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const ch
 
 void ender_descriptor_init(void)
 {
+	int i;
+
 	_descriptors = eina_hash_string_superfast_new(NULL);
+	/* initialize to some sane values */
+	for (i = 0; i < ENDER_PROPERTY_TYPES; i++)
+	{
+		_setters[i] = _ender_dummy_set;
+		_getters[i] = _ender_dummy_get;
+		_relative_accessors[i] = _ender_relative_dummy_set;
+	}
 	/* setters */
 	_setters[ENDER_BOOL] = _ender_int32_set;
 	_setters[ENDER_UINT32] = _ender_int32_set;
@@ -316,6 +344,7 @@ void ender_descriptor_init(void)
 	_setters[ENDER_ENDER] = _ender_ender_set;
 	_setters[ENDER_LIST] = _ender_pointer_set;
 	_setters[ENDER_STRUCT] = _ender_pointer_set;
+	_setters[ENDER_UNION] = _ender_pointer_set;
 	/* getters */
 	_getters[ENDER_BOOL] = _ender_int32_get;
 	_getters[ENDER_UINT32] = _ender_int32_get;
@@ -326,11 +355,12 @@ void ender_descriptor_init(void)
 	_getters[ENDER_STRING] = _ender_pointer_get;
 	/* the special matrix case */
 	_getters[ENDER_MATRIX] = _ender_matrix_get;
-	_getters[ENDER_RENDERER] = _ender_matrix_get;
-	_getters[ENDER_SURFACE] = _ender_matrix_get;
-	_getters[ENDER_ENDER] = _ender_matrix_get;
-	_getters[ENDER_LIST] = _ender_matrix_get;
-	_getters[ENDER_STRUCT] = _ender_matrix_get;
+	_getters[ENDER_RENDERER] = _ender_pointer_get;
+	_getters[ENDER_SURFACE] = _ender_pointer_get;
+	_getters[ENDER_ENDER] = _ender_pointer_get;
+	_getters[ENDER_LIST] = _ender_pointer_get;
+	_getters[ENDER_STRUCT] = _ender_pointer_get;
+	_getters[ENDER_UNION] = _ender_pointer_get;
 	/* relative setters */
 	_relative_accessors[ENDER_BOOL] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_UINT32] = _ender_relative_int32_set;
@@ -345,6 +375,7 @@ void ender_descriptor_init(void)
 	_relative_accessors[ENDER_ENDER] = _ender_relative_ender_set;
 	_relative_accessors[ENDER_LIST] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_STRUCT] = _ender_relative_pointer_set;
+	_relative_accessors[ENDER_UNION] = _ender_relative_pointer_set;
 }
 
 void ender_descriptor_shutdown(void)

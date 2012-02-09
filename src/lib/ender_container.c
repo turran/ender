@@ -127,6 +127,31 @@ EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigne
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Ender_Container * ender_container_compound_get_by_name(Ender_Container *ec, const char *name, unsigned int *idx)
+{
+	Ender_Container_Sub *sub = NULL;
+	Eina_List *l;
+	int i = 0;
+
+	if (!ender_container_is_compound(ec))
+		return NULL;
+	if (!name) return NULL;
+	EINA_LIST_FOREACH(ec->elements, l, sub)
+	{
+		if (!strcmp(sub->name, name))
+		{
+			if (idx) *idx = i;
+			return sub->c;
+		}
+		i++;
+	}
+	return NULL;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_container_compound_get_extended(Ender_Container *ec, unsigned int idx, Ender_Container **c, const char **name)
 {
 	Ender_Container_Sub *sub;
@@ -200,7 +225,10 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 		case ENDER_STRUCT:
 		EINA_LIST_FOREACH(ec->elements, l, sub)
 		{
-			size += ender_container_size_get(sub->c);
+			if (sub->c->type == ENDER_STRUCT || sub->c->type == ENDER_UNION)
+				size += ender_container_compound_size_get(sub->c);
+			else
+				size += ender_container_size_get(sub->c);
 		}
 		break;
 
@@ -215,10 +243,15 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 		{
 			size_t new_size;
 
-			new_size = ender_container_size_get(sub->c);
+			if (sub->c->type == ENDER_STRUCT || sub->c->type == ENDER_UNION)
+				new_size = ender_container_compound_size_get(sub->c);
+			else
+				new_size = ender_container_size_get(sub->c);
 			if (new_size > size)
 				size = new_size;
 		}
+		/* add the space for the integer type */
+		size += 4;
 		break;
 
 		default:
@@ -276,7 +309,8 @@ EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Conta
 
 		case ENDER_UNION:
 		ec->elements = eina_list_append(ec->elements, sub);
-		sub->c->offset = 0;
+		/* always leave 4 bytes for the integer type */
+		sub->c->offset = 4;
 		break;
 
 		case ENDER_LIST:

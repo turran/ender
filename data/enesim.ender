@@ -119,7 +119,11 @@ namespace "enesim.renderer" {
 		bool "sweep";
 	};
 
-	union "command_definition" {
+	struct "close" {
+		bool "close";
+	};
+
+	union "command" {
 		move_to "m";
 		line_to "l";
 		squadratic_to "sq";
@@ -127,11 +131,7 @@ namespace "enesim.renderer" {
 		cubic_to "c";
 		scubic_to "sc";
 		arc_to "a";
-	};
-
-	struct "command" {
-		int "type";
-		command_definition "cmd";
+		close "z";
 	};
 
 	class "path" : "shape" {

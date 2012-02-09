@@ -282,18 +282,55 @@ EAPI char * ender_value_string_get(Ender_Value *value)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_value_struct_set(Ender_Value *value, void * structure)
+EAPI void ender_value_struct_set(Ender_Value *value, void *structure)
 {
-
+	if (value->container->type != ENDER_STRUCT)
+		return;
+	value->data.ptr = structure;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_value_const_struct_set(Ender_Value *value, void * structure)
+EAPI void * ender_value_struct_get(Ender_Value *value)
 {
+	if (value->container->type != ENDER_STRUCT)
+		return NULL;
+	return value->data.ptr;
+}
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_value_union_set(Ender_Value *value, int type, void *un)
+{
+	if (value->container->type != ENDER_UNION)
+		return;
+	value->data.ptr = un;
+	if (un)
+	{
+		int *d = un;
+		*d = type;
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_value_union_get(Ender_Value *value, int *type)
+{
+	int *d;
+	if (value->container->type != ENDER_UNION)
+		return NULL;
+	d = value->data.ptr;
+	if (type)
+	{
+		if (type) *type = *d;
+	}
+	return d;
 }
 
 /**
@@ -467,4 +504,22 @@ EAPI void ender_value_free(Ender_Value *value)
 		value->free_cb(value, value->free_cb_data);
 	}
 	free(value);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_value_ref(Ender_Value *thiz)
+{
+
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_value_unref(Ender_Value *thiz)
+{
+
 }

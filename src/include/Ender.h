@@ -116,6 +116,7 @@ EAPI void ender_shutdown(void);
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
 EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
+EAPI Ender_Container * ender_container_compound_get_by_name(Ender_Container *ec, const char *name, unsigned int *idx);
 EAPI void ender_container_compound_get_extended(Ender_Container *ec, unsigned int idx, Ender_Container **c, const char **name);
 EAPI size_t ender_container_size_get(Ender_Container *ec);
 EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
@@ -165,8 +166,10 @@ EAPI void ender_value_static_string_set(Ender_Value *value, const char * string)
 EAPI char * ender_value_string_get(Ender_Value *value);
 
 EAPI void ender_value_struct_set(Ender_Value *value, void * structure);
-EAPI void ender_value_const_struct_set(Ender_Value *value, void * structure);
-EAPI const void * ender_value_struct_get(Ender_Value *value);
+EAPI void * ender_value_struct_get(Ender_Value *value);
+
+EAPI void ender_value_union_set(Ender_Value *value, int type, void *un);
+EAPI void * ender_value_union_get(Ender_Value *valu, int *type);
 
 EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer);
 EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value);
