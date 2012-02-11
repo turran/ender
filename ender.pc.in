@@ -7,7 +7,7 @@ datadir=@datadir@/@PACKAGE@
 
 Name: Ender
 Description: Ender
-Requires: eina enesim
+@pkgconfig_requires_private@: @requirements_ender@
 Version: @VERSION@
 Libs: -L${libdir} -lender
 Cflags: -I${includedir}

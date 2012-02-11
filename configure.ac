@@ -1,67 +1,82 @@
-# get rid of that stupid cache mechanism
-rm -f config.cache
 
-AC_INIT(ender, 0.0.5, enesim-devel@googlegroups.com)
-AC_PREREQ(2.52)
-AC_CONFIG_SRCDIR(configure.ac)
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
-AC_ISC_POSIX
+### Version
 
-AM_INIT_AUTOMAKE(1.6 dist-bzip2)
-AM_CONFIG_HEADER(src/include/config.h)
+m4_define([v_maj], [0])
+m4_define([v_min], [0])
+m4_define([v_mic], [5])
+m4_define([v_ver], [v_maj.v_min.v_mic])
+
+m4_define([lt_cur], m4_eval(v_maj + v_min))
+m4_define([lt_rev], v_mic)
+m4_define([lt_age], v_min)
+
+AC_INIT([ender], [v_ver], [enesim-devel@googlegroups.com])
+AC_PREREQ([2.60])
+AC_CONFIG_SRCDIR([configure.ac])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADERS([src/include/config.h])
+
+AM_INIT_AUTOMAKE([1.6 dist-bzip2])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-AC_PROG_CC
-AM_PROG_CC_STDC
-AC_HEADER_STDC
-AC_C_CONST
-AC_C_BIGENDIAN
+LT_PREREQ([2.2])
+LT_INIT([win32-dll])
 
-AC_LIBTOOL_WIN32_DLL
-define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
-define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
-AC_PROG_LIBTOOL
+version_info="lt_cur:lt_rev:lt_age"
+AC_SUBST([version_info])
+
+
+### Needed information
+
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+
+ENDER_BUILD=""
+case "$host_os" in
+   mingw*)
+      ENDER_BUILD="-DENDER_BUILD"
+   ;;
+esac
+AC_SUBST([ENDER_BUILD])
+
+requirements_ender="enesim >= 0.0.15 eina >= 1.0.0"
+AC_SUBST([requirements_ender])
+
+
+### Checks for programs
+
+AC_PROG_CC
+
+# pkg-config
+PKG_PROG_PKG_CONFIG
+
+# Check whether pkg-config supports Requires.private
+if $PKG_CONFIG --atleast-pkgconfig-version 0.22; then
+   pkgconfig_requires_private="Requires.private"
+else
+   pkgconfig_requires_private="Requires"
+fi
+AC_SUBST([pkgconfig_requires_private])
+
+# lex
 
 AM_PROG_LEX
 if test "x$ac_cv_prog_LEX" = "x"; then
-  AC_MSG_ERROR(Cannot find flex)
+   AC_MSG_ERROR(Cannot find flex)
 fi
+
 AC_PROG_YACC
 if test "x$ac_cv_prog_YACC" = "x"; then
-  AC_MSG_ERROR(Cannot find bison)
+   AC_MSG_ERROR(Cannot find bison)
 fi
 
-dnl Set PACKAGE_DATA_DIR in config.h.
-if test "x${prefix}" = "xNONE"; then
-  AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${ac_default_prefix}/share/${PACKAGE}", [Shared Data Directory])
-else
-  AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${prefix}/share/${PACKAGE}", [Shared Data Directory])
-fi
+# doxygen program for documentation building
+EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
-VMAJ=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $1);}'`
-VMIN=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $2);}'`
-VMIC=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $3);}'`
-SNAP=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $4);}'`
-version_info=`expr $VMAJ + $VMIN`":$VMIC:$VMIN"
-AC_SUBST(version_info)
 
-create_shared_lib=""
-case "$host_os" in
-    mingw|mingw32)
-	create_shared_lib="-no-undefined"
-    ;;
-esac
-AC_SUBST(create_shared_lib)
+### Checks for libraries
 
-# Common
-PKG_CHECK_MODULES(EINA, [eina >= 1.0.0])
-PKG_CHECK_MODULES(ENESIM, [enesim >= 0.0.9])
-
-ENDER_CFLAGS="$EINA_CFLAGS $ENESIM_CFLAGS"
-ENDER_LIBS="$EINA_LIBS $ENESIM_LIBS"
-AC_SUBST(ENDER_CFLAGS)
-AC_SUBST(ENDER_LIBS)
+PKG_CHECK_MODULES([ENDER], [${requirements_ender}])
 
 ## Make the debug preprocessor configurable
 
@@ -74,7 +89,6 @@ src/lib/Makefile
 src/include/Makefile
 src/bin/Makefile
 src/tests/Makefile
-],[
 ])
 
 
@@ -91,9 +105,11 @@ echo
 echo
 echo "Configuration Options Summary:"
 echo
-echo "Installation Path.........: $prefix"
+echo "Compilation............: make (or gmake)"
+echo "  CPPFLAGS.............: $CPPFLAGS"
+echo "  CFLAGS...............: $CFLAGS"
+echo "  LDFLAGS..............: $LDFLAGS"
 echo
-echo "Now type 'make' ('gmake' on some systems) to compile $PACKAGE,"
-echo "and then afterwards as root (or the user who will install this), type"
-echo "'make install'. Change users with 'su' or 'sudo' appropriately."
+echo "Installation...........: make install (as root if needed, with 'su' or 'sudo')"
+echo "  prefix...............: $prefix"
 echo

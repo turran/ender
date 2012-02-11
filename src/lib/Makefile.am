@@ -1,8 +1,10 @@
 MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
--I$(top_srcdir)/src/include \
 -I. \
+-I$(top_srcdir)/src/include \
+-I$(top_builddir)/src/include \
+-DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
 @ENDER_CFLAGS@
 
 AM_YFLAGS = -d -p ender_
@@ -33,10 +35,5 @@ ender_namespace.c \
 ender_property.c \
 ender_value.c
 
-libender_la_LIBADD = \
-@ENDER_LIBS@ \
-@LEXLIB@
-
-libender_la_DEPENDENCIES =
-
-libender_la_LDFLAGS = @create_shared_lib@ -version-info @version_info@
+libender_la_LIBADD = @ENDER_LIBS@ @LEXLIB@
+libender_la_LDFLAGS = -no-undefined -version-info @version_info@
