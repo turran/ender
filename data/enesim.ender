@@ -226,8 +226,9 @@ namespace "enesim.renderer" {
 	class "gradient_radial" : "gradient" {
 		double "center_x";
 		double "center_y";
-		double "radius_x";
-		double "radius_y";
+		double "focus_x";
+		double "focus_y";
+		double "radius";
 	};
 
 	class "background" : "renderer" {

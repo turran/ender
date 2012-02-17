@@ -1,2 +1,6 @@
 Add ref/unref here too
 Add constraints to properties, this way we can define enums and ranges
+Given the nature of ender, it is very easy to describe any kind of object (not only renderers) with the current approach. It will be useful for example 
+on esvg, where there are several objects that are not a renderable but do need to set/get/animate properties. The only problem with this is the single
+inheritance we have now, on SVG every object inherits from the SVGElement both the renderables and the not renderables, so we'll need to duplicate
+the attributes on both abstractions we do on esvg (one for the renderables and one for the objects)
