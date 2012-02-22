@@ -230,6 +230,15 @@ namespace "enesim.renderer" {
 		double "focus_y";
 		double "radius";
 	};
+	
+	class "pattern" : "renderer" {
+		double "x";
+		double "y";
+		double "width";
+		double "height";
+		int "repeat_mode";
+		renderer "source";
+	};
 
 	class "background" : "renderer" {
 		color "color";
