@@ -149,8 +149,8 @@ namespace "enesim.renderer" {
 		surface "src";
 		int "x";
 		int "y";
-		int "w";
-		int "h";
+		int "width";
+		int "height";
 	};
 
 	class "dispmap" : "renderer" {
@@ -230,7 +230,7 @@ namespace "enesim.renderer" {
 		double "focus_y";
 		double "radius";
 	};
-	
+
 	class "pattern" : "renderer" {
 		double "x";
 		double "y";
