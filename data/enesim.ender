@@ -147,10 +147,10 @@ namespace "enesim.renderer" {
 
 	class "image" : "renderer" {
 		surface "src";
-		int "x";
-		int "y";
-		int "width";
-		int "height";
+		double "x";
+		double "y";
+		double "width";
+		double "height";
 	};
 
 	class "dispmap" : "renderer" {
