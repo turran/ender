@@ -209,7 +209,8 @@ EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child);
 EAPI void ender_value_list_set(Ender_Value *value, Eina_List *list);
 EAPI const Eina_List * ender_value_list_get(Ender_Value *value);
 
-EAPI void ender_value_free(Ender_Value *v);
+EAPI Ender_Value * ender_value_ref(Ender_Value *thiz);
+EAPI void ender_value_unref(Ender_Value *thiz);
 
 /**
  * @}
@@ -336,7 +337,6 @@ EAPI Ender_Container * ender_property_container_get(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
 EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p);
-EAPI Ender_Constraint * ender_property_constraint_get(Ender_Property *p);
 /**
  * @}
  * @defgroup Ender_Constraint_Group Constraint

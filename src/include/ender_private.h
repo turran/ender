@@ -47,6 +47,7 @@ struct _Ender_Container
 struct _Ender_Value
 {
 	Ender_Container *container;
+	int ref;
 	Ender_Value_Free free_cb;
 	void *free_cb_data;
 	Eina_Bool owned;

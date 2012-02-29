@@ -17,6 +17,14 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
+/*
+ * @TODO
+ * We need to implement this
+ * We can also add a constraint for the type an object can be
+ * We can also add a constraint of type "file", this way we can have several
+ * optmiziations on the escen side for this, like knowing the path where
+ * to find this, etc
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

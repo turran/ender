@@ -22,12 +22,26 @@
  *============================================================================*/
 static Ender_Value * _ender_value_new(Ender_Container *ec)
 {
-	Ender_Value *ev;
+	Ender_Value *thiz;
 
-	ev = calloc(1, sizeof(Ender_Value));
-	ev->container = ec;
+	thiz = calloc(1, sizeof(Ender_Value));
+	thiz->container = ec;
+	thiz->ref++;
 
-	return ev;
+	return thiz;
+}
+
+static void _ender_value_free(Ender_Value *thiz)
+{
+	if (thiz->owned)
+	{
+		free(thiz->data.ptr);
+	}
+	else if (thiz->free_cb)
+	{
+		thiz->free_cb(thiz, thiz->free_cb_data);
+	}
+	free(thiz);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -493,33 +507,21 @@ EAPI void ender_value_bool_set(Ender_Value *value, Eina_Bool boolean)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_value_free(Ender_Value *value)
+EAPI Ender_Value * ender_value_ref(Ender_Value *thiz)
 {
-	if (value->owned)
-	{
-		free(value->data.ptr);
-	}
-	else if (value->free_cb)
-	{
-		value->free_cb(value, value->free_cb_data);
-	}
-	free(value);
+	if (!thiz) return NULL;
+	thiz->ref++;
+	return thiz;
 }
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_value_ref(Ender_Value *thiz)
-{
-
-}
-
 /**
  * To be documented
  * FIXME: To be fixed
  */
 EAPI void ender_value_unref(Ender_Value *thiz)
 {
+	if (!thiz) return;
 
+	thiz->ref--;
+	if (!thiz->ref)
+		_ender_value_free(thiz);
 }
