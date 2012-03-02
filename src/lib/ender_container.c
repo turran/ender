@@ -194,7 +194,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 		break;
 
 		case ENDER_MATRIX:
-		case ENDER_RENDERER:
+		case ENDER_OBJECT:
 		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_LIST:

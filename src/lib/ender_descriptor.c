@@ -36,9 +36,9 @@ typedef struct _Ender_Descriptor_Property
 } Ender_Descriptor_Property;
 
 typedef void (*Ender_Value_Accessor)(Ender_Value *v, Ender_Accessor acc,
-		Enesim_Renderer *e);
+		void *e);
 typedef void (*Ender_Value_Relative_Accessor)(Ender_Value *v, Ender_Accessor acc,
-		Ender_Element *e, Enesim_Renderer *parent);
+		Ender_Element *e, void *parent);
 
 
 static Ender_Value_Accessor _setters[ENDER_PROPERTY_TYPES];
@@ -68,55 +68,62 @@ static inline void _value_set(Ender_Property *p, Ender_Element *e, Ender_Value *
 		parent = ender_element_parent_get(e);
 		if (parent)
 		{
-			Enesim_Renderer *rparent;
+			void *rparent;
 
-			rparent = ender_element_renderer_get(parent);
+			rparent = ender_element_object_get(parent);
 			_relative_accessors[v->container->type](v, acc, e, rparent);
 		}
 		else WRN("Trying to set a relative property with no parent");
 	}
 	else
 	{
-		Enesim_Renderer *renderer;
+		void *object;
 
-		renderer = ender_element_renderer_get(e);
-		_setters[v->container->type](v, acc, renderer);
+		object = ender_element_object_get(e);
+		if (v->container->type == ENDER_ENDER)
+		{
+			/* This functions sets the parent */
+			ender_element_parent_set(v->data.ptr, e);
+		}
+
+
+		_setters[v->container->type](v, acc, object);
 	}
 
 }
 /*----------------------------------------------------------------------------*
  *                     uint32 / in32 / argb / bool                            *
  *----------------------------------------------------------------------------*/
-static void _ender_int32_get(Ender_Value *v, Ender_Getter get, Enesim_Renderer *e)
+static void _ender_int32_get(Ender_Value *v, Ender_Getter get, void *e)
 {
 	get(e, &v->data.i32);
 }
 
-static void _ender_int32_set(Ender_Value *v, Ender_Setter set, Enesim_Renderer *e)
+static void _ender_int32_set(Ender_Value *v, Ender_Setter set, void *e)
 {
 	set(e, v->data.i32);
 }
 
 static void _ender_relative_int32_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Enesim_Renderer *parent)
+		Ender_Element *e, void *parent)
 {
 	set(parent, e, v->data.i32);
 }
 /*----------------------------------------------------------------------------*
  *                                   double                                   *
  *----------------------------------------------------------------------------*/
-static void _ender_double_get(Ender_Value *v, Ender_Setter set, Enesim_Renderer *e)
+static void _ender_double_get(Ender_Value *v, Ender_Setter set, void *e)
 {
 	set(e, &v->data.d);
 }
 
-static void _ender_double_set(Ender_Value *v, Ender_Setter set, Enesim_Renderer *e)
+static void _ender_double_set(Ender_Value *v, Ender_Setter set, void *e)
 {
 	set(e, v->data.d);
 }
 
 static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender_Element *e,
-		Enesim_Renderer *parent)
+		void *parent)
 {
 	set(parent, e, v->data.d);
 }
@@ -128,44 +135,44 @@ static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender_E
  * *copied* so you need to have the requested alloced data in the ender value
  */
 static void _ender_matrix_get(Ender_Value *v, Ender_Getter get,
-		Enesim_Renderer *e)
+		void *e)
 {
 	get(e, &v->data.matrix);
 }
 
-/* used for string, surface, struct, matrix, renderer */
+/* used for string, surface, struct, matrix, object */
 static void _ender_matrix_set(Ender_Value *v, Ender_Setter set,
-		Enesim_Renderer *e)
+		void *e)
 {
 	set(e, v->data.matrix);
 }
 
-/* used for string, surface, struct, matrix, renderer */
+/* used for string, surface, struct, matrix, object */
 static void _ender_relative_matrix_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Enesim_Renderer *parent)
+		Ender_Element *e, void *parent)
 {
 	set(parent, e, v->data.matrix);
 }
 /*----------------------------------------------------------------------------*
  *                                  pointer                                   *
  *----------------------------------------------------------------------------*/
-/* used for string, surface, renderer, ender */
+/* used for string, surface, object, ender */
 static void _ender_pointer_get(Ender_Value *v, Ender_Getter get,
-		Enesim_Renderer *e)
+		void *e)
 {
 	get(e, &v->data.ptr);
 }
 
-/* used for string, surface, struct, union, matrix, renderer */
+/* used for string, surface, struct, union, matrix, object */
 static void _ender_pointer_set(Ender_Value *v, Ender_Setter set,
-		Enesim_Renderer *e)
+		void *e)
 {
 	set(e, v->data.ptr);
 }
 
-/* used for string, surface, struct, union, matrix, renderer */
+/* used for string, surface, struct, union, matrix, object */
 static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Enesim_Renderer *parent)
+		Ender_Element *e, void *parent)
 {
 	set(parent, e, v->data.ptr);
 }
@@ -173,17 +180,13 @@ static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
  *                                   ender                                    *
  *----------------------------------------------------------------------------*/
 static void _ender_ender_set(Ender_Value *v, Ender_Setter set,
-		Enesim_Renderer *e)
+		void *object)
 {
-	Ender_Element *child;
-
-	child = v->data.ptr;
-	set(e, child);
-	ender_element_parent_set(child, ender_element_renderer_from(e));
+	set(object, v->data.ptr);
 }
 
 static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, Enesim_Renderer *parent)
+		Ender_Element *e, void *parent)
 {
 	set(parent, e, v->data.ptr);
 }
@@ -191,19 +194,19 @@ static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
  *                                   dummy                                    *
  *----------------------------------------------------------------------------*/
 static void _ender_dummy_set(Ender_Value *v, Ender_Setter set,
-		Enesim_Renderer *r)
+		void *o)
 {
 
 }
 
 static void _ender_dummy_get(Ender_Value *v, Ender_Setter set,
-		Enesim_Renderer *r)
+		void *o)
 {
 
 }
 
 static void _ender_relative_dummy_set(Ender_Value *v, Ender_Setter set,
-		Enesim_Renderer *r, Enesim_Renderer *parent)
+		Ender_Element *e, void *parent)
 {
 
 }
@@ -236,19 +239,19 @@ static void _property_remove(Ender_Property *p, Ender_Element *e, Ender_Value *v
 static void _property_get(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
-	Enesim_Renderer *renderer;
+	void *object;
 
-	renderer = ender_element_renderer_get(e);
-	_getters[v->container->type](v, dprop->get, renderer);
+	object = ender_element_object_get(e);
+	_getters[v->container->type](v, dprop->get, object);
 }
 
 static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
-	Enesim_Renderer *renderer;
+	void *object;
 
-	renderer = ender_element_renderer_get(e);
-	dprop->clear(renderer);
+	object = ender_element_object_get(e);
+	dprop->clear(object);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -339,7 +342,7 @@ void ender_descriptor_init(void)
 	_setters[ENDER_COLOR] = _ender_int32_set;
 	_setters[ENDER_STRING] = _ender_pointer_set;
 	_setters[ENDER_MATRIX] = _ender_pointer_set;
-	_setters[ENDER_RENDERER] = _ender_pointer_set;
+	_setters[ENDER_OBJECT] = _ender_pointer_set;
 	_setters[ENDER_SURFACE] = _ender_pointer_set;
 	_setters[ENDER_ENDER] = _ender_ender_set;
 	_setters[ENDER_LIST] = _ender_pointer_set;
@@ -355,7 +358,7 @@ void ender_descriptor_init(void)
 	_getters[ENDER_STRING] = _ender_pointer_get;
 	/* the special matrix case */
 	_getters[ENDER_MATRIX] = _ender_matrix_get;
-	_getters[ENDER_RENDERER] = _ender_pointer_get;
+	_getters[ENDER_OBJECT] = _ender_pointer_get;
 	_getters[ENDER_SURFACE] = _ender_pointer_get;
 	_getters[ENDER_ENDER] = _ender_pointer_get;
 	_getters[ENDER_LIST] = _ender_pointer_get;
@@ -370,7 +373,7 @@ void ender_descriptor_init(void)
 	_relative_accessors[ENDER_COLOR] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_STRING] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_MATRIX] = _ender_relative_pointer_set;
-	_relative_accessors[ENDER_RENDERER] = _ender_relative_pointer_set;
+	_relative_accessors[ENDER_OBJECT] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_SURFACE] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_ENDER] = _ender_relative_ender_set;
 	_relative_accessors[ENDER_LIST] = _ender_relative_pointer_set;

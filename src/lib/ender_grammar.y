@@ -47,10 +47,10 @@ static inline void _on_namespace(Ender_Parser *parser, const char *name)
 		parser->descriptor->on_namespace(parser->data, name);
 }
 
-static inline void _on_renderer(Ender_Parser *parser, const char *name, Ender_Descriptor_Type type, const char *parent)
+static inline void _on_object(Ender_Parser *parser, const char *name, Ender_Descriptor_Type type, const char *parent)
 {
-	if (parser->descriptor->on_renderer)
-		parser->descriptor->on_renderer(parser->data, name, type, parent);
+	if (parser->descriptor->on_object)
+		parser->descriptor->on_object(parser->data, name, type, parent);
 }
 
 static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Bool relative, Ender_Container *container)
@@ -85,7 +85,7 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 %token <vtype> T_MATRIX
 %token <vtype> T_STRUCT
 %token <vtype> T_UNION
-%token <vtype> T_RENDERER
+%token <vtype> T_OBJECT
 %token <vtype> T_ENDER
 %token <dtype> T_ABSTRACT
 %token <dtype> T_CLASS
@@ -101,7 +101,7 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 %type <dtype> definition
 %type <container> list_type
 %type <container> struct_union_type
-%type <s> renderer_inheritance
+%type <s> object_inheritance
 %type <list> types
 %type <type> type
 
@@ -137,7 +137,7 @@ definition_list
 	:
 	| struct definition_list
 	| union definition_list
-	| renderer definition_list
+	| object definition_list
 	;
 
 struct
@@ -178,10 +178,10 @@ union
 	}
 	;
 
-renderer
-	: definition T_INLINE_STRING renderer_inheritance
+object
+	: definition T_INLINE_STRING object_inheritance
 	{
-		_on_renderer(parser, $2, $1, $3);
+		_on_object(parser, $2, $1, $3);
 	}
 	'{' declaration_list '}' ';'
 	;
@@ -192,7 +192,7 @@ definition
 	| T_ABSTRACT { $$ = $1; }
 	;
 
-renderer_inheritance
+object_inheritance
 	: { $$ = NULL; }
 	| ':' T_INLINE_STRING { $$ = $2; }
 	;
@@ -217,7 +217,7 @@ basic_type
 	| T_DOUBLE { $$ = $1; }
 	| T_STRING { $$ = $1; }
 	| T_SURFACE { $$ = $1; }
-	| T_RENDERER { $$ = $1; }
+	| T_OBJECT { $$ = $1; }
 	| T_ENDER { $$ = $1; }
 	| T_MATRIX { $$ = $1; }
 	;
@@ -300,7 +300,15 @@ void ender_error(void *data, void *scanner, Ender_Parser *parser, const char *st
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data)
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_parser_parse(const char *file,
+		Ender_Parser_Descriptor *descriptor, void *data)
 {
 	Ender_Parser parser;
 	void *scanner;

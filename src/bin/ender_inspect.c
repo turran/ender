@@ -38,7 +38,7 @@ static void _container_compound_dump(Ender_Container *c, int level)
 		printf("\t");
 		for (j = 0; j < level; j++)
 			printf("   ");
-		printf("%s", ender_value_type_name_get(ender_container_type_get(sub)));
+		printf("%s", ender_value_type_string_to(ender_container_type_get(sub)));
 		if (name)
 			printf(" %s", name);
 
@@ -57,7 +57,7 @@ static void _container_compound_dump(Ender_Container *c, int level)
 
 static void _container_dump(Ender_Container *c, int level)
 {
-	printf("%s", ender_value_type_name_get(ender_container_type_get(c)));
+	printf("%s", ender_value_type_string_to(ender_container_type_get(c)));
 	if (ender_container_is_compound(c))
 		_container_compound_dump(c, level + 1);
 	printf("\n");
@@ -108,7 +108,7 @@ static void _descriptor_dump(const char *name)
 	}
 	eina_array_free(inheritance);
 	printf("Information:\n");
-	printf("\ttype = %s\n", ender_descriptor_type_name_get(ender_descriptor_type(ed)));
+	printf("\ttype = %s\n", ender_descriptor_type_string_to(ender_descriptor_type(ed)));
 	printf("Properties:\n");
 	ender_descriptor_property_list(ed, _prop_cb, ed);
 }

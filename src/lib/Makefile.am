@@ -25,7 +25,6 @@ ender_container.c \
 ender_constraint.c \
 ender_descriptor.c \
 ender_element.c \
-ender_generator.c \
 ender_grammar.y \
 ender_lexer.l \
 ender_loader.c \

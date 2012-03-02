@@ -117,21 +117,6 @@ void ender_namespace_shutdown(void);
 /* element */
 void ender_element_parent_set(Ender_Element *e, Ender_Element *parent);
 
-/* the parser */
-typedef struct _Ender_Parser_Descriptor
-{
-	/* using */
-	void (*on_using)(void *data, const char *file);
-	/* namespace */
-	void (*on_namespace)(void *data, const char *name);
-	/* renderer */
-	void (*on_renderer)(void *data, const char *name, Ender_Descriptor_Type type, const char *parent);
-	/* property */
-	void (*on_property)(void *data, const char *name, Eina_Bool relative, Ender_Container *container); 
-} Ender_Parser_Descriptor;
-
-Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data);
-
 /* the loader */
 void ender_loader_init(void);
 void ender_loader_shutdown(void);

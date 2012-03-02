@@ -9,7 +9,7 @@ namespace "enesim" {
 		double "y_scale";
 		color "color";
 		int "rop" [ "blend", "fill" ];
-		renderer "mask";
+		object "mask";
 	};
 };
 
@@ -18,12 +18,12 @@ namespace "enesim.renderer" {
 		int "draw_mode";
 		double "stroke_weight";
 		color "stroke_color";
-		renderer "stroke_renderer";
+		object "stroke_object";
 		int "stroke_location";
 		int "stroke_cap";
 		int "stroke_join";
 		color "fill_color";
-		renderer "fill_renderer";
+		object "fill_object";
 	};
 
 	class "line" : "shape" {
@@ -164,8 +164,8 @@ namespace "enesim.renderer" {
 	class "hswitch" : "renderer" {
 		uint "w";
 		uint "h";
-		renderer "left";
-		renderer "right";
+		object "left";
+		object "right";
 		double "step";
 	};
 
@@ -196,14 +196,14 @@ namespace "enesim.renderer" {
 	class "stripes" : "renderer" {
 		double "even_thickness";
 		color "even_color";
-		renderer "even_renderer";
+		object "even_object";
 		double "odd_thickness";
 		color "odd_color";
-		renderer "odd_renderer";
+		object "odd_object";
 	};
 
 	class "compound" : "renderer" {
-		[renderer] "layer";
+		[object] "layer";
 	};
 
 	struct "stop" {
@@ -237,7 +237,7 @@ namespace "enesim.renderer" {
 		double "width";
 		double "height";
 		int "repeat_mode";
-		renderer "source";
+		object "source";
 	};
 
 	class "background" : "renderer" {
@@ -246,13 +246,13 @@ namespace "enesim.renderer" {
 
 	class "transition" : "renderer" {
 		double "level";
-		renderer "source";
-		renderer "target";
+		object "source";
+		object "target";
 	};
 
 	class "clipper" : "renderer" {
 		double "width";
 		double "height";
-		renderer "content";
+		object "content";
 	};
 };

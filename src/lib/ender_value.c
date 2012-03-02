@@ -351,20 +351,20 @@ EAPI void * ender_value_union_get(Ender_Value *value, int *type)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer)
+EAPI void ender_value_object_set(Ender_Value *value, void *object)
 {
-	if (value->container->type != ENDER_RENDERER)
+	if (value->container->type != ENDER_OBJECT)
 		return;
-	value->data.ptr = renderer;
+	value->data.ptr = object;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value)
+EAPI void * ender_value_object_get(Ender_Value *value)
 {
-	if (value->container->type != ENDER_RENDERER)
+	if (value->container->type != ENDER_OBJECT)
 		return NULL;
 	return value->data.ptr;
 }

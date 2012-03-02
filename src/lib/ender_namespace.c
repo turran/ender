@@ -57,7 +57,7 @@ void ender_namespace_dump(Ender_Namespace *ns)
 		Ender_Descriptor_Type type;
 
 		type = ender_descriptor_type(descriptor);
-		printf("\t %s \"%s\" {\n", ender_descriptor_type_name_get(type), ender_descriptor_name_get(descriptor));
+		printf("\t %s \"%s\" {\n", ender_descriptor_type_string_to(type), ender_descriptor_name_get(descriptor));
 		printf("\t};\n");
 	}
 	printf("};\n");

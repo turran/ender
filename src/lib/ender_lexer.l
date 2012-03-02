@@ -65,9 +65,9 @@ matrix			{
 				yylval_param->vtype = ENDER_MATRIX;
 				return T_MATRIX;
 			}
-renderer		{
-				yylval_param->vtype = ENDER_RENDERER;
-				return T_RENDERER;
+object			{
+				yylval_param->vtype = ENDER_OBJECT;
+				return T_OBJECT;
 			}
 ender			{
 				yylval_param->vtype = ENDER_ENDER;

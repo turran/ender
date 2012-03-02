@@ -55,7 +55,7 @@
 			case ENDER_STRING:				\
 			case ENDER_SURFACE:				\
 			case ENDER_MATRIX:				\
-			case ENDER_RENDERER:				\
+			case ENDER_OBJECT:				\
 			case ENDER_ENDER:				\
 			case ENDER_LIST:				\
 			case ENDER_VALUE:				\
@@ -87,7 +87,7 @@
 			case ENDER_STRUCT:				\
 			case ENDER_STRING:				\
 			case ENDER_SURFACE:				\
-			case ENDER_RENDERER:				\
+			case ENDER_OBJECT:				\
 			case ENDER_ENDER:				\
 			case ENDER_LIST:				\
 			case ENDER_VALUE:				\
@@ -140,7 +140,7 @@ struct _Ender_Element
 {
 	EINA_MAGIC
 	Ender_Descriptor *descriptor;
-	Enesim_Renderer *renderer;
+	void *object;
 	Eina_Hash *listeners;
 	Ender_Element *parent;
 	Eina_Hash *properties;
@@ -150,7 +150,7 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 {
 	Ender_Element *ender;
 	Ender_New_Listener *listener;
-	Enesim_Renderer *renderer;
+	void *object;
 	Ender_Descriptor *desc;
 	Eina_List *l;
 
@@ -167,8 +167,8 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 		return NULL;
 	}
 
-	renderer = desc->create();
-	if (!renderer)
+	object = desc->create();
+	if (!object)
 	{
 		ERR("For some reason the creator for \"%s.%s\" failed", ns_name, name);
 		return NULL;
@@ -176,11 +176,13 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 
 	ender = calloc(1, sizeof(Ender_Element));
 	EINA_MAGIC_SET(ender, ENDER_MAGIC);
-	ender->renderer = renderer;
+	ender->object = object;
 	ender->descriptor = desc;
 	ender->listeners = eina_hash_string_superfast_new(NULL);
 	ender->properties = eina_hash_string_superfast_new(NULL);
-	enesim_renderer_private_set(renderer, "ender", ender);
+#if 0
+	enesim_object_private_set(object, "ender", ender);
+#endif
 	/* call the constructor callback */
 	EINA_LIST_FOREACH(_new_callbacks, l, listener)
 	{
@@ -271,7 +273,9 @@ EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const ch
 EAPI void ender_element_delete(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
-	enesim_renderer_unref(e->renderer);
+#if 0
+	enesim_object_unref(e->object);
+#endif
 	free(e);
 }
 
@@ -286,8 +290,10 @@ EAPI void * ender_element_data_set(Ender_Element *e, const char *key, void *data
 	if (!key) return NULL;
 
 	ENDER_MAGIC_CHECK(e);
-	old_data = enesim_renderer_private_get(e->renderer, key);
-	enesim_renderer_private_set(e->renderer, key, data);
+#if 0
+	old_data = enesim_object_private_get(e->object, key);
+	enesim_object_private_set(e->object, key, data);
+#endif
 
 	return old_data;
 }
@@ -301,7 +307,9 @@ EAPI void * ender_element_data_get(Ender_Element *e, const char *key)
 	if (!key) return NULL;
 
 	ENDER_MAGIC_CHECK(e);
-	return enesim_renderer_private_get(e->renderer, key);
+#if 0
+	return enesim_object_private_get(e->object, key);
+#endif
 }
 
 
@@ -768,14 +776,14 @@ EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Proper
 }
 
 /**
- * Get the enesim renderer associated with an ender
+ * Get the enesim object associated with an ender
  * @param e
  * @return
  */
-EAPI Enesim_Renderer * ender_element_renderer_get(Ender_Element *e)
+EAPI void * ender_element_object_get(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
-	return e->renderer;
+	return e->object;
 }
 
 /**
@@ -786,16 +794,6 @@ EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
 	return e->parent;
-}
-
-/**
- * Get the ender associated with an enesim renderer
- * @param r
- * @return
- */
-EAPI Ender_Element * ender_element_renderer_from(Enesim_Renderer *r)
-{
-	return enesim_renderer_private_get(r, "ender");
 }
 
 /**

@@ -46,7 +46,7 @@
 /**
  * @mainpage Ender
  * @section intro Introduction
- * Ender is a library that loads descriptions of enesim renderers and abstracts
+ * Ender is a library that loads descriptions of objects 
  * them into a collection of properties that are accesible through a common API.
  *
  * @section syntax Syntax
@@ -58,7 +58,7 @@
  *   }
  * }
  * Where PROPERTY can be one of the following:
- * uint | int | double | argb | color | surface | matrix | renderer | ender | LIST
+ * uint | int | double | argb | color | surface | matrix | object | ender | LIST
 
  * Where LIST is defined as:
  * (PROPERTY [, PROPERTY])
@@ -102,7 +102,7 @@ typedef enum _Ender_Value_Type
 	ENDER_ARGB,
 	ENDER_STRING,
 	ENDER_MATRIX,
-	ENDER_RENDERER,
+	ENDER_OBJECT,
 	ENDER_SURFACE,
 	ENDER_ENDER,
 	ENDER_POINTER,
@@ -193,8 +193,8 @@ EAPI void * ender_value_struct_get(Ender_Value *value);
 EAPI void ender_value_union_set(Ender_Value *value, int type, void *un);
 EAPI void * ender_value_union_get(Ender_Value *valu, int *type);
 
-EAPI void ender_value_renderer_set(Ender_Value *value, Enesim_Renderer *renderer);
-EAPI Enesim_Renderer * ender_value_renderer_get(Ender_Value *value);
+EAPI void ender_value_object_set(Ender_Value *value, void *object);
+EAPI void * ender_value_object_get(Ender_Value *value);
 
 EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender);
 EAPI Ender_Element * ender_value_ender_get(Ender_Value *value);
@@ -319,8 +319,7 @@ EAPI void ender_element_value_remove_simple(Ender_Element *e, const char *name, 
 
 EAPI void ender_element_value_clear(Ender_Element *e, const char *name);
 
-EAPI Enesim_Renderer * ender_element_renderer_get(Ender_Element *e);
-EAPI Ender_Element * ender_element_renderer_from(Enesim_Renderer *r);
+EAPI void * ender_element_object_get(Ender_Element *e);
 
 EAPI Ender_Element * ender_element_parent_get(Ender_Element *e);
 
@@ -384,9 +383,8 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
  * @defgroup Ender_Helper_Group Helper
  * @{
  */
-/* TODO rename this to _to_string(): we are not getting the name from the Type */
-EAPI const char * ender_value_type_name_get(Ender_Value_Type type);
-EAPI const char * ender_descriptor_type_name_get(Ender_Descriptor_Type type);
+EAPI const char * ender_value_type_string_to(Ender_Value_Type type);
+EAPI const char * ender_descriptor_type_string_to(Ender_Descriptor_Type type);
 
 /**
  * @}
@@ -398,6 +396,27 @@ typedef void (*Ender_Loader_Registry_Callback)(void *data);
 
 EAPI void ender_loader_load(const char *in);
 EAPI void ender_loader_registry_callback_add(Ender_Loader_Registry_Callback cb, void *data);
+
+/**
+ * @}
+ * @defgroup Ender_Parser_Group Parser
+ * @{
+ */
+
+typedef void (*Ender_Parser_On_Using)(void *data, const char *name);
+typedef void (*Ender_Parser_On_Namespace)(void *data, const char *name);
+typedef void (*Ender_Parser_On_Object)(void *data, const char *name, Ender_Descriptor_Type type, const char *parent);
+typedef void (*Ender_Parser_On_Property)(void *data, const char *name, Eina_Bool relative, Ender_Container *container); 
+
+typedef struct _Ender_Parser_Descriptor
+{
+	Ender_Parser_On_Using on_using;
+	Ender_Parser_On_Namespace on_namespace;
+	Ender_Parser_On_Object on_object;
+	Ender_Parser_On_Property on_property;
+} Ender_Parser_Descriptor;
+
+EAPI Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data);
 
 /**
  * @}

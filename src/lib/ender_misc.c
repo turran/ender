@@ -30,7 +30,7 @@
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * ender_descriptor_type_name_get(Ender_Descriptor_Type type)
+EAPI const char * ender_descriptor_type_string_to(Ender_Descriptor_Type type)
 {
 	switch (type)
 	{
@@ -49,7 +49,7 @@ EAPI const char * ender_descriptor_type_name_get(Ender_Descriptor_Type type)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * ender_value_type_name_get(Ender_Value_Type type)
+EAPI const char * ender_value_type_string_to(Ender_Value_Type type)
 {
 	switch (type)
 	{
@@ -74,8 +74,8 @@ EAPI const char * ender_value_type_name_get(Ender_Value_Type type)
 		case ENDER_MATRIX:
 		return "MATRIX";
 
-		case ENDER_RENDERER:
-		return "RENDERER";
+		case ENDER_OBJECT:
+		return "OBJECT";
 
 		case ENDER_SURFACE:
 		return "SURFACE";

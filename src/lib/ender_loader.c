@@ -348,7 +348,7 @@ static void _loader_on_namespace(void *data, const char *name)
 	thiz->namespace = _loader_namespace_new(name);
 }
 
-static void _loader_on_renderer(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
+static void _loader_on_object(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Loader *thiz;
 	Ender_Descriptor *parent_descriptor = NULL;
@@ -359,7 +359,7 @@ static void _loader_on_renderer(void *data, const char *name, Ender_Descriptor_T
 		parent_descriptor = ender_descriptor_find(parent);
 		if (!parent_descriptor)
 		{
-			ERR("No parent %s found for desriptor %s", parent, name);
+			ERR("No parent \"%s\" found for desriptor \"%s\"", parent, name);
 			return;
 		}
 	}
@@ -378,7 +378,7 @@ static void _loader_on_property(void *data, const char *name, Eina_Bool relative
 static Ender_Parser_Descriptor _loader_parser = {
 	/* on_using = */ _loader_on_using,
 	/* on_namespace = */ _loader_on_namespace,
-	/* on_renderer = */ _loader_on_renderer,
+	/* on_object = */ _loader_on_object,
 	/* on_property = */ _loader_on_property,
 };
 /*============================================================================*
