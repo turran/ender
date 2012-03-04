@@ -95,7 +95,10 @@ EAPI const char * ender_value_type_string_to(Ender_Value_Type type)
 		case ENDER_BOOL:
 		return "BOOL";
 
+		case ENDER_POINTER:
+		return "POINTER";
+
 		default:
-		return NULL;
+		return "UNKNOWN";
 	}
 }
