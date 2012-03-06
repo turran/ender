@@ -196,7 +196,7 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	fprintf(thiz->out, "\t\t\t\t);\n");
 	/* assign the property to the API available property if needed */
 	_property_name(pname, thiz->ns_name, thiz->name, name);
-	fprintf(thiz->out, "\t\tif (%s) %s = ep;\n", pname, pname);
+	fprintf(thiz->out, "\t\t%s = ep;\n", pname, pname);
 	/* close everything */
 	fprintf(thiz->out, "\t}\n");
 }
