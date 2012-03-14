@@ -153,7 +153,7 @@ static void _generator_on_renderer(void *data, const char *name, Ender_Descripto
 	if (type == ENDER_ABSTRACT)
 		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", NULL, parent, ENDER_%s);\n", thiz->name, ender_descriptor_type_string_to(type));
 	else
-		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", _%s_%s_new, parent, ENDER_%s);\n", thiz->name, thiz->ns_name, name, ender_descriptor_type_string_to(type));
+		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", ENDER_CREATOR(_%s_%s_new), parent, ENDER_%s);\n", thiz->name, thiz->ns_name, name, ender_descriptor_type_string_to(type));
 	fprintf(thiz->out, "\tif (!d) return;\n");
 	/* the properties */
 	//ender_descriptor_property_list(descriptor, _dump_property, descriptor);

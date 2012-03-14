@@ -218,7 +218,9 @@ EAPI void ender_value_unref(Ender_Value *thiz);
  * @{
  */
 typedef void (*Ender_List_Callback)(const char *name, void *data);
-typedef Enesim_Renderer * (*Ender_Creator)(void);
+typedef void * (*Ender_Creator)(void);
+
+#define ENDER_CREATOR(f) ((Ender_Creator)(f))
 
 EAPI void ender_namespace_list(Ender_List_Callback cb, void *data);
 EAPI Ender_Namespace * ender_namespace_new(const char *name);
