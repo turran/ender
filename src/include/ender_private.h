@@ -115,7 +115,6 @@ void ender_namespace_init(void);
 void ender_namespace_shutdown(void);
 
 /* element */
-void ender_element_parent_set(Ender_Element *e, Ender_Element *parent);
 
 /* the loader */
 void ender_loader_init(void);

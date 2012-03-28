@@ -80,13 +80,6 @@ static inline void _value_set(Ender_Property *p, Ender_Element *e, Ender_Value *
 		void *object;
 
 		object = ender_element_object_get(e);
-		if (v->container->type == ENDER_ENDER)
-		{
-			/* This functions sets the parent */
-			ender_element_parent_set(v->data.ptr, e);
-		}
-
-
 		_setters[v->container->type](v, acc, object);
 	}
 

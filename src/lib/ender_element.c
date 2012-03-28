@@ -142,7 +142,6 @@ struct _Ender_Element
 	Ender_Descriptor *descriptor;
 	void *object;
 	Eina_Hash *listeners;
-	Ender_Element *parent;
 	Eina_Hash *properties;
 };
 
@@ -193,6 +192,34 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 
 }
 
+static Ender_Property * _ender_element_property_get_simple(Ender_Element *e,
+		const char *name)
+{
+	Ender_Property *prop;
+
+	/* first check dynamic properties */
+	prop = eina_hash_find(e->properties, name);
+	if (prop) return prop;
+	/* now the static properties */
+	prop = ender_descriptor_property_get(e->descriptor, name);
+	return prop;
+}
+
+static Ender_Property * _ender_element_property_parent_get(Ender_Element *e)
+{
+	Ender_Property *prop;
+	Ender_Value_Type type;
+
+	prop = _ender_element_property_get_simple(e, "parent");
+	if (!prop) return prop;
+
+	type = ender_property_type_get(prop);
+	if (type != ENDER_ENDER)
+		return prop;
+
+	return prop;
+}
+
 static void _property_is_relative_cb(Ender_Property *prop, void *data)
 {
 	Ender_Element_Property_List_Data *new_data = data;
@@ -200,7 +227,6 @@ static void _property_is_relative_cb(Ender_Property *prop, void *data)
 	if (ender_property_is_relative(prop))
 		new_data->cb(prop, new_data->data);
 }
-
 /*----------------------------------------------------------------------------*
  *                        The property interface                              *
  *----------------------------------------------------------------------------*/
@@ -241,10 +267,6 @@ static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void ender_element_parent_set(Ender_Element *e, Ender_Element *parent)
-{
-	e->parent = parent;
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -623,22 +645,24 @@ EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *n
 EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *name)
 {
 	Ender_Property *prop;
+	Ender_Element *parent;
 
 	ENDER_MAGIC_CHECK(e);
-	/* first check dynamic properties */
-	prop = eina_hash_find(e->properties, name);
+
+	/* the simplest case */
+	prop = _ender_element_property_get_simple(e, name);
 	if (prop) return prop;
-	/* now the static properties */
-	prop = ender_descriptor_property_get(e->descriptor, name);
-	if (prop) return prop;
-	/* now check relative proprties */
-	if (!e->parent)
+
+	/* now check relative properties */
+	parent = ender_element_parent_get(e);
+	if (!parent)
 	{
 		WRN("Property %s not found and it has no parent", name);
 		return NULL;
 	}
 
-	prop = ender_descriptor_property_get(e->parent->descriptor, name);
+	/* get the property from the parent */
+	prop = ender_element_property_get(parent, name);
 	if (!prop)
 	{
 		WRN("Parent does not have the property %s", name);
@@ -660,6 +684,7 @@ EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *n
 EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Callback cb, void *data)
 {
 	Ender_Element_Property_List_Data new_data;
+	Ender_Element *parent;
 	Ender_Descriptor *desc;
 
 	ENDER_MAGIC_CHECK(e);
@@ -672,10 +697,12 @@ EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Call
 	}
 	while ((desc = ender_descriptor_parent(desc)));
 	/* now let's list the relative properties from the parent */
-	if (!e->parent) return;
+	parent = ender_element_parent_get(e);
+	if (!parent) return;
+
 	new_data.data = data;
 	new_data.cb = cb;
-	ender_descriptor_property_list(e->parent->descriptor, _property_is_relative_cb, &new_data);
+	ender_element_property_list(parent, _property_is_relative_cb, &new_data);
 }
 
 /**
@@ -792,8 +819,15 @@ EAPI void * ender_element_object_get(Ender_Element *e)
  */
 EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
 {
+	Ender_Property *prop;
+	Ender_Element *parent;
+
 	ENDER_MAGIC_CHECK(e);
-	return e->parent;
+
+	prop = _ender_element_property_parent_get(e);
+	ender_element_property_value_get(e, prop, &parent, NULL); 
+
+	return parent;
 }
 
 /**
