@@ -824,8 +824,12 @@ EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
 
 	ENDER_MAGIC_CHECK(e);
 
+	/* FIXME right now we only support parents that are enders
+	 * but we also need parents that are objects ...
+	 */
 	prop = _ender_element_property_parent_get(e);
-	ender_element_property_value_get(e, prop, &parent, NULL); 
+	if (!prop) return NULL;
+	ender_element_property_value_get(e, prop, &parent, NULL);
 
 	return parent;
 }
