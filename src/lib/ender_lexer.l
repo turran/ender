@@ -22,6 +22,7 @@ typedef struct _Ender_Type
 #define YY_NO_UNISTD_H
 %}
 
+%x C_COMMENT
 _operator [\[\]{}.,;=\:]
 
 %%
@@ -124,5 +125,8 @@ using			return T_USING;
 {_operator}		{ return *yytext; }
 \n                      /* ignore end of line */
 [ \t]+                  /* ignore whitespace */
+"/*"            { BEGIN(C_COMMENT); }
+<C_COMMENT>"*/" { BEGIN(INITIAL); }
+<C_COMMENT>.    { }
 
 %%
