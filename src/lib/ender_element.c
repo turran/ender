@@ -52,6 +52,7 @@
 			break;						\
 									\
 			case ENDER_STRUCT:				\
+			case ENDER_UNION:				\
 			case ENDER_STRING:				\
 			case ENDER_SURFACE:				\
 			case ENDER_MATRIX:				\
@@ -85,6 +86,7 @@
 			break;						\
 									\
 			case ENDER_STRUCT:				\
+			case ENDER_UNION:				\
 			case ENDER_STRING:				\
 			case ENDER_SURFACE:				\
 			case ENDER_OBJECT:				\
@@ -749,6 +751,52 @@ EAPI void ender_element_property_value_set_simple(Ender_Element *e, Ender_Proper
 	ENDER_MAGIC_CHECK(e);
 
 	ender_property_element_value_set(prop, e, value);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_element_property_value_add_valist(Ender_Element *e, Ender_Property *prop, va_list var_args)
+{
+	ENDER_MAGIC_CHECK(e);
+
+	while (prop)
+	{
+		Ender_Value v;
+		Ender_Container *ec;
+
+		ec = ender_property_container_get(prop);
+		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ender_property_element_value_add(prop, e, &v);
+		prop = va_arg(var_args, Ender_Property *);
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_element_property_value_add(Ender_Element *e, Ender_Property *prop, ...)
+{
+	va_list ap;
+
+	ENDER_MAGIC_CHECK(e);
+
+	va_start(ap, prop);
+	ender_element_property_value_add_valist(e, prop, ap);
+	va_end(ap);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_element_property_value_add_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value)
+{
+	ENDER_MAGIC_CHECK(e);
+
+	ender_property_element_value_add(prop, e, value);
 }
 
 /**

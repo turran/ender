@@ -302,6 +302,9 @@ EAPI void ender_element_property_value_get_valist(Ender_Element *e, Ender_Proper
 EAPI void ender_element_property_value_get(Ender_Element *e, Ender_Property *prop, ...);
 EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value);
 
+EAPI void ender_element_property_value_add_valist(Ender_Element *e, Ender_Property *prop, va_list var_args);
+EAPI void ender_element_property_value_add(Ender_Element *e, Ender_Property *prop, ...);
+EAPI void ender_element_property_value_add_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value);
 
 EAPI void ender_element_value_get(Ender_Element *e, const char *name, ...);
 EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_list var_args);
