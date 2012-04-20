@@ -767,6 +767,9 @@ EAPI void ender_element_property_value_add_valist(Ender_Element *e, Ender_Proper
 		Ender_Container *ec;
 
 		ec = ender_property_container_get(prop);
+		if (ender_container_type_get(ec) != ENDER_LIST) break;
+		ec = ender_container_compound_get(ec, 0);
+
 		ENDER_VALUE_COLLECT(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
 		prop = va_arg(var_args, Ender_Property *);
