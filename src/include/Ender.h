@@ -379,6 +379,12 @@ typedef struct _Ender_Event_Mutation
 	Ender_Event_Mutation_Type type;
 } Ender_Event_Mutation;
 
+typedef struct _Ender_Event_Mutation_Property
+{
+	const Ender_Value *value;
+	Ender_Event_Mutation_Type type;
+} Ender_Event_Mutation_Property;
+
 EAPI void ender_event_listener_add(Ender_Element *e, const char *event_name, Ender_Event_Callback cb, void *data);
 EAPI void ender_event_listener_remove(Ender_Element *e, const char *event_name, Ender_Event_Callback cb);
 EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *event_data);

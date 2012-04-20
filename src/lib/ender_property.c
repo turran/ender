@@ -32,6 +32,27 @@ struct _Ender_Property
 	Eina_Bool relative;
 	void *data;
 };
+
+static void _ender_property_mutation_dispatch(Ender_Element *e,
+		Ender_Value *v,
+		Ender_Property *p,
+		Ender_Event_Mutation_Type type)
+{
+	Ender_Event_Mutation ev_mutation;
+	Ender_Event_Mutation_Property ev_prop;
+	char ev_prop_name[PATH_MAX];
+
+	ev_mutation.name = p->name;
+	ev_mutation.value = v;
+	ev_mutation.type = type;
+	ender_event_dispatch(e, "Mutation", &ev_mutation);
+
+	ev_prop.value = v;
+	ev_prop.type = type;
+	strcpy(ev_prop_name, "Mutation:");
+	strcat(ev_prop_name, p->name);
+	ender_event_dispatch(e, ev_prop_name, &ev_prop);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -64,15 +85,10 @@ Ender_Property * ender_property_new(const char *name,
 void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v)
 {
-	Ender_Event_Mutation event_data;
-
 	if (!ep->set) return;
 	ep->set(ep, e, v, ep->data);
 
-	event_data.name = ep->name;
-	event_data.value = v;
-	event_data.type = ENDER_EVENT_MUTATION_SET;
-	ender_event_dispatch(e, "Mutation", &event_data);
+	_ender_property_mutation_dispatch(e, v, ep, ENDER_EVENT_MUTATION_SET);
 }
 
 void ender_property_element_value_get(Ender_Property *ep, Ender_Element *e,
@@ -85,42 +101,27 @@ void ender_property_element_value_get(Ender_Property *ep, Ender_Element *e,
 void ender_property_element_value_add(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v)
 {
-	Ender_Event_Mutation event_data;
-
 	if (!ep->add) return;
 	ep->add(ep, e, v, ep->data);
 
-	event_data.name = ep->name;
-	event_data.value = v;
-	event_data.type = ENDER_EVENT_MUTATION_ADD;
-	ender_event_dispatch(e, "Mutation", &event_data);
+	_ender_property_mutation_dispatch(e, v, ep, ENDER_EVENT_MUTATION_ADD);
 }
 
 void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v)
 {
-	Ender_Event_Mutation event_data;
-
 	if (!ep->remove) return;
 	ep->remove(ep, e, v, ep->data);
 
-	event_data.name = ep->name;
-	event_data.value = v;
-	event_data.type = ENDER_EVENT_MUTATION_REMOVE;
-	ender_event_dispatch(e, "Mutation", &event_data);
+	_ender_property_mutation_dispatch(e, v, ep, ENDER_EVENT_MUTATION_REMOVE);
 }
 
 void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
 {
-	Ender_Event_Mutation event_data;
-
 	if (!ep->clear) return;
 	ep->clear(ep, e, ep->data);
 
-	event_data.name = ep->name;
-	event_data.value = NULL;
-	event_data.type = ENDER_EVENT_MUTATION_CLEAR;
-	ender_event_dispatch(e, "Mutation", &event_data);
+	_ender_property_mutation_dispatch(e, NULL, ep, ENDER_EVENT_MUTATION_CLEAR);
 }
 /*============================================================================*
  *                                   API                                      *
