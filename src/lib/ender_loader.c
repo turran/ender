@@ -265,6 +265,7 @@ void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_D
 	Ender_Add add = NULL;
 	Ender_Remove remove = NULL;
 	Ender_Clear clear = NULL;
+	Ender_Is_Set is_set = NULL;
 	char prefix[PATH_MAX];
 	char func_name[PATH_MAX];
 	const char *edesc_name;
@@ -292,6 +293,14 @@ void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_D
 	if (!set)
 	{
 		WRN("No setter %s for type %s", func_name, edesc_name);
+	}
+	/* the is_set */
+	strncpy(func_name, prefix, PATH_MAX);
+	strncat(func_name, "is_set", PATH_MAX);
+	is_set = dlsym(namespace->lib->dl_handle, func_name);
+	if (!is_set)
+	{
+		DBG("No is_set %s for type %s", func_name, edesc_name);
 	}
 	/* in case of a compound property, also try to get the add/remove/clear */
 	if (prop->type == ENDER_LIST)
@@ -321,7 +330,7 @@ void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_D
 			WRN("No clear %s for type %s", func_name, edesc_name);
 		}
 	}
-	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear, rel);
+	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear, is_set, rel);
 }
 
 /*----------------------------------------------------------------------------*

@@ -33,6 +33,7 @@ typedef struct _Ender_Descriptor_Property
 	Ender_Add add;
 	Ender_Remove remove;
 	Ender_Clear clear;
+	Ender_Is_Set is_set;
 } Ender_Descriptor_Property;
 
 typedef void (*Ender_Value_Accessor)(Ender_Value *v, Ender_Accessor acc,
@@ -153,17 +154,19 @@ static void _ender_relative_matrix_set(Ender_Value *v, Ender_Setter set,
 static void _ender_pointer_get(Ender_Value *v, Ender_Getter get,
 		void *e)
 {
-	get(e, &v->data.ptr);
+	/* FIXME here it all depends if the struct is alloc'ed or not */
+	//get(e, &v->data.ptr);
+	get(e, v->data.ptr);
 }
 
-/* used for string, surface, struct, union, matrix, object */
+/* used for string, surface, struct, union, object */
 static void _ender_pointer_set(Ender_Value *v, Ender_Setter set,
 		void *e)
 {
 	set(e, v->data.ptr);
 }
 
-/* used for string, surface, struct, union, matrix, object */
+/* used for string, surface, struct, union, object */
 static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
 		Ender_Element *e, void *parent)
 {
@@ -246,6 +249,15 @@ static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
 	object = ender_element_object_get(e);
 	dprop->clear(object);
 }
+
+static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *data)
+{
+	Ender_Descriptor_Property *dprop = data;
+	void *object;
+
+	object = ender_element_object_get(e);
+	return dprop->is_set(object);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -283,6 +295,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
 		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
 		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
+		Ender_Is_Set is_set,
 		Eina_Bool relative)
 {
 	Ender_Property *prop;
@@ -300,6 +313,7 @@ Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const ch
 	dprop->add = add;
 	dprop->remove = remove;
 	dprop->clear = clear;
+	dprop->clear = clear;
 
 	prop = ender_property_new(name, ec,
 			get ? _property_get : NULL,
@@ -307,6 +321,7 @@ Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const ch
 			add ? _property_add : NULL,
 			remove ? _property_remove : NULL,
 			clear ? _property_clear : NULL,
+			is_set ? _property_is_set : NULL,
 			relative, dprop);
 	eina_ordered_hash_add(edesc->properties, name, prop);
 	DBG("Property %s added to %s", name, edesc->name);
@@ -487,6 +502,25 @@ EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_Li
 		cb(prop, data);
 	}
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data)
+{
+	Ender_Property *prop;
+	Ender_Descriptor *ed;
+	Eina_List *l;
+
+	ed = thiz;
+	while (ed)
+	{
+		ender_descriptor_property_list(ed, cb, data);
+		ed = ed->parent;
+	}
+}
+
 
 /**
  * To be documented

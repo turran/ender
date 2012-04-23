@@ -121,6 +121,7 @@ typedef enum _Ender_Property_Flag
 	ENDER_ADD = (1 << 2),
 	ENDER_REMOVE = (1 << 3),
 	ENDER_CLEAR = (1 << 4),
+	ENDER_IS_SET = (1 << 5),
 } Ender_Property_Flag;
 
 /*
@@ -158,6 +159,7 @@ typedef void (*Ender_Value_Free)(Ender_Value *value, void *data);
 EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type);
 EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type);
 EAPI Ender_Value * ender_value_new_container_from(Ender_Container *container);
+Ender_Value * ender_value_new_container_static_from(Ender_Container *ec);
 EAPI Ender_Container * ender_value_container_get(Ender_Value *value);
 EAPI Ender_Value_Type ender_value_type_get(Ender_Value *value);
 
@@ -235,13 +237,15 @@ EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
  * @defgroup Ender_Descriptor_Group Descriptor
  * @{
  */
-typedef void (*Ender_Accessor)(Enesim_Renderer *r, ...);
+typedef void (*Ender_Accessor)(void *o, ...);
+typedef Eina_Bool (*Ender_Is_Set)(void *o);
 typedef Ender_Accessor Ender_Getter;
 typedef Ender_Accessor Ender_Setter;
 typedef Ender_Accessor Ender_Add;
 typedef Ender_Accessor Ender_Remove;
-typedef void (*Ender_Clear)(Enesim_Renderer *r);
+typedef void (*Ender_Clear)(void *o);
 
+#define ENDER_IS_SET(f) ((Ender_Is_Set)(f))
 #define ENDER_GETTER(f) ((Ender_Getter)(f))
 #define ENDER_SETTER(f) ((Ender_Setter)(f))
 #define ENDER_ADD(f) ((Ender_Add)(f))
@@ -252,11 +256,18 @@ typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
 EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns);
-Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
+Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
+		const char *name,
+		Ender_Container *ec,
+		Ender_Getter get,
+		Ender_Setter set,
+		Ender_Add add,
+		Ender_Remove remove,
+		Ender_Clear clear,
+		Ender_Is_Set is_set,
 		Eina_Bool relative);
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
+EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
 EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);
@@ -270,6 +281,7 @@ EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed);
  * @{
  */
 typedef void (*Ender_Element_Accessor)(Ender_Element *e, Ender_Property *ep, Ender_Value *v, void *data);
+typedef Eina_Bool (*Ender_Element_Is_Set)(Ender_Element *e, Ender_Property *ep, void *data);
 typedef Ender_Element_Accessor Ender_Element_Getter;
 typedef Ender_Element_Accessor Ender_Element_Setter;
 typedef Ender_Element_Accessor Ender_Element_Add;
@@ -291,6 +303,7 @@ EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *n
 		Ender_Element_Add add,
 		Ender_Element_Remove remove,
 		Ender_Element_Clear clear,
+		Ender_Element_Is_Set is_set,
 		Eina_Bool relative, void *data);
 EAPI Ender_Property * ender_element_property_get(Ender_Element *e, const char *name);
 EAPI void ender_element_property_list(Ender_Element *e, Ender_Property_List_Callback cb, void *data);
@@ -300,15 +313,17 @@ EAPI void ender_element_property_value_set_simple(Ender_Element *e, Ender_Proper
 
 EAPI void ender_element_property_value_get_valist(Ender_Element *e, Ender_Property *prop, va_list va_args);
 EAPI void ender_element_property_value_get(Ender_Element *e, Ender_Property *prop, ...);
-EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value);
+EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Property *prop, Ender_Value **value);
 
 EAPI void ender_element_property_value_add_valist(Ender_Element *e, Ender_Property *prop, va_list var_args);
 EAPI void ender_element_property_value_add(Ender_Element *e, Ender_Property *prop, ...);
 EAPI void ender_element_property_value_add_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value);
 
+EAPI Eina_Bool ender_element_property_value_is_set(Ender_Element *e, Ender_Property *prop);
+
 EAPI void ender_element_value_get(Ender_Element *e, const char *name, ...);
 EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_list var_args);
-EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, Ender_Value *value);
+EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, Ender_Value **value);
 
 EAPI void ender_element_value_set(Ender_Element *e, const char *name, ...);
 EAPI void ender_element_value_set_valist(Ender_Element *e, const char *name, va_list var_args);
@@ -323,6 +338,8 @@ EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, 
 EAPI void ender_element_value_remove_simple(Ender_Element *e, const char *name, Ender_Value *value);
 
 EAPI void ender_element_value_clear(Ender_Element *e, const char *name);
+
+EAPI Eina_Bool ender_element_value_is_set(Ender_Element *e, const char *name);
 
 EAPI void * ender_element_object_get(Ender_Element *e);
 

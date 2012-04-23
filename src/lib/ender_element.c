@@ -135,6 +135,7 @@ typedef struct _Ender_Element_Property
 	Ender_Element_Add add;
 	Ender_Element_Remove remove;
 	Ender_Element_Clear clear;
+	Ender_Element_Is_Set is_set;
 	void *data;
 } Ender_Element_Property;
 
@@ -265,6 +266,13 @@ static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
 	Ender_Element_Property *eprop = data;
 
 	eprop->clear(e, p, eprop->data);
+}
+
+static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *data)
+{
+	Ender_Element_Property *eprop = data;
+
+	return eprop->is_set(e, p, eprop->data);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -491,6 +499,21 @@ EAPI void ender_element_value_clear(Ender_Element *e, const char *name)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Eina_Bool ender_element_value_is_set(Ender_Element *e, const char *name)
+{
+	Ender_Property *prop;
+	Ender_Container *ec;
+
+	ENDER_MAGIC_CHECK(e);
+	prop = ender_descriptor_property_get(e->descriptor, name);
+	if (!prop) return EINA_FALSE;
+	return ender_property_element_value_is_set(prop, e);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_element_value_get_valist(Ender_Element *e, const char *name, va_list var_args)
 {
 	ENDER_MAGIC_CHECK(e);
@@ -529,7 +552,7 @@ EAPI void ender_element_value_get(Ender_Element *e, const char *name, ...)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, Ender_Value *value)
+EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, Ender_Value **value)
 {
 	Ender_Property *prop;
 
@@ -538,7 +561,8 @@ EAPI void ender_element_value_get_simple(Ender_Element *e, const char *name, End
 
 	prop = ender_descriptor_property_get(e->descriptor, name);
 	if (!prop) return;
-	ender_property_element_value_get(prop, e, value);
+
+	ender_element_property_value_get_simple(e, prop, value);
 }
 
 /**
@@ -607,6 +631,7 @@ EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *n
 		Ender_Element_Add add,
 		Ender_Element_Remove remove,
 		Ender_Element_Clear clear,
+		Ender_Element_Is_Set is_set,
 		Eina_Bool relative, void *data)
 {
 	Ender_Property *prop;
@@ -625,6 +650,7 @@ EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *n
 	eprop->add = add;
 	eprop->remove = remove;
 	eprop->clear = clear;
+	eprop->is_set = is_set;
 	eprop->data = data;
 
 	prop = ender_property_new(name, ec,
@@ -633,6 +659,7 @@ EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *n
 			_property_add,
 			_property_remove,
 			_property_clear,
+			_property_is_set,
 			relative, eprop);
 	eina_hash_add(e->properties, name, prop);
 	DBG("Property %s added", name);
@@ -844,14 +871,35 @@ EAPI void ender_element_property_value_get(Ender_Element *e, Ender_Property *pro
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Property *prop, Ender_Value *value)
+EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Property *prop, Ender_Value **value)
 {
 	ENDER_MAGIC_CHECK(e);
 	if (!prop) return;
 	if (!value) return;
 
-	ender_property_element_value_get(prop, e, value);
+	if (!*value)
+	{
+		Ender_Container *ec;
+
+		ec = ender_property_container_get(prop);
+		*value = ender_value_new_container_static_from(ec);
+	}
+
+	ender_property_element_value_get(prop, e, *value);
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_element_property_value_is_set(Ender_Element *e, Ender_Property *prop)
+{
+	ENDER_MAGIC_CHECK(e);
+	if (!prop) return;
+
+	return ender_property_element_value_is_set(prop, e);
+}
+
 
 /**
  * Get the enesim object associated with an ender

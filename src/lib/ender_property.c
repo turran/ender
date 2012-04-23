@@ -28,6 +28,7 @@ struct _Ender_Property
 	Ender_Property_Add add;
 	Ender_Property_Remove remove;
 	Ender_Property_Clear clear;
+	Ender_Property_Is_Set is_set;
 	Ender_Container *container;
 	Eina_Bool relative;
 	void *data;
@@ -63,6 +64,7 @@ Ender_Property * ender_property_new(const char *name,
 		Ender_Property_Add add,
 		Ender_Property_Remove remove,
 		Ender_Property_Clear clear,
+		Ender_Property_Is_Set is_set,
 		Eina_Bool relative, void *data)
 {
 	Ender_Property *prop;
@@ -123,6 +125,12 @@ void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
 
 	_ender_property_mutation_dispatch(e, NULL, ep, ENDER_EVENT_MUTATION_CLEAR);
 }
+
+Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element *e)
+{
+	if (!ep->is_set) return EINA_TRUE;
+	ep->is_set(ep, e, ep->data);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -175,6 +183,7 @@ EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p)
 	if (p->add) flags |= ENDER_ADD;
 	if (p->remove) flags |= ENDER_REMOVE;
 	if (p->clear) flags |= ENDER_CLEAR;
+	if (p->is_set) flags |= ENDER_IS_SET;
 
 	return flags;
 }

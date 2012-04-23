@@ -73,6 +73,27 @@ EAPI Ender_Value * ender_value_new_container_from(Ender_Container *ec)
 	return _ender_value_new(ec);
 }
 
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
+{
+	Ender_Value *thiz;
+
+	thiz = _ender_value_new(ec);
+	if (ec->type == ENDER_UNION || ec->type == ENDER_STRUCT)
+	{
+		size_t size;
+
+		size = ender_container_compound_size_get(ec);
+		thiz->data.ptr = calloc(1, size);
+		thiz->owned = EINA_TRUE;
+	}
+	return thiz;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed
