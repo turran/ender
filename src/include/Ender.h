@@ -163,53 +163,53 @@ Ender_Value * ender_value_new_container_static_from(Ender_Container *ec);
 EAPI Ender_Container * ender_value_container_get(Ender_Value *value);
 EAPI Ender_Value_Type ender_value_type_get(Ender_Value *value);
 
-EAPI Eina_Bool ender_value_bool_get(Ender_Value *value);
 EAPI void ender_value_bool_set(Ender_Value *value, Eina_Bool boolean);
+EAPI Eina_Bool ender_value_bool_get(const Ender_Value *value);
 
 EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32);
-EAPI int32_t ender_value_int32_get(Ender_Value *value);
+EAPI int32_t ender_value_int32_get(const Ender_Value *value);
 
 EAPI void ender_value_uint32_set(Ender_Value *value, uint32_t u32);
-EAPI uint32_t ender_value_uint32_get(Ender_Value *value);
+EAPI uint32_t ender_value_uint32_get(const Ender_Value *value);
 
 EAPI void ender_value_double_set(Ender_Value *value, double d);
-EAPI double ender_value_double_get(Ender_Value *value);
+EAPI double ender_value_double_get(const Ender_Value *value);
 
 EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb);
-EAPI Enesim_Argb ender_value_argb_get(Ender_Value *value);
+EAPI Enesim_Argb ender_value_argb_get(const Ender_Value *value);
 
 EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color argb);
-EAPI Enesim_Color ender_value_color_get(Ender_Value *value);
+EAPI Enesim_Color ender_value_color_get(const Ender_Value *value);
 
 EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix);
 EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix *matrix);
-EAPI Enesim_Matrix * ender_value_matrix_get(Ender_Value *value);
+EAPI Enesim_Matrix * ender_value_matrix_get(const Ender_Value *value);
 
 EAPI void ender_value_string_set(Ender_Value *value, char * string);
 EAPI void ender_value_static_string_set(Ender_Value *value, const char * string);
-EAPI char * ender_value_string_get(Ender_Value *value);
+EAPI const char * ender_value_string_get(const Ender_Value *value);
 
 EAPI void ender_value_struct_set(Ender_Value *value, void * structure);
-EAPI void * ender_value_struct_get(Ender_Value *value);
+EAPI void * ender_value_struct_get(const Ender_Value *value);
 
 EAPI void ender_value_union_set(Ender_Value *value, int type, void *un);
-EAPI void * ender_value_union_get(Ender_Value *valu, int *type);
+EAPI void * ender_value_union_get(const Ender_Value *value, int *type);
 
 EAPI void ender_value_object_set(Ender_Value *value, void *object);
-EAPI void * ender_value_object_get(Ender_Value *value);
+EAPI void * ender_value_object_get(const Ender_Value *value);
 
 EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender);
-EAPI Ender_Element * ender_value_ender_get(Ender_Value *value);
+EAPI Ender_Element * ender_value_ender_get(const Ender_Value *value);
 
 EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface);
-EAPI Enesim_Surface * ender_value_surface_get(Ender_Value *value);
+EAPI Enesim_Surface * ender_value_surface_get(const Ender_Value *value);
 
 EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Free free_cb, void *user_data);
-EAPI void * ender_value_pointer_get(Ender_Value *value);
+EAPI void * ender_value_pointer_get(const Ender_Value *value);
 
 EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child);
 EAPI void ender_value_list_set(Ender_Value *value, Eina_List *list);
-EAPI const Eina_List * ender_value_list_get(Ender_Value *value);
+EAPI const Eina_List * ender_value_list_get(const Ender_Value *value);
 
 EAPI Ender_Value * ender_value_ref(Ender_Value *thiz);
 EAPI void ender_value_unref(Ender_Value *thiz);

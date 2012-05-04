@@ -143,7 +143,7 @@ EAPI void ender_value_int32_set(Ender_Value *value, int32_t i32)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int32_t ender_value_int32_get(Ender_Value *value)
+EAPI int32_t ender_value_int32_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_INT32)
 		return 0;
@@ -165,7 +165,7 @@ EAPI void ender_value_uint32_set(Ender_Value *value, uint32_t u32)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI uint32_t ender_value_uint32_get(Ender_Value *value)
+EAPI uint32_t ender_value_uint32_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_UINT32)
 		return 0;
@@ -187,7 +187,7 @@ EAPI void ender_value_double_set(Ender_Value *value, double d)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI double ender_value_double_get(Ender_Value *value)
+EAPI double ender_value_double_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_DOUBLE)
 		return 0;
@@ -209,7 +209,7 @@ EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Argb ender_value_argb_get(Ender_Value *value)
+EAPI Enesim_Argb ender_value_argb_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_ARGB)
 		return 0;
@@ -231,7 +231,7 @@ EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color color)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Color ender_value_color_get(Ender_Value *value)
+EAPI Enesim_Color ender_value_color_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_COLOR)
 		return 0;
@@ -271,7 +271,7 @@ EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Matrix * ender_value_matrix_get(Ender_Value *value)
+EAPI Enesim_Matrix * ender_value_matrix_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_MATRIX)
 		return NULL;
@@ -306,7 +306,7 @@ EAPI void ender_value_static_string_set(Ender_Value *value, const char * string)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI char * ender_value_string_get(Ender_Value *value)
+EAPI const char * ender_value_string_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_STRING)
 		return NULL;
@@ -328,7 +328,7 @@ EAPI void ender_value_struct_set(Ender_Value *value, void *structure)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void * ender_value_struct_get(Ender_Value *value)
+EAPI void * ender_value_struct_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_STRUCT)
 		return NULL;
@@ -355,7 +355,7 @@ EAPI void ender_value_union_set(Ender_Value *value, int type, void *un)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void * ender_value_union_get(Ender_Value *value, int *type)
+EAPI void * ender_value_union_get(const Ender_Value *value, int *type)
 {
 	int *d;
 	if (value->container->type != ENDER_UNION)
@@ -383,7 +383,7 @@ EAPI void ender_value_object_set(Ender_Value *value, void *object)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void * ender_value_object_get(Ender_Value *value)
+EAPI void * ender_value_object_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_OBJECT)
 		return NULL;
@@ -405,7 +405,7 @@ EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Element * ender_value_ender_get(Ender_Value *value)
+EAPI Ender_Element * ender_value_ender_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_ENDER)
 		return NULL;
@@ -427,7 +427,7 @@ EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Surface * ender_value_surface_get(Ender_Value *value)
+EAPI Enesim_Surface * ender_value_surface_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_SURFACE)
 		return NULL;
@@ -451,7 +451,7 @@ EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Fre
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void * ender_value_pointer_get(Ender_Value *value)
+EAPI void * ender_value_pointer_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_POINTER)
 		return NULL;
@@ -495,7 +495,7 @@ EAPI void ender_value_list_set(Ender_Value *value, Eina_List *list)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const Eina_List * ender_value_list_get(Ender_Value *value)
+EAPI const Eina_List * ender_value_list_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_LIST)
 		return NULL;
@@ -506,7 +506,7 @@ EAPI const Eina_List * ender_value_list_get(Ender_Value *value)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool ender_value_bool_get(Ender_Value *value)
+EAPI Eina_Bool ender_value_bool_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_BOOL)
 		return EINA_FALSE;
