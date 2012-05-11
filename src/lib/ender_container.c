@@ -33,9 +33,8 @@ static Ender_Container * _ender_container_new(Ender_Value_Type t)
 {
 	Ender_Container *ec;
 
-	ec = malloc(sizeof(Ender_Container));
+	ec = calloc(1, sizeof(Ender_Container));
 	ec->type = t;
-	ec->elements = NULL;
 	return ec;
 }
 /*============================================================================*
@@ -46,21 +45,6 @@ void ender_container_delete(Ender_Container *d)
 	/* FIXME call the delete for each descriptor */
 	free(d);
 }
-
-void ender_container_register(const char *name, Ender_Container *ec)
-{
-	if (ec->type != ENDER_STRUCT && ec->type != ENDER_UNION) return;
-	eina_hash_add(_structs, name, ec);
-}
-
-Ender_Container * ender_container_find(const char *name)
-{
-	Ender_Container *ec;
-
-	ec = eina_hash_find(_structs, name);
-	return ec;
-}
-
 
 void ender_container_init(void)
 {
@@ -96,6 +80,31 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 		return _basic_containers[t];
 	}
 	return _ender_container_new(t);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_container_register(Ender_Container *thiz, const char *name)
+{
+	if (thiz->type != ENDER_STRUCT && thiz->type != ENDER_UNION) return;
+	if (!name) return;
+
+	thiz->registered_name = strdup(name);
+	eina_hash_add(_structs, thiz->registered_name, thiz);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Container * ender_container_find(const char *name)
+{
+	Ender_Container *ec;
+
+	ec = eina_hash_find(_structs, name);
+	return ec;
 }
 
 /**
@@ -333,6 +342,19 @@ EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Conta
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
 {
 	return c->type;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI const char * ender_container_registered_name_get(Ender_Container *thiz)
+{
+	if (!thiz) return NULL;
+
+	if (!thiz->registered_name)
+		return "anonymous";
+	return thiz->registered_name;
 }
 
 /**

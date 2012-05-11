@@ -59,6 +59,11 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 		parser->descriptor->on_property(parser->data, name, relative, container);
 }
 
+static inline void _on_container(Ender_Parser *parser, const char *name, Ender_Container *container)
+{
+	if (parser->descriptor->on_container)
+		parser->descriptor->on_container(parser->data, name, container);
+}
 
 
 %}
@@ -155,7 +160,8 @@ struct
 			free(t);
  			$4 = eina_list_remove_list($4, l);
 		}
-		ender_container_register($2, c);
+		ender_container_register(c, $2);
+		_on_container(parser, $2, c);
 	}
 	;
 
@@ -174,7 +180,8 @@ union
 			free(t);
  			$4 = eina_list_remove_list($4, l);
 		}
-		ender_container_register($2, c);
+		ender_container_register(c, $2);
+		_on_container(parser, $2, c);
 	}
 	;
 

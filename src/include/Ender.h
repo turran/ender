@@ -137,6 +137,10 @@ EAPI void ender_shutdown(void);
  * @{
  */
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
+
+EAPI void ender_container_register(Ender_Container *thiz, const char *name);
+EAPI Ender_Container * ender_container_find(const char *name);
+
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
 EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
 EAPI Ender_Container * ender_container_compound_get_by_name(Ender_Container *ec, const char *name, unsigned int *idx);
@@ -146,6 +150,7 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
 EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
 EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Container *sub);
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
+EAPI const char * ender_container_registered_name_get(Ender_Container *thiz);
 
 /**
  * @}
@@ -435,6 +440,7 @@ typedef void (*Ender_Parser_On_Using)(void *data, const char *name);
 typedef void (*Ender_Parser_On_Namespace)(void *data, const char *name);
 typedef void (*Ender_Parser_On_Object)(void *data, const char *name, Ender_Descriptor_Type type, const char *parent);
 typedef void (*Ender_Parser_On_Property)(void *data, const char *name, Eina_Bool relative, Ender_Container *container); 
+typedef void (*Ender_Parser_On_Container)(void *data, const char *name, Ender_Container *container); 
 
 typedef struct _Ender_Parser_Descriptor
 {
@@ -442,6 +448,7 @@ typedef struct _Ender_Parser_Descriptor
 	Ender_Parser_On_Namespace on_namespace;
 	Ender_Parser_On_Object on_object;
 	Ender_Parser_On_Property on_property;
+	Ender_Parser_On_Container on_container;
 } Ender_Parser_Descriptor;
 
 EAPI Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data);

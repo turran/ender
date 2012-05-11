@@ -36,6 +36,7 @@ typedef void (*Ender_Shutdown)(void);
 struct _Ender_Container
 {
 	/* common */
+	char *registered_name;
 	Ender_Value_Type type;
 	/* structs */
 	int num_elements;
