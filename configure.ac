@@ -46,6 +46,7 @@ AC_SUBST([requirements_ender])
 ### Checks for programs
 
 AC_PROG_CC
+AM_PROG_CC_C_O
 
 # pkg-config
 PKG_PROG_PKG_CONFIG
