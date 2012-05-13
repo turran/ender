@@ -95,6 +95,24 @@ static void _dump_container_recursive(Ender_Generator *thiz, Ender_Container *co
 	else
 	{
 		fprintf(thiz->out, "tmp%d = ender_container_new(ENDER_%s);\n", level, ender_value_type_string_to(type));
+		if (type == ENDER_LIST)
+		{
+			Ender_Container *sub;
+			const char *name;
+
+			ender_container_compound_get_extended(container, 0, &sub, &name);
+			_tabs(thiz, level + 1);
+			fprintf(thiz->out, "{\n");
+			_dump_container_recursive(thiz, sub, level + 2);
+			_tabs(thiz, level + 2);
+			if (name && *name)
+				fprintf(thiz->out, "ender_container_add(tmp%d, \"%s\", tmp%d);\n", level, name, level + 2);
+			else
+				fprintf(thiz->out, "ender_container_add(tmp%d, NULL, tmp%d);\n", level, level + 2);
+				
+			_tabs(thiz, level + 1);
+			fprintf(thiz->out, "}\n");
+		}
 	}
 }
 
