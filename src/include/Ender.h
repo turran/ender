@@ -97,6 +97,8 @@ typedef enum _Ender_Value_Type
 	ENDER_BOOL,
 	ENDER_UINT32,
 	ENDER_INT32,
+	ENDER_UINT64,
+	ENDER_INT64,
 	ENDER_DOUBLE,
 	ENDER_COLOR,
 	ENDER_ARGB,
@@ -176,6 +178,12 @@ EAPI int32_t ender_value_int32_get(const Ender_Value *value);
 
 EAPI void ender_value_uint32_set(Ender_Value *value, uint32_t u32);
 EAPI uint32_t ender_value_uint32_get(const Ender_Value *value);
+
+EAPI void ender_value_int64_set(Ender_Value *value, int64_t i64);
+EAPI int64_t ender_value_int64_get(const Ender_Value *value);
+
+EAPI void ender_value_uint64_set(Ender_Value *value, uint64_t u64);
+EAPI uint64_t ender_value_uint64_get(const Ender_Value *value);
 
 EAPI void ender_value_double_set(Ender_Value *value, double d);
 EAPI double ender_value_double_get(const Ender_Value *value);

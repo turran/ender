@@ -34,11 +34,19 @@ bool			{
 			}
 uint 			{
 				yylval_param->vtype = ENDER_UINT32;
-				return T_UINT;
+				return T_UINT32;
 			}
 int			{
 				yylval_param->vtype = ENDER_INT32;
-				return T_INT;
+				return T_INT32;
+			}
+ulong 			{
+				yylval_param->vtype = ENDER_UINT64;
+				return T_UINT64;
+			}
+long			{
+				yylval_param->vtype = ENDER_INT64;
+				return T_INT64;
 			}
 argb			{
 				yylval_param->vtype = ENDER_ARGB;

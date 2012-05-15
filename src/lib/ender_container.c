@@ -194,6 +194,11 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 		size = sizeof(int32_t);
 		break;
 
+		case ENDER_INT64:
+		case ENDER_UINT64:
+		size = sizeof(int64_t);
+		break;
+
 		case ENDER_DOUBLE:
 		size = sizeof(double);
 		break;

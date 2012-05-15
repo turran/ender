@@ -176,6 +176,50 @@ EAPI uint32_t ender_value_uint32_get(const Ender_Value *value)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void ender_value_int64_set(Ender_Value *value, int64_t i64)
+{
+	if (value->container->type != ENDER_INT64)
+		return;
+	value->data.i64 = i64;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI int64_t ender_value_int64_get(const Ender_Value *value)
+{
+	if (value->container->type != ENDER_INT64)
+		return 0;
+	return value->data.i64;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_value_uint64_set(Ender_Value *value, uint64_t u64)
+{
+	if (value->container->type != ENDER_UINT64)
+		return;
+	value->data.u64 = u64;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI uint64_t ender_value_uint64_get(const Ender_Value *value)
+{
+	if (value->container->type != ENDER_UINT64)
+		return 0;
+	return value->data.u64;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void ender_value_double_set(Ender_Value *value, double d)
 {
 	if (value->container->type != ENDER_DOUBLE)

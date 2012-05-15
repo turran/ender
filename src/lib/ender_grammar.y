@@ -79,8 +79,10 @@ static inline void _on_container(Ender_Parser *parser, const char *name, Ender_C
 }
 
 %token <vtype> T_BOOL
-%token <vtype> T_UINT
-%token <vtype> T_INT
+%token <vtype> T_UINT32
+%token <vtype> T_INT32
+%token <vtype> T_UINT64
+%token <vtype> T_INT64
 %token <vtype> T_COLOR
 %token <vtype> T_ARGB
 %token <vtype> T_DOUBLE
@@ -217,8 +219,10 @@ types
 
 basic_type
 	: T_BOOL { $$ = $1; }
-	| T_UINT { $$ = $1; }
-	| T_INT { $$ = $1; }
+	| T_UINT32 { $$ = $1; }
+	| T_INT32 { $$ = $1; }
+	| T_UINT64 { $$ = $1; }
+	| T_INT64 { $$ = $1; }
 	| T_COLOR { $$ = $1; }
 	| T_ARGB { $$ = $1; }
 	| T_DOUBLE { $$ = $1; }

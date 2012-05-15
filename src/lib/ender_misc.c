@@ -59,6 +59,12 @@ EAPI const char * ender_value_type_string_to(Ender_Value_Type type)
 		case ENDER_INT32:
 		return "INT32";
 
+		case ENDER_UINT64:
+		return "UINT64";
+
+		case ENDER_INT64:
+		return "INT64";
+
 		case ENDER_DOUBLE:
 		return "DOUBLE";
 

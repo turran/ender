@@ -104,6 +104,24 @@ static void _ender_relative_int32_set(Ender_Value *v, Ender_Setter set,
 	set(parent, e, v->data.i32);
 }
 /*----------------------------------------------------------------------------*
+ *                              uint64 / in64                                 *
+ *----------------------------------------------------------------------------*/
+static void _ender_int64_get(Ender_Value *v, Ender_Getter get, void *e)
+{
+	get(e, &v->data.i64);
+}
+
+static void _ender_int64_set(Ender_Value *v, Ender_Setter set, void *e)
+{
+	set(e, v->data.i64);
+}
+
+static void _ender_relative_int64_set(Ender_Value *v, Ender_Setter set,
+		Ender_Element *e, void *parent)
+{
+	set(parent, e, v->data.i64);
+}
+/*----------------------------------------------------------------------------*
  *                                   double                                   *
  *----------------------------------------------------------------------------*/
 static void _ender_double_get(Ender_Value *v, Ender_Setter set, void *e)
@@ -345,6 +363,8 @@ void ender_descriptor_init(void)
 	_setters[ENDER_BOOL] = _ender_int32_set;
 	_setters[ENDER_UINT32] = _ender_int32_set;
 	_setters[ENDER_INT32] = _ender_int32_set;
+	_setters[ENDER_UINT64] = _ender_int64_set;
+	_setters[ENDER_INT64] = _ender_int64_set;
 	_setters[ENDER_DOUBLE] = _ender_double_set;
 	_setters[ENDER_ARGB] = _ender_int32_set;
 	_setters[ENDER_COLOR] = _ender_int32_set;
@@ -360,6 +380,8 @@ void ender_descriptor_init(void)
 	_getters[ENDER_BOOL] = _ender_int32_get;
 	_getters[ENDER_UINT32] = _ender_int32_get;
 	_getters[ENDER_INT32] = _ender_int32_get;
+	_getters[ENDER_UINT64] = _ender_int64_get;
+	_getters[ENDER_INT64] = _ender_int64_get;
 	_getters[ENDER_DOUBLE] = _ender_double_get;
 	_getters[ENDER_ARGB] = _ender_int32_get;
 	_getters[ENDER_COLOR] = _ender_int32_get;
@@ -376,6 +398,8 @@ void ender_descriptor_init(void)
 	_relative_accessors[ENDER_BOOL] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_UINT32] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_INT32] = _ender_relative_int32_set;
+	_relative_accessors[ENDER_UINT64] = _ender_relative_int64_set;
+	_relative_accessors[ENDER_INT64] = _ender_relative_int64_set;
 	_relative_accessors[ENDER_DOUBLE] = _ender_relative_double_set;
 	_relative_accessors[ENDER_ARGB] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_COLOR] = _ender_relative_int32_set;

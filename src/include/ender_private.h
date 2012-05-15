@@ -55,6 +55,8 @@ struct _Ender_Value
 	union {
 		int32_t i32;
 		uint32_t u32;
+		int64_t i64;
+		uint64_t u64;
 		double d;
 		void *ptr;
 		Enesim_Matrix matrix;

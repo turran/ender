@@ -47,6 +47,11 @@
 			v.data.u32 = va_arg(var_args, uint32_t);	\
 			break;						\
 									\
+			case ENDER_UINT64:				\
+			case ENDER_INT64:				\
+			v.data.u64 = va_arg(var_args, uint64_t);	\
+			break;						\
+									\
 			case ENDER_DOUBLE:				\
 			v.data.d = va_arg(var_args, double);		\
 			break;						\
@@ -79,6 +84,11 @@
 			case ENDER_INT32:				\
 			case ENDER_BOOL:				\
 			*(va_arg(var_args, uint32_t*)) = v.data.u32;	\
+			break;						\
+									\
+			case ENDER_UINT64:				\
+			case ENDER_INT64:				\
+			*(va_arg(var_args, uint64_t*)) = v.data.u64;	\
 			break;						\
 									\
 			case ENDER_DOUBLE:				\
