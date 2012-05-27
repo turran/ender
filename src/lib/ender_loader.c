@@ -186,7 +186,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 	else
 	{
 		strncpy(tmp1, name, PATH_MAX);
-		tmp1[PATH_MAX] = '\0';
+		tmp1[PATH_MAX - 1] = '\0';
 	}
 	/* check if we already have the library */
 	library = eina_hash_find(_libraries, tmp1);
