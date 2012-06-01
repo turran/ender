@@ -327,7 +327,7 @@ EAPI Eina_Bool ender_parser_parse(const char *file,
 	int ret;
 
 	f = fopen(file, "r");
-	if (!f) return;
+	if (!f) return EINA_FALSE;
 
 	parser.descriptor = descriptor;
 	parser.file = file;

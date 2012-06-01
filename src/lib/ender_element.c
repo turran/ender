@@ -905,7 +905,7 @@ EAPI void ender_element_property_value_get_simple(Ender_Element *e, Ender_Proper
 EAPI Eina_Bool ender_element_property_value_is_set(Ender_Element *e, Ender_Property *prop)
 {
 	ENDER_MAGIC_CHECK(e);
-	if (!prop) return;
+	if (!prop) return EINA_FALSE;
 
 	return ender_property_element_value_is_set(prop, e);
 }
