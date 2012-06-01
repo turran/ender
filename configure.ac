@@ -79,6 +79,10 @@ EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 PKG_CHECK_MODULES([ENDER], [${requirements_ender}])
 
+### Checks for library functions
+
+EFL_CHECK_DLOPEN
+
 ## Make the debug preprocessor configurable
 
 AC_OUTPUT([

@@ -34,5 +34,5 @@ ender_namespace.c \
 ender_property.c \
 ender_value.c
 
-libender_la_LIBADD = @ENDER_LIBS@ @LEXLIB@
+libender_la_LIBADD = @ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@
 libender_la_LDFLAGS = -no-undefined -version-info @version_info@

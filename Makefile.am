@@ -24,7 +24,9 @@ COPYING \
 gendoc \
 Doxyfile \
 README \
-ender.pc.in
+ender.pc.in \
+efl_dlfcn.m4 \
+efl_doxygen.m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ender.pc
