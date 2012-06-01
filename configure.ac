@@ -85,7 +85,7 @@ EFL_CHECK_DLOPEN
 
 ## Make the debug preprocessor configurable
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 ender.pc
 data/Makefile
@@ -96,6 +96,7 @@ src/bin/Makefile
 src/tests/Makefile
 ])
 
+AC_OUTPUT
 
 #####################################################################
 ## Info
