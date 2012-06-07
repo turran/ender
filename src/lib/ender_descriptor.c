@@ -391,7 +391,7 @@ void ender_descriptor_init(void)
 	_getters[ENDER_OBJECT] = _ender_pointer_get;
 	_getters[ENDER_SURFACE] = _ender_pointer_get;
 	_getters[ENDER_ENDER] = _ender_pointer_get;
-	_getters[ENDER_LIST] = _ender_pointer_get;
+	_getters[ENDER_LIST] = _ender_matrix_get;
 	_getters[ENDER_STRUCT] = _ender_pointer_get;
 	_getters[ENDER_UNION] = _ender_pointer_get;
 	/* relative setters */
