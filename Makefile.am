@@ -25,8 +25,8 @@ gendoc \
 Doxyfile \
 README \
 ender.pc.in \
-efl_dlfcn.m4 \
-efl_doxygen.m4
+m4/efl_dlfcn.m4 \
+m4/efl_doxygen.m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ender.pc
