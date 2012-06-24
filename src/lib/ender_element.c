@@ -351,6 +351,8 @@ EAPI void * ender_element_data_get(Ender_Element *e, const char *key)
 	ENDER_MAGIC_CHECK(e);
 #if 0
 	return enesim_object_private_get(e->object, key);
+#else
+	return NULL;
 #endif
 }
 

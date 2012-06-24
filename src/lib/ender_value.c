@@ -88,8 +88,11 @@ Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
 		size_t size;
 
 		size = ender_container_compound_size_get(ec);
-		thiz->data.ptr = calloc(1, size);
-		thiz->owned = EINA_TRUE;
+		if (size)
+		{
+			thiz->data.ptr = calloc(1, size);
+			thiz->owned = EINA_TRUE;
+		}
 	}
 	return thiz;
 }

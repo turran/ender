@@ -371,7 +371,7 @@ EAPI const char * ender_container_registered_name_get(Ender_Container *thiz)
  */
 EAPI Ender_Container * ender_container_ref(Ender_Container *c)
 {
-
+	return NULL;
 }
 
 /**
@@ -398,5 +398,5 @@ EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint
  */
 EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *thiz)
 {
-
+	return NULL;
 }

@@ -129,7 +129,7 @@ void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
 Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element *e)
 {
 	if (!ep->is_set) return EINA_TRUE;
-	ep->is_set(ep, e, ep->data);
+	return ep->is_set(ep, e, ep->data);
 }
 /*============================================================================*
  *                                   API                                      *
