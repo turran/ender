@@ -5,6 +5,7 @@ AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \
 -I$(top_builddir)/src/include \
 -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
+@ENDER_BUILD@ \
 @ENDER_CFLAGS@
 
 AM_YFLAGS = -d -p ender_

@@ -22,7 +22,7 @@
 #include <Enesim.h>
 
 #ifdef _WIN32
-# ifdef EFL_ENDER_BUILD
+# ifdef ENDER_BUILD
 #  ifdef DLL_EXPORT
 #   define EAPI __declspec(dllexport)
 #  else
