@@ -269,7 +269,7 @@ typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
 EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns);
-Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
+EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 		const char *name,
 		Ender_Container *ec,
 		Ender_Getter get,
