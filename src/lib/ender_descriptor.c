@@ -310,43 +310,6 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	return desc;
 }
 
-Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-		Ender_Is_Set is_set,
-		Eina_Bool relative)
-{
-	Ender_Property *prop;
-	Ender_Descriptor_Property *dprop;
-
-	prop = eina_ordered_hash_find(edesc->properties, name);
-	if (prop)
-	{
-		WRN("Property %s already found on %s. Not adding it", name, edesc->name);
-		return NULL;
-	}
-	dprop = calloc(1, sizeof(Ender_Descriptor_Property));
-	dprop->get = get;
-	dprop->set = set;
-	dprop->add = add;
-	dprop->remove = remove;
-	dprop->clear = clear;
-	dprop->clear = clear;
-
-	prop = ender_property_new(name, ec,
-			get ? _property_get : NULL,
-			set ? _property_set : NULL,
-			add ? _property_add : NULL,
-			remove ? _property_remove : NULL,
-			clear ? _property_clear : NULL,
-			is_set ? _property_is_set : NULL,
-			relative, dprop);
-	eina_ordered_hash_add(edesc->properties, name, prop);
-	DBG("Property %s added to %s", name, edesc->name);
-
-	return prop;
-}
-
 void ender_descriptor_init(void)
 {
 	int i;
@@ -463,6 +426,43 @@ EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, c
 	ns = ender_namespace_find(ns_name);
 	if (!ns) return NULL;
 	return ender_namespace_descriptor_find(ns, name);
+}
+
+EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
+		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
+		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
+		Ender_Is_Set is_set,
+		Eina_Bool relative)
+{
+	Ender_Property *prop;
+	Ender_Descriptor_Property *dprop;
+
+	prop = eina_ordered_hash_find(edesc->properties, name);
+	if (prop)
+	{
+		WRN("Property %s already found on %s. Not adding it", name, edesc->name);
+		return NULL;
+	}
+	dprop = calloc(1, sizeof(Ender_Descriptor_Property));
+	dprop->get = get;
+	dprop->set = set;
+	dprop->add = add;
+	dprop->remove = remove;
+	dprop->clear = clear;
+	dprop->clear = clear;
+
+	prop = ender_property_new(name, ec,
+			get ? _property_get : NULL,
+			set ? _property_set : NULL,
+			add ? _property_add : NULL,
+			remove ? _property_remove : NULL,
+			clear ? _property_clear : NULL,
+			is_set ? _property_is_set : NULL,
+			relative, dprop);
+	eina_ordered_hash_add(edesc->properties, name, prop);
+	DBG("Property %s added to %s", name, edesc->name);
+
+	return prop;
 }
 
 /**
