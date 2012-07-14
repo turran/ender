@@ -21,6 +21,10 @@
 #include <Eina.h>
 #include <Enesim.h>
 
+#ifdef EAPI
+# undef EAPI
+#endif
+
 #ifdef _WIN32
 # ifdef ENDER_BUILD
 #  ifdef DLL_EXPORT
