@@ -281,6 +281,7 @@ static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *dat
  *============================================================================*/
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
+		Ender_Destructor destructor,
 		Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
@@ -300,6 +301,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	desc->name = strdup(name);
 	desc->parent = parent;
 	desc->create = creator;
+	desc->destroy = destructor;
 	desc->type = type;
 	desc->ns = ns;
 	desc->properties = eina_ordered_hash_new();

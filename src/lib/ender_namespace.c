@@ -153,12 +153,12 @@ EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns, Ender_List_Callba
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Descriptor_Type type)
+EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Destructor destructor, Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
 
 	if (!name || !ens) return NULL;
-	desc = ender_descriptor_new(name, ens, creator, parent, type);
+	desc = ender_descriptor_new(name, ens, creator, destructor, parent, type);
 	if (!desc) return NULL;
 	DBG("class %s@%s registered correctly %p", name, ens->name, desc);
 	eina_hash_add(ens->descriptors, name, desc);

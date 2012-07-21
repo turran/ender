@@ -238,15 +238,22 @@ EAPI void ender_value_unref(Ender_Value *thiz);
  */
 typedef void (*Ender_List_Callback)(const char *name, void *data);
 typedef void * (*Ender_Creator)(void);
+typedef void (*Ender_Destructor)(void *);
 
 #define ENDER_CREATOR(f) ((Ender_Creator)(f))
+#define ENDER_DESTRUCTOR(f) ((Ender_Destructor)(f))
 
 EAPI void ender_namespace_list(Ender_List_Callback cb, void *data);
 EAPI Ender_Namespace * ender_namespace_new(const char *name);
 EAPI Ender_Namespace * ender_namespace_find(const char *name);
-EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns, Ender_List_Callback cb, void *data);
-EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name);
-EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, const char *name, Ender_Creator creator, Ender_Descriptor *parent, Ender_Descriptor_Type type);
+EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns,
+		Ender_List_Callback cb, void *data);
+EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns,
+		const char *name);
+EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens,
+		const char *name,
+		Ender_Creator creator, Ender_Destructor destructor,
+		Ender_Descriptor *parent, Ender_Descriptor_Type type);
 EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
 
 /**
@@ -307,7 +314,8 @@ typedef void (*Ender_Element_Clear)(Ender_Element *e, Ender_Property *ep, void *
 
 EAPI Ender_Element * ender_element_new(const char *name);
 EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name);
-EAPI void ender_element_delete(Ender_Element *e);
+EAPI Ender_Element * ender_element_ref(Ender_Element *e);
+EAPI Ender_Element * ender_element_unref(Ender_Element *e);
 EAPI void * ender_element_data_set(Ender_Element *e, const char *key, void *data);
 EAPI void * ender_element_data_get(Ender_Element *e, const char *key);
 EAPI const char * ender_element_name_get(Ender_Element *e);

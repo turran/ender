@@ -158,6 +158,16 @@ static void _name_to_c(char *name)
 	}
 }
 
+static inline void * _sym_get(void *dl_handle, const char *ns_name, const char *name, const char *sym)
+{
+	char computed_name[PATH_MAX];
+	void *found;
+
+	snprintf(computed_name, PATH_MAX, "%s_%s_%s", ns_name, name, sym);
+	found = dlsym(dl_handle, computed_name);
+	return found;
+}
+
 static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 {
 	Ender_Library_Namespace *namespace;
@@ -229,28 +239,31 @@ Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, co
 {
 	Ender_Descriptor *desc;
 	Ender_Creator creator;
+	Ender_Destructor destructor;
 	const char *ns_name;
+	char computed_name[PATH_MAX];
 
 	if (!namespace) return NULL;
 
 	ns_name = ender_namespace_name_get(namespace->ns);
-	/* now the class itself */
-	if (type == ENDER_CLASS)
+
+	creator = _sym_get(namespace->lib->dl_handle, ns_name, name, "new");
+	if (!creator)
 	{
-		char ctor_name[PATH_MAX];
-		
-		snprintf(ctor_name, PATH_MAX, "%s_%s_new", ns_name, name);
-		creator = dlsym(namespace->lib->dl_handle, ctor_name);
-		if (!creator)
-		{
-			DBG("No creator found?");
-		}
+		DBG("No creator found");
 	}
-	else
+	/* for the destructor we start with _delete, then _unref */
+	destructor = _sym_get(namespace->lib->dl_handle, ns_name, name, "delete");
+	if (!destructor)
 	{
-		creator = NULL;
+		destructor = _sym_get(namespace->lib->dl_handle, ns_name, name, "unref");
 	}
-	desc = ender_namespace_descriptor_add(namespace->ns, name, creator, parent, type);
+	if (!destructor)
+	{
+		DBG("No destructor found");
+	}
+
+	desc = ender_namespace_descriptor_add(namespace->ns, name, creator, destructor, parent, type);
 	if (!desc) return NULL;
 	DBG("class %s@%s registered correctly %p", name, ns_name, desc);
 

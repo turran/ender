@@ -156,6 +156,7 @@ struct _Ender_Element
 	void *object;
 	Eina_Hash *listeners;
 	Eina_Hash *properties;
+	int ref;
 };
 
 static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
@@ -192,9 +193,6 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 	ender->descriptor = desc;
 	ender->listeners = eina_hash_string_superfast_new(NULL);
 	ender->properties = eina_hash_string_superfast_new(NULL);
-#if 0
-	enesim_object_private_set(object, "ender", ender);
-#endif
 	/* call the constructor callback */
 	EINA_LIST_FOREACH(_new_callbacks, l, listener)
 	{
@@ -203,6 +201,33 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 
 	return ender;
 
+}
+
+static void _ender_element_delete(Ender_Element *e)
+{
+	Ender_Destructor destroy;
+
+	destroy = e->descriptor->destroy;
+	while (!destroy)
+	{
+		Ender_Descriptor *parent;
+
+		parent = ender_descriptor_parent(e->descriptor);
+		if (!parent) break;
+
+		destroy = parent->destroy;
+		
+	}
+	if (destroy)
+	{
+		destroy(e->object);
+	}
+	/* call the free callback */
+	ender_event_dispatch(e, "Free", NULL);
+	/* free every private data */
+	/* TODO the listeners */
+	/* TODO the properties */
+	free(e);
 }
 
 static Ender_Property * _ender_element_property_get_simple(Ender_Element *e,
@@ -309,16 +334,30 @@ EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const ch
 	return _ender_element_new(name, ns_name);
 }
 
+
 /**
- * Delete an ender
+ * Ref an ender
  */
-EAPI void ender_element_delete(Ender_Element *e)
+EAPI Ender_Element * ender_element_ref(Ender_Element *e)
 {
 	ENDER_MAGIC_CHECK(e);
-#if 0
-	enesim_object_unref(e->object);
-#endif
-	free(e);
+	e->ref++;
+	return e;
+}
+
+/**
+ * Unref an ender
+ */
+EAPI Ender_Element * ender_element_unref(Ender_Element *e)
+{
+	ENDER_MAGIC_CHECK(e);
+	e->ref--;
+	if (!e->ref)
+	{
+		_ender_element_delete(e);
+		return NULL;
+	}
+	return e;
 }
 
 /**
