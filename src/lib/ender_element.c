@@ -193,6 +193,7 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 	ender->descriptor = desc;
 	ender->listeners = eina_hash_string_superfast_new(NULL);
 	ender->properties = eina_hash_string_superfast_new(NULL);
+	ender->ref = 1;
 	/* call the constructor callback */
 	EINA_LIST_FOREACH(_new_callbacks, l, listener)
 	{
@@ -206,16 +207,18 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 static void _ender_element_delete(Ender_Element *e)
 {
 	Ender_Destructor destroy;
+	Ender_Descriptor *desc = e->descriptor;
 
-	destroy = e->descriptor->destroy;
+	destroy = desc->destroy;
 	while (!destroy)
 	{
 		Ender_Descriptor *parent;
 
-		parent = ender_descriptor_parent(e->descriptor);
+		parent = ender_descriptor_parent(desc);
 		if (!parent) break;
 
 		destroy = parent->destroy;
+		desc = parent;
 		
 	}
 	if (destroy)
