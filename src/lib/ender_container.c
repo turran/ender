@@ -48,6 +48,7 @@ static void _ender_container_delete(Ender_Container *thiz)
 		if (s->name)
 			free(s->name);
 		ender_container_unref(s->c);
+		free(s);
 	}
 	if (thiz->registered_name)
 		free(thiz->registered_name);
@@ -85,6 +86,12 @@ void ender_container_init(void)
 
 void ender_container_shutdown(void)
 {
+	int i;
+
+	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
+	{
+		ender_container_unref(_basic_containers[i]);
+	}
 	eina_hash_free(_structs);
 }
 /*============================================================================*
@@ -128,7 +135,7 @@ EAPI Ender_Container * ender_container_find(const char *name)
 	Ender_Container *ec;
 
 	ec = eina_hash_find(_structs, name);
-	return ec;
+	return ender_container_ref(ec);
 }
 
 /**
