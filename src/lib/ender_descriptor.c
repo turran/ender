@@ -310,7 +310,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	desc->destroy = destructor;
 	desc->type = type;
 	desc->ns = ns;
-	desc->properties = eina_ordered_hash_new(_property_free);
+	desc->properties = eina_ordered_hash_new((Eina_Free_Cb)ender_property_free);
 
 	if (!found)
 		eina_hash_add(_descriptors, name, desc);
@@ -472,7 +472,8 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, con
 			remove ? _property_remove : NULL,
 			clear ? _property_clear : NULL,
 			is_set ? _property_is_set : NULL,
-			relative, dprop);
+			relative,
+			_property_free, dprop);
 	eina_ordered_hash_add(edesc->properties, name, prop);
 	DBG("Property %s added to %s", name, edesc->name);
 

@@ -31,6 +31,7 @@ struct _Ender_Property
 	Ender_Property_Is_Set is_set;
 	Ender_Container *container;
 	Eina_Bool relative;
+	Ender_Property_Free free;
 	void *data;
 };
 
@@ -65,7 +66,9 @@ Ender_Property * ender_property_new(const char *name,
 		Ender_Property_Remove remove,
 		Ender_Property_Clear clear,
 		Ender_Property_Is_Set is_set,
-		Eina_Bool relative, void *data)
+		Eina_Bool relative,
+		Ender_Property_Free free,
+		void *data)
 {
 	Ender_Property *prop;
 
@@ -76,11 +79,22 @@ Ender_Property * ender_property_new(const char *name,
 	prop->add = add;
 	prop->remove = remove;
 	prop->clear = clear;
+	/* own the container */
 	prop->container = ec;
 	prop->relative = relative;
 	prop->data = data;
+	prop->free = free;
 
 	return prop;
+}
+
+void ender_property_free(Ender_Property *thiz)
+{
+	if (thiz->name)
+		free(thiz->name);
+	if (thiz->free)
+		thiz->free(thiz->data);
+	ender_container_unref(thiz->container);
 }
 
 /* TODO add guards, the value type must be equal to the property type */

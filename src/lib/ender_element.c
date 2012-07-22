@@ -17,13 +17,6 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
-/**
- * @todo
- * - Add dynamic properties, we must export the property_add function for
- * descriptors given that those *must* be fixed always and impossible to remove
- * but properties that are added through a element_property_add/remove must
- * be available
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -192,7 +185,7 @@ static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
 	ender->object = object;
 	ender->descriptor = desc;
 	ender->listeners = eina_hash_string_superfast_new(NULL);
-	ender->properties = eina_hash_string_superfast_new(NULL);
+	ender->properties = eina_hash_string_superfast_new((Eina_Free_Cb)ender_property_free);
 	ender->ref = 1;
 	/* call the constructor callback */
 	EINA_LIST_FOREACH(_new_callbacks, l, listener)
@@ -229,7 +222,7 @@ static void _ender_element_delete(Ender_Element *e)
 	ender_event_dispatch(e, "Free", NULL);
 	/* free every private data */
 	/* TODO the listeners */
-	/* TODO the properties */
+	eina_hash_free(e->properties);
 	free(e);
 }
 
@@ -267,6 +260,12 @@ static void _property_is_relative_cb(Ender_Property *prop, void *data)
 
 	if (ender_property_is_relative(prop))
 		new_data->cb(prop, new_data->data);
+}
+
+static void _ender_element_property_free(void *data)
+{
+	Ender_Property *p = data;
+
 }
 /*----------------------------------------------------------------------------*
  *                        The property interface                              *
@@ -311,6 +310,13 @@ static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *dat
 	Ender_Element_Property *eprop = data;
 
 	return eprop->is_set(e, p, eprop->data);
+}
+
+static void _property_free(void *data)
+{
+	Ender_Element_Property *eprop = data;
+	/* TODO free the user provided data */
+	free(eprop);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -714,7 +720,8 @@ EAPI Ender_Property * ender_element_property_add(Ender_Element *e, const char *n
 			_property_remove,
 			_property_clear,
 			_property_is_set,
-			relative, eprop);
+			relative,
+			_property_free, eprop);
 	eina_hash_add(e->properties, name, prop);
 	DBG("Property %s added", name);
 

@@ -38,6 +38,7 @@ struct _Ender_Container
 	/* common */
 	char *registered_name;
 	Ender_Value_Type type;
+	int ref;
 	/* structs */
 	int num_elements;
 	Eina_List *elements;
@@ -93,7 +94,7 @@ typedef Ender_Property_Accessor Ender_Property_Setter;
 typedef Ender_Property_Accessor Ender_Property_Add;
 typedef Ender_Property_Accessor Ender_Property_Remove;
 typedef void (*Ender_Property_Clear)(Ender_Property *ep, Ender_Element *e, void *data);
-
+typedef void (*Ender_Property_Free)(void *data);
 Ender_Property * ender_property_new(const char *name,
 		Ender_Container *ec,
 		Ender_Property_Getter get,
@@ -102,7 +103,10 @@ Ender_Property * ender_property_new(const char *name,
 		Ender_Property_Remove remove,
 		Ender_Property_Clear clear,
 		Ender_Property_Is_Set is_set,
-		Eina_Bool relative, void *data);
+		Eina_Bool relative,
+		Ender_Property_Free free,
+		void *data);
+void ender_property_free(Ender_Property *p);
 
 void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v);
@@ -115,9 +119,10 @@ void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
 void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e);
 Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element *e);
 /* container */
-void ender_property_container_delete(Ender_Container *p);
 void ender_container_init(void);
 void ender_container_shutdown(void);
+Ender_Container * ender_container_ref(Ender_Container *thiz);
+void ender_container_unref(Ender_Container *thiz);
 
 /* namespace */
 void ender_namespace_init(void);
