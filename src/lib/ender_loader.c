@@ -93,6 +93,24 @@ static Ender_Library * _library_new(const char *name, void *dl_handle)
 	return library;
 }
 
+static void _library_free(void *data)
+{
+	Ender_Library *thiz = data;
+	Ender_Init shutdown;
+	char sym_name[PATH_MAX];
+
+	/* shutdown the library */
+	snprintf(sym_name, PATH_MAX, "%s_shutdown", thiz->name);
+	shutdown = dlsym(thiz->dl_handle, sym_name);
+	if (shutdown) shutdown();
+}
+
+static void _library_namespace_free(void *data)
+{
+	Ender_Library_Namespace *thiz = data;
+	free(thiz);
+}
+
 static Eina_Bool _file_locate(const char *file, char *real_file)
 {
 	struct stat st;
@@ -235,7 +253,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 	return namespace;
 }
 
-Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, const char *name, Ender_Descriptor *parent, Ender_Descriptor_Type type)
+static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, const char *name, Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
 	Ender_Creator creator;
@@ -270,7 +288,7 @@ Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, co
 	return desc;
 }
 
-void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_Descriptor *edesc,
+static void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_Descriptor *edesc,
 		const char *name, Ender_Container *prop, Eina_Bool rel)
 {
 	Ender_Getter get;
@@ -410,8 +428,8 @@ void ender_loader_init(void)
 {
 	if (!_init++)
 	{
-		_library_namespaces = eina_hash_string_superfast_new(NULL);
-		_libraries = eina_hash_string_superfast_new(NULL);
+		_library_namespaces = eina_hash_string_superfast_new(_library_namespace_free);
+		_libraries = eina_hash_string_superfast_new(_library_free);
 	}
 }
 
@@ -419,24 +437,8 @@ void ender_loader_shutdown(void)
 {
 	if (_init-- == 1)
 	{
-		Eina_Iterator *it;
-		Ender_Library *lib;
-		/* call the shutdown on every library */
-		it = eina_hash_iterator_data_new(_libraries);
-		while (eina_iterator_next(it, (void **)&lib))
-		{
-			Ender_Init shutdown;
-			char sym_name[PATH_MAX];
-
-			/* shutdown the library */
-			snprintf(sym_name, PATH_MAX, "%s_shutdown", lib->name);
-			shutdown = dlsym(lib->dl_handle, sym_name);
-			if (shutdown) shutdown();
-		}
-		eina_iterator_free(it);
-		/* TODO actually delete the hashes contents */
-		eina_hash_free(_libraries);
 		eina_hash_free(_library_namespaces);
+		eina_hash_free(_libraries);
 		/* TODO free the list of files */
 	}
 }

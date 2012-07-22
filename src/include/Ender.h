@@ -489,7 +489,7 @@ typedef struct _Eina_Ordered_Hash
 	Eina_Hash *hash;
 } Eina_Ordered_Hash;
 
-EAPI Eina_Ordered_Hash * eina_ordered_hash_new();
+EAPI Eina_Ordered_Hash * eina_ordered_hash_new(Eina_Free_Cb cb);
 EAPI void eina_ordered_hash_free(Eina_Ordered_Hash *thiz);
 EAPI int eina_ordered_hash_count(Eina_Ordered_Hash *thiz);
 EAPI void * eina_ordered_hash_nth_get(Eina_Ordered_Hash *thiz, int nth);

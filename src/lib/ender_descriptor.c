@@ -276,6 +276,12 @@ static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *dat
 	object = ender_element_object_get(e);
 	return dprop->is_set(object);
 }
+
+static void _property_free(void *data)
+{
+	Ender_Descriptor_Property *dprop = data;
+	free(dprop);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -304,12 +310,19 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	desc->destroy = destructor;
 	desc->type = type;
 	desc->ns = ns;
-	desc->properties = eina_ordered_hash_new();
+	desc->properties = eina_ordered_hash_new(_property_free);
 
 	if (!found)
 		eina_hash_add(_descriptors, name, desc);
 
 	return desc;
+}
+
+void ender_descriptor_free(Ender_Descriptor *thiz)
+{
+	if (thiz->name)
+		free(thiz->name);
+	eina_ordered_hash_free(thiz->properties);
 }
 
 void ender_descriptor_init(void)
@@ -380,7 +393,6 @@ void ender_descriptor_init(void)
 
 void ender_descriptor_shutdown(void)
 {
-	/* TODO remove every descriptor */
 	eina_hash_free(_descriptors);
 }
 /*============================================================================*

@@ -79,6 +79,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
 		Ender_Destructor destructor,
 		Ender_Descriptor *parent, Ender_Descriptor_Type type);
+void ender_descriptor_free(Ender_Descriptor *thiz);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
 void ender_descriptor_init(void);

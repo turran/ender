@@ -30,17 +30,26 @@ struct _Ender_Namespace
 typedef void (*Ender_Namespace_Init)(void);
 
 static Eina_Hash *_namespaces = NULL;
+
+static void _ender_namespace_free(void *data)
+{
+	Ender_Namespace *thiz = data;
+
+	if (thiz->name)
+		free(thiz->name);
+	eina_hash_free(thiz->descriptors);
+	free(thiz);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 void ender_namespace_init(void)
 {
-	_namespaces = eina_hash_string_superfast_new(NULL);
+	_namespaces = eina_hash_string_superfast_new(_ender_namespace_free);
 }
 
 void ender_namespace_shutdown(void)
 {
-	/* TODO remove every namespace */
 	eina_hash_free(_namespaces);
 }
 
@@ -82,7 +91,8 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name)
 	{
 		namespace = malloc(sizeof(Ender_Namespace));
 		namespace->name = strdup(name);
-		namespace->descriptors = eina_hash_string_superfast_new(NULL);
+		namespace->descriptors = eina_hash_string_superfast_new(
+				(Eina_Free_Cb)ender_descriptor_free);
 		eina_hash_add(_namespaces, name, namespace);
 	}
 	return namespace;

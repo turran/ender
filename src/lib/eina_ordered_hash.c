@@ -29,21 +29,20 @@
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Eina_Ordered_Hash * eina_ordered_hash_new()
+EAPI Eina_Ordered_Hash * eina_ordered_hash_new(Eina_Free_Cb cb)
 {
 	Eina_Ordered_Hash *thiz;
 
 	thiz = calloc(1, sizeof(Eina_Ordered_Hash));
-	thiz->hash = eina_hash_string_superfast_new(NULL);
+	thiz->hash = eina_hash_string_superfast_new(cb);
 
 	return thiz;
 }
 
 EAPI void eina_ordered_hash_free(Eina_Ordered_Hash *thiz)
 {
-	/* TODO destroy them */
-	//eina_hash_free(thiz->hash);
-	//eina_list_free(thiz->order);
+	eina_hash_free(thiz->hash);
+	eina_list_free(thiz->order);
 }
 
 EAPI int eina_ordered_hash_count(Eina_Ordered_Hash *thiz)
