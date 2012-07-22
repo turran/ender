@@ -122,7 +122,7 @@ Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element 
 void ender_container_init(void);
 void ender_container_shutdown(void);
 Ender_Container * ender_container_ref(Ender_Container *thiz);
-void ender_container_unref(Ender_Container *thiz);
+Ender_Container * ender_container_unref(Ender_Container *thiz);
 
 /* namespace */
 void ender_namespace_init(void);

@@ -63,13 +63,15 @@ Ender_Container * ender_container_ref(Ender_Container *thiz)
 	return thiz;
 }
 
-void ender_container_unref(Ender_Container *thiz)
+Ender_Container * ender_container_unref(Ender_Container *thiz)
 {
 	thiz->ref--;
 	if (!thiz->ref)
 	{
 		_ender_container_delete(thiz);
+		return NULL;
 	}
+	return thiz;
 }
 
 void ender_container_init(void)
@@ -90,7 +92,11 @@ void ender_container_shutdown(void)
 
 	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
 	{
-		ender_container_unref(_basic_containers[i]);
+		_basic_containers[i] = ender_container_unref(_basic_containers[i]);
+		if (_basic_containers[i])
+			printf("refocunt error %d on type %s\n",
+					_basic_containers[i]->ref,
+					ender_value_type_string_to(_basic_containers[i]->type));
 	}
 	eina_hash_free(_structs);
 }
@@ -339,7 +345,8 @@ EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Conta
 	sub = calloc(1, sizeof(Ender_Container_Sub));
 	if (name)
 		sub->name = strdup(name);
-	sub->c = ender_container_ref(s);
+	/* own the sub container */
+	sub->c = s;
 	switch (ec->type)
 	{
 		case ENDER_STRUCT:
