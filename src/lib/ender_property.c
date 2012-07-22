@@ -95,6 +95,7 @@ void ender_property_free(Ender_Property *thiz)
 	if (thiz->free)
 		thiz->free(thiz->data);
 	ender_container_unref(thiz->container);
+	free(thiz);
 }
 
 /* TODO add guards, the value type must be equal to the property type */

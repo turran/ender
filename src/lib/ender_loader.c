@@ -58,21 +58,6 @@ static Eina_Hash *_libraries = NULL;
 static Eina_Hash *_library_namespaces = NULL;
 static Eina_List *_files = NULL;
 
-static void _library_unref(Ender_Library *lib)
-{
-	lib->ref--;
-	if (!lib->ref)
-	{
-		dlclose(lib->dl_handle);
-		free(lib);
-	}
-}
-
-static void _library_ref(Ender_Library *lib)
-{
-	lib->ref++;
-}
-
 static void _dir_list_cb(const char *name, const char *path, void *data)
 {
 	char file[PATH_MAX];
@@ -103,6 +88,9 @@ static void _library_free(void *data)
 	snprintf(sym_name, PATH_MAX, "%s_shutdown", thiz->name);
 	shutdown = dlsym(thiz->dl_handle, sym_name);
 	if (shutdown) shutdown();
+	free(thiz->name);
+	dlclose(thiz->dl_handle);
+	free(thiz);
 }
 
 static void _library_namespace_free(void *data)
@@ -239,7 +227,6 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 	{
 		*tmp2 = '_';
 	}
-	_library_ref(library);
 	ns = ender_namespace_find(tmp1);
 	if (!ns)
 	{
@@ -250,6 +237,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 	namespace->ns = ns;
 	namespace->lib = library;
 
+	eina_hash_add(_library_namespaces, name, namespace);
 	return namespace;
 }
 
@@ -437,9 +425,12 @@ void ender_loader_shutdown(void)
 {
 	if (_init-- == 1)
 	{
+		char *name;
+
 		eina_hash_free(_library_namespaces);
 		eina_hash_free(_libraries);
-		/* TODO free the list of files */
+		EINA_LIST_FREE(_files, name)
+			free(name);
 	}
 }
 

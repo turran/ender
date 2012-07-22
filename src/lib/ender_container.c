@@ -78,7 +78,7 @@ void ender_container_init(void)
 {
 	int i;
 
-	_structs = eina_hash_string_superfast_new(NULL);
+	_structs = eina_hash_string_superfast_new((Eina_Free_Cb)ender_container_unref);
 	/* define the common (basic) containers here */
 	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
 	{
@@ -90,6 +90,7 @@ void ender_container_shutdown(void)
 {
 	int i;
 
+	eina_hash_free(_structs);
 	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
 	{
 		_basic_containers[i] = ender_container_unref(_basic_containers[i]);
@@ -98,7 +99,6 @@ void ender_container_shutdown(void)
 					_basic_containers[i]->ref,
 					ender_value_type_string_to(_basic_containers[i]->type));
 	}
-	eina_hash_free(_structs);
 }
 /*============================================================================*
  *                                   API                                      *

@@ -117,7 +117,11 @@ static inline void _on_container(Ender_Parser *parser, const char *name, Ender_C
 main
 	: using
 	{
+		char *name;
+
 		_on_using(parser, $1);
+		EINA_LIST_FREE($1, name)
+			free(name);
 	}
 	namespace_list
 	;
@@ -136,6 +140,7 @@ namespace
 	: T_NAMESPACE T_INLINE_STRING
 	{
 		_on_namespace(parser, $2);
+		free($2);
 	}
 	'{' definition_list '}' ';'
 	;
@@ -159,11 +164,13 @@ struct
 		EINA_LIST_FOREACH_SAFE($4, l, ll, t)
 		{
 			ender_container_add(c, t->name, t->container);
+			free(t->name);
 			free(t);
  			$4 = eina_list_remove_list($4, l);
 		}
 		ender_container_register(c, $2);
 		_on_container(parser, $2, c);
+		free($2);
 	}
 	;
 
@@ -179,11 +186,13 @@ union
 		EINA_LIST_FOREACH_SAFE($4, l, ll, t)
 		{
 			ender_container_add(c, t->name, t->container);
+			free(t->name);
 			free(t);
  			$4 = eina_list_remove_list($4, l);
 		}
 		ender_container_register(c, $2);
 		_on_container(parser, $2, c);
+		free($2);
 	}
 	;
 
@@ -191,6 +200,9 @@ object
 	: definition T_INLINE_STRING object_inheritance
 	{
 		_on_object(parser, $2, $1, $3);
+		if ($3)
+			free($3);
+		free($2);
 	}
 	'{' declaration_list '}' ';'
 	;
@@ -234,7 +246,11 @@ basic_type
 	;
 
 struct_union_type
-	: T_WORD { $$ = ender_container_find($1); }
+	: T_WORD
+	{
+		$$ = ender_container_find($1);
+		free($1);
+	}
 	;
 
 list_type
@@ -292,6 +308,7 @@ declaration
 	type_relative type constraint ';'
 	{
 		_on_property(parser, $2->name, $1, $2->container);
+		free($2->name);
 		free($2);
 	}
 	;

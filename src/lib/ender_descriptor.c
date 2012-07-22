@@ -323,6 +323,7 @@ void ender_descriptor_free(Ender_Descriptor *thiz)
 	if (thiz->name)
 		free(thiz->name);
 	eina_ordered_hash_free(thiz->properties);
+	free(thiz);
 }
 
 void ender_descriptor_init(void)

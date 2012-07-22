@@ -43,6 +43,7 @@ EAPI void eina_ordered_hash_free(Eina_Ordered_Hash *thiz)
 {
 	eina_hash_free(thiz->hash);
 	eina_list_free(thiz->order);
+	free(thiz);
 }
 
 EAPI int eina_ordered_hash_count(Eina_Ordered_Hash *thiz)

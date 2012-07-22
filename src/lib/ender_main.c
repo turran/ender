@@ -88,9 +88,9 @@ EAPI void ender_shutdown(void)
 	if (_init == 1)
 	{
 		ender_loader_shutdown();
-		ender_container_shutdown();
 		ender_namespace_shutdown();
 		ender_descriptor_shutdown();
+		ender_container_shutdown();
 		enesim_shutdown();
 		eina_log_domain_unregister(ender_log_dom);
 		eina_shutdown();
