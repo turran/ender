@@ -254,7 +254,11 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 		fprintf(thiz->out, "\t\t\t\tNULL,\n");
 		fprintf(thiz->out, "\t\t\t\tNULL,\n");
 	}
-	fprintf(thiz->out, "\t\t\t\tENDER_IS_SET(_%s_%s_%s_is_set),\n", thiz->ns_name, thiz->name, name);
+	/* the is_set is part of the extended functions */
+	if (thiz->extended)
+		fprintf(thiz->out, "\t\t\t\tENDER_IS_SET(_%s_%s_%s_is_set),\n", thiz->ns_name, thiz->name, name);
+	else
+		fprintf(thiz->out, "\t\t\t\tNULL,\n");
 	fprintf(thiz->out, "\t\t\t\t%s\n", relative ? "EINA_TRUE" : "EINA_FALSE");
 	fprintf(thiz->out, "\t\t\t\t);\n");
 	/* assign the property to the API available property if needed */
