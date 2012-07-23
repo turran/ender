@@ -26,7 +26,7 @@
  *============================================================================*/
 typedef struct _Ender_Generator
 {
-	const char *ns_name;
+	char *ns_name;
 	const char *name;
 	FILE *out;
 	Eina_Bool found;
@@ -162,7 +162,7 @@ static void _generator_on_namespace(void *data, const char *name)
 	Ender_Generator *thiz;
 
 	thiz = data;
-	thiz->ns_name = name;
+	thiz->ns_name = strdup(name);
 }
 
 static void _generator_on_container(void *data, const char *name, Ender_Container *c)
@@ -303,6 +303,9 @@ static void _generator_run(Eina_Bool extended, const char *i, const char *elemen
 	{
 		fprintf(thiz.out, "}\n");
 	}
+
+	if (thiz.ns_name)
+		free(thiz.ns_name);
 }
 
 /*

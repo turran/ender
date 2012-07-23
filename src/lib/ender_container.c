@@ -141,6 +141,7 @@ EAPI Ender_Container * ender_container_find(const char *name)
 	Ender_Container *ec;
 
 	ec = eina_hash_find(_structs, name);
+	if (!ec) return NULL;
 	return ender_container_ref(ec);
 }
 
