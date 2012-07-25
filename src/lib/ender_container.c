@@ -57,23 +57,6 @@ static void _ender_container_delete(Ender_Container *thiz)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Container * ender_container_ref(Ender_Container *thiz)
-{
-	thiz->ref++;
-	return thiz;
-}
-
-Ender_Container * ender_container_unref(Ender_Container *thiz)
-{
-	thiz->ref--;
-	if (!thiz->ref)
-	{
-		_ender_container_delete(thiz);
-		return NULL;
-	}
-	return thiz;
-}
-
 void ender_container_init(void)
 {
 	int i;
@@ -118,6 +101,32 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 	}
 	return _ender_container_new(t);
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Container * ender_container_ref(Ender_Container *thiz)
+{
+	thiz->ref++;
+	return thiz;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Container * ender_container_unref(Ender_Container *thiz)
+{
+	thiz->ref--;
+	if (!thiz->ref)
+	{
+		_ender_container_delete(thiz);
+		return NULL;
+	}
+	return thiz;
+}
+
 
 /**
  * To be documented

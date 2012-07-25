@@ -168,7 +168,7 @@ static void _ender_relative_matrix_set(Ender_Value *v, Ender_Setter set,
 /*----------------------------------------------------------------------------*
  *                                  pointer                                   *
  *----------------------------------------------------------------------------*/
-/* used for string, surface, object, ender */
+/* used for known pointers: struct, unions, etc */
 static void _ender_pointer_get(Ender_Value *v, Ender_Getter get,
 		void *e)
 {
@@ -191,15 +191,21 @@ static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
 	set(parent, e, v->data.ptr);
 }
 /*----------------------------------------------------------------------------*
- *                                   ender                                    *
+ *                                 objects                                    *
  *----------------------------------------------------------------------------*/
-static void _ender_ender_set(Ender_Value *v, Ender_Setter set,
+/* valid for every object: surface, ender, object, etc ... */
+static void _ender_object_get(Ender_Value *v, Ender_Getter get,
+		void *object)
+{
+	get(object, &v->data.ptr);
+}
+static void _ender_object_set(Ender_Value *v, Ender_Setter set,
 		void *object)
 {
 	set(object, v->data.ptr);
 }
 
-static void _ender_relative_ender_set(Ender_Value *v, Ender_Setter set,
+static void _ender_relative_object_set(Ender_Value *v, Ender_Setter set,
 		Ender_Element *e, void *parent)
 {
 	set(parent, e, v->data.ptr);
@@ -349,9 +355,9 @@ void ender_descriptor_init(void)
 	_setters[ENDER_COLOR] = _ender_int32_set;
 	_setters[ENDER_STRING] = _ender_pointer_set;
 	_setters[ENDER_MATRIX] = _ender_pointer_set;
-	_setters[ENDER_OBJECT] = _ender_pointer_set;
-	_setters[ENDER_SURFACE] = _ender_pointer_set;
-	_setters[ENDER_ENDER] = _ender_ender_set;
+	_setters[ENDER_OBJECT] = _ender_object_set;
+	_setters[ENDER_SURFACE] = _ender_object_set;
+	_setters[ENDER_ENDER] = _ender_object_set;
 	_setters[ENDER_LIST] = _ender_pointer_set;
 	_setters[ENDER_STRUCT] = _ender_pointer_set;
 	_setters[ENDER_UNION] = _ender_pointer_set;
@@ -367,9 +373,9 @@ void ender_descriptor_init(void)
 	_getters[ENDER_STRING] = _ender_pointer_get;
 	/* the special matrix case */
 	_getters[ENDER_MATRIX] = _ender_matrix_get;
-	_getters[ENDER_OBJECT] = _ender_pointer_get;
-	_getters[ENDER_SURFACE] = _ender_pointer_get;
-	_getters[ENDER_ENDER] = _ender_pointer_get;
+	_getters[ENDER_OBJECT] = _ender_object_get;
+	_getters[ENDER_SURFACE] = _ender_object_get;
+	_getters[ENDER_ENDER] = _ender_object_get;
 	_getters[ENDER_LIST] = _ender_matrix_get;
 	_getters[ENDER_STRUCT] = _ender_pointer_get;
 	_getters[ENDER_UNION] = _ender_pointer_get;
@@ -384,9 +390,9 @@ void ender_descriptor_init(void)
 	_relative_accessors[ENDER_COLOR] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_STRING] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_MATRIX] = _ender_relative_pointer_set;
-	_relative_accessors[ENDER_OBJECT] = _ender_relative_pointer_set;
-	_relative_accessors[ENDER_SURFACE] = _ender_relative_pointer_set;
-	_relative_accessors[ENDER_ENDER] = _ender_relative_ender_set;
+	_relative_accessors[ENDER_OBJECT] = _ender_relative_object_set;
+	_relative_accessors[ENDER_SURFACE] = _ender_relative_object_set;
+	_relative_accessors[ENDER_ENDER] = _ender_relative_object_set;
 	_relative_accessors[ENDER_LIST] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_STRUCT] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_UNION] = _ender_relative_pointer_set;

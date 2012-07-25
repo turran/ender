@@ -143,6 +143,8 @@ EAPI void ender_shutdown(void);
  * @{
  */
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
+EAPI Ender_Container * ender_container_ref(Ender_Container *thiz);
+EAPI Ender_Container * ender_container_unref(Ender_Container *thiz);
 
 EAPI void ender_container_register(Ender_Container *thiz, const char *name);
 EAPI Ender_Container * ender_container_find(const char *name);
