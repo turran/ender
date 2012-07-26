@@ -18,9 +18,10 @@
 #include "Ender.h"
 #include <getopt.h>
 
-static void _list_cb(const char *name, void *data)
+static Eina_Bool _list_cb(Ender_Descriptor *descriptor, void *data)
 {
-	printf("%s\n", name);
+	printf("%s\n", ender_descriptor_name_get(descriptor));
+	return EINA_TRUE;
 }
 
 static void _container_compound_dump(Ender_Container *c, int level)

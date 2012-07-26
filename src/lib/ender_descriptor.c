@@ -35,6 +35,19 @@ typedef struct _Ender_Descriptor_Property
 	Ender_Clear clear;
 	Ender_Is_Set is_set;
 } Ender_Descriptor_Property;
+	
+typedef struct _Ender_Descriptor_List_Data
+{
+	Eina_Bool ret;
+	Ender_Descriptor_List_Callback real_cb;
+	void *real_data;
+} Ender_Descriptor_List_Data;
+
+typedef struct _Ender_Descriptor_Find_Data
+{
+	Ender_Descriptor *ret;
+	const char *name;
+} Ender_Descriptor_Find_Data;
 
 typedef void (*Ender_Value_Accessor)(Ender_Value *v, Ender_Accessor acc,
 		void *e);
@@ -45,8 +58,42 @@ typedef void (*Ender_Value_Relative_Accessor)(Ender_Value *v, Ender_Accessor acc
 static Ender_Value_Accessor _setters[ENDER_PROPERTY_TYPES];
 static Ender_Value_Accessor _getters[ENDER_PROPERTY_TYPES];
 static Ender_Value_Relative_Accessor _relative_accessors[ENDER_PROPERTY_TYPES];
-static Eina_Hash *_descriptors = NULL;
 static Ender_Property * _descriptor_property_get(Ender_Descriptor *e, const char *name);
+
+static Eina_Bool _descriptor_list_namespace_cb(Ender_Descriptor *thiz, void *user_data)
+{
+	Ender_Descriptor_List_Data *data = user_data;
+
+	data->ret = data->real_cb(thiz, data->real_data);
+	return data->ret;
+}
+static Eina_Bool _descriptor_list_cb(Ender_Namespace *ns, void *user_data)
+{
+	Ender_Descriptor_List_Data *data = user_data;
+
+	ender_namespace_descriptor_list(ns, _descriptor_list_namespace_cb, data);
+	return data->ret;
+}
+
+static Eina_Bool _descriptor_find_namespace_cb(Ender_Descriptor *thiz, void *user_data)
+{
+	Ender_Descriptor_Find_Data *data = user_data;
+
+	if (!strcmp(thiz->name, data->name))
+	{
+		data->ret = thiz;
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;	
+}
+
+static Eina_Bool _descriptor_find_cb(Ender_Namespace *ns, void *user_data)
+{
+	Ender_Descriptor_Find_Data *data = user_data;
+
+	ender_namespace_descriptor_list(ns, _descriptor_find_namespace_cb, data);
+	return data->ret ? EINA_FALSE : EINA_TRUE;
+}
 
 static Ender_Property * _descriptor_property_get(Ender_Descriptor *e, const char *name)
 {
@@ -297,17 +344,6 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
-	Eina_Bool found = EINA_FALSE;
-
-	desc = eina_hash_find(_descriptors, name);
-	/* we have already added a new descriptor with this name */
-	if (desc)
-	{
-		WRN("Descriptor \"%s\" already found", name);
-		found = EINA_TRUE;
-		/* same namespace, then return previous one */
-		if (desc->ns == ns) return desc;
-	}
 
 	desc = calloc(1, sizeof(Ender_Descriptor));
 	desc->name = strdup(name);
@@ -317,9 +353,6 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	desc->type = type;
 	desc->ns = ns;
 	desc->properties = eina_ordered_hash_new((Eina_Free_Cb)ender_property_free);
-
-	if (!found)
-		eina_hash_add(_descriptors, name, desc);
 
 	return desc;
 }
@@ -336,7 +369,6 @@ void ender_descriptor_init(void)
 {
 	int i;
 
-	_descriptors = eina_hash_string_superfast_new(NULL);
 	/* initialize to some sane values */
 	for (i = 0; i < ENDER_PROPERTY_TYPES; i++)
 	{
@@ -400,7 +432,6 @@ void ender_descriptor_init(void)
 
 void ender_descriptor_shutdown(void)
 {
-	eina_hash_free(_descriptors);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -410,17 +441,17 @@ void ender_descriptor_shutdown(void)
  * @param cb
  * @param data
  */
-EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data)
+EAPI void ender_descriptor_list(Ender_Descriptor_List_Callback cb, void *user_data)
 {
-	Eina_Iterator *it;
-	char *name;
+	Ender_Descriptor_List_Data data;
 
-	it = eina_hash_iterator_key_new(_descriptors);
-	while (eina_iterator_next(it, (void **)&name))
-	{
-		cb(name, data);
-	}
-	eina_iterator_free(it);
+	if (!cb) return;
+
+	data.ret = EINA_TRUE;
+	data.real_cb = cb;
+	data.real_data = user_data;
+	
+	ender_namespace_list(_descriptor_list_cb, &data);
 }
 
 /**
@@ -429,22 +460,27 @@ EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data)
  */
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name)
 {
-	Ender_Descriptor *ed;
+	Ender_Descriptor_Find_Data data;
 
-	ed = eina_hash_find(_descriptors, name);
-	return ed;
+	if (!name) return NULL;
+
+	data.ret = NULL;
+	data.name = name;
+
+	ender_namespace_list(_descriptor_find_cb, &data);
+	return data.ret;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns_name)
+EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns_name, int version)
 {
 	Ender_Namespace *ns;
 
 	if (!ns_name) return ender_descriptor_find(name);
-	ns = ender_namespace_find(ns_name);
+	ns = ender_namespace_find(ns_name, version);
 	if (!ns) return NULL;
 	return ender_namespace_descriptor_find(ns, name);
 }
@@ -485,19 +521,6 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, con
 	DBG("Property %s added to %s", name, edesc->name);
 
 	return prop;
-}
-
-/**
- * Check if an ender with name @name exists on the library
- * @param name
- */
-EAPI Eina_Bool ender_descriptor_exists(const char *name)
-{
-	Ender_Descriptor *desc;
-
-	desc = eina_hash_find(_descriptors, name);
-	if (desc) return EINA_TRUE;
-	else return EINA_FALSE;
 }
 
 /**

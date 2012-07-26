@@ -23,7 +23,8 @@ typedef struct _Ender_Type
 %}
 
 %x C_COMMENT
-_operator [\[\]{}.,;=\:]
+_operator 		[\[\]{}.,;=\:]
+D			[0-9]
 
 %%
 
@@ -100,6 +101,10 @@ abstract		{
 				return T_ABSTRACT;
 			}
 using			return T_USING;
+[0-9]* 			{
+				yylval_param->number = atoi(yytext);
+				return T_NUMBER;
+			}
 
 (\"[^\"]*\")* {
 	char *tmp = NULL;

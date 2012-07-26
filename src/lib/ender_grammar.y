@@ -13,19 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct _Ender_Parser
-{
-	const char *file;
-	Ender_Parser_Descriptor *descriptor;
-	void *data;
-} Ender_Parser;
-
-typedef struct _Ender_Type
-{
-	char *name;
-	Ender_Container *container;
-} Ender_Type;
-
 void ender_error(void *lloc, void *scanner, Ender_Parser *parser, const char *str);
 
 static inline void _on_using(Ender_Parser *parser, Eina_List *list)
@@ -41,10 +28,10 @@ static inline void _on_using(Ender_Parser *parser, Eina_List *list)
 	}
 }
 
-static inline void _on_namespace(Ender_Parser *parser, const char *name)
+static inline void _on_namespace(Ender_Parser *parser, const char *name, int version)
 {
 	if (parser->descriptor->on_namespace)
-		parser->descriptor->on_namespace(parser->data, name);
+		parser->descriptor->on_namespace(parser->data, name, version);
 }
 
 static inline void _on_object(Ender_Parser *parser, const char *name, Ender_Descriptor_Type type, const char *parent)
@@ -65,17 +52,17 @@ static inline void _on_container(Ender_Parser *parser, const char *name, Ender_C
 		parser->descriptor->on_container(parser->data, name, container);
 }
 
-
 %}
 
 %union {
 	Ender_Descriptor_Type dtype;
 	Ender_Value_Type vtype;
 	Ender_Container *container;
-	Ender_Type *type;
+	Ender_Parser_Type *type;
 	char *s;
 	Eina_Bool b;
 	Eina_List *list; // use this for every _list nonterminal
+	int number;
 }
 
 %token <vtype> T_BOOL
@@ -96,6 +83,7 @@ static inline void _on_container(Ender_Parser *parser, const char *name, Ender_C
 %token <vtype> T_ENDER
 %token <dtype> T_ABSTRACT
 %token <dtype> T_CLASS
+%token <number> T_NUMBER
 %token T_NAMESPACE
 %token T_REL
 %token T_USING
@@ -128,7 +116,7 @@ main
 
 using
 	: { $$ = NULL; }
-	| T_USING T_INLINE_STRING ';' using { $$ = eina_list_append($4, $2); }
+	| T_USING T_INLINE_STRING ':' T_NUMBER ';' using { $$ = eina_list_append($6, $2); }
 	;
 
 namespace_list
@@ -137,9 +125,9 @@ namespace_list
 	;
 
 namespace
-	: T_NAMESPACE T_INLINE_STRING
+	: T_NAMESPACE T_INLINE_STRING ':' T_NUMBER
 	{
-		_on_namespace(parser, $2);
+		_on_namespace(parser, $2, $4);
 		free($2);
 	}
 	'{' definition_list '}' ';'
@@ -156,7 +144,7 @@ struct
 	: T_STRUCT T_INLINE_STRING '{' types '}' ';'
 	{
 		Ender_Container *c;
-		Ender_Type *t;
+		Ender_Parser_Type *t;
 		Eina_List *l;
 		Eina_List *ll;
 
@@ -178,7 +166,7 @@ union
 	: T_UNION T_INLINE_STRING '{' types '}' ';'
 	{
 		Ender_Container *c;
-		Ender_Type *t;
+		Ender_Parser_Type *t;
 		Eina_List *l;
 		Eina_List *ll;
 
@@ -294,7 +282,7 @@ type_relative
 type
 	: type_specifier T_INLINE_STRING
 	{
-		Ender_Type *type = malloc(sizeof(Ender_Type));
+		Ender_Parser_Type *type = malloc(sizeof(Ender_Parser_Type));
 		
 		type->container = $1;
 		type->name = $2;

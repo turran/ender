@@ -27,6 +27,7 @@
 typedef struct _Ender_Generator
 {
 	char *ns_name;
+	int ns_version;
 	const char *name;
 	FILE *out;
 	Eina_Bool found;
@@ -157,12 +158,13 @@ static void _dump_container_struct_union_recursive(Ender_Generator *thiz, Ender_
 /*----------------------------------------------------------------------------*
  *                            The parser interface                            *
  *----------------------------------------------------------------------------*/
-static void _generator_on_namespace(void *data, const char *name)
+static void _generator_on_namespace(void *data, const char *name, int version)
 {
 	Ender_Generator *thiz;
 
 	thiz = data;
 	thiz->ns_name = strdup(name);
+	thiz->ns_version = version;
 }
 
 static void _generator_on_container(void *data, const char *name, Ender_Container *c)
@@ -185,7 +187,7 @@ static void _generator_on_container(void *data, const char *name, Ender_Containe
 	fprintf(thiz->out, "\t}\n");
 }
 
-static void _generator_on_renderer(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
+static void _generator_on_object(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Generator *thiz;
 
@@ -205,6 +207,9 @@ static void _generator_on_renderer(void *data, const char *name, Ender_Descripto
 	fprintf(thiz->out, "\tstatic Ender_Descriptor *d = NULL;\n");
 	fprintf(thiz->out, "\tif (d) return;\n");
 	fprintf(thiz->out, "\tns = %s_namespace_get();\n", thiz->ns_name);
+	/* TODO instead of getting the descriptor this way, get it from every "using"
+	 * also using the version
+	 */
 	/* the descriptor itself */
 	if (parent)
 	{
@@ -271,7 +276,7 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 static Ender_Parser_Descriptor _generator_parser = {
 	/* .on_using 		= */ NULL,
 	/* .on_namespace 	= */ _generator_on_namespace,
-	/* .on_renderer 	= */ _generator_on_renderer,
+	/* .on_object 		= */ _generator_on_object,
 	/* .on_property 	= */ _generator_on_property,
 	/* .on_container 	= */ NULL,
 };
@@ -279,7 +284,7 @@ static Ender_Parser_Descriptor _generator_parser = {
 static Ender_Parser_Descriptor _generator_type_parser = {
 	/* .on_using 		= */ NULL,
 	/* .on_namespace 	= */ _generator_on_namespace,
-	/* .on_renderer 	= */ NULL,
+	/* .on_object 		= */ NULL,
 	/* .on_property 	= */ NULL,
 	/* .on_container 	= */ _generator_on_container,
 };

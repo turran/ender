@@ -133,4 +133,19 @@ void ender_loader_init(void);
 void ender_loader_shutdown(void);
 void ender_loader_load_all(void);
 
+/* the parser */
+typedef struct _Ender_Parser
+{
+	const char *file;
+	Ender_Parser_Descriptor *descriptor;
+	void *data;
+} Ender_Parser;
+
+typedef struct _Ender_Parser_Type
+{
+	char *name;
+	Ender_Container *container;
+} Ender_Parser_Type;
+
+
 #endif

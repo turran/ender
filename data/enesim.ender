@@ -1,4 +1,4 @@
-namespace "enesim" {
+namespace "enesim" : 0 {
 	abstract "renderer" {
 		string "name";
 		matrix "transformation";
@@ -13,7 +13,7 @@ namespace "enesim" {
 	};
 };
 
-namespace "enesim.renderer" {
+namespace "enesim.renderer" : 0 {
 	abstract "shape" : "renderer" {
 		int "draw_mode";
 		double "stroke_weight";

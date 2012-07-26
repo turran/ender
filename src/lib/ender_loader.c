@@ -174,16 +174,18 @@ static inline void * _sym_get(void *dl_handle, const char *ns_name, const char *
 	return found;
 }
 
-static Ender_Library_Namespace * _loader_namespace_new(const char *name)
+static Ender_Library_Namespace * _loader_namespace_new(const char *name, int version)
 {
 	Ender_Library_Namespace *namespace;
 	Ender_Namespace *ns;
 	Ender_Library *library;
+	char real_lib[PATH_MAX];
 	char tmp1[PATH_MAX];
 	char *tmp2;
+	void *dl_handle;
 
 	if (!name) return NULL;
-	DBG("Registering new namespace %s", name);
+	DBG("Registering new namespace %s:%d", name, version);
 	/* check if we already have the namespace */
 	namespace = eina_hash_find(_library_namespaces, name);
 	if (namespace) return namespace;
@@ -205,21 +207,19 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 		tmp1[PATH_MAX - 1] = '\0';
 	}
 	/* check if we already have the library */
-	library = eina_hash_find(_libraries, tmp1);
+	/* FIXME fix the windows case */
+	snprintf(real_lib, PATH_MAX, "lib%s.so.%d", tmp1, version);
+	library = eina_hash_find(_libraries, real_lib);
 	if (!library)
 	{
-		char real_lib[PATH_MAX];
-		void *dl_handle;
-
-		snprintf(real_lib, PATH_MAX, "lib%s.so", tmp1);
 		dl_handle = dlopen(real_lib, RTLD_LAZY);
 		if (!dl_handle)
 		{
 			ERR("The library %s can not be found", real_lib);
 			return NULL;
 		}
-		library = _library_new(tmp1, dl_handle);
-		eina_hash_add(_libraries, tmp1, library);
+		library = _library_new(real_lib, dl_handle);
+		eina_hash_add(_libraries, real_lib, library);
 	}
 	/* replace every . with a _ */
 	strncpy(tmp1, name, PATH_MAX);
@@ -227,10 +227,10 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name)
 	{
 		*tmp2 = '_';
 	}
-	ns = ender_namespace_find(tmp1);
+	ns = ender_namespace_find(tmp1, version);
 	if (!ns)
 	{
-		ns = ender_namespace_new(tmp1);
+		ns = ender_namespace_new(tmp1, version);
 	}
 
 	namespace = malloc(sizeof(Ender_Library_Namespace));
@@ -368,12 +368,12 @@ static void _loader_on_using(void *data, const char *file)
 	free(c_name);
 }
 
-static void _loader_on_namespace(void *data, const char *name)
+static void _loader_on_namespace(void *data, const char *name, int version)
 {
 	Ender_Loader *thiz;
 
 	thiz = data;
-	thiz->namespace = _loader_namespace_new(name);
+	thiz->namespace = _loader_namespace_new(name, version);
 }
 
 static void _loader_on_object(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)

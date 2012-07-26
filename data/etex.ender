@@ -1,6 +1,6 @@
-using "enesim";
+using "enesim": 0;
 
-namespace "etex" {
+namespace "etex" : 0 {
 	abstract "base" : "renderer" {
 		string "font_name";
 		uint "size";

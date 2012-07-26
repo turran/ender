@@ -152,33 +152,33 @@ struct _Ender_Element
 	int ref;
 };
 
-static Ender_Element * _ender_element_new(const char *name, const char *ns_name)
+static Ender_Element * _ender_element_new(const char *name, Ender_Descriptor *desc)
 {
 	Ender_Element *ender;
 	Ender_New_Listener *listener;
 	void *object;
-	Ender_Descriptor *desc;
 	Eina_List *l;
 
-	desc = ender_descriptor_find_with_namespace(name, ns_name);
-	DBG("Creating new ender \"%s\" for namesapce \"%s\"", name, ns_name);
+	DBG("Creating new ender '%s'", name);
 	if (!desc)
 	{
-		ERR("No such descriptor for name \"%s.%s\"", ns_name, name);
+		ERR("No such descriptor for name '%s'", name);
 		return NULL;
 	}
+
 	if (!desc->create)
 	{
-		ERR("The descriptor for name \"%s.%s\" does not have a creator", ns_name, name);
+		ERR("The descriptor for name '%s' does not have a creator", name);
 		return NULL;
 	}
 
 	object = desc->create();
 	if (!object)
 	{
-		ERR("For some reason the creator for \"%s.%s\" failed", ns_name, name);
+		ERR("For some reason the creator for '%s' failed", name);
 		return NULL;
 	}
+	DBG("Element '%s' created correctly", name);
 
 	ender = calloc(1, sizeof(Ender_Element));
 	EINA_MAGIC_SET(ender, ENDER_MAGIC);
@@ -331,18 +331,41 @@ static void _property_free(void *data)
  */
 EAPI Ender_Element * ender_element_new(const char *name)
 {
-	return ender_element_new_with_namespace(name, NULL);
+	return ender_element_new_with_namespace(name, NULL, 0);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name)
+EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name, int version)
 {
-	return _ender_element_new(name, ns_name);
+	Ender_Descriptor *desc;
+
+	desc = ender_descriptor_find_with_namespace(name, ns_name, version);
+	return _ender_element_new(name, desc);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Element * ender_element_new_namespace_from(const char *name, Ender_Namespace *ns)
+{
+	Ender_Descriptor *desc;
+
+	desc = ender_namespace_descriptor_find(ns, name);
+	return _ender_element_new(name, desc);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Element * ender_element_new_descriptor_from(const char *name, Ender_Descriptor *desc)
+{
+	return _ender_element_new(name, desc);
+}
 
 /**
  * Ref an ender

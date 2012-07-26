@@ -23,22 +23,32 @@
 struct _Ender_Namespace
 {
 	char *name;
+	int version;
 	Eina_Hash *descriptors;
 };
 
 /* TODO */
 typedef void (*Ender_Namespace_Init)(void);
 
+/* on this hash we store the list of namespaces, we use a list because we need
+ * to support multiple versions for the same namespace name. The list is ordered
+ * from the minimum version to the latest version
+ */
 static Eina_Hash *_namespaces = NULL;
 
 static void _ender_namespace_free(void *data)
 {
-	Ender_Namespace *thiz = data;
+	Eina_List *namespaces = data;
+	Eina_List *ll;
+	Ender_Namespace *thiz;
 
-	if (thiz->name)
-		free(thiz->name);
-	eina_hash_free(thiz->descriptors);
-	free(thiz);
+	EINA_LIST_FOREACH(namespaces, ll, thiz)
+	{
+		if (thiz->name)
+			free(thiz->name);
+		eina_hash_free(thiz->descriptors);
+		free(thiz);
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -79,38 +89,56 @@ void ender_namespace_dump(Ender_Namespace *ns)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Namespace * ender_namespace_new(const char *name)
+EAPI Ender_Namespace * ender_namespace_new(const char *name, int version)
 {
-	Ender_Namespace *namespace;
+	Ender_Namespace *thiz;
+	Eina_List *namespaces, *tmp;
 
 	if (!name) return NULL;
 
+	namespaces = eina_hash_find(_namespaces, name);
 	/* check if we already have the namespace */
-	namespace = eina_hash_find(_namespaces, name);
-	if (!namespace)
+	EINA_LIST_FOREACH(namespaces, tmp, thiz)
 	{
-		namespace = malloc(sizeof(Ender_Namespace));
-		namespace->name = strdup(name);
-		namespace->descriptors = eina_hash_string_superfast_new(
-				(Eina_Free_Cb)ender_descriptor_free);
-		eina_hash_add(_namespaces, name, namespace);
+		if (!thiz->version == version)
+			return thiz;
+		else if (thiz->version > version)
+			break;
 	}
-	return namespace;
+	/* if not append it */
+	thiz = malloc(sizeof(Ender_Namespace));
+	thiz->name = strdup(name);
+	thiz->version = version;
+	thiz->descriptors = eina_hash_string_superfast_new(
+			(Eina_Free_Cb)ender_descriptor_free);
+
+	tmp = eina_list_append_relative_list(namespaces, thiz, tmp);
+	/* add it */
+	eina_hash_set(_namespaces, name, tmp);
+
+	return thiz;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_namespace_list(Ender_List_Callback cb, void *data)
+EAPI void ender_namespace_list(Ender_Namespace_List_Callback cb, void *data)
 {
+	Eina_List *namespaces;
 	Eina_Iterator *it;
-	char *name;
 
-	it = eina_hash_iterator_key_new(_namespaces);
-	while (eina_iterator_next(it, (void **)&name))
+	it = eina_hash_iterator_data_new(_namespaces);
+	while (eina_iterator_next(it, (void **)&namespaces))
 	{
-		cb(name, data);
+		Ender_Namespace *thiz;
+		Eina_List *tmp;
+
+		EINA_LIST_FOREACH(namespaces, tmp, thiz)
+		{
+			if (!cb(thiz, data))
+				break;
+		}
 	}
 	eina_iterator_free(it);
 }
@@ -119,42 +147,76 @@ EAPI void ender_namespace_list(Ender_List_Callback cb, void *data)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Namespace * ender_namespace_find(const char *name)
+EAPI Eina_Bool ender_namespace_list_with_name(const char *name,
+		Ender_Namespace_List_Callback cb, void *data)
 {
-	Ender_Namespace *namespace;
+	Eina_List *namespaces;
+	Eina_List *tmp;
+	Ender_Namespace *thiz;
+
+	if (!name) return EINA_FALSE;
+
+	namespaces = eina_hash_find(_namespaces, name);
+	if (!namespaces) return EINA_FALSE;
+
+	EINA_LIST_FOREACH(namespaces, tmp, thiz)
+	{
+		if (!cb(thiz, data))
+			break;
+	}
+	return EINA_TRUE;
+}
+
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Namespace * ender_namespace_find(const char *name, int version)
+{
+	Eina_List *namespaces;
+	Eina_List *tmp;
+	Ender_Namespace *thiz;
 
 	if (!name) return NULL;
 
-	namespace = eina_hash_find(_namespaces, name);
-	return namespace;
+	namespaces = eina_hash_find(_namespaces, name);
+	EINA_LIST_FOREACH(namespaces, tmp, thiz)
+	{
+		/* TODO we might need in the future to not be too restrictive? */
+		if (thiz->version == version)
+			return thiz;
+	}
+	return NULL;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns, const char *name)
+EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *thiz, const char *name)
 {
-	if (!ns || !name) return NULL;
+	if (!thiz || !name) return NULL;
 
-	return eina_hash_find(ns->descriptors, name);
+	return eina_hash_find(thiz->descriptors, name);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns, Ender_List_Callback cb, void *data)
+EAPI void ender_namespace_descriptor_list(Ender_Namespace *thiz, Ender_Descriptor_List_Callback cb, void *data)
 {
 	Eina_Iterator *it;
-	char *name;
+	Ender_Descriptor *desc;
 
-	if (!ns) return;
+	if (!thiz) return;
 
-	it = eina_hash_iterator_key_new(ns->descriptors);
-	while (eina_iterator_next(it, (void **)&name))
+	it = eina_hash_iterator_data_new(thiz->descriptors);
+	while (eina_iterator_next(it, (void **)&desc))
 	{
-		cb(name, data);
+		if (!cb(desc, data))
+			break;
 	}
 	eina_iterator_free(it);
 }
@@ -180,8 +242,19 @@ EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens, con
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * ender_namespace_name_get(Ender_Namespace *ns)
+EAPI const char * ender_namespace_name_get(Ender_Namespace *thiz)
 {
-	if (!ns) return NULL;
-	return ns->name;
+	if (!thiz) return NULL;
+	return thiz->name;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI int ender_namespace_version_get(Ender_Namespace *thiz)
+{
+	if (!thiz) return 0;
+	return thiz->version;
+}
+

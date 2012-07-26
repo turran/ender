@@ -238,25 +238,28 @@ EAPI void ender_value_unref(Ender_Value *thiz);
  * @defgroup Ender_Namespace_Group Namespace
  * @{
  */
-typedef void (*Ender_List_Callback)(const char *name, void *data);
+typedef Eina_Bool (*Ender_Namespace_List_Callback)(Ender_Namespace *thiz, void *data);
+typedef Eina_Bool (*Ender_Descriptor_List_Callback)(Ender_Descriptor *thiz, void *data);
 typedef void * (*Ender_Creator)(void);
 typedef void (*Ender_Destructor)(void *);
 
 #define ENDER_CREATOR(f) ((Ender_Creator)(f))
 #define ENDER_DESTRUCTOR(f) ((Ender_Destructor)(f))
 
-EAPI void ender_namespace_list(Ender_List_Callback cb, void *data);
-EAPI Ender_Namespace * ender_namespace_new(const char *name);
-EAPI Ender_Namespace * ender_namespace_find(const char *name);
-EAPI void ender_namespace_descriptor_list(Ender_Namespace *ns,
-		Ender_List_Callback cb, void *data);
-EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *ns,
+EAPI void ender_namespace_list(Ender_Namespace_List_Callback cb, void *data);
+EAPI Eina_Bool ender_namespace_list_with_name(const char *name, Ender_Namespace_List_Callback cb, void *data);
+EAPI Ender_Namespace * ender_namespace_new(const char *name, int version);
+EAPI Ender_Namespace * ender_namespace_find(const char *name, int version);
+EAPI void ender_namespace_descriptor_list(Ender_Namespace *thiz,
+		Ender_Descriptor_List_Callback cb, void *data);
+EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *thiz,
 		const char *name);
 EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens,
 		const char *name,
 		Ender_Creator creator, Ender_Destructor destructor,
 		Ender_Descriptor *parent, Ender_Descriptor_Type type);
-EAPI const char * ender_namespace_name_get(Ender_Namespace *ns);
+EAPI const char * ender_namespace_name_get(Ender_Namespace *thiz);
+EAPI int ender_namespace_version_get(Ender_Namespace *thiz);
 
 /**
  * @}
@@ -281,7 +284,7 @@ typedef void (*Ender_Clear)(void *o);
 typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
-EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns);
+EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns, int version);
 EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 		const char *name,
 		Ender_Container *ec,
@@ -295,7 +298,7 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
-EAPI void ender_descriptor_list(Ender_List_Callback cb, void *data);
+EAPI void ender_descriptor_list(Ender_Descriptor_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);
 EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed);
 EAPI const char * ender_descriptor_name_get(Ender_Descriptor *ed);
@@ -315,7 +318,9 @@ typedef Ender_Element_Accessor Ender_Element_Remove;
 typedef void (*Ender_Element_Clear)(Ender_Element *e, Ender_Property *ep, void *data);
 
 EAPI Ender_Element * ender_element_new(const char *name);
-EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name);
+EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name, int version);
+EAPI Ender_Element * ender_element_new_namespace_from(const char *name, Ender_Namespace *ns);
+EAPI Ender_Element * ender_element_new_descriptor_from(const char *name, Ender_Descriptor *desc);
 EAPI Ender_Element * ender_element_ref(Ender_Element *e);
 EAPI Ender_Element * ender_element_unref(Ender_Element *e);
 EAPI void * ender_element_data_set(Ender_Element *e, const char *key, void *data);
@@ -463,7 +468,7 @@ EAPI void ender_loader_registry_callback_add(Ender_Loader_Registry_Callback cb, 
  */
 
 typedef void (*Ender_Parser_On_Using)(void *data, const char *name);
-typedef void (*Ender_Parser_On_Namespace)(void *data, const char *name);
+typedef void (*Ender_Parser_On_Namespace)(void *data, const char *name, int version);
 typedef void (*Ender_Parser_On_Object)(void *data, const char *name, Ender_Descriptor_Type type, const char *parent);
 typedef void (*Ender_Parser_On_Property)(void *data, const char *name, Eina_Bool relative, Ender_Container *container); 
 typedef void (*Ender_Parser_On_Container)(void *data, const char *name, Ender_Container *container); 
