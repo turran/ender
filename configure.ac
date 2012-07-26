@@ -42,6 +42,8 @@ AC_SUBST([ENDER_BUILD])
 requirements_ender="enesim >= 0.0.15 eina >= 1.0.0"
 AC_SUBST([requirements_ender])
 
+LT_SYS_MODULE_EXT
+
 
 ### Checks for programs
 
