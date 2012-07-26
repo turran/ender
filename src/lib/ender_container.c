@@ -78,7 +78,7 @@ void ender_container_shutdown(void)
 	{
 		_basic_containers[i] = ender_container_unref(_basic_containers[i]);
 		if (_basic_containers[i])
-			printf("refocunt error %d on type %s\n",
+			printf("refcount error %d on type %s\n",
 					_basic_containers[i]->ref,
 					ender_value_type_string_to(_basic_containers[i]->type));
 	}
