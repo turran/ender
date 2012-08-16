@@ -213,7 +213,8 @@ static void _generator_on_object(void *data, const char *name, Ender_Descriptor_
 	/* the descriptor itself */
 	if (parent)
 	{
-		fprintf(thiz->out, "\tparent = ender_descriptor_find(\"%s\");\n", parent);
+		fprintf(thiz->out, "\tparent = ender_namespace_descriptor_find(ns, \"%s\");\n", parent);
+		fprintf(thiz->out, "\tif (!parent) parent = ender_descriptor_find(\"%s\");;\n", parent);
 		fprintf(thiz->out, "\tif (!parent) return;\n");
 	}
 	if (type == ENDER_ABSTRACT)

@@ -362,9 +362,9 @@ EAPI Ender_Element * ender_element_new_namespace_from(const char *name, Ender_Na
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Element * ender_element_new_descriptor_from(const char *name, Ender_Descriptor *desc)
+EAPI Ender_Element * ender_element_new_descriptor_from(Ender_Descriptor *desc)
 {
-	return _ender_element_new(name, desc);
+	return _ender_element_new(desc->name, desc);
 }
 
 /**

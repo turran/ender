@@ -320,7 +320,7 @@ typedef void (*Ender_Element_Clear)(Ender_Element *e, Ender_Property *ep, void *
 EAPI Ender_Element * ender_element_new(const char *name);
 EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name, int version);
 EAPI Ender_Element * ender_element_new_namespace_from(const char *name, Ender_Namespace *ns);
-EAPI Ender_Element * ender_element_new_descriptor_from(const char *name, Ender_Descriptor *desc);
+EAPI Ender_Element * ender_element_new_descriptor_from(Ender_Descriptor *desc);
 EAPI Ender_Element * ender_element_ref(Ender_Element *e);
 EAPI Ender_Element * ender_element_unref(Ender_Element *e);
 EAPI void * ender_element_data_set(Ender_Element *e, const char *key, void *data);
