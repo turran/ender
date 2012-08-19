@@ -18,12 +18,12 @@ namespace "enesim.renderer" : 0 {
 		int "draw_mode";
 		double "stroke_weight";
 		color "stroke_color";
-		object "stroke_object";
+		object "stroke_renderer";
 		int "stroke_location";
 		int "stroke_cap";
 		int "stroke_join";
 		color "fill_color";
-		object "fill_object";
+		object "fill_renderer";
 	};
 
 	class "line" : "shape" {
@@ -196,10 +196,10 @@ namespace "enesim.renderer" : 0 {
 	class "stripes" : "renderer" {
 		double "even_thickness";
 		color "even_color";
-		object "even_object";
+		object "even_renderer";
 		double "odd_thickness";
 		color "odd_color";
-		object "odd_object";
+		object "odd_renderer";
 	};
 
 	class "compound" : "renderer" {
