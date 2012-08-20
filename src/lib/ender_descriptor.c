@@ -402,7 +402,7 @@ void ender_descriptor_init(void)
 	_getters[ENDER_DOUBLE] = _ender_double_get;
 	_getters[ENDER_ARGB] = _ender_int32_get;
 	_getters[ENDER_COLOR] = _ender_int32_get;
-	_getters[ENDER_STRING] = _ender_pointer_get;
+	_getters[ENDER_STRING] = _ender_object_get;
 	/* the special matrix case */
 	_getters[ENDER_MATRIX] = _ender_matrix_get;
 	_getters[ENDER_OBJECT] = _ender_object_get;
