@@ -1153,3 +1153,30 @@ EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data)
 		}
 	}
 }
+
+#if 0
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_element_marshal(Ender_Element *e, unsigned int *len)
+{
+	/* always marshal first the element name */
+	/* then iterate every property and based on the container type
+	 * create a descriptor for "name" "value"
+	 * or either whenever a descriptor is added, also create its
+	 * eet descriptor
+	 */
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Element * ender_element_unmarshal(void *data, unsigned int len)
+{
+
+}
+
+#endif
