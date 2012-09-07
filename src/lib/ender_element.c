@@ -149,6 +149,7 @@ struct _Ender_Element
 	void *object;
 	Eina_Hash *listeners;
 	Eina_Hash *properties;
+	Eina_Hash *data;
 	int ref;
 };
 
@@ -186,6 +187,7 @@ static Ender_Element * _ender_element_new(const char *name, Ender_Descriptor *de
 	ender->descriptor = desc;
 	ender->listeners = eina_hash_string_superfast_new(NULL);
 	ender->properties = eina_hash_string_superfast_new((Eina_Free_Cb)ender_property_free);
+	ender->data = eina_hash_string_superfast_new(NULL);
 	ender->ref = 1;
 	/* call the constructor callback */
 	EINA_LIST_FOREACH(_new_callbacks, l, listener)
@@ -223,6 +225,7 @@ static void _ender_element_delete(Ender_Element *e)
 	/* free every private data */
 	/* TODO the listeners */
 	eina_hash_free(e->properties);
+	eina_hash_free(e->data);
 	free(e);
 }
 
@@ -403,10 +406,8 @@ EAPI void * ender_element_data_set(Ender_Element *e, const char *key, void *data
 	if (!key) return NULL;
 
 	ENDER_MAGIC_CHECK(e);
-#if 0
-	old_data = enesim_object_private_get(e->object, key);
-	enesim_object_private_set(e->object, key, data);
-#endif
+	old_data = eina_hash_find(e->data, key);
+	eina_hash_add(e->data, key, data);
 
 	return old_data;
 }
@@ -420,11 +421,7 @@ EAPI void * ender_element_data_get(Ender_Element *e, const char *key)
 	if (!key) return NULL;
 
 	ENDER_MAGIC_CHECK(e);
-#if 0
-	return enesim_object_private_get(e->object, key);
-#else
-	return NULL;
-#endif
+	return eina_hash_find(e->data, key);
 }
 
 
