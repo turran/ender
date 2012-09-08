@@ -100,7 +100,7 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name, int version)
 	/* check if we already have the namespace */
 	EINA_LIST_FOREACH(namespaces, tmp, thiz)
 	{
-		if (!thiz->version == version)
+		if (thiz->version == version)
 			return thiz;
 		else if (thiz->version > version)
 			break;
