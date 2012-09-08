@@ -117,7 +117,7 @@ EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Container * ender_value_container_get(Ender_Value *value)
+EAPI Ender_Container * ender_value_container_get(const Ender_Value *value)
 {
 	return value->container;
 }
@@ -126,7 +126,7 @@ EAPI Ender_Container * ender_value_container_get(Ender_Value *value)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Value_Type ender_value_type_get(Ender_Value *value)
+EAPI Ender_Value_Type ender_value_type_get(const Ender_Value *value)
 {
 	return value->container->type;
 }
