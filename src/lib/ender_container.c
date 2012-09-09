@@ -17,6 +17,22 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
+
+/* In order to serlaize values we need:
+ * 1. Simple container types (int, double, etc) just require the
+ * main eet data descriptor to be the Ender_Value_Data union
+ * so we just "decode" into it directly
+ * 2. Lists, require that the children are allocated and thus
+ * we need to create a data descriptor for each basic type. In case the
+ * list has a compound type like a struct or union we need to
+ * be able to create such malloced data by eet itself
+ * 3. Unions/Structs requires eet to define its descriptor dynamically
+ * based on the children container type not the container descriptor
+ * 4. Pointers (enders, objects, surfaces, etc) require the user to
+ * provide an "id" number for them. This "id" must be provided
+ * and calculated by the user. Given that it is the most
+ * difficult part, it will be done at the end.
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -28,14 +44,88 @@ typedef struct _Ender_Container_Sub
 
 static Eina_Hash *_structs = NULL;
 static Ender_Container *_basic_containers[ENDER_LIST - ENDER_BOOL];
+#ifdef BUILD_SERIALIZE
+static Eet_Data_Descriptor *_value_descriptors[ENDER_PROPERTY_TYPES];
+
+static Eet_Data_Descriptor * _ender_container_value_descriptor_new(Ender_Value_Type t)
+{
+	Eet_Data_Descriptor *edd = NULL;
+	Eet_Data_Descriptor_Class eddc;
+
+       	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc),
+			ender_value_type_string_to(t),
+			sizeof(Ender_Value));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	switch (t)
+	{
+		case ENDER_BOOL:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "name", data.i32, EET_T_CHAR);
+		break;
+
+		case ENDER_UINT32:
+		case ENDER_INT32:
+		case ENDER_UINT64:
+		case ENDER_INT64:
+		case ENDER_DOUBLE:
+		case ENDER_COLOR:
+		case ENDER_ARGB:
+		case ENDER_STRING:
+		case ENDER_MATRIX:
+		case ENDER_OBJECT:
+		case ENDER_SURFACE:
+		case ENDER_ENDER:
+		case ENDER_POINTER:
+		case ENDER_VALUE:
+		/* compound types */
+		case ENDER_LIST:
+		case ENDER_STRUCT:
+		case ENDER_UNION:
+		break;
+	}
+	return edd;
+}
+#endif
+
 
 static Ender_Container * _ender_container_new(Ender_Value_Type t)
 {
 	Ender_Container *thiz;
+#if BUILD_SERIALIZE
+	Eet_Data_Descriptor *edd = NULL;
+	Eet_Data_Descriptor_Class eddc;
+#endif
 
 	thiz = calloc(1, sizeof(Ender_Container));
 	thiz->type = t;
 	thiz->ref = 1;
+#if BUILD_SERIALIZE
+	switch (t)
+	{
+		case ENDER_BOOL:
+		break;
+
+		case ENDER_UINT32:
+		case ENDER_INT32:
+		case ENDER_UINT64:
+		case ENDER_INT64:
+		case ENDER_DOUBLE:
+		case ENDER_COLOR:
+		case ENDER_ARGB:
+		case ENDER_STRING:
+		case ENDER_MATRIX:
+		case ENDER_OBJECT:
+		case ENDER_SURFACE:
+		case ENDER_ENDER:
+		case ENDER_POINTER:
+		case ENDER_VALUE:
+		/* compound types */
+		case ENDER_LIST:
+		case ENDER_STRUCT:
+		case ENDER_UNION:
+		break;
+	}
+	thiz->eet = edd;
+#endif
 	return thiz;
 }
 

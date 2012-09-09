@@ -81,6 +81,14 @@ EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 PKG_CHECK_MODULES([ENDER], [${requirements_ender}])
 
+build_serialize="no"
+PKG_CHECK_MODULES([EET], [eet >= 1.0.0], [have_eet="yes"], [have_eet="no"])
+if test "x${have_eet}" = "xyes"; then
+   build_serialize="yes"
+   AC_DEFINE([BUILD_SERIALIZE], [1], [Build support for serializing elements and values])
+fi
+
+AM_CONDITIONAL([BUILD_SERIALIZE], [test "x${build_serialize}" = "xyes"])
 ### Checks for library functions
 
 EFL_CHECK_DLOPEN
@@ -112,6 +120,8 @@ echo "------------------------------------------------------------------------"
 echo
 echo
 echo "Configuration Options Summary:"
+echo
+echo "Serializing support ...: $build_serialize"
 echo
 echo "Compilation............: make (or gmake)"
 echo "  CPPFLAGS.............: $CPPFLAGS"

@@ -594,3 +594,21 @@ EAPI void ender_value_unref(Ender_Value *thiz)
 	if (!thiz->ref)
 		_ender_value_free(thiz);
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_value_marshal(Ender_Value *v, unsigned int *len)
+{
+
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Value * ender_value_unmarshal(void *data, unsigned int len)
+{
+
+}

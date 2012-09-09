@@ -22,6 +22,10 @@
 #include "config.h"
 #endif
 
+#if BUILD_SERIALIZE
+#include "Eet.h"
+#endif
+
 #include <dlfcn.h>
 
 /* core */
@@ -44,6 +48,9 @@ struct _Ender_Container
 	Eina_List *elements;
 	/* inner element */
 	ssize_t offset;
+#if BUILD_SERIALIZE
+	Eet_Data_Descriptor *eet;
+#endif
 };
 
 struct _Ender_Value
