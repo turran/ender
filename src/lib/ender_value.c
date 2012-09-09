@@ -343,6 +343,7 @@ EAPI void ender_value_string_set(Ender_Value *value, char * string)
  */
 EAPI void ender_value_static_string_set(Ender_Value *value, const char * string)
 {
+	if (!string) return;
 	if (value->container->type != ENDER_STRING)
 		return;
 	value->data.ptr = strdup(string);

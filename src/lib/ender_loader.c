@@ -104,7 +104,8 @@ static Eina_Bool _file_locate(const char *file, char *real_file)
 	struct stat st;
 
 	strcpy(real_file, file);
-	if (strcmp(real_file + strlen(real_file) - 6, ".ender"))
+	if (strlen(real_file) <= 6 ||
+	    strcmp(real_file + strlen(real_file) - 6, ".ender"))
 	{
 		strcat(real_file, ".ender");
 	}
