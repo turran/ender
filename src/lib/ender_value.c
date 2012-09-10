@@ -601,14 +601,6 @@ EAPI void ender_value_unref(Ender_Value *thiz)
  */
 EAPI void * ender_value_marshal(Ender_Value *v, unsigned int *len)
 {
-
+	return ender_container_value_marshal(v->container, v, len);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Ender_Value * ender_value_unmarshal(void *data, unsigned int len)
-{
-
-}

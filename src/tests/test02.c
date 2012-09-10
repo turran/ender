@@ -19,6 +19,26 @@ ENDER_STRUCT,
 ENDER_PROPERTY_TYPES,
 */
 
+static Eina_Bool serialize = EINA_TRUE;
+
+static Ender_Value * test_serialize(Ender_Value *v)
+{
+	Ender_Container *c;
+	Ender_Value *other;
+	void *data;
+	unsigned int len;
+
+	data = ender_value_marshal(v, &len);
+	if (!data) return NULL;
+
+	c = ender_value_container_get(v);
+	other = ender_container_value_unmarshal(c, data, len);
+	if (!other) return NULL;
+
+	ender_value_unref(v);
+	return other;
+}
+
 static Eina_Bool test_bool(void)
 {
 	Ender_Value *v;
@@ -26,10 +46,15 @@ static Eina_Bool test_bool(void)
 
 	v = ender_value_basic_new(ENDER_BOOL);
 	ender_value_bool_set(v, EINA_TRUE);
+	if (serialize)
+		v = test_serialize(v);
+
 	if (ender_value_bool_get(v) != EINA_TRUE)
 	{
 		return EINA_FALSE;
 	}
+	ender_value_unref(v);
+
 	return EINA_TRUE;
 }
 
@@ -40,20 +65,28 @@ static Eina_Bool test_uint32(void)
 
 	v = ender_value_basic_new(ENDER_UINT32);
 	ender_value_uint32_set(v, 123456);
+	if (serialize)
+		v = test_serialize(v);
+
 	if (ender_value_uint32_get(v) != 123456)
 	{
 		return EINA_FALSE;
 	}
+	ender_value_unref(v);
+
 	return EINA_TRUE;
 }
 
 int main(int argc, char **argv)
 {
+	ender_init(&argc, &argv);
+
 	/* just test the value types */
 	if (!test_bool())
 		return -1;
 	if (!test_uint32())
 		return -1;
 	/* new values, set and get */
+	ender_shutdown();
 	return 0;
 }

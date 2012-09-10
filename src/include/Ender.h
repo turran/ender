@@ -84,6 +84,7 @@ typedef struct _Ender_Container Ender_Container;
 typedef struct _Ender_Descriptor Ender_Descriptor;
 typedef struct _Ender_Namespace Ender_Namespace;
 typedef struct _Ender_Constraint Ender_Constraint;
+typedef struct _Ender_Value Ender_Value;
 
 typedef void (*Ender_Event_Callback)(Ender_Element *e, const char *event_name, void *event_data, void *data);
 typedef void (*Ender_New_Callback)(Ender_Element *e, void *data);
@@ -160,13 +161,15 @@ EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Conta
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
 EAPI const char * ender_container_registered_name_get(Ender_Container *thiz);
 
+EAPI void * ender_container_value_marshal(Ender_Container *c, const Ender_Value *v, unsigned int *len);
+EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *c, void *data, unsigned int len);
+
 /**
  * @}
  * @defgroup Ender_Value_Group Value
  * @{
  */
 
-typedef struct _Ender_Value Ender_Value;
 typedef void (*Ender_Value_Free)(Ender_Value *value, void *data);
 
 EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type);
@@ -175,6 +178,8 @@ EAPI Ender_Value * ender_value_new_container_from(Ender_Container *container);
 Ender_Value * ender_value_new_container_static_from(Ender_Container *ec);
 EAPI Ender_Container * ender_value_container_get(const Ender_Value *value);
 EAPI Ender_Value_Type ender_value_type_get(const Ender_Value *value);
+
+EAPI void * ender_value_marshal(Ender_Value *v, unsigned int *len);
 
 EAPI void ender_value_bool_set(Ender_Value *value, Eina_Bool boolean);
 EAPI Eina_Bool ender_value_bool_get(const Ender_Value *value);

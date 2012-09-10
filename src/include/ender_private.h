@@ -46,10 +46,10 @@ struct _Ender_Container
 	/* structs */
 	int num_elements;
 	Eina_List *elements;
-	/* inner element */
-	ssize_t offset;
+	/* relative to a parent container */
 #if BUILD_SERIALIZE
-	Eet_Data_Descriptor *eet;
+	Eet_Data_Descriptor *descriptor;
+	Eet_Data_Descriptor *compound;
 #endif
 };
 

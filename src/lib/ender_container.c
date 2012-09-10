@@ -32,54 +32,157 @@
  * provide an "id" number for them. This "id" must be provided
  * and calculated by the user. Given that it is the most
  * difficult part, it will be done at the end.
+ *
+ * Problems with eet tha ive seen so far:
+ * 1. You can only serialize full structs, not single values
+ * 2. Given the nature of the compound containers (structs and unions)
+ * where you can add elements incrementally, you need to know beforehand
+ * the full siz eof your struct which is false of course. An option
+ * is to destroy the previous descriptor and create a new one, but then
+ * every container referencing this (struct inside struct) must be aware of
+ * it
+ * Other alternatives:
+ * http://tpl.sourceforge.net/userguide.html
+ * http://gwlib.com/
+ * http://s11n.net/c11n/
+ * http://avro.apache.org/docs/current/api/c/index.html
  */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 typedef struct _Ender_Container_Sub
 {
-	char *name;
 	Ender_Container *c;
+	char *name;
+	size_t offset;
 } Ender_Container_Sub;
 
 static Eina_Hash *_structs = NULL;
 static Ender_Container *_basic_containers[ENDER_LIST - ENDER_BOOL];
+
 #ifdef BUILD_SERIALIZE
-static Eet_Data_Descriptor *_value_descriptors[ENDER_PROPERTY_TYPES];
+static Eet_Data_Descriptor *_matrix_descriptor;
 
-static Eet_Data_Descriptor * _ender_container_value_descriptor_new(Ender_Value_Type t)
+static void _ender_container_descriptor_add(Ender_Value_Type t)
 {
-	Eet_Data_Descriptor *edd = NULL;
-	Eet_Data_Descriptor_Class eddc;
-
-       	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc),
-			ender_value_type_string_to(t),
-			sizeof(Ender_Value));
-	edd = eet_data_descriptor_stream_new(&eddc);
 	switch (t)
 	{
 		case ENDER_BOOL:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "name", data.i32, EET_T_CHAR);
 		break;
 
 		case ENDER_UINT32:
-		case ENDER_INT32:
-		case ENDER_UINT64:
-		case ENDER_INT64:
-		case ENDER_DOUBLE:
 		case ENDER_COLOR:
 		case ENDER_ARGB:
-		case ENDER_STRING:
-		case ENDER_MATRIX:
+		break;
+
+		case ENDER_INT32:
+		break;
+
+		case ENDER_UINT64:
 		case ENDER_OBJECT:
 		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
-		case ENDER_VALUE:
-		/* compound types */
+		break;
+
+		case ENDER_INT64:
+		break;
+
+		case ENDER_DOUBLE:
+		break;
+
+		case ENDER_STRING:
+		break;
+
+		/* the compound sub types will be added on its own function */
 		case ENDER_LIST:
 		case ENDER_STRUCT:
 		case ENDER_UNION:
+		break;
+
+		case ENDER_MATRIX:
+		case ENDER_VALUE:
+		ERR("value not supported yet");
+		break;
+	}
+}
+
+static Eet_Data_Descriptor * _ender_container_descriptor_new(Ender_Value_Type t)
+{
+	Eet_Data_Descriptor *edd = NULL;
+	Eet_Data_Descriptor_Class eddc;
+
+	/* own allocated values */
+       	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc),
+			"Ender_Value",
+			sizeof(Ender_Value));
+
+	switch (t)
+	{
+		case ENDER_BOOL:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "bool", data.i32, EET_T_CHAR);
+		break;
+
+		case ENDER_UINT32:
+		case ENDER_COLOR:
+		case ENDER_ARGB:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint32", data.i32, EET_T_UINT);
+		break;
+
+		case ENDER_INT32:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int32", data.i32, EET_T_INT);
+		break;
+
+		case ENDER_UINT64:
+		/* for this we need an id */
+		case ENDER_OBJECT:
+		case ENDER_SURFACE:
+		case ENDER_ENDER:
+		case ENDER_POINTER:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint64", data.u64, EET_T_ULONG_LONG);
+		break;
+
+		case ENDER_INT64:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int64", data.i64, EET_T_LONG_LONG);
+		break;
+
+		case ENDER_DOUBLE:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "d", data.d, EET_T_DOUBLE);
+		break;
+
+		case ENDER_STRING:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "s", data.d, EET_T_INLINED_STRING);
+		break;
+
+		case ENDER_MATRIX:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "xx", data.matrix.xx, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "xy", data.matrix.xy, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "xz", data.matrix.xz, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "yx", data.matrix.yx, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "yy", data.matrix.yy, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "yz", data.matrix.yz, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "zx", data.matrix.zx, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "zy", data.matrix.zy, EET_T_DOUBLE);
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "zz", data.matrix.zz, EET_T_DOUBLE);
+		break;
+
+		/* the compound sub types will be added on its own function */
+		case ENDER_LIST:
+		case ENDER_STRUCT:
+		case ENDER_UNION:
+		edd = eet_data_descriptor_stream_new(&eddc);
+		break;
+
+		case ENDER_VALUE:
+		ERR("value not supported yet");
 		break;
 	}
 	return edd;
@@ -98,33 +201,10 @@ static Ender_Container * _ender_container_new(Ender_Value_Type t)
 	thiz = calloc(1, sizeof(Ender_Container));
 	thiz->type = t;
 	thiz->ref = 1;
-#if BUILD_SERIALIZE
-	switch (t)
-	{
-		case ENDER_BOOL:
-		break;
 
-		case ENDER_UINT32:
-		case ENDER_INT32:
-		case ENDER_UINT64:
-		case ENDER_INT64:
-		case ENDER_DOUBLE:
-		case ENDER_COLOR:
-		case ENDER_ARGB:
-		case ENDER_STRING:
-		case ENDER_MATRIX:
-		case ENDER_OBJECT:
-		case ENDER_SURFACE:
-		case ENDER_ENDER:
-		case ENDER_POINTER:
-		case ENDER_VALUE:
-		/* compound types */
-		case ENDER_LIST:
-		case ENDER_STRUCT:
-		case ENDER_UNION:
-		break;
-	}
-	thiz->eet = edd;
+#if BUILD_SERIALIZE
+	/* now create the descriptor for it */
+	thiz->descriptor = _ender_container_descriptor_new(t);
 #endif
 	return thiz;
 }
@@ -144,11 +224,130 @@ static void _ender_container_delete(Ender_Container *thiz)
 		free(thiz->registered_name);
 	free(thiz);
 }
+
+static void _ender_container_list_add(Ender_Container *thiz, const char *name,
+		Ender_Container_Sub *sub)
+{
+	/* for list type, only limit the number
+	 * of child to one  */
+	if (thiz->elements)
+	{
+		if (sub->name)
+			free(sub->name);
+		free(sub);
+		return;
+	}
+
+	thiz->elements = eina_list_append(thiz->elements, sub);
+	sub->offset = 0;
+#if BUILD_SERIALIZE
+#if 0
+	switch (sub->c->type)
+	{
+		case ENDER_BOOL:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "bool", data.i32, EET_T_CHAR);
+		break;
+
+		case ENDER_UINT32:
+		case ENDER_COLOR:
+		case ENDER_ARGB:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint32", data.i32, EET_T_UINT);
+		break;
+
+		case ENDER_INT32:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int32", data.i32, EET_T_INT);
+		break;
+
+		case ENDER_UINT64:
+		/* for this we need an id */
+		case ENDER_OBJECT:
+		case ENDER_SURFACE:
+		case ENDER_ENDER:
+		case ENDER_POINTER:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint64", data.u64, EET_T_ULONG_LONG);
+		break;
+
+		case ENDER_INT64:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int64", data.i64, EET_T_LONG_LONG);
+		break;
+
+		case ENDER_DOUBLE:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "d", data.d, EET_T_DOUBLE);
+		break;
+
+		case ENDER_STRING:
+		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "s", data.d, EET_T_INLINED_STRING);
+		break;
+
+		case ENDER_MATRIX:
+		EET_DATA_DESCRIPTOR_ADD_LIST(thiz->edd, Ender_Value, "list", data.ptr, _matrix_descriptor);
+		break;
+
+		/* the compound sub types will be added on its own function */
+		case ENDER_STRUCT:
+		case ENDER_UNION:
+		EET_DATA_DESCRIPTOR_ADD_LIST(thiz->edd, Ender_Value, "list", data.ptr, sub->c->compound);
+		break;
+
+		case ENDER_LIST:
+		case ENDER_VALUE:
+		ERR("value not supported yet");
+		break;
+		
+	}
+#endif
+#endif
+}
+
+static void _ender_container_union_add(Ender_Container *thiz, const char *name,
+		Ender_Container_Sub *sub)
+{
+	thiz->elements = eina_list_append(thiz->elements, sub);
+	/* always leave 4 bytes for the integer type */
+	sub->offset = 4;
+#if BUILD_SERIALIZE
+#endif
+}
+
+static void _ender_container_struct_add(Ender_Container *thiz, const char *name,
+		Ender_Container_Sub *sub)
+{
+	ssize_t prev_offset = 0;
+	size_t prev_size = 0;
+
+	if (thiz->elements)
+	{
+		Ender_Container_Sub *prev;
+
+		prev = eina_list_data_get(eina_list_last(thiz->elements));
+		prev_offset = prev->offset;
+		prev_size = ender_container_size_get(prev->c);
+	}
+	thiz->elements = eina_list_append(thiz->elements, sub);
+	sub->offset = prev_offset + prev_size;
+#if BUILD_SERIALIZE
+	/* destroy the old definition and create a new one */
+	if (thiz->compound)
+	{
+		
+	}
+	if (!thiz->compound)
+	{
+		Eet_Data_Descriptor *compound;
+	}
+	/* replace the descriptor sub with this one */
+	//EET_DATA_DESCRIPTOR_ADD_SUB(edd, struct_type, name, member, subtype);
+#endif
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 void ender_container_init(void)
 {
+#if BUILD_SERIALIZE
+	Eet_Data_Descriptor *edd = NULL;
+	Eet_Data_Descriptor_Class eddc;
+#endif
 	int i;
 
 	_structs = eina_hash_string_superfast_new((Eina_Free_Cb)ender_container_unref);
@@ -157,6 +356,25 @@ void ender_container_init(void)
 	{
 		_basic_containers[i] = _ender_container_new(i);
 	}
+#if BUILD_SERIALIZE
+	/* given that the matrix is the only struct that we handle on our value
+	 * better cache it
+	 */
+       	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc),
+			"Enesim_Matrix",
+			sizeof(Enesim_Matrix));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "xx", xx, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "xy", xy, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "xz", xz, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "yx", yx, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "yy", yy, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "yz", yz, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "zx", zx, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "zy", zy, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "zz", zz, EET_T_DOUBLE);
+	_matrix_descriptor = edd;
+#endif
 }
 
 void ender_container_shutdown(void)
@@ -173,6 +391,7 @@ void ender_container_shutdown(void)
 					ender_value_type_string_to(_basic_containers[i]->type));
 	}
 }
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -185,11 +404,12 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 	Ender_Container *ec;
 
 	/* if it is a basic type, just get it from the list */
+	/* FIXME this can be changed to is_compound */
 	if (t >= ENDER_BOOL && t < ENDER_LIST)
 	{
 		return ender_container_ref(_basic_containers[t]);
 	}
-	return _ender_container_new(t);
+	ec = _ender_container_new(t);
 }
 
 /**
@@ -430,16 +650,14 @@ EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Container *s)
+EAPI void ender_container_add(Ender_Container *thiz, const char *name, Ender_Container *s)
 {
 	Ender_Container_Sub *sub;
-	ssize_t prev_offset = 0;
-	size_t prev_size = 0;
 
-	if (!ec) return;
+	if (!thiz) return;
 	if (!s) return;
 
-	if (!ender_container_is_compound(ec))
+	if (!ender_container_is_compound(thiz))
 		return;
 
 	sub = calloc(1, sizeof(Ender_Container_Sub));
@@ -447,33 +665,19 @@ EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Conta
 		sub->name = strdup(name);
 	/* own the sub container */
 	sub->c = s;
-	switch (ec->type)
+	switch (thiz->type)
 	{
 		case ENDER_STRUCT:
-		if (ec->elements)
-		{
-			Ender_Container_Sub *prev;
 
-			prev = eina_list_data_get(eina_list_last(ec->elements));
-			prev_offset = prev->c->offset;
-			prev_size = ender_container_size_get(prev->c);
-		}
-		ec->elements = eina_list_append(ec->elements, sub);
-		sub->c->offset = prev_offset + prev_size;
+		_ender_container_struct_add(thiz, name, sub);
 		break;
 
 		case ENDER_UNION:
-		ec->elements = eina_list_append(ec->elements, sub);
-		/* always leave 4 bytes for the integer type */
-		sub->c->offset = 4;
+		_ender_container_union_add(thiz, name, sub);
 		break;
 
 		case ENDER_LIST:
-		/* for list type, only limit the number
-		 * of child to one  */
-		if (ec->elements) return;
-		ec->elements = eina_list_append(ec->elements, sub);
-		sub->c->offset = 0;
+		_ender_container_list_add(thiz, name, sub);
 		break;
 
 		default:
@@ -520,3 +724,37 @@ EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *th
 {
 	return NULL;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Value *v, unsigned int *len)
+{
+#if BUILD_SERIALIZE
+	return eet_data_descriptor_encode(thiz->descriptor, v, len);
+#else
+	return NULL;
+#endif
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *thiz, void *data, unsigned int len)
+{
+#if BUILD_SERIALIZE
+	Ender_Value *v;
+
+	v = eet_data_descriptor_decode(thiz->descriptor, data, len);
+	/* set more needed data */
+	v->ref = 1;
+	v->container = thiz;
+	return v;
+#else
+	return NULL;
+#endif
+}
+
+
