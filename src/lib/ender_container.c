@@ -46,6 +46,15 @@
  * http://gwlib.com/
  * http://s11n.net/c11n/
  * http://avro.apache.org/docs/current/api/c/index.html
+ *
+ * Ok, now that we have committed tpl here, we need to start doing the
+ * encoding/decoding of the values.
+ * 1. Every container must have a string referring to its mapping
+ * 2. Looks like we can unmap single struct fields, if that's the case
+ * when unmapping structs, instead of unmapping the whole struct just iterate
+ * over it an decode single values, when a an object is decoded, trigger the
+ * callback. We can mark a struct as if it has or not a foreign reference
+ * 
  */
 /*============================================================================*
  *                                  Local                                     *

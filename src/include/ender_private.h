@@ -37,6 +37,16 @@ extern int ender_log_dom;
 typedef void (*Ender_Init)(void);
 typedef void (*Ender_Shutdown)(void);
 
+
+#if BUILD_SERIALIZE
+typedef struct _Ender_Container_Serialize
+{
+	char signature[PATH_MAX];
+	Eina_Bool external;
+} Ender_Container_Serialize;
+#endif
+
+
 struct _Ender_Container
 {
 	/* common */
@@ -48,6 +58,7 @@ struct _Ender_Container
 	Eina_List *elements;
 	/* relative to a parent container */
 #if BUILD_SERIALIZE
+	Ender_Container_Serialize serialize;
 	Eet_Data_Descriptor *descriptor;
 	Eet_Data_Descriptor *compound;
 #endif

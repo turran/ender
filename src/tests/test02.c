@@ -54,6 +54,7 @@ static Eina_Bool test_bool(void)
 		return EINA_FALSE;
 	}
 	ender_value_unref(v);
+	printf("bool ok\n");
 
 	return EINA_TRUE;
 }
@@ -73,6 +74,7 @@ static Eina_Bool test_uint32(void)
 		return EINA_FALSE;
 	}
 	ender_value_unref(v);
+	printf("uint32 ok\n");
 
 	return EINA_TRUE;
 }

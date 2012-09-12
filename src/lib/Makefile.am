@@ -1,8 +1,11 @@
 MAINTAINERCLEANFILES = Makefile.in
 
+SUBDIRS = tpl
+
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
+-I$(top_srcdir)/src/lib/tp \
 -I$(top_builddir)/src/include \
 -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
 @ENDER_BUILD@ \
@@ -36,5 +39,8 @@ ender_namespace.c \
 ender_property.c \
 ender_value.c
 
-libender_la_LIBADD = @ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@ @EET_LIBS@
+libender_la_LIBADD = \
+tpl/libender_tpl.la \
+@ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@ @EET_LIBS@
+
 libender_la_LDFLAGS = -no-undefined -version-info @version_info@
