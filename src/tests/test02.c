@@ -51,6 +51,7 @@ static Eina_Bool test_bool(void)
 
 	if (ender_value_bool_get(v) != EINA_TRUE)
 	{
+		printf("value is %d\n", ender_value_bool_get(v));
 		return EINA_FALSE;
 	}
 	ender_value_unref(v);
@@ -71,6 +72,7 @@ static Eina_Bool test_uint32(void)
 
 	if (ender_value_uint32_get(v) != 123456)
 	{
+		printf("value is %d\n", ender_value_uint32_get(v));
 		return EINA_FALSE;
 	}
 	ender_value_unref(v);
@@ -81,14 +83,14 @@ static Eina_Bool test_uint32(void)
 
 int main(int argc, char **argv)
 {
+	Eina_Bool ret;
+
 	ender_init(&argc, &argv);
 
 	/* just test the value types */
-	if (!test_bool())
-		return -1;
-	if (!test_uint32())
-		return -1;
+	ret = test_bool();
+	ret &= test_uint32();
 	/* new values, set and get */
 	ender_shutdown();
-	return 0;
+	return !ret;
 }

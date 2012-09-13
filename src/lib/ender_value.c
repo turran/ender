@@ -78,7 +78,7 @@ EAPI Ender_Value * ender_value_new_container_from(Ender_Container *ec)
  * To be documented
  * FIXME: To be fixed
  */
-Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
+EAPI Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
 {
 	Ender_Value *thiz;
 

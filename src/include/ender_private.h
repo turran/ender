@@ -22,9 +22,7 @@
 #include "config.h"
 #endif
 
-#if BUILD_SERIALIZE
-#include "Eet.h"
-#endif
+#define BUILD_SERIALIZE 1
 
 #include <dlfcn.h>
 
@@ -41,11 +39,10 @@ typedef void (*Ender_Shutdown)(void);
 #if BUILD_SERIALIZE
 typedef struct _Ender_Container_Serialize
 {
-	char signature[PATH_MAX];
+	char *signature;
 	Eina_Bool external;
 } Ender_Container_Serialize;
 #endif
-
 
 struct _Ender_Container
 {
@@ -59,8 +56,6 @@ struct _Ender_Container
 	/* relative to a parent container */
 #if BUILD_SERIALIZE
 	Ender_Container_Serialize serialize;
-	Eet_Data_Descriptor *descriptor;
-	Eet_Data_Descriptor *compound;
 #endif
 };
 

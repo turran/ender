@@ -175,7 +175,7 @@ typedef void (*Ender_Value_Free)(Ender_Value *value, void *data);
 EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type);
 EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type);
 EAPI Ender_Value * ender_value_new_container_from(Ender_Container *container);
-Ender_Value * ender_value_new_container_static_from(Ender_Container *ec);
+EAPI Ender_Value * ender_value_new_container_static_from(Ender_Container *ec);
 EAPI Ender_Container * ender_value_container_get(const Ender_Value *value);
 EAPI Ender_Value_Type ender_value_type_get(const Ender_Value *value);
 

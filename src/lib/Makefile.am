@@ -5,12 +5,11 @@ SUBDIRS = tpl
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
--I$(top_srcdir)/src/lib/tp \
+-I$(top_srcdir)/src/lib/tpl \
 -I$(top_builddir)/src/include \
 -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
 @ENDER_BUILD@ \
-@ENDER_CFLAGS@ \
-@EET_CFLAGS@
+@ENDER_CFLAGS@
 
 AM_YFLAGS = -d -p ender_
 AM_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
@@ -41,6 +40,6 @@ ender_value.c
 
 libender_la_LIBADD = \
 tpl/libender_tpl.la \
-@ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@ @EET_LIBS@
+@ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@
 
 libender_la_LDFLAGS = -no-undefined -version-info @version_info@

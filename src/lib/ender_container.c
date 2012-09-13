@@ -17,6 +17,7 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
+#include "tpl.h"
 
 /* In order to serlaize values we need:
  * 1. Simple container types (int, double, etc) just require the
@@ -55,6 +56,8 @@
  * over it an decode single values, when a an object is decoded, trigger the
  * callback. We can mark a struct as if it has or not a foreign reference
  * 
+ * We need to avoid the user to modify a container after it is assigned
+ * into a property. So we can fixate a container when it is assigned.
  */
 /*============================================================================*
  *                                  Local                                     *
@@ -70,9 +73,7 @@ static Eina_Hash *_structs = NULL;
 static Ender_Container *_basic_containers[ENDER_LIST - ENDER_BOOL];
 
 #ifdef BUILD_SERIALIZE
-static Eet_Data_Descriptor *_matrix_descriptor;
-
-static void _ender_container_descriptor_add(Ender_Value_Type t)
+static void _ender_container_serialize_add(Ender_Value_Type t)
 {
 	switch (t)
 	{
@@ -116,85 +117,67 @@ static void _ender_container_descriptor_add(Ender_Value_Type t)
 	}
 }
 
-static Eet_Data_Descriptor * _ender_container_descriptor_new(Ender_Value_Type t)
+static void _ender_container_serialize_new(Ender_Container_Serialize *s, Ender_Value_Type t)
 {
-	Eet_Data_Descriptor *edd = NULL;
-	Eet_Data_Descriptor_Class eddc;
-
-	/* own allocated values */
-       	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc),
-			"Ender_Value",
-			sizeof(Ender_Value));
-
 	switch (t)
 	{
 		case ENDER_BOOL:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "bool", data.i32, EET_T_CHAR);
+		s->signature = "c";
 		break;
 
 		case ENDER_UINT32:
 		case ENDER_COLOR:
 		case ENDER_ARGB:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint32", data.i32, EET_T_UINT);
+		s->signature = "u";
 		break;
 
 		case ENDER_INT32:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int32", data.i32, EET_T_INT);
+		s->signature = "i";
 		break;
 
 		case ENDER_UINT64:
+		s->signature = "U";
+		break;
+
 		/* for this we need an id */
 		case ENDER_OBJECT:
 		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint64", data.u64, EET_T_ULONG_LONG);
+		s->signature = "U";
+		s->external = EINA_TRUE;
 		break;
 
 		case ENDER_INT64:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int64", data.i64, EET_T_LONG_LONG);
+		s->signature = "I";
 		break;
 
 		case ENDER_DOUBLE:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "d", data.d, EET_T_DOUBLE);
+		s->signature = "f";
 		break;
 
 		case ENDER_STRING:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "s", data.d, EET_T_INLINED_STRING);
+		s->signature = "s";
 		break;
 
 		case ENDER_MATRIX:
-		edd = eet_data_descriptor_stream_new(&eddc);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "xx", data.matrix.xx, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "xy", data.matrix.xy, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "xz", data.matrix.xz, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "yx", data.matrix.yx, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "yy", data.matrix.yy, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "yz", data.matrix.yz, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "zx", data.matrix.zx, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "zy", data.matrix.zy, EET_T_DOUBLE);
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "zz", data.matrix.zz, EET_T_DOUBLE);
+		s->signature = "S(fffffffff)";
 		break;
 
 		/* the compound sub types will be added on its own function */
 		case ENDER_LIST:
+		s->signature = "A()";
+		break;
+
 		case ENDER_STRUCT:
 		case ENDER_UNION:
-		edd = eet_data_descriptor_stream_new(&eddc);
+		s->signature = "S()";
 		break;
 
 		case ENDER_VALUE:
-		ERR("value not supported yet");
+		WRN("value not supported yet");
 		break;
 	}
-	return edd;
 }
 #endif
 
@@ -202,10 +185,6 @@ static Eet_Data_Descriptor * _ender_container_descriptor_new(Ender_Value_Type t)
 static Ender_Container * _ender_container_new(Ender_Value_Type t)
 {
 	Ender_Container *thiz;
-#if BUILD_SERIALIZE
-	Eet_Data_Descriptor *edd = NULL;
-	Eet_Data_Descriptor_Class eddc;
-#endif
 
 	thiz = calloc(1, sizeof(Ender_Container));
 	thiz->type = t;
@@ -213,7 +192,7 @@ static Ender_Container * _ender_container_new(Ender_Value_Type t)
 
 #if BUILD_SERIALIZE
 	/* now create the descriptor for it */
-	thiz->descriptor = _ender_container_descriptor_new(t);
+	_ender_container_serialize_new(&thiz->serialize, t);
 #endif
 	return thiz;
 }
@@ -336,14 +315,6 @@ static void _ender_container_struct_add(Ender_Container *thiz, const char *name,
 	sub->offset = prev_offset + prev_size;
 #if BUILD_SERIALIZE
 	/* destroy the old definition and create a new one */
-	if (thiz->compound)
-	{
-		
-	}
-	if (!thiz->compound)
-	{
-		Eet_Data_Descriptor *compound;
-	}
 	/* replace the descriptor sub with this one */
 	//EET_DATA_DESCRIPTOR_ADD_SUB(edd, struct_type, name, member, subtype);
 #endif
@@ -353,10 +324,6 @@ static void _ender_container_struct_add(Ender_Container *thiz, const char *name,
  *============================================================================*/
 void ender_container_init(void)
 {
-#if BUILD_SERIALIZE
-	Eet_Data_Descriptor *edd = NULL;
-	Eet_Data_Descriptor_Class eddc;
-#endif
 	int i;
 
 	_structs = eina_hash_string_superfast_new((Eina_Free_Cb)ender_container_unref);
@@ -365,25 +332,6 @@ void ender_container_init(void)
 	{
 		_basic_containers[i] = _ender_container_new(i);
 	}
-#if BUILD_SERIALIZE
-	/* given that the matrix is the only struct that we handle on our value
-	 * better cache it
-	 */
-       	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc),
-			"Enesim_Matrix",
-			sizeof(Enesim_Matrix));
-	edd = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "xx", xx, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "xy", xy, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "xz", xz, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "yx", yx, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "yy", yy, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "yz", yz, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "zx", zx, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "zy", zy, EET_T_DOUBLE);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Enesim_Matrix, "zz", zz, EET_T_DOUBLE);
-	_matrix_descriptor = edd;
-#endif
 }
 
 void ender_container_shutdown(void)
@@ -741,7 +689,44 @@ EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *th
 EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Value *v, unsigned int *len)
 {
 #if BUILD_SERIALIZE
-	return eet_data_descriptor_encode(thiz->descriptor, v, len);
+	tpl_node *n;
+	void *data = NULL;
+
+	switch (thiz->type)
+	{
+		case ENDER_INT32:
+		case ENDER_UINT32:
+		case ENDER_COLOR:
+		case ENDER_ARGB:
+		case ENDER_BOOL:
+		case ENDER_INT64:
+		case ENDER_UINT64:
+		case ENDER_DOUBLE:
+		case ENDER_STRING:
+		case ENDER_MATRIX:
+		n = tpl_map(thiz->serialize.signature, &v->data);
+		tpl_pack(n, 0); 
+		tpl_dump(n, TPL_MEM, &data, len);
+		tpl_free(n);
+		break;
+
+		/* for external objects, fetch it into a local var
+		 * then call the callback and set it on the value
+		 */
+		case ENDER_OBJECT:
+		case ENDER_SURFACE:
+		case ENDER_ENDER:
+		case ENDER_POINTER:
+
+		/* for structs/unions allocate the needed size and assign it to the void * */
+		/* for lists, iterate over each element on the array and add it to the list, then assign the
+		 * the list to the void * */
+		case ENDER_LIST:
+		case ENDER_STRUCT:
+		case ENDER_UNION:
+		break;
+	}
+	return data;
 #else
 	return NULL;
 #endif
@@ -755,11 +740,43 @@ EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *thiz, void *
 {
 #if BUILD_SERIALIZE
 	Ender_Value *v;
+	tpl_node *n;
 
-	v = eet_data_descriptor_decode(thiz->descriptor, data, len);
-	/* set more needed data */
-	v->ref = 1;
-	v->container = thiz;
+	v = ender_value_new_container_from(thiz);
+	switch (thiz->type)
+	{
+		case ENDER_INT32:
+		case ENDER_UINT32:
+		case ENDER_COLOR:
+		case ENDER_ARGB:
+		case ENDER_BOOL:
+		case ENDER_INT64:
+		case ENDER_UINT64:
+		case ENDER_DOUBLE:
+		case ENDER_STRING:
+		case ENDER_MATRIX:
+		n = tpl_map(thiz->serialize.signature, &v->data);
+		tpl_load(n, TPL_MEM, data, len);
+		tpl_unpack(n, 0); 
+		tpl_free(n);
+		break;
+
+		/* for external objects, fetch it into a local var
+		 * then call the callback and set it on the value
+		 */
+		case ENDER_OBJECT:
+		case ENDER_SURFACE:
+		case ENDER_ENDER:
+		case ENDER_POINTER:
+
+		/* for structs/unions allocate the needed size and assign it to the void * */
+		/* for lists, iterate over each element on the array and add it to the list, then assign the
+		 * the list to the void * */
+		case ENDER_LIST:
+		case ENDER_STRUCT:
+		case ENDER_UNION:
+		break;
+	}
 	return v;
 #else
 	return NULL;
