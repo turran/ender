@@ -1,7 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
 
-SUBDIRS = tpl
-
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
@@ -36,10 +34,15 @@ ender_main.c \
 ender_misc.c \
 ender_namespace.c \
 ender_property.c \
-ender_value.c
+ender_value.c \
+tpl/tpl.c \
+tpl/tpl.h
+
+if HAVE_WIN32
+libender_la_SOURCES += tpl/mmap.c tpl/mmap.h
+endif
 
 libender_la_LIBADD = \
-tpl/libender_tpl.la \
 @ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@
 
 libender_la_LDFLAGS = -no-undefined -version-info @version_info@

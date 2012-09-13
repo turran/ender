@@ -41,17 +41,25 @@ extern "C" {
 #endif
 
 #ifdef _WIN32
-#ifdef TPL_EXPORTS
-#define TPL_API __declspec(dllexport)
-#else							/*  */
-#ifdef TPL_NOLIB
-#define TPL_API
+# ifdef ENDER_BUILD
+#  ifdef DLL_EXPORT
+#   define TPL_API __declspec(dllexport)
+#  else
+#   define TPL_API
+#  endif /* ! DLL_EXPORT */
+# else
+#  define TPL_API __declspec(dllimport)
+# endif /* ! EFL_ENDER_BUILD */
 #else
-#define TPL_API __declspec(dllimport)
-#endif /* TPL_NOLIB */
-#endif	/* TPL_EXPORTS*/
-#else
-#define TPL_API
+# ifdef __GNUC__
+#  if __GNUC__ >= 4
+#   define TPL_API __attribute__ ((visibility("default")))
+#  else
+#   define TPL_API
+#  endif
+# else
+#  define TPL_API
+# endif
 #endif
 
 /* bit flags (external) */

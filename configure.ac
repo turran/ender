@@ -28,16 +28,19 @@ AC_SUBST([version_info])
 
 ### Needed information
 
-AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
+have_win32="no"
 ENDER_BUILD=""
 case "$host_os" in
    mingw*)
       ENDER_BUILD="-DENDER_BUILD"
+      have_win32="yes"
    ;;
 esac
 AC_SUBST([ENDER_BUILD])
+
+AM_CONDITIONAL([HAVE_WIN32], [test "x${have_win32}" = "xyes"])
 
 requirements_ender="enesim >= 0.0.15 eina >= 1.0.0"
 AC_SUBST([requirements_ender])

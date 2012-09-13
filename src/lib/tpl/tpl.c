@@ -55,7 +55,7 @@ typedef unsigned __int64 uint64_t;
 
 
 #if ( defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32 )
-#include "win/mman.h"   /* mmap */
+#include "mman.h"   /* mmap */
 #else
 #include <sys/mman.h>   /* mmap */
 #endif
