@@ -96,7 +96,6 @@ ender.pc
 data/Makefile
 src/Makefile
 src/lib/Makefile
-src/lib/tpl/Makefile
 src/include/Makefile
 src/bin/Makefile
 src/tests/Makefile
