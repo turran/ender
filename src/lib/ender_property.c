@@ -155,6 +155,7 @@ Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element 
  */
 EAPI Ender_Container * ender_property_container_get(Ender_Property *p)
 {
+	if (!p) return NULL;
 	return p->container;
 }
 /**

@@ -1051,6 +1051,7 @@ EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
 {
 	Ender_Property *prop;
 	Ender_Element *parent;
+	Ender_Container *container;
 
 	ENDER_MAGIC_CHECK(e);
 
@@ -1059,6 +1060,9 @@ EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
 	 */
 	prop = _ender_element_property_parent_get(e);
 	if (!prop) return NULL;
+	container = ender_property_container_get(prop);
+	if (ender_container_type_get(container) != ENDER_ENDER)
+		return NULL;
 	ender_element_property_value_get(e, prop, &parent, NULL);
 
 	return parent;
