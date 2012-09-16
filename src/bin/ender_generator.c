@@ -61,7 +61,7 @@ static void _upper(const char *src, size_t len, char *dst)
 	}
 }
 
-static void _property_name(char *dst, const char *ns, const char *oname, const char *pname)
+static void _property_variable_name(char *dst, const char *ns, const char *oname, const char *pname)
 {
 	size_t len;
 
@@ -79,6 +79,25 @@ static void _property_name(char *dst, const char *ns, const char *oname, const c
 	_upper(pname, len, dst);
 	dst += len;
 	*dst++ = '\0';
+}
+
+static void _property_normalized(char *dst, const char *name)
+{
+	const char *tmp;
+
+	tmp = name;
+	while (tmp && *tmp)
+	{
+		if (*tmp == ' ' || *tmp == '-')
+		{
+			*dst = '_';
+		}
+		else
+			*dst = *tmp;
+		dst++;
+		tmp++;
+	}
+	*dst = '\0';
 }
 
 static void _dump_container_recursive(Ender_Generator *thiz, Ender_Container *container, int level)
@@ -233,10 +252,13 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	Ender_Generator *thiz;
 	Ender_Value_Type type;
 	char pname[PATH_MAX];
+	char pnormalized[PATH_MAX];
 
 	thiz = data;
 	if (!thiz->name_matched) return;
 
+	/* generate the normalized name */
+	_property_normalized(pnormalized, name);
 	/* first the container */
 	fprintf(thiz->out, "\t{\n");
 	fprintf(thiz->out, "\t\tEnder_Container *ec;\n");
@@ -245,14 +267,14 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	fprintf(thiz->out, "\t\tec = tmp2;\n");
 	fprintf(thiz->out, "\t\tep = ender_descriptor_property_add(d, \"%s\",\n", name);
 	fprintf(thiz->out, "\t\t\t\tec,\n");
-	fprintf(thiz->out, "\t\t\t\tENDER_GETTER(_%s_%s_%s_get),\n", thiz->ns_name, thiz->name, name);
-	fprintf(thiz->out, "\t\t\t\tENDER_SETTER(_%s_%s_%s_set),\n", thiz->ns_name, thiz->name, name);
+	fprintf(thiz->out, "\t\t\t\tENDER_GETTER(_%s_%s_%s_get),\n", thiz->ns_name, thiz->name, pnormalized);
+	fprintf(thiz->out, "\t\t\t\tENDER_SETTER(_%s_%s_%s_set),\n", thiz->ns_name, thiz->name, pnormalized);
 	type = ender_container_type_get(container);
 	if (type == ENDER_LIST)
 	{
-		fprintf(thiz->out, "\t\t\t\tENDER_ADD(_%s_%s_%s_add),\n", thiz->ns_name, thiz->name, name);
-		fprintf(thiz->out, "\t\t\t\tENDER_REMOVE(_%s_%s_%s_remove),\n", thiz->ns_name, thiz->name, name);
-		fprintf(thiz->out, "\t\t\t\tENDER_CLEAR(_%s_%s_%s_clear),\n", thiz->ns_name, thiz->name, name);
+		fprintf(thiz->out, "\t\t\t\tENDER_ADD(_%s_%s_%s_add),\n", thiz->ns_name, thiz->name, pnormalized);
+		fprintf(thiz->out, "\t\t\t\tENDER_REMOVE(_%s_%s_%s_remove),\n", thiz->ns_name, thiz->name, pnormalized);
+		fprintf(thiz->out, "\t\t\t\tENDER_CLEAR(_%s_%s_%s_clear),\n", thiz->ns_name, thiz->name, pnormalized);
 	}
 	else
 	{
@@ -262,13 +284,13 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	}
 	/* the is_set is part of the extended functions */
 	if (thiz->extended)
-		fprintf(thiz->out, "\t\t\t\tENDER_IS_SET(_%s_%s_%s_is_set),\n", thiz->ns_name, thiz->name, name);
+		fprintf(thiz->out, "\t\t\t\tENDER_IS_SET(_%s_%s_%s_is_set),\n", thiz->ns_name, thiz->name, pnormalized);
 	else
 		fprintf(thiz->out, "\t\t\t\tNULL,\n");
 	fprintf(thiz->out, "\t\t\t\t%s\n", relative ? "EINA_TRUE" : "EINA_FALSE");
 	fprintf(thiz->out, "\t\t\t\t);\n");
-	/* assign the property to the API available property if needed */
-	_property_name(pname, thiz->ns_name, thiz->name, name);
+	/* now assing the exported property variable to the recently created property */
+	_property_variable_name(pname, thiz->ns_name, thiz->name, pnormalized);
 	fprintf(thiz->out, "\t\t%s = ep;\n", pname, pname);
 	/* close everything */
 	fprintf(thiz->out, "\t}\n");
