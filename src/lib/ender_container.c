@@ -367,6 +367,7 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 		return ender_container_ref(_basic_containers[t]);
 	}
 	ec = _ender_container_new(t);
+	return ec;
 }
 
 /**
