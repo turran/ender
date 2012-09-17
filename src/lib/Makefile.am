@@ -39,7 +39,7 @@ tpl/tpl.c \
 tpl/tpl.h
 
 if HAVE_WIN32
-libender_la_SOURCES += tpl/mmap.c tpl/mmap.h
+libender_la_SOURCES += tpl/mmap.c tpl/mman.h
 endif
 
 libender_la_LIBADD = \
