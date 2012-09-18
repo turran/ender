@@ -88,7 +88,8 @@ static void _property_normalized(char *dst, const char *name)
 	tmp = name;
 	while (tmp && *tmp)
 	{
-		if (*tmp == ' ' || *tmp == '-')
+		/* TODO replace this with the isalpha, isnumber, etc variants */
+		if (*tmp == ' ' || *tmp == '-' || *tmp == ':')
 		{
 			*dst = '_';
 		}
