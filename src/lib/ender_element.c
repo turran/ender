@@ -112,12 +112,19 @@
 
 static Eina_List *_new_callbacks = NULL;
 
+typedef struct _Ender_Listener_Container
+{
+	char *name;
+	Eina_List *listeners;
+} Ender_Listener_Container;
+
 /* TODO rename this */
-typedef struct _Ender_Listener
+struct _Ender_Listener
 {
 	Ender_Event_Callback callback;
+	Ender_Listener_Container *container;
 	void *data;
-} Ender_Listener;
+};
 
 typedef struct _Ender_New_Listener
 {
@@ -1072,33 +1079,63 @@ EAPI Ender_Element * ender_element_parent_get(Ender_Element *e)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_event_listener_add(Ender_Element *e, const char *event_name,
+EAPI Ender_Listener * ender_event_listener_add(Ender_Element *e, const char *event_name,
 		Ender_Event_Callback cb, void *data)
 {
 	Ender_Listener *listener;
-	Eina_List *listeners, *tmp;
+	Ender_Listener_Container *container;
 
 	ENDER_MAGIC_CHECK(e);
+
+	container = eina_hash_find(e->listeners, event_name);
+	if (!container)
+	{
+		container = calloc(1, sizeof(Ender_Listener_Container));
+		container->name = strdup(event_name);
+		eina_hash_add(e->listeners, event_name, container);
+	}
 	listener = calloc(1, sizeof(Ender_Listener));
 	listener->callback = cb;
 	listener->data = data;
+	listener->container = container;
 
-	listeners = eina_hash_find(e->listeners, event_name);
-	tmp = eina_list_append(listeners, listener);
-	if (!listeners)
-	{
-		eina_hash_add(e->listeners, event_name, tmp);
-	}
+	container->listeners = eina_list_append(container->listeners, listener);
+	return listener;
+}
+
+EAPI void ender_event_listener_remove(Ender_Listener *l)
+{
+	Ender_Listener_Container *container;
+	if (!l) return;
+
+	container = l->container;
+	container->listeners = eina_list_remove(container->listeners, l);
+	free(l);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_event_listener_remove(Ender_Element *e, const char *name,
-		Ender_Event_Callback cb)
+EAPI void ender_event_listener_remove_full(Ender_Element *e, const char *name,
+		Ender_Event_Callback cb, void *data)
 {
+	Ender_Listener_Container *container;
+	Ender_Listener *listener;
+	Eina_List *l;
+
 	ENDER_MAGIC_CHECK(e);
+	container = eina_hash_find(e->listeners, name);
+	if (!container) return;
+
+	EINA_LIST_FOREACH(container->listeners, l, listener)
+	{
+		if (listener->callback == cb && listener->data == data)
+		{
+			ender_event_listener_remove(listener);
+			break;
+		}
+	}
 }
 
 /**
@@ -1108,14 +1145,14 @@ EAPI void ender_event_listener_remove(Ender_Element *e, const char *name,
 EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *event_data)
 {
 	Ender_Listener *listener;
-	Eina_List *listeners;
+	Ender_Listener_Container *container;
 	Eina_List *l;
 
 	ENDER_MAGIC_CHECK(e);
-	listeners = eina_hash_find(e->listeners, event_name);
-	if (!listeners) return;
+	container = eina_hash_find(e->listeners, event_name);
+	if (!container) return;
 
-	EINA_LIST_FOREACH(listeners, l, listener)
+	EINA_LIST_FOREACH(container->listeners, l, listener)
 	{
 		listener->callback(e, event_name, event_data, listener->data);
 	}
