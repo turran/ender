@@ -208,11 +208,12 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name, int ver
 		tmp1[PATH_MAX - 1] = '\0';
 	}
 	/* check if we already have the library */
-	/* FIXME fix the Windows and Mac OS X case */
 #ifdef _WIN32
-	snprintf(real_lib, PATH_MAX, "lib%s-%d" LT_MODULE_EXT "", tmp1, version);
+	snprintf(real_lib, PATH_MAX, "lib%s-%d.dll", tmp1, version);
+#elif defined (__MACH__) && defined (__APPLE__)
+	snprintf(real_lib, PATH_MAX, "lib%s.%d.dylib", tmp1, version);
 #else
-	snprintf(real_lib, PATH_MAX, "lib%s" LT_MODULE_EXT ".%d", tmp1, version);
+	snprintf(real_lib, PATH_MAX, "lib%s.so.%d", tmp1, version);
 #endif
 	library = eina_hash_find(_libraries, real_lib);
 	if (!library)
