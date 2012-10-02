@@ -19,7 +19,7 @@
 #include "ender_private.h"
 #include "tpl.h"
 
-/* In order to serlaize values we need:
+/* In order to serialize values we need:
  * 1. Simple container types (int, double, etc) just require the
  * main eet data descriptor to be the Ender_Value_Data union
  * so we just "decode" into it directly
@@ -55,7 +55,7 @@
  * when unmapping structs, instead of unmapping the whole struct just iterate
  * over it an decode single values, when a an object is decoded, trigger the
  * callback. We can mark a struct as if it has or not a foreign reference
- * 
+ *
  * We need to avoid the user to modify a container after it is assigned
  * into a property. So we can fixate a container when it is assigned.
  */
@@ -281,7 +281,6 @@ static void _ender_container_list_add(Ender_Container *thiz, const char *name,
 		case ENDER_VALUE:
 		ERR("value not supported yet");
 		break;
-		
 	}
 #endif
 #endif

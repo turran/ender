@@ -138,6 +138,7 @@ void ender_container_shutdown(void);
 /* namespace */
 void ender_namespace_init(void);
 void ender_namespace_shutdown(void);
+void ender_namespace_dump(Ender_Namespace *ns);
 
 /* element */
 
