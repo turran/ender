@@ -28,6 +28,12 @@ D			[0-9]
 
 %%
 
+<C_COMMENT>{
+	"*/"	{ BEGIN(INITIAL); }
+	\n	/* ignore end of line */
+	.	/* everything else ignored */
+}
+
 rel			return T_REL;
 bool			{
 				yylval_param->vtype = ENDER_BOOL;
@@ -138,8 +144,7 @@ using			return T_USING;
 {_operator}		{ return *yytext; }
 \n                      /* ignore end of line */
 [ \t]+                  /* ignore whitespace */
-"/*"            { BEGIN(C_COMMENT); }
-<C_COMMENT>"*/" { BEGIN(INITIAL); }
-<C_COMMENT>.    { }
+"/*"            	{ BEGIN(C_COMMENT); }
+.			{ printf("found2 %s\n", yytext); } /* everything else ignored */
 
 %%
