@@ -928,12 +928,25 @@ EAPI void ender_element_property_value_get_valist(Ender_Element *e, Ender_Proper
 	while (prop)
 	{
 		Ender_Value v;
+		Ender_Value_Type type;
 		Ender_Container *ec;
 
 		ec = ender_property_container_get(prop);
+		type = ender_container_type_get(ec);
 		v.container = ec;
-		ender_property_element_value_get(prop, e, &v);
-		ENDER_VALUE_TO_DATA(v, ec, var_args);
+		v.data.ptr = NULL;
+
+		/* for structs and unions we ned the pointer from the passed in value */
+		if (type == ENDER_STRUCT || type == ENDER_UNION)
+		{
+			ENDER_VALUE_COLLECT(v, ec, var_args);
+			ender_property_element_value_get(prop, e, &v);
+		}
+		else
+		{
+			ender_property_element_value_get(prop, e, &v);
+			ENDER_VALUE_TO_DATA(v, ec, var_args);
+		}
 		prop = va_arg(var_args, Ender_Property *);
 	}
 }
