@@ -161,6 +161,13 @@ namespace "enesim.renderer" : 0 {
 		double "factor";
 	};
 
+	class "blur" : "renderer" {
+		surface "src";
+		int "channel";
+		double "radius_x";
+		double "radius_y";
+	};
+
 	class "hswitch" : "renderer" {
 		uint "w";
 		uint "h";

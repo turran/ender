@@ -172,6 +172,10 @@ static inline void * _sym_get(void *dl_handle, const char *ns_name, const char *
 
 	snprintf(computed_name, PATH_MAX, "%s_%s_%s", ns_name, name, sym);
 	found = dlsym(dl_handle, computed_name);
+	if (!found)
+	{
+		DBG("Symbol '%s' not found", computed_name);
+	}
 	return found;
 }
 
