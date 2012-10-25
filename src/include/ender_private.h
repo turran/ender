@@ -29,12 +29,9 @@
 /* core */
 #define ERR(...) EINA_LOG_DOM_ERR(ender_log_dom, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(ender_log_dom, __VA_ARGS__)
+#define INF(...) EINA_LOG_DOM_INFO(ender_log_dom, __VA_ARGS__)
 #define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
 extern int ender_log_dom;
-
-typedef void (*Ender_Init)(void);
-typedef void (*Ender_Shutdown)(void);
-
 
 #if BUILD_SERIALIZE
 typedef struct _Ender_Container_Serialize

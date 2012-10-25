@@ -119,6 +119,11 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name, int version)
 	return thiz;
 }
 
+#if 0
+EAPI void ender_namespace_init_cb_add(Ender_Namespace *thiz);
+EAPI void ender_namespace_shutdown_cb_add(Ender_Namespace *thiz);
+#endif
+
 /**
  * To be documented
  * FIXME: To be fixed

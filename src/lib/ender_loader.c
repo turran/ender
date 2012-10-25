@@ -28,6 +28,9 @@
 static Eina_List *_pre_registry = NULL;
 static int _init = 0;
 
+typedef void (*Ender_Library_Init)(void);
+typedef void (*Ender_Library_Shutdown)(void);
+
 typedef struct _Ender_Loader_Registry_Data
 {
 	Ender_Loader_Registry_Callback cb;
@@ -81,7 +84,7 @@ static Ender_Library * _library_new(const char *name, void *dl_handle)
 static void _library_free(void *data)
 {
 	Ender_Library *thiz = data;
-	Ender_Init shutdown;
+	Ender_Library_Shutdown shutdown;
 	char sym_name[PATH_MAX];
 
 	/* shutdown the library */
@@ -464,13 +467,17 @@ void ender_loader_load_all(void)
 	it = eina_hash_iterator_data_new(_libraries);
 	while (eina_iterator_next(it, (void **)&lib))
 	{
-		Ender_Init init;
+		Ender_Library_Init init;
 		char sym_name[PATH_MAX];
 
 		/* initialize the library */
 		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
 		init = dlsym(lib->dl_handle, sym_name);
-		if (init) init();
+		if (init)
+		{
+			INF("Initializing the library '%s'", lib->name);
+			init();
+		}
 	}
 	eina_iterator_free(it);
 }
