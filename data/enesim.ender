@@ -1,5 +1,6 @@
 namespace "enesim" : 0 {
 	abstract "renderer" {
+		bool "visibility";
 		string "name";
 		matrix "transformation";
 		matrix "geometry_transformation";
