@@ -92,6 +92,8 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Descriptor *parent, Ender_Descriptor_Type type);
 void ender_descriptor_free(Ender_Descriptor *thiz);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
+void * ender_descriptor_object_create(Ender_Descriptor *thiz);
+void ender_descriptor_object_destroy(Ender_Descriptor *thiz, void *object);
 Ender_Descriptor * ender_descriptor_find(const char *name);
 void ender_descriptor_init(void);
 void ender_descriptor_shutdown(void);
@@ -133,11 +135,15 @@ void ender_container_init(void);
 void ender_container_shutdown(void);
 
 /* namespace */
+typedef void (*Ender_Namespace_Initialize)(Ender_Namespace *thiz, void *data);
+void ender_namespace_initialize_cb_set(Ender_Namespace *thiz, Ender_Namespace_Initialize cb, void *data);
 void ender_namespace_init(void);
 void ender_namespace_shutdown(void);
 void ender_namespace_dump(Ender_Namespace *ns);
+Ender_Element * ender_namespace_element_new_from_descriptor(Ender_Namespace *thiz, Ender_Descriptor *desc);
 
 /* element */
+Ender_Element * ender_element_new(Ender_Descriptor *d);
 
 /* the loader */
 void ender_loader_init(void);

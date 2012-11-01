@@ -365,6 +365,40 @@ void ender_descriptor_free(Ender_Descriptor *thiz)
 	free(thiz);
 }
 
+void * ender_descriptor_object_create(Ender_Descriptor *thiz)
+{
+	void *object;
+	if (!thiz->create)
+	{
+		ERR("The descriptor for name '%s' does not have a creator", thiz->name);
+		return NULL;
+	}
+	object = thiz->create();
+	return object;
+}
+
+void ender_descriptor_object_destroy(Ender_Descriptor *thiz, void *object)
+{
+	Ender_Destructor destroy;
+
+	destroy = thiz->destroy;
+	while (!destroy)
+	{
+		Ender_Descriptor *parent;
+
+		parent = ender_descriptor_parent(thiz);
+		if (!parent) break;
+
+		destroy = parent->destroy;
+		thiz = parent;
+		
+	}
+	if (destroy)
+	{
+		destroy(object);
+	}
+}
+
 void ender_descriptor_init(void)
 {
 	int i;
@@ -610,3 +644,13 @@ EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed)
 	if (!ed) return NULL;
 	return ed->ns;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *desc)
+{
+	return ender_namespace_element_new_from_descriptor(desc->ns, desc);
+}
+

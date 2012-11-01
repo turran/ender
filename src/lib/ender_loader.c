@@ -39,6 +39,7 @@ typedef struct _Ender_Loader_Registry_Data
 
 typedef struct _Ender_Library
 {
+	Eina_Bool initialized;
 	int ref;
 	void *dl_handle;
 	char *name;
@@ -73,9 +74,10 @@ static Ender_Library * _library_new(const char *name, void *dl_handle)
 {
 	Ender_Library *library;
 
-	library = malloc(sizeof(Ender_Library));
+	library = calloc(1, sizeof(Ender_Library));
 	library->name = strdup(name);
 	library->dl_handle = dl_handle;
+	library->initialized = EINA_FALSE;
 	library->ref = 0;
 
 	return library;
@@ -100,6 +102,26 @@ static void _library_namespace_free(void *data)
 {
 	Ender_Library_Namespace *thiz = data;
 	free(thiz);
+}
+
+static void _namespace_initialize(Ender_Namespace *ns, void *data)
+{
+	Ender_Library_Namespace *thiz = data;
+	Ender_Library *lib = thiz->lib;
+	Ender_Library_Init init;
+	char sym_name[PATH_MAX];
+
+	if (lib->initialized)
+		return;
+	/* initialize the library */
+	snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
+	init = dlsym(lib->dl_handle, sym_name);
+	if (init)
+	{
+		INF("Initializing the library '%s'", lib->name);
+		init();
+	}
+	lib->initialized = EINA_TRUE;
 }
 
 static Eina_Bool _file_locate(const char *file, char *real_file)
@@ -225,7 +247,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name, int ver
 	library = eina_hash_find(_libraries, real_lib);
 	if (!library)
 	{
-		dl_handle = dlopen(real_lib, RTLD_LAZY);
+		dl_handle = dlopen(real_lib, RTLD_LAZY | RTLD_GLOBAL);
 		if (!dl_handle)
 		{
 			ERR("The library %s can not be found", real_lib);
@@ -240,15 +262,17 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name, int ver
 	{
 		*tmp2 = '_';
 	}
+
+	namespace = calloc(1, sizeof(Ender_Library_Namespace));
+	namespace->lib = library;
+
 	ns = ender_namespace_find(tmp1, version);
 	if (!ns)
 	{
 		ns = ender_namespace_new(tmp1, version);
+		ender_namespace_initialize_cb_set(ns, _namespace_initialize, namespace);
 	}
-
-	namespace = malloc(sizeof(Ender_Library_Namespace));
 	namespace->ns = ns;
-	namespace->lib = library;
 
 	eina_hash_add(_library_namespaces, name, namespace);
 	return namespace;
@@ -265,7 +289,6 @@ static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namesp
 	if (!namespace) return NULL;
 
 	ns_name = ender_namespace_name_get(namespace->ns);
-
 	creator = _sym_get(namespace->lib->dl_handle, ns_name, name, "new");
 	if (!creator)
 	{
@@ -449,11 +472,8 @@ void ender_loader_shutdown(void)
 
 void ender_loader_load_all(void)
 {
-	Ender_Library *lib;
 	Ender_Loader_Registry_Data *data;
-	Eina_Iterator *it;
 	Eina_List *l;
-
 
 	/* first call the pre callbacks */
 	EINA_LIST_FOREACH(_pre_registry, l, data)
@@ -463,23 +483,6 @@ void ender_loader_load_all(void)
 
 	/* iterate over the list of .ender files and parse them */
 	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
-	/* now that every ender is regsitered we can start initializing the libraries */
-	it = eina_hash_iterator_data_new(_libraries);
-	while (eina_iterator_next(it, (void **)&lib))
-	{
-		Ender_Library_Init init;
-		char sym_name[PATH_MAX];
-
-		/* initialize the library */
-		snprintf(sym_name, PATH_MAX, "%s_init", lib->name);
-		init = dlsym(lib->dl_handle, sym_name);
-		if (init)
-		{
-			INF("Initializing the library '%s'", lib->name);
-			init();
-		}
-	}
-	eina_iterator_free(it);
 }
 /*============================================================================*
  *                                   API                                      *

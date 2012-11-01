@@ -268,6 +268,10 @@ EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens,
 		Ender_Descriptor *parent, Ender_Descriptor_Type type);
 EAPI const char * ender_namespace_name_get(Ender_Namespace *thiz);
 EAPI int ender_namespace_version_get(Ender_Namespace *thiz);
+EAPI Ender_Element * ender_namespace_element_new(Ender_Namespace *thiz, const char *name);
+
+EAPI void ender_namespace_element_new_listener_add(Ender_Namespace *thiz, Ender_New_Callback cb, void *data);
+EAPI void ender_namespace_element_new_listener_remove(Ender_Namespace *thiz, Ender_New_Callback cb, void *data);
 
 /**
  * @}
@@ -312,6 +316,7 @@ EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed);
 EAPI const char * ender_descriptor_name_get(Ender_Descriptor *ed);
 EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *ed);
 EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed);
+EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *desc);
 /**
  * @}
  * @defgroup Ender_Element_Group Element
@@ -325,10 +330,7 @@ typedef Ender_Element_Accessor Ender_Element_Add;
 typedef Ender_Element_Accessor Ender_Element_Remove;
 typedef void (*Ender_Element_Clear)(Ender_Element *e, Ender_Property *ep, void *data);
 
-EAPI Ender_Element * ender_element_new(const char *name);
 EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name, int version);
-EAPI Ender_Element * ender_element_new_namespace_from(const char *name, Ender_Namespace *ns);
-EAPI Ender_Element * ender_element_new_descriptor_from(Ender_Descriptor *desc);
 EAPI Ender_Element * ender_element_ref(Ender_Element *e);
 EAPI Ender_Element * ender_element_unref(Ender_Element *e);
 EAPI void * ender_element_data_set(Ender_Element *e, const char *key, void *data);
@@ -389,8 +391,6 @@ EAPI void * ender_element_object_get(Ender_Element *e);
 
 EAPI Ender_Element * ender_element_parent_get(Ender_Element *e);
 
-EAPI void ender_element_new_listener_add(Ender_New_Callback cb, void *data);
-EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data);
 
 /**
  * @}

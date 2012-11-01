@@ -213,21 +213,21 @@ Eina_Bool test01_setters_getters(void)
 	Ender_Element *ender;
 	Enesim_Matrix matrix;
 
-	e = ender_element_new("test01_object");
+	e = ender_element_new_with_namespace("test01_object", "test01_namespace", 0);
 	if (!e)
 	{
 		printf("impossible to instantiate an element\n");
 		return EINA_FALSE;
 	}
-	ender_element_value_set(e, "bool", EINA_TRUE);
-	ender_element_value_get(e, "bool", &b);
+	ender_element_value_set(e, "bool", EINA_TRUE, NULL);
+	ender_element_value_get(e, "bool", &b, NULL);
 	if (b != EINA_TRUE)
 	{
 		printf("failed setting/getting the bool\n");
 		return EINA_FALSE;
 	}
-	ender_element_value_set(e, "uint32", 123456);
-	ender_element_value_get(e, "uint32", &u32);
+	ender_element_value_set(e, "uint32", 123456, NULL);
+	ender_element_value_get(e, "uint32", &u32, NULL);
 	if (u32 != 123456)
 	{
 		printf("failed setting/getting the u32\n");

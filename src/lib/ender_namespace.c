@@ -24,11 +24,18 @@ struct _Ender_Namespace
 {
 	char *name;
 	int version;
+	Eina_Bool initialized;
+	Ender_Namespace_Initialize initialize;
+	void *initialize_data;
 	Eina_Hash *descriptors;
+	Eina_List *new_callbacks;
 };
 
-/* TODO */
-typedef void (*Ender_Namespace_Init)(void);
+typedef struct _Ender_New_Listener
+{
+	Ender_New_Callback callback;
+	void *data;
+} Ender_New_Listener;
 
 /* on this hash we store the list of namespaces, we use a list because we need
  * to support multiple versions for the same namespace name. The list is ordered
@@ -82,6 +89,35 @@ void ender_namespace_dump(Ender_Namespace *ns)
 	printf("};\n");
 	eina_iterator_free(it);
 }
+
+Ender_Element * ender_namespace_element_new_from_descriptor(Ender_Namespace *thiz, Ender_Descriptor *desc)
+{
+	Ender_Element *element;
+	Ender_New_Listener *listener;
+	Eina_List *l;
+
+	/* TODO check that we have been initialized */
+	if (!thiz->initialized)
+	{
+		if (thiz->initialize)
+			thiz->initialize(thiz, thiz->initialize_data);
+		thiz->initialized = EINA_TRUE;
+	}
+	element = ender_element_new(desc);
+	/* call the constructor callback */
+	EINA_LIST_FOREACH(thiz->new_callbacks, l, listener)
+	{
+		listener->callback(element, listener->data);
+	}
+	return element;
+}
+
+/* FIXME maybe in the future we want this event to be added and also exported */
+void ender_namespace_initialize_cb_set(Ender_Namespace *thiz, Ender_Namespace_Initialize cb, void *data)
+{
+	thiz->initialize = cb;
+	thiz->initialize_data = data;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -106,7 +142,7 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name, int version)
 			break;
 	}
 	/* if not append it */
-	thiz = malloc(sizeof(Ender_Namespace));
+	thiz = calloc(1, sizeof(Ender_Namespace));
 	thiz->name = strdup(name);
 	thiz->version = version;
 	thiz->descriptors = eina_hash_string_superfast_new(
@@ -119,10 +155,52 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name, int version)
 	return thiz;
 }
 
-#if 0
-EAPI void ender_namespace_init_cb_add(Ender_Namespace *thiz);
-EAPI void ender_namespace_shutdown_cb_add(Ender_Namespace *thiz);
-#endif
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_namespace_element_new_listener_add(Ender_Namespace *thiz, Ender_New_Callback cb, void *data)
+{
+	Ender_New_Listener *listener;
+
+	listener = calloc(1, sizeof(Ender_New_Listener));
+	listener->callback = cb;
+	listener->data = data;
+	thiz->new_callbacks = eina_list_append(thiz->new_callbacks, listener);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_namespace_element_new_listener_remove(Ender_Namespace *thiz, Ender_New_Callback cb, void *data)
+{
+	Ender_New_Listener *listener;
+	Eina_List *l;
+
+	EINA_LIST_FOREACH(thiz->new_callbacks, l, listener)
+	{
+		if (listener->callback == cb && listener->data == data)
+		{
+			thiz->new_callbacks = eina_list_remove(l, listener);
+			break;
+		}
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Element * ender_namespace_element_new(Ender_Namespace *thiz, const char *name)
+{
+	Ender_Descriptor *desc;
+	Ender_Element *element;
+
+	desc = ender_namespace_descriptor_find(thiz, name);
+	if (!desc) return NULL;
+	return ender_namespace_element_new_from_descriptor(thiz, desc);
+}
 
 /**
  * To be documented
@@ -171,7 +249,6 @@ EAPI Eina_Bool ender_namespace_list_with_name(const char *name,
 	}
 	return EINA_TRUE;
 }
-
 
 /**
  * To be documented

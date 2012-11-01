@@ -110,8 +110,6 @@
 		}							\
 	}								\
 
-static Eina_List *_new_callbacks = NULL;
-
 typedef struct _Ender_Listener_Container
 {
 	char *name;
@@ -125,12 +123,6 @@ struct _Ender_Listener
 	Ender_Listener_Container *container;
 	void *data;
 };
-
-typedef struct _Ender_New_Listener
-{
-	Ender_New_Callback callback;
-	void *data;
-} Ender_New_Listener;
 
 typedef struct _Ender_Element_Property_List_Data
 {
@@ -160,75 +152,13 @@ struct _Ender_Element
 	int ref;
 };
 
-static Ender_Element * _ender_element_new(const char *name, Ender_Descriptor *desc)
-{
-	Ender_Element *ender;
-	Ender_New_Listener *listener;
-	void *object;
-	Eina_List *l;
-
-	DBG("Creating new ender '%s'", name);
-	if (!desc)
-	{
-		ERR("No such descriptor for name '%s'", name);
-		return NULL;
-	}
-
-	if (!desc->create)
-	{
-		ERR("The descriptor for name '%s' does not have a creator", name);
-		return NULL;
-	}
-
-	object = desc->create();
-	if (!object)
-	{
-		ERR("For some reason the creator for '%s' failed", name);
-		return NULL;
-	}
-	DBG("Element '%s' created correctly", name);
-
-	ender = calloc(1, sizeof(Ender_Element));
-	EINA_MAGIC_SET(ender, ENDER_MAGIC);
-	ender->object = object;
-	ender->descriptor = desc;
-	ender->listeners = eina_hash_string_superfast_new(NULL);
-	ender->properties = eina_hash_string_superfast_new((Eina_Free_Cb)ender_property_free);
-	ender->data = eina_hash_string_superfast_new(NULL);
-	ender->ref = 1;
-	/* call the constructor callback */
-	EINA_LIST_FOREACH(_new_callbacks, l, listener)
-	{
-		listener->callback(ender, listener->data);
-	}
-
-	return ender;
-
-}
-
 static void _ender_element_delete(Ender_Element *e)
 {
-	Ender_Destructor destroy;
 	Ender_Descriptor *desc = e->descriptor;
 
-	destroy = desc->destroy;
-	while (!destroy)
-	{
-		Ender_Descriptor *parent;
-
-		parent = ender_descriptor_parent(desc);
-		if (!parent) break;
-
-		destroy = parent->destroy;
-		desc = parent;
-		
-	}
-	if (destroy)
-	{
-		destroy(e->object);
-	}
 	/* call the free callback */
 	ender_event_dispatch(e, "Free", NULL);
+	ender_descriptor_object_destroy(desc, e->object);
 	/* free every private data */
 	/* TODO the listeners */
 	eina_hash_free(e->properties);
@@ -331,50 +261,52 @@ static void _property_free(void *data)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Ender_Element * ender_element_new(Ender_Descriptor *desc)
+{
+	Ender_Element *ender;
+	void *object;
+
+	if (!desc)
+	{
+		ERR("No such descriptor for name");
+		return NULL;
+	}
+
+	DBG("Creating new ender '%s'", desc->name);
+	object = ender_descriptor_object_create(desc);
+	if (!object)
+	{
+		ERR("For some reason the creator for '%s' failed", desc->name);
+		return NULL;
+	}
+	DBG("Element '%s' created correctly", desc->name);
+
+	ender = calloc(1, sizeof(Ender_Element));
+	EINA_MAGIC_SET(ender, ENDER_MAGIC);
+	ender->object = object;
+	ender->descriptor = desc;
+	ender->listeners = eina_hash_string_superfast_new(NULL);
+	ender->properties = eina_hash_string_superfast_new((Eina_Free_Cb)ender_property_free);
+	ender->data = eina_hash_string_superfast_new(NULL);
+	ender->ref = 1;
+
+	return ender;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * Create a new ender
- * @param name
- * @return
- */
-EAPI Ender_Element * ender_element_new(const char *name)
-{
-	return ender_element_new_with_namespace(name, NULL, 0);
-}
-
 /**
  * To be documented
  * FIXME: To be fixed
  */
 EAPI Ender_Element * ender_element_new_with_namespace(const char *name, const char *ns_name, int version)
 {
+	Ender_Namespace *ns;
 	Ender_Descriptor *desc;
 
-	desc = ender_descriptor_find_with_namespace(name, ns_name, version);
-	return _ender_element_new(name, desc);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Ender_Element * ender_element_new_namespace_from(const char *name, Ender_Namespace *ns)
-{
-	Ender_Descriptor *desc;
-
-	desc = ender_namespace_descriptor_find(ns, name);
-	return _ender_element_new(name, desc);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Ender_Element * ender_element_new_descriptor_from(Ender_Descriptor *desc)
-{
-	return _ender_element_new(desc->name, desc);
+	ns = ender_namespace_find(ns_name, version);
+	if (!ns) return NULL;
+	return ender_namespace_element_new(ns, name);
 }
 
 /**
@@ -1168,40 +1100,6 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
 	EINA_LIST_FOREACH(container->listeners, l, listener)
 	{
 		listener->callback(e, event_name, event_data, listener->data);
-	}
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_element_new_listener_add(Ender_New_Callback cb, void *data)
-{
-	Ender_New_Listener *listener;
-
-	listener = calloc(1, sizeof(Ender_New_Listener));
-	listener->callback = cb;
-	listener->data = data;
-
-	_new_callbacks = eina_list_append(_new_callbacks, listener);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_element_new_listener_remove(Ender_New_Callback cb, void *data)
-{
-	Ender_New_Listener *listener;
-	Eina_List *l;
-
-	EINA_LIST_FOREACH(_new_callbacks, l, listener)
-	{
-		if (listener->callback == cb && listener->data == data)
-		{
-			_new_callbacks = eina_list_remove(l, listener);
-			break;
-		}
 	}
 }
 
