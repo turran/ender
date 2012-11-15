@@ -82,6 +82,7 @@ struct _Ender_Descriptor
 	Ender_Creator create;
 	Ender_Destructor destroy;
 	Eina_Ordered_Hash *properties;
+	Eina_Ordered_Hash *functions;
 	Ender_Namespace *ns;
 };
 
@@ -130,6 +131,11 @@ void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v);
 void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e);
 Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element *e);
+
+/* function */
+Ender_Function * ender_function_new(const char *name,
+		Ender_Container *ret, Eina_List *args);
+
 /* container */
 void ender_container_init(void);
 void ender_container_shutdown(void);

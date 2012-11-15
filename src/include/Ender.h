@@ -80,6 +80,7 @@
 
 typedef struct _Ender_Element Ender_Element;
 typedef struct _Ender_Property Ender_Property;
+typedef struct _Ender_Function Ender_Function;
 typedef struct _Ender_Container Ender_Container;
 typedef struct _Ender_Descriptor Ender_Descriptor;
 typedef struct _Ender_Namespace Ender_Namespace;
@@ -402,6 +403,19 @@ EAPI Ender_Container * ender_property_container_get(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
 EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p);
+
+/**
+ * @}
+ * @defgroup Ender_Function_Group Function
+ * @{
+ */
+
+typedef Eina_Bool (*Ender_Function_Marshaller)(void *data, va_list args);
+EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
+		Ender_Container *ret, ...);
+EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc, const char *name,
+		Ender_Container *ret, Eina_List *args);
+
 /**
  * @}
  * @defgroup Ender_Constraint_Group Constraint

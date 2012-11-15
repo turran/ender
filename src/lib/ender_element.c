@@ -27,7 +27,7 @@
 			EINA_MAGIC_FAIL(d, ENDER_MAGIC);		\
 	} while(0)
 
-#define ENDER_VALUE_COLLECT(v, cnt, args)				\
+#define ENDER_VALUE_FROM_DATA(v, cnt, args)				\
 	{								\
 		v.container = cnt;					\
 		switch (cnt->type)					\
@@ -403,7 +403,7 @@ EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0);
 
-		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
 		name = va_arg(var_args, char *);
 	}
@@ -460,7 +460,7 @@ EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, 
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0);
 
-		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_remove(prop, e, &v);
 		name = va_arg(var_args, char *);
 	}
@@ -602,7 +602,7 @@ EAPI void ender_element_value_set_valist(Ender_Element *e, const char *name, va_
 		if (!prop) return;
 		ec = ender_property_container_get(prop);
 
-		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_set(prop, e, &v);
 		name = va_arg(var_args, char *);
 	} 
@@ -768,7 +768,7 @@ EAPI void ender_element_property_value_set_valist(Ender_Element *e, Ender_Proper
 		Ender_Container *ec;
 
 		ec = ender_property_container_get(prop);
-		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_set(prop, e, &v);
 		prop = va_arg(var_args, Ender_Property *);
 	}
@@ -817,7 +817,7 @@ EAPI void ender_element_property_value_add_valist(Ender_Element *e, Ender_Proper
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0);
 
-		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
 		prop = va_arg(var_args, Ender_Property *);
 	}
@@ -871,7 +871,7 @@ EAPI void ender_element_property_value_get_valist(Ender_Element *e, Ender_Proper
 		/* for structs and unions we ned the pointer from the passed in value */
 		if (type == ENDER_STRUCT || type == ENDER_UNION)
 		{
-			ENDER_VALUE_COLLECT(v, ec, var_args);
+			ENDER_VALUE_FROM_DATA(v, ec, var_args);
 			ender_property_element_value_get(prop, e, &v);
 		}
 		else
@@ -900,7 +900,7 @@ EAPI void ender_element_property_value_remove_valist(Ender_Element *e, Ender_Pro
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0);
 
-		ENDER_VALUE_COLLECT(v, ec, var_args);
+		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_remove(prop, e, &v);
 		prop = va_arg(var_args, Ender_Property *);
 	}
@@ -981,6 +981,43 @@ EAPI Eina_Bool ender_element_property_value_is_set(Ender_Element *e, Ender_Prope
 	if (!prop) return EINA_FALSE;
 
 	return ender_property_element_value_is_set(prop, e);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_list va_args)
+{
+	ENDER_MAGIC_CHECK(e);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...)
+{
+	ENDER_MAGIC_CHECK(e);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, va_list va_args)
+{
+	ENDER_MAGIC_CHECK(e);
+}
+
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, ...)
+{
+	ENDER_MAGIC_CHECK(e);
 }
 
 

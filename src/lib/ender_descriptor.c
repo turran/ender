@@ -561,6 +561,56 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, con
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
+		Ender_Container *ret, ...)
+{
+	Ender_Container *arg;
+	Ender_Function *function;
+	Eina_List *args = NULL;
+	va_list va_args;
+
+	va_start(va_args, ret);
+	while ((arg = va_arg(va_args, Ender_Container *)))
+	{
+		args = eina_list_append(args, arg);
+	}
+	va_end(va_args);
+	function = ender_descriptor_function_add_list(edesc, name, ret, args);
+	if (args)
+	{
+		eina_list_free(args);
+	}
+	return function;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc, const char *name,
+		Ender_Container *ret, Eina_List *args)
+{
+	Ender_Function *function;
+
+	function = eina_ordered_hash_find(edesc->functions, name);
+	if (function)
+	{
+		WRN("Function '%s' already foind on '%s'. Not adding it", name, edesc->name);
+		return NULL;
+	}
+
+	function = ender_function_new(name, ret, args);
+	if (!function) return function;
+
+	eina_ordered_hash_add(edesc->functions, name, function);
+	DBG("Function '%s' added to '%s'", name, edesc->name);
+	return function;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed)
 {
 	if (!ed) return 0;
