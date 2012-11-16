@@ -22,7 +22,8 @@
  *============================================================================*/
 struct _Ender_Function
 {
-	Ender_Function_Marshaller *marshaller;
+	Ender_Accessor f;
+	Ender_Marshaller marshaller;
 	Ender_Container *ret;
 	Eina_List *args;
 };
@@ -30,18 +31,44 @@ struct _Ender_Function
  *                                 Global                                     *
  *============================================================================*/
 Ender_Function * ender_function_new(const char *name,
+		Ender_Accessor f,
+		Ender_Marshaller marshaller,
 		Ender_Container *ret, Eina_List *args)
 {
 	Ender_Function *thiz;
 	Ender_Container *arg;
 
+	if (!f) return NULL;
+
+	if (!marshaller)
+	{
+		marshaller = ender_marshaller_find_list(ret, args);
+		if (!marshaller) return NULL;
+	}
+
 	thiz = calloc(1, sizeof(Ender_Function));
 	thiz->args = args;
 	thiz->ret = ret;
+	thiz->marshaller = marshaller;
+	thiz->f = f;
 
 	return thiz;
+}
+
+void ender_function_call(Ender_Function *thiz, void *o,
+		Ender_Value *ret, Eina_List *args)
+{
+	thiz->marshaller(o, thiz->f, ret, args);
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI int ender_function_args_count(Ender_Function *thiz)
+{
+	return eina_list_count(thiz->args);
+}
 
+EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz)
+{
+	return thiz->args;
+}

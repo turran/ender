@@ -35,7 +35,7 @@ typedef struct _Ender_Descriptor_Property
 	Ender_Clear clear;
 	Ender_Is_Set is_set;
 } Ender_Descriptor_Property;
-	
+
 typedef struct _Ender_Descriptor_List_Data
 {
 	Eina_Bool ret;
@@ -84,7 +84,7 @@ static Eina_Bool _descriptor_find_namespace_cb(Ender_Descriptor *thiz, void *use
 		data->ret = thiz;
 		return EINA_FALSE;
 	}
-	return EINA_TRUE;	
+	return EINA_TRUE;
 }
 
 static Eina_Bool _descriptor_find_cb(Ender_Namespace *ns, void *user_data)
@@ -353,6 +353,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 	desc->type = type;
 	desc->ns = ns;
 	desc->properties = eina_ordered_hash_new((Eina_Free_Cb)ender_property_free);
+	desc->functions = eina_ordered_hash_new(NULL);
 
 	return desc;
 }
@@ -391,7 +392,6 @@ void ender_descriptor_object_destroy(Ender_Descriptor *thiz, void *object)
 
 		destroy = parent->destroy;
 		thiz = parent;
-		
 	}
 	if (destroy)
 	{
@@ -484,7 +484,7 @@ EAPI void ender_descriptor_list(Ender_Descriptor_List_Callback cb, void *user_da
 	data.ret = EINA_TRUE;
 	data.real_cb = cb;
 	data.real_data = user_data;
-	
+
 	ender_namespace_list(_descriptor_list_cb, &data);
 }
 
@@ -562,6 +562,8 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, con
  * FIXME: To be fixed
  */
 EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
+		Ender_Accessor f,
+		Ender_Marshaller marshaller,
 		Ender_Container *ret, ...)
 {
 	Ender_Container *arg;
@@ -575,7 +577,7 @@ EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, con
 		args = eina_list_append(args, arg);
 	}
 	va_end(va_args);
-	function = ender_descriptor_function_add_list(edesc, name, ret, args);
+	function = ender_descriptor_function_add_list(edesc, name, f, marshaller, ret, args);
 	if (args)
 	{
 		eina_list_free(args);
@@ -588,6 +590,8 @@ EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, con
  * FIXME: To be fixed
  */
 EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc, const char *name,
+		Ender_Accessor f,
+		Ender_Marshaller marshaller,
 		Ender_Container *ret, Eina_List *args)
 {
 	Ender_Function *function;
@@ -599,12 +603,18 @@ EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc
 		return NULL;
 	}
 
-	function = ender_function_new(name, ret, args);
+	function = ender_function_new(name, f, marshaller, ret, args);
 	if (!function) return function;
 
 	eina_ordered_hash_add(edesc->functions, name, function);
 	DBG("Function '%s' added to '%s'", name, edesc->name);
 	return function;
+}
+
+EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *edesc, const char *name)
+{
+	if (!edesc) return NULL;
+	return eina_ordered_hash_find(edesc->functions, name);
 }
 
 /**

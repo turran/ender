@@ -31,6 +31,7 @@ ender_function.c \
 ender_grammar.y \
 ender_lexer.l \
 ender_loader.c \
+ender_marshaller.c \
 ender_main.c \
 ender_misc.c \
 ender_namespace.c \

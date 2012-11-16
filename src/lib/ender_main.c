@@ -75,6 +75,7 @@ EAPI void ender_init(int *argc, char ***argv)
 		ender_descriptor_init();
 		ender_namespace_init();
 		ender_container_init();
+		ender_marshaller_init();
 		ender_loader_init();
 		ender_loader_load_all();
 	}
@@ -90,6 +91,7 @@ EAPI void ender_shutdown(void)
 		ender_loader_shutdown();
 		ender_namespace_shutdown();
 		ender_descriptor_shutdown();
+		ender_marshaller_shutdown();
 		ender_container_shutdown();
 		enesim_shutdown();
 		eina_log_domain_unregister(ender_log_dom);

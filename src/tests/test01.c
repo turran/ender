@@ -87,12 +87,19 @@ void dummy_object_surface_get(Dummy_Object *thiz, Enesim_Surface **s)
 	*s = thiz->s;
 }
 
+/* functions */
+void dummy_object_function_01(Dummy_Object *thiz)
+{
+	printf("function 01 called\n");
+}
+
 static void test01_object_register(void)
 {
 	Ender_Namespace *ns;
 	Ender_Descriptor *descriptor;
 	Ender_Container *ec;
 	Ender_Property *prop;
+	Ender_Function *function;
 
 	/* create a new namespace */
 	ns = ender_namespace_new("test01_namespace", 0);
@@ -165,6 +172,10 @@ static void test01_object_register(void)
 			NULL,
 			NULL,
 			EINA_FALSE);
+	/* add the functions */
+	ender_descriptor_function_add(descriptor, "function_01",
+			ENDER_FUNCTION(dummy_object_function_01),
+			NULL, NULL, NULL);
 }
 
 /* test that the namespace is created */
@@ -237,6 +248,19 @@ Eina_Bool test01_setters_getters(void)
 	return EINA_TRUE;
 }
 
+Eina_Bool test01_functions(void)
+{
+	Ender_Element *e;
+
+	e = ender_element_new_with_namespace("test01_object", "test01_namespace", 0);
+	if (!e)
+	{
+		printf("impossible to instantiate an element\n");
+		return EINA_FALSE;
+	}
+	ender_element_call(e, "function_01");
+}
+
 int main(int argc, char **argv)
 {
 	ender_init(&argc, &argv);
@@ -245,6 +269,7 @@ int main(int argc, char **argv)
 	if (!test01_namespace()) return -1;
 	if (!test01_properties()) return -1;
 	if (!test01_setters_getters()) return -1;
+	if (!test01_functions()) return -1;
 	/* test that the object is part of that namespace */
 	/* create the ender */
 	/* add dynamic properties */

@@ -246,6 +246,21 @@ EAPI const Eina_List * ender_value_list_get(const Ender_Value *value);
 EAPI Ender_Value * ender_value_ref(Ender_Value *thiz);
 EAPI void ender_value_unref(Ender_Value *thiz);
 
+typedef void (*Ender_Accessor)(void *o, ...);
+typedef Eina_Bool (*Ender_Is_Set)(void *o);
+typedef Ender_Accessor Ender_Getter;
+typedef Ender_Accessor Ender_Setter;
+typedef Ender_Accessor Ender_Add;
+typedef Ender_Accessor Ender_Remove;
+typedef void (*Ender_Clear)(void *o);
+
+#define ENDER_IS_SET(f) ((Ender_Is_Set)(f))
+#define ENDER_GETTER(f) ((Ender_Getter)(f))
+#define ENDER_SETTER(f) ((Ender_Setter)(f))
+#define ENDER_ADD(f) ((Ender_Add)(f))
+#define ENDER_REMOVE(f) ((Ender_Remove)(f))
+#define ENDER_CLEAR(f) ((Ender_Clear)(f))
+
 /**
  * @}
  * @defgroup Ender_Namespace_Group Namespace
@@ -280,24 +295,35 @@ EAPI void ender_namespace_element_new_listener_remove(Ender_Namespace *thiz, End
 
 /**
  * @}
+ * @defgroup Ender_Marshaller_Group Marshaller
+ * @{
+ */
+
+typedef Eina_Bool (*Ender_Marshaller)(void *data, Ender_Accessor f, Ender_Value *ret,
+		Eina_List *args);
+
+EAPI Ender_Marshaller ender_marshaller_find(Ender_Container *ret,
+		...);
+EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
+		Eina_List *args);
+
+EAPI ender_marshaller_void__void(void *data, Ender_Accessor f,
+		Ender_Value *ret, Eina_List *args);
+
+/**
+ * @}
+ * @defgroup Ender_Function_Group Function
+ * @{
+ */
+#define ENDER_FUNCTION(f) ((Ender_Accessor)(f))
+
+EAPI int ender_function_args_count(Ender_Function *thiz);
+
+/**
+ * @}
  * @defgroup Ender_Descriptor_Group Descriptor
  * @{
  */
-typedef void (*Ender_Accessor)(void *o, ...);
-typedef Eina_Bool (*Ender_Is_Set)(void *o);
-typedef Ender_Accessor Ender_Getter;
-typedef Ender_Accessor Ender_Setter;
-typedef Ender_Accessor Ender_Add;
-typedef Ender_Accessor Ender_Remove;
-typedef void (*Ender_Clear)(void *o);
-
-#define ENDER_IS_SET(f) ((Ender_Is_Set)(f))
-#define ENDER_GETTER(f) ((Ender_Getter)(f))
-#define ENDER_SETTER(f) ((Ender_Setter)(f))
-#define ENDER_ADD(f) ((Ender_Add)(f))
-#define ENDER_REMOVE(f) ((Ender_Remove)(f))
-#define ENDER_CLEAR(f) ((Ender_Clear)(f))
-
 typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
@@ -315,6 +341,14 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
+
+EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
+		Ender_Accessor f, Ender_Marshaller marshaller, Ender_Container *ret, ...);
+EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc, const char *name,
+		Ender_Accessor f, Ender_Marshaller marshaller, Ender_Container *ret,
+		Eina_List *args);
+EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *ed, const char *name);
+
 EAPI void ender_descriptor_list(Ender_Descriptor_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);
 EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed);
@@ -396,6 +430,10 @@ EAPI void * ender_element_object_get(Ender_Element *e);
 
 EAPI Ender_Element * ender_element_parent_get(Ender_Element *e);
 
+EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_list va_args);
+EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...);
+EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, va_list va_args);
+EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, ...);
 
 /**
  * @}
@@ -407,18 +445,6 @@ EAPI Ender_Container * ender_property_container_get(Ender_Property *p);
 EAPI Eina_Bool ender_property_is_relative(Ender_Property *p);
 EAPI const char * ender_property_name_get(Ender_Property *p);
 EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p);
-
-/**
- * @}
- * @defgroup Ender_Function_Group Function
- * @{
- */
-
-typedef Eina_Bool (*Ender_Function_Marshaller)(void *data, va_list args);
-EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ret, ...);
-EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ret, Eina_List *args);
 
 /**
  * @}

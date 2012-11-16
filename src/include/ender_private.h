@@ -132,9 +132,17 @@ void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
 void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e);
 Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element *e);
 
+/* marshaller */
+void ender_marshaller_init(void);
+void ender_marshaller_shutdown(void);
+
 /* function */
 Ender_Function * ender_function_new(const char *name,
+		Ender_Accessor f,
+		Ender_Marshaller marshaller,
 		Ender_Container *ret, Eina_List *args);
+void ender_function_call(Ender_Function *thiz, void *o,
+		Ender_Value *ret, Eina_List *args);
 
 /* container */
 void ender_container_init(void);

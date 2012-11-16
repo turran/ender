@@ -37,16 +37,16 @@
 			case ENDER_UINT32:				\
 			case ENDER_INT32:				\
 			case ENDER_BOOL:				\
-			v.data.u32 = va_arg(var_args, uint32_t);	\
+			v.data.u32 = va_arg(args, uint32_t);		\
 			break;						\
 									\
 			case ENDER_UINT64:				\
 			case ENDER_INT64:				\
-			v.data.u64 = va_arg(var_args, uint64_t);	\
+			v.data.u64 = va_arg(args, uint64_t);		\
 			break;						\
 									\
 			case ENDER_DOUBLE:				\
-			v.data.d = va_arg(var_args, double);		\
+			v.data.d = va_arg(args, double);		\
 			break;						\
 									\
 			case ENDER_STRUCT:				\
@@ -58,7 +58,7 @@
 			case ENDER_ENDER:				\
 			case ENDER_LIST:				\
 			case ENDER_VALUE:				\
-			v.data.ptr = va_arg(var_args, void *);		\
+			v.data.ptr = va_arg(args, void *);		\
 			break;						\
 									\
 			default:					\
@@ -989,7 +989,16 @@ EAPI Eina_Bool ender_element_property_value_is_set(Ender_Element *e, Ender_Prope
  */
 EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_list va_args)
 {
+	Ender_Function *f;
+	Ender_Descriptor *d;
+
 	ENDER_MAGIC_CHECK(e);
+	/* get the function associated */
+	d = ender_element_descriptor_get(e);
+	f = ender_descriptor_function_get(d, name);
+	if (!f) return EINA_FALSE;
+
+	ender_element_function_call_valist(e, f, va_args);
 }
 
 /**
@@ -998,7 +1007,13 @@ EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_
  */
 EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...)
 {
+	va_list va_args;
+
 	ENDER_MAGIC_CHECK(e);
+
+	va_start(va_args, name);
+	ender_element_call_valist(e, name, va_args);
+	va_end(va_args);
 }
 
 /**
@@ -1007,7 +1022,25 @@ EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...)
  */
 EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, va_list va_args)
 {
+	Eina_List *largs = NULL;
+	Eina_List *lvalues = NULL;
+	Eina_List *l;
+	Ender_Container *c;
+
 	ENDER_MAGIC_CHECK(e);
+
+	largs = ender_function_args_get(f);
+	EINA_LIST_FOREACH (largs, l, c)
+	{
+		Ender_Value *value;
+
+		value = alloca(sizeof(Ender_Value));
+		ENDER_VALUE_FROM_DATA((*value), c, va_args);
+		lvalues = eina_list_append(lvalues, value);
+	}
+	/* TODO add a value for the ret */
+	/* call the real function */
+	ender_function_call(f, e->object, NULL, lvalues);
 }
 
 
@@ -1017,7 +1050,13 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
  */
 EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, ...)
 {
+	va_list va_args;
+
 	ENDER_MAGIC_CHECK(e);
+
+	va_start(va_args, f);
+	ender_element_function_call_valist(e, f, va_args);
+	va_end(va_args);
 }
 
 
