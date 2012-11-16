@@ -47,6 +47,10 @@
 # endif
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @mainpage Ender
  * @section intro Introduction
@@ -532,5 +536,9 @@ EAPI void eina_ordered_hash_del(Eina_Ordered_Hash *thiz, const char *name, void 
 /**
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*_ENDER_H*/
