@@ -307,7 +307,7 @@ EAPI Ender_Marshaller ender_marshaller_find(Ender_Container *ret,
 EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
 		Eina_List *args);
 
-EAPI ender_marshaller_void__void(void *data, Ender_Accessor f,
+EAPI Eina_Bool ender_marshaller_void__void(void *data, Ender_Accessor f,
 		Ender_Value *ret, Eina_List *args);
 
 /**
