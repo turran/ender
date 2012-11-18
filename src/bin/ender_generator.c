@@ -44,6 +44,9 @@ static void _tabs(Ender_Generator *thiz, int count)
 		fprintf(thiz->out, "\t");
 }
 
+/* some function to filter the names of things
+ * TODO add a way to camelize/uncamelize
+ */
 static void _upper(const char *src, size_t len, char *dst)
 {
 	int i;
@@ -306,11 +309,58 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	fprintf(thiz->out, "\t}\n");
 }
 
+static void _generator_on_function(void *data, const char *name, Ender_Container *ret, Eina_List *args)
+{
+	Ender_Generator *thiz;
+	Ender_Container *c;
+	Ender_Value_Type type;
+	Eina_List *l;
+	char fname[PATH_MAX];
+	char fnormalized[PATH_MAX];
+
+	thiz = data;
+	if (!thiz->name_matched) return;
+
+	/* generate the normalized name */
+	_property_normalized(fnormalized, name);
+	/* first the container */
+	fprintf(thiz->out, "\t{\n");
+	fprintf(thiz->out, "\t\tEnder_Container *ret = NULL;\n");
+	fprintf(thiz->out, "\t\tEnder_Container *args = NULL;\n");
+	fprintf(thiz->out, "\t\tEnder_Function *ef;\n");
+	if (ret)
+	{
+		fprintf(thiz->out, "\t\t{\n");
+		_dump_container_recursive(thiz, ret, 3);
+		fprintf(thiz->out, "\t\t\tret = tmp3;\n");
+		fprintf(thiz->out, "\t\t}\n");
+	}
+	EINA_LIST_FOREACH (args, l, c)
+	{
+		fprintf(thiz->out, "\t\t{\n");
+		_dump_container_recursive(thiz, c, 3);
+		fprintf(thiz->out, "\t\t\targs = eina_list_append(args, tmp3);\n");
+		fprintf(thiz->out, "\t\t}\n");
+	}
+	fprintf(thiz->out, "\t\tef = ender_descriptor_function_add_list(d, \"%s\",\n", name);
+	fprintf(thiz->out, "\t\t\t\tec,\n");
+	fprintf(thiz->out, "\t\t\t\tENDER_FUNCTION(_%s_%s_%s),\n", thiz->ns_name, thiz->name, fnormalized);
+	fprintf(thiz->out, "\t\t\t\tNULL, ret, args);\n");
+#if 0
+	/* now assing the exported function variable to the recently created function */
+	_function_variable_name(pname, thiz->ns_name, thiz->name, fnormalized);
+	fprintf(thiz->out, "\t\t%s = ep;\n", fname, fname);
+#endif
+	/* close everything */
+	fprintf(thiz->out, "\t}\n");
+}
+
 static Ender_Parser_Descriptor _generator_parser = {
 	/* .on_using 		= */ NULL,
 	/* .on_namespace 	= */ _generator_on_namespace,
 	/* .on_object 		= */ _generator_on_object,
 	/* .on_property 	= */ _generator_on_property,
+	/* .on_function 	= */ _generator_on_function,
 	/* .on_container 	= */ NULL,
 };
 
@@ -319,6 +369,7 @@ static Ender_Parser_Descriptor _generator_type_parser = {
 	/* .on_namespace 	= */ _generator_on_namespace,
 	/* .on_object 		= */ NULL,
 	/* .on_property 	= */ NULL,
+	/* .on_function 	= */ NULL,
 	/* .on_container 	= */ _generator_on_container,
 };
 

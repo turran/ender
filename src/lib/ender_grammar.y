@@ -46,6 +46,12 @@ static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Boo
 		parser->descriptor->on_property(parser->data, name, relative, container);
 }
 
+static inline void _on_function(Ender_Parser *parser, const char *name, Ender_Container *ret, Eina_List *args)
+{
+	if (parser->descriptor->on_function)
+		parser->descriptor->on_function(parser->data, name, ret, args);
+}
+
 static inline void _on_container(Ender_Parser *parser, const char *name, Ender_Container *container)
 {
 	if (parser->descriptor->on_container)
@@ -98,6 +104,7 @@ static inline void _on_container(Ender_Parser *parser, const char *name, Ender_C
 %type <container> struct_union_type
 %type <s> object_inheritance
 %type <list> types
+%type <list> function_args
 %type <type> type
 
 %%
@@ -275,8 +282,7 @@ type_specifier
 	;
 
 type_relative
-	: { $$ = EINA_FALSE; }
-	| T_REL { $$ = EINA_TRUE; }
+	: T_REL { $$ = EINA_TRUE; }
 	;
 
 type
@@ -291,14 +297,41 @@ type
 	}
 	;
 
-declaration
-	:
-	type_relative type constraint ';'
+property
+	: type_relative type constraint ';'
 	{
-		_on_property(parser, $2->name, $1, $2->container);
+		_on_property(parser, $2->name, EINA_TRUE, $2->container);
 		free($2->name);
 		free($2);
 	}
+	| type constraint ';'
+	{
+		_on_property(parser, $1->name, EINA_FALSE, $1->container);
+		free($1->name);
+		free($1);
+	}
+	;
+
+function_args
+	: { $$ = NULL; }
+	| type_specifier ',' function_args { $$ = eina_list_append($3, $1); }
+	| type_specifier { $$ = eina_list_append(NULL, $1); }
+	;
+
+function
+	: T_INLINE_STRING '(' function_args ')' ';'
+	{
+		_on_function(parser, $1, NULL, $3);
+	}
+	| type '(' function_args ')' ';'
+	{
+		_on_function(parser, $1->name, $1->container, $3);
+	}
+	;
+
+declaration
+	: property
+	| function
 	;
 
 declaration_list

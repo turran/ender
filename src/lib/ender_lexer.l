@@ -23,7 +23,7 @@ typedef struct _Ender_Type
 %}
 
 %x C_COMMENT
-_operator 		[\[\]{}.,;=\:]
+_operator 		[\[\]{}.,;=\:\(\)]
 D			[0-9]
 
 %%

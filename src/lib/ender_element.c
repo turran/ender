@@ -1029,7 +1029,7 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 
 	ENDER_MAGIC_CHECK(e);
 
-	largs = ender_function_args_get(f);
+	largs = (Eina_List *) ender_function_args_get(f);
 	EINA_LIST_FOREACH (largs, l, c)
 	{
 		Ender_Value *value;

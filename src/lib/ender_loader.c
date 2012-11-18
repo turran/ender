@@ -439,11 +439,18 @@ static void _loader_on_property(void *data, const char *name, Eina_Bool relative
 
 }
 
+static void _loader_on_function(void *data, const char *name, Ender_Container *ret, Eina_List *args)
+{
+	ERR("Functions not supported yet");
+}
+
 static Ender_Parser_Descriptor _loader_parser = {
-	/* on_using = */ _loader_on_using,
-	/* on_namespace = */ _loader_on_namespace,
-	/* on_object = */ _loader_on_object,
-	/* on_property = */ _loader_on_property,
+	/* .on_using 		= */ _loader_on_using,
+	/* .on_namespace 	= */ _loader_on_namespace,
+	/* .on_object 		= */ _loader_on_object,
+	/* .on_property 	= */ _loader_on_property,
+	/* .on_function 	= */ _loader_on_function,
+	/* .on_container 	= */ NULL,
 };
 /*============================================================================*
  *                                 Global                                     *
