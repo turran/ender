@@ -326,7 +326,7 @@ static void _generator_on_function(void *data, const char *name, Ender_Container
 	/* first the container */
 	fprintf(thiz->out, "\t{\n");
 	fprintf(thiz->out, "\t\tEnder_Container *ret = NULL;\n");
-	fprintf(thiz->out, "\t\tEnder_Container *args = NULL;\n");
+	fprintf(thiz->out, "\t\tEina_List *args = NULL;\n");
 	fprintf(thiz->out, "\t\tEnder_Function *ef;\n");
 	if (ret)
 	{
@@ -343,7 +343,6 @@ static void _generator_on_function(void *data, const char *name, Ender_Container
 		fprintf(thiz->out, "\t\t}\n");
 	}
 	fprintf(thiz->out, "\t\tef = ender_descriptor_function_add_list(d, \"%s\",\n", name);
-	fprintf(thiz->out, "\t\t\t\tec,\n");
 	fprintf(thiz->out, "\t\t\t\tENDER_FUNCTION(_%s_%s_%s),\n", thiz->ns_name, thiz->name, fnormalized);
 	fprintf(thiz->out, "\t\t\t\tNULL, ret, args);\n");
 #if 0
