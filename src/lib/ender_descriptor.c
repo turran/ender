@@ -611,10 +611,31 @@ EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc
 	return function;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *edesc, const char *name)
 {
 	if (!edesc) return NULL;
 	return eina_ordered_hash_find(edesc->functions, name);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_descriptor_function_list(Ender_Descriptor *ed, Ender_Function_List_Callback cb, void *data)
+{
+	Ender_Function *prop;
+	Eina_List *l;
+
+	if (!ed || !cb) return;
+
+	EINA_LIST_FOREACH(ed->functions->order, l, prop)
+	{
+		cb(prop, data);
+	}
 }
 
 /**

@@ -1028,10 +1028,14 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 	Eina_List *lvalues = NULL;
 	Eina_List *l;
 	Ender_Container *c;
+	Ender_Value ret;
 
 	ENDER_MAGIC_CHECK(e);
 
 	largs = (Eina_List *) ender_function_args_get(f);
+	/* add a value for the ret */
+	c = ender_function_ret_get(f);
+	ret.container = c;
 	EINA_LIST_FOREACH (largs, l, c)
 	{
 		Ender_Value *value;
@@ -1040,9 +1044,8 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 		ENDER_VALUE_FROM_DATA((*value), c, va_args);
 		lvalues = eina_list_append(lvalues, value);
 	}
-	/* TODO add a value for the ret */
 	/* call the real function */
-	return ender_function_call(f, e->object, NULL, lvalues);
+	return ender_function_call(f, e->object, &ret, lvalues);
 }
 
 

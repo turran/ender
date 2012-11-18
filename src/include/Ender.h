@@ -321,6 +321,7 @@ EAPI Eina_Bool ender_marshaller_ender__string(void *data, Ender_Accessor f,
 
 EAPI int ender_function_args_count(Ender_Function *thiz);
 EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz);
+EAPI Ender_Container * ender_function_ret_get(Ender_Function *thiz);
 
 /**
  * @}
@@ -328,6 +329,7 @@ EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz);
  * @{
  */
 typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
+typedef void (*Ender_Function_List_Callback)(Ender_Function *func, void *data);
 
 EAPI Ender_Descriptor * ender_descriptor_find(const char *name);
 EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns, int version);
@@ -351,6 +353,7 @@ EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc
 		Ender_Accessor f, Ender_Marshaller marshaller, Ender_Container *ret,
 		Eina_List *args);
 EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *ed, const char *name);
+EAPI void ender_descriptor_function_list(Ender_Descriptor *ed, Ender_Function_List_Callback cb, void *data);
 
 EAPI void ender_descriptor_list(Ender_Descriptor_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);

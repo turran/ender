@@ -72,3 +72,8 @@ EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz)
 {
 	return thiz->args;
 }
+
+EAPI Ender_Container * ender_function_ret_get(Ender_Function *thiz)
+{
+	return thiz->ret;
+}
