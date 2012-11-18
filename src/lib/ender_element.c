@@ -998,7 +998,7 @@ EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_
 	f = ender_descriptor_function_get(d, name);
 	if (!f) return EINA_FALSE;
 
-	ender_element_function_call_valist(e, f, va_args);
+	return ender_element_function_call_valist(e, f, va_args);
 }
 
 /**
@@ -1007,13 +1007,15 @@ EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_
  */
 EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...)
 {
+	Eina_Bool ret;
 	va_list va_args;
 
 	ENDER_MAGIC_CHECK(e);
 
 	va_start(va_args, name);
-	ender_element_call_valist(e, name, va_args);
+	ret = ender_element_call_valist(e, name, va_args);
 	va_end(va_args);
+	return ret;
 }
 
 /**
@@ -1040,7 +1042,7 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 	}
 	/* TODO add a value for the ret */
 	/* call the real function */
-	ender_function_call(f, e->object, NULL, lvalues);
+	return ender_function_call(f, e->object, NULL, lvalues);
 }
 
 
@@ -1050,13 +1052,15 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
  */
 EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, ...)
 {
+	Eina_Bool ret;
 	va_list va_args;
 
 	ENDER_MAGIC_CHECK(e);
 
 	va_start(va_args, f);
-	ender_element_function_call_valist(e, f, va_args);
+	ret = ender_element_function_call_valist(e, f, va_args);
 	va_end(va_args);
+	return ret;
 }
 
 

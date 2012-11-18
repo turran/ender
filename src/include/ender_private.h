@@ -141,7 +141,7 @@ Ender_Function * ender_function_new(const char *name,
 		Ender_Accessor f,
 		Ender_Marshaller marshaller,
 		Ender_Container *ret, Eina_List *args);
-void ender_function_call(Ender_Function *thiz, void *o,
+Eina_Bool ender_function_call(Ender_Function *thiz, void *o,
 		Ender_Value *ret, Eina_List *args);
 
 /* container */

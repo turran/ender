@@ -55,10 +55,10 @@ Ender_Function * ender_function_new(const char *name,
 	return thiz;
 }
 
-void ender_function_call(Ender_Function *thiz, void *o,
+Eina_Bool ender_function_call(Ender_Function *thiz, void *o,
 		Ender_Value *ret, Eina_List *args)
 {
-	thiz->marshaller(o, thiz->f, ret, args);
+	return thiz->marshaller(o, thiz->f, ret, args);
 }
 /*============================================================================*
  *                                   API                                      *
