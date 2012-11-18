@@ -318,6 +318,7 @@ EAPI Eina_Bool ender_marshaller_void__void(void *data, Ender_Accessor f,
 #define ENDER_FUNCTION(f) ((Ender_Accessor)(f))
 
 EAPI int ender_function_args_count(Ender_Function *thiz);
+EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz);
 
 /**
  * @}
