@@ -38,7 +38,7 @@ void ender_marshaller_init(void)
 {
 	_marshallers = eina_hash_string_superfast_new(NULL);
 	eina_hash_add(_marshallers, "void__void", ender_marshaller_void__void);
-	eina_hash_add(_marshallers, "ender__string", ender_marshaller_ender__string);
+	eina_hash_add(_marshallers, "ENDER__STRING", ender_marshaller_ender__string);
 }
 
 void ender_marshaller_shutdown(void)
@@ -83,8 +83,12 @@ EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
 		strcat(name, "_");
 		_ender_marshaller_arg_append(name, arg);
 	}
-	marshaller = eina_hash_find(_marshallers, name);
 	DBG("Looking for %s %p\n", name, marshaller);
+	marshaller = eina_hash_find(_marshallers, name);
+	if (!marshaller)
+	{
+		ERR("No marshaller registered for '%s' format", name);
+	}	
 	return marshaller;
 }
 

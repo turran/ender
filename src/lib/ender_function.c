@@ -22,6 +22,7 @@
  *============================================================================*/
 struct _Ender_Function
 {
+	char *name;
 	Ender_Accessor f;
 	Ender_Marshaller marshaller;
 	Ender_Container *ret;
@@ -38,15 +39,24 @@ Ender_Function * ender_function_new(const char *name,
 	Ender_Function *thiz;
 	Ender_Container *arg;
 
-	if (!f) return NULL;
+	if (!f)
+	{
+		ERR("No accessor on '%s' function creation", name);
+		return NULL;
+	}
 
 	if (!marshaller)
 	{
 		marshaller = ender_marshaller_find_list(ret, args);
-		if (!marshaller) return NULL;
+		if (!marshaller)
+		{
+			ERR("No marshaller defined");
+			return NULL;
+		}
 	}
 
 	thiz = calloc(1, sizeof(Ender_Function));
+	thiz->name = strdup(name);
 	thiz->args = args;
 	thiz->ret = ret;
 	thiz->marshaller = marshaller;
@@ -76,4 +86,9 @@ EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz)
 EAPI Ender_Container * ender_function_ret_get(Ender_Function *thiz)
 {
 	return thiz->ret;
+}
+
+EAPI const char * ender_function_name_get(Ender_Function *thiz)
+{
+	return thiz->name;
 }

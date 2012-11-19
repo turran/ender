@@ -54,7 +54,7 @@ extern "C" {
 /**
  * @mainpage Ender
  * @section intro Introduction
- * Ender is a library that loads descriptions of objects 
+ * Ender is a library that loads descriptions of objects
  * them into a collection of properties that are accesible through a common API.
  *
  * @section syntax Syntax
@@ -322,6 +322,7 @@ EAPI Eina_Bool ender_marshaller_ender__string(void *data, Ender_Accessor f,
 EAPI int ender_function_args_count(Ender_Function *thiz);
 EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz);
 EAPI Ender_Container * ender_function_ret_get(Ender_Function *thiz);
+EAPI const char * ender_function_name_get(Ender_Function *thiz);
 
 /**
  * @}

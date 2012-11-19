@@ -604,7 +604,11 @@ EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc
 	}
 
 	function = ender_function_new(name, f, marshaller, ret, args);
-	if (!function) return function;
+	if (!function)
+	{
+		ERR("Impossible to add the function '%s'", name);
+		return function;
+	}
 
 	eina_ordered_hash_add(edesc->functions, name, function);
 	DBG("Function '%s' added to '%s'", name, edesc->name);
@@ -627,14 +631,14 @@ EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *edesc, con
  */
 EAPI void ender_descriptor_function_list(Ender_Descriptor *ed, Ender_Function_List_Callback cb, void *data)
 {
-	Ender_Function *prop;
+	Ender_Function *f;
 	Eina_List *l;
 
 	if (!ed || !cb) return;
 
-	EINA_LIST_FOREACH(ed->functions->order, l, prop)
+	EINA_LIST_FOREACH(ed->functions->order, l, f)
 	{
-		cb(prop, data);
+		cb(f, data);
 	}
 }
 
