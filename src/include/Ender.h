@@ -309,6 +309,10 @@ EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
 
 EAPI Eina_Bool ender_marshaller_void__void(void *data, Ender_Accessor f,
 		Ender_Value *ret, Eina_List *args);
+EAPI Eina_Bool ender_marshaller_void__string_string(void *data, Ender_Accessor f,
+		Ender_Value *ret, Eina_List *args);
+EAPI Eina_Bool ender_marshaller_string__string(void *data, Ender_Accessor f,
+		Ender_Value *ret, Eina_List *args);
 EAPI Eina_Bool ender_marshaller_ender__string(void *data, Ender_Accessor f,
 		Ender_Value *ret, Eina_List *args);
 
@@ -532,11 +536,16 @@ EAPI void ender_loader_registry_callback_add(Ender_Loader_Registry_Callback cb, 
  */
 
 typedef void (*Ender_Parser_On_Using)(void *data, const char *name);
-typedef void (*Ender_Parser_On_Namespace)(void *data, const char *name, int version);
-typedef void (*Ender_Parser_On_Object)(void *data, const char *name, Ender_Descriptor_Type type, const char *parent);
-typedef void (*Ender_Parser_On_Property)(void *data, const char *name, Eina_Bool relative, Ender_Container *container); 
-typedef void (*Ender_Parser_On_Function)(void *data, const char *name, Ender_Container *ret, Eina_List *args); 
-typedef void (*Ender_Parser_On_Container)(void *data, const char *name, Ender_Container *container); 
+typedef void (*Ender_Parser_On_Namespace)(void *data, const char *name,
+		int version);
+typedef void (*Ender_Parser_On_Object)(void *data, const char *name,
+		Ender_Descriptor_Type type, const char *parent);
+typedef void (*Ender_Parser_On_Property)(void *data, const char *name,
+		const char *alias, Eina_Bool relative, Ender_Container *container);
+typedef void (*Ender_Parser_On_Function)(void *data, const char *name,
+		const char *alias, Ender_Container *ret, Eina_List *args);
+typedef void (*Ender_Parser_On_Container)(void *data, const char *name,
+		Ender_Container *container);
 
 typedef struct _Ender_Parser_Descriptor
 {

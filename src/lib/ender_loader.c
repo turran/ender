@@ -220,9 +220,9 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name, int ver
 	namespace = eina_hash_find(_library_namespaces, name);
 	if (namespace) return namespace;
 
-	/* first we need to split the namespace by the dot 
-	 * the string before the first dot is the library name 
-	 * and the rest is the namespace 
+	/* first we need to split the namespace by the dot
+	 * the string before the first dot is the library name
+	 * and the rest is the namespace
 	 * Note: this wont work for multi-byte or wide chars
 	 */
 	tmp2 = strchr(name, '.');
@@ -311,10 +311,53 @@ static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namesp
 
 	return desc;
 }
-
-static void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, Ender_Descriptor *edesc,
-		const char *name, Ender_Container *prop, Eina_Bool rel)
+/*----------------------------------------------------------------------------*
+ *                           The parser insterface                            *
+ *----------------------------------------------------------------------------*/
+static void _loader_on_using(void *data, const char *file)
 {
+	char *c_name;
+
+	char *lib;
+	char *ns;
+
+	c_name = strdup(file);
+	_name_to_c(c_name);
+	ender_loader_load(c_name);
+	free(c_name);
+}
+
+static void _loader_on_namespace(void *data, const char *name, int version)
+{
+	Ender_Loader *thiz;
+
+	thiz = data;
+	thiz->namespace = _loader_namespace_new(name, version);
+}
+
+static void _loader_on_object(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
+{
+	Ender_Loader *thiz;
+	Ender_Descriptor *parent_descriptor = NULL;
+
+	thiz = data;
+	if (parent)
+	{
+		parent_descriptor = ender_descriptor_find(parent);
+		if (!parent_descriptor)
+		{
+			ERR("No parent \"%s\" found for desriptor \"%s\"", parent, name);
+			return;
+		}
+	}
+	thiz->descriptor = _loader_descriptor_new(thiz->namespace, name, parent_descriptor, type);
+}
+
+static void _loader_on_property(void *data, const char *name, const char *alias, Eina_Bool relative, Ender_Container *container)
+{
+	Ender_Loader *thiz = data;
+	Ender_Library_Namespace *namespace = thiz->namespace;
+	Ender_Descriptor *edesc = thiz->descriptor;
 	Ender_Getter get;
 	Ender_Setter set;
 	Ender_Add add = NULL;
@@ -358,7 +401,7 @@ static void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, 
 		DBG("No is_set %s for type %s", func_name, edesc_name);
 	}
 	/* in case of a compound property, also try to get the add/remove/clear */
-	if (prop->type == ENDER_LIST)
+	if (container->type == ENDER_LIST)
 	{
 		/* the add */
 		strncpy(func_name, prefix, PATH_MAX);
@@ -385,63 +428,33 @@ static void _loader_descriptor_property_add(Ender_Library_Namespace *namespace, 
 			WRN("No clear %s for type %s", func_name, edesc_name);
 		}
 	}
-	ender_descriptor_property_add(edesc, name, prop, get, set, add, remove, clear, is_set, rel);
+	ender_descriptor_property_add(edesc, name, container, get, set, add, remove, clear, is_set, relative);
 }
 
-/*----------------------------------------------------------------------------*
- *                           The parser insterface                            *
- *----------------------------------------------------------------------------*/
-static void _loader_on_using(void *data, const char *file)
+static void _loader_on_function(void *data, const char *name, const char *alias, Ender_Container *ret, Eina_List *args)
 {
-	char *c_name;
+	Ender_Loader *thiz = data;
+	Ender_Library_Namespace *namespace = thiz->namespace;
+	Ender_Descriptor *edesc = thiz->descriptor;
+	Ender_Accessor f;
+	char func_name[PATH_MAX];
+	const char *edesc_name;
+	const char *ns_name;
+	if (!namespace || !namespace->ns || !namespace->lib) return;
 
-	char *lib;
-	char *ns;
+	ns_name = ender_namespace_name_get(namespace->ns);
+	edesc_name = ender_descriptor_name_get(edesc);
+	DBG("Adding function %s to %s", name, edesc_name);
+	snprintf(func_name, PATH_MAX, "%s_%s_%s", ns_name, edesc_name, name);
 
-	c_name = strdup(file);
-	_name_to_c(c_name);
-	ender_loader_load(c_name);
-	free(c_name);
-}
-
-static void _loader_on_namespace(void *data, const char *name, int version)
-{
-	Ender_Loader *thiz;
-
-	thiz = data;
-	thiz->namespace = _loader_namespace_new(name, version);
-}
-
-static void _loader_on_object(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
-{
-	Ender_Loader *thiz;
-	Ender_Descriptor *parent_descriptor = NULL;
-
-	thiz = data;
-	if (parent)
+	/* the function */
+	f = dlsym(namespace->lib->dl_handle, func_name);
+	if (!f)
 	{
-		parent_descriptor = ender_descriptor_find(parent);
-		if (!parent_descriptor)
-		{
-			ERR("No parent \"%s\" found for desriptor \"%s\"", parent, name);
-			return;
-		}
+		ERR("No function '%s' found", func_name, edesc_name);
+		return;
 	}
-	thiz->descriptor = _loader_descriptor_new(thiz->namespace, name, parent_descriptor, type);
-}
-
-static void _loader_on_property(void *data, const char *name, Eina_Bool relative, Ender_Container *container)
-{
-	Ender_Loader *thiz;
-
-	thiz = data;
-	_loader_descriptor_property_add(thiz->namespace, thiz->descriptor, name, container, relative);
-
-}
-
-static void _loader_on_function(void *data, const char *name, Ender_Container *ret, Eina_List *args)
-{
-	ERR("Functions not supported yet");
+	ender_descriptor_function_add_list(edesc, alias ? alias : name, f, NULL, ret, args);
 }
 
 static Ender_Parser_Descriptor _loader_parser = {

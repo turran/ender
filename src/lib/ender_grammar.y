@@ -40,19 +40,22 @@ static inline void _on_object(Ender_Parser *parser, const char *name, Ender_Desc
 		parser->descriptor->on_object(parser->data, name, type, parent);
 }
 
-static inline void _on_property(Ender_Parser *parser, const char *name, Eina_Bool relative, Ender_Container *container)
+static inline void _on_property(Ender_Parser *parser, const char *name, const char *alias,
+		Eina_Bool relative, Ender_Container *container)
 {
 	if (parser->descriptor->on_property)
-		parser->descriptor->on_property(parser->data, name, relative, container);
+		parser->descriptor->on_property(parser->data, name, alias, relative, container);
 }
 
-static inline void _on_function(Ender_Parser *parser, const char *name, Ender_Container *ret, Eina_List *args)
+static inline void _on_function(Ender_Parser *parser, const char *name,
+		const char *alias, Ender_Container *ret, Eina_List *args)
 {
 	if (parser->descriptor->on_function)
-		parser->descriptor->on_function(parser->data, name, ret, args);
+		parser->descriptor->on_function(parser->data, name, alias, ret, args);
 }
 
-static inline void _on_container(Ender_Parser *parser, const char *name, Ender_Container *container)
+static inline void _on_container(Ender_Parser *parser, const char *name,
+		Ender_Container *container)
 {
 	if (parser->descriptor->on_container)
 		parser->descriptor->on_container(parser->data, name, container);
@@ -106,6 +109,8 @@ static inline void _on_container(Ender_Parser *parser, const char *name, Ender_C
 %type <list> types
 %type <list> function_args
 %type <type> type
+%type <type> extended_type
+%type <s> alias
 
 %%
 
@@ -285,29 +290,46 @@ type_relative
 	: T_REL { $$ = EINA_TRUE; }
 	;
 
+alias
+	: ',' T_INLINE_STRING { $$ = $2; }
+	| { $$ = NULL; }
+	;
+
+extended_type
+	: type alias
+	{
+		$$ = $1;
+		$$->alias = $2;
+	}
+	;
+
 type
 	: type_specifier T_INLINE_STRING
 	{
 		Ender_Parser_Type *type = malloc(sizeof(Ender_Parser_Type));
-		
+
 		type->container = $1;
 		type->name = $2;
+		type->alias = NULL;
 
 		$$ = type;
 	}
 	;
 
 property
-	: type_relative type constraint ';'
+	: type_relative extended_type constraint ';'
 	{
-		_on_property(parser, $2->name, EINA_TRUE, $2->container);
+		_on_property(parser, $2->name, $2->alias, EINA_TRUE, $2->container);
 		free($2->name);
+			free($2->alias);
 		free($2);
 	}
-	| type constraint ';'
+	| extended_type constraint ';'
 	{
-		_on_property(parser, $1->name, EINA_FALSE, $1->container);
+		_on_property(parser, $1->name, $1->alias, EINA_FALSE, $1->container);
 		free($1->name);
+		if ($1->alias)
+			free($1->alias);
 		free($1);
 	}
 	;
@@ -319,13 +341,17 @@ function_args
 	;
 
 function
-	: T_INLINE_STRING '(' function_args ')' ';'
+	: T_INLINE_STRING alias '(' function_args ')' ';'
 	{
-		_on_function(parser, $1, NULL, $3);
+		_on_function(parser, $1, $2, NULL, $4);
 	}
-	| type '(' function_args ')' ';'
+	| extended_type '(' function_args ')' ';'
 	{
-		_on_function(parser, $1->name, $1->container, $3);
+		_on_function(parser, $1->name, $1->alias, $1->container, $3);
+		free($1->name);
+		if ($1->alias)
+			free($1->alias);
+		free($1);
 	}
 	;
 

@@ -77,7 +77,7 @@ static void _property_variable_name(char *dst, const char *ns, const char *oname
 	_upper(oname, len, dst);
 	dst += len;
 	*dst++ = '_';
-	
+
 	len = strlen(pname);
 	_upper(pname, len, dst);
 	dst += len;
@@ -136,7 +136,7 @@ static void _dump_container_recursive(Ender_Generator *thiz, Ender_Container *co
 				fprintf(thiz->out, "ender_container_add(tmp%d, \"%s\", tmp%d);\n", level, name, level + 2);
 			else
 				fprintf(thiz->out, "ender_container_add(tmp%d, NULL, tmp%d);\n", level, level + 2);
-				
+
 			_tabs(thiz, level + 1);
 			fprintf(thiz->out, "}\n");
 		}
@@ -170,7 +170,7 @@ static void _dump_container_struct_union_recursive(Ender_Generator *thiz, Ender_
 			fprintf(thiz->out, "ender_container_add(tmp%d, \"%s\", tmp%d);\n", level, name, level + 2);
 		else
 			fprintf(thiz->out, "ender_container_add(tmp%d, NULL, tmp%d);\n", level, level + 2);
-			
+
 		_tabs(thiz, level + 1);
 		fprintf(thiz->out, "}\n");
 	}
@@ -260,7 +260,7 @@ static void _generator_on_object(void *data, const char *name, Ender_Descriptor_
 	fprintf(thiz->out, "\tif (!d) return;\n");
 }
 
-static void _generator_on_property(void *data, const char *name, Eina_Bool relative, Ender_Container *container)
+static void _generator_on_property(void *data, const char *name, const char *alias, Eina_Bool relative, Ender_Container *container)
 {
 	Ender_Generator *thiz;
 	Ender_Value_Type type;
@@ -309,7 +309,7 @@ static void _generator_on_property(void *data, const char *name, Eina_Bool relat
 	fprintf(thiz->out, "\t}\n");
 }
 
-static void _generator_on_function(void *data, const char *name, Ender_Container *ret, Eina_List *args)
+static void _generator_on_function(void *data, const char *name, const char *alias, Ender_Container *ret, Eina_List *args)
 {
 	Ender_Generator *thiz;
 	Ender_Container *c;
@@ -342,7 +342,7 @@ static void _generator_on_function(void *data, const char *name, Ender_Container
 		fprintf(thiz->out, "\t\t\targs = eina_list_append(args, tmp3);\n");
 		fprintf(thiz->out, "\t\t}\n");
 	}
-	fprintf(thiz->out, "\t\tef = ender_descriptor_function_add_list(d, \"%s\",\n", name);
+	fprintf(thiz->out, "\t\tef = ender_descriptor_function_add_list(d, \"%s\",\n", alias ? alias : name);
 	fprintf(thiz->out, "\t\t\t\tENDER_FUNCTION(_%s_%s_%s),\n", thiz->ns_name, thiz->name, fnormalized);
 	fprintf(thiz->out, "\t\t\t\tNULL, ret, args);\n");
 #if 0

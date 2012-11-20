@@ -38,7 +38,9 @@ void ender_marshaller_init(void)
 {
 	_marshallers = eina_hash_string_superfast_new(NULL);
 	eina_hash_add(_marshallers, "void__void", ender_marshaller_void__void);
+	eina_hash_add(_marshallers, "void__STRING_STRING", ender_marshaller_void__string_string);
 	eina_hash_add(_marshallers, "ENDER__STRING", ender_marshaller_ender__string);
+	eina_hash_add(_marshallers, "STRING__STRING", ender_marshaller_string__string);
 }
 
 void ender_marshaller_shutdown(void)
@@ -88,7 +90,7 @@ EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
 	if (!marshaller)
 	{
 		ERR("No marshaller registered for '%s' format", name);
-	}	
+	}
 	return marshaller;
 }
 
@@ -123,6 +125,52 @@ EAPI Eina_Bool ender_marshaller_void__void(void *data, Ender_Accessor f,
 
 	_f = (_Function)(f);
 	_f(data);
+	return EINA_TRUE;
+}
+
+EAPI Eina_Bool ender_marshaller_string__string(void *data, Ender_Accessor f,
+		Ender_Value *ret, Eina_List *args)
+{
+	typedef char * (*_Function)(void *o, const char *string);
+	_Function _f;
+	char *r;
+	Ender_Value *arg0;
+	const char *str;
+
+	_f = (_Function)(f);
+	/* get the args */
+	if (!args) return EINA_FALSE;
+
+	arg0 = args->data;
+	str = ender_value_string_get(arg0);
+	r = _f(data, str);
+	/* set the return value */
+	ender_value_string_set(ret, r);
+
+	return EINA_TRUE;
+}
+
+EAPI Eina_Bool ender_marshaller_void__string_string(void *data, Ender_Accessor f,
+		Ender_Value *ret, Eina_List *args)
+{
+	typedef void (*_Function)(void *o, const char *arg0, const char *arg1);
+	_Function _f;
+	Ender_Value *arg0;
+	Ender_Value *arg1;
+	const char *str0;
+	const char *str1;
+
+	_f = (_Function)(f);
+	/* get the args */
+	if (eina_list_count(args) != 2)
+		return EINA_FALSE;
+
+	arg0 = eina_list_nth(args, 0);
+	arg1 = eina_list_nth(args, 1);
+	str0 = ender_value_string_get(arg0);
+	str1 = ender_value_string_get(arg1);
+	_f(data, str0, str1);
+
 	return EINA_TRUE;
 }
 

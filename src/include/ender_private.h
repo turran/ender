@@ -175,6 +175,7 @@ typedef struct _Ender_Parser
 typedef struct _Ender_Parser_Type
 {
 	char *name;
+	char *alias;
 	Ender_Container *container;
 } Ender_Parser_Type;
 

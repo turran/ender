@@ -12,12 +12,6 @@
 
 #define YY_USER_ACTION { yylloc->first_line = yylineno; yylloc->last_line = yylineno; }
 
-typedef struct _Ender_Type
-{
-	char *name;
-	Ender_Container *container;
-} Ender_Type;
-
 #include "libender_la-ender_grammar.h"
 #define YY_NO_UNISTD_H
 %}
