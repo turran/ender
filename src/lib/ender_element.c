@@ -1048,6 +1048,15 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 	return ender_function_call(f, e->object, &ret, lvalues);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_element_function_call_simple(Ender_Element *e,
+		Ender_Function *f, Ender_Value *ret, Eina_List *args)
+{
+	return ender_function_call(f, e->object, ret, args);
+}
 
 /**
  * To be documented

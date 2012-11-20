@@ -441,6 +441,8 @@ EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_
 EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...);
 EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, va_list va_args);
 EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, ...);
+EAPI Eina_Bool ender_element_function_call_simple(Ender_Element *e,
+		Ender_Function *f, Ender_Value *ret, Eina_List *args);
 
 /**
  * @}
