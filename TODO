@@ -1,5 +1,34 @@
-Add mutation events per property
-Add a serializer
-Add ref/unref here too
-Add constraints to properties, this way we can define enums and ranges
++ We need to have a way to describe a system that is not an object by itself, for example:
+typedef sutrct _Esvg_Length
+{
+	int units;
+	double val;
+} Esvg_Length;
+
+esvg_length_from_string(&length, const char *s);
+char * esvg_length_to_string(&string);
+
+We can describe this on terms of ender like:
+
+class "length" {
+	int units;
+	double val;
+	string to_string();
+};
+
+this way we can describe for example the Enesim_Matrix system, or
+any other system that is not an "object" (i.e opaque pointer)
+
+but, if we use length as a property of another class, then the
+var is going to be passed as Esvg_Length ** but what we really
+want is to just pass Esvg_Length given that it is a "known type"
+and we can avoid allocating a new Esvg_Length for each _get() function
+
+Or we either create a new type that the getters/setters/constructors
+will know how to handle, or we add functions to a struct?
+
++ Add mutation events per property
++ Add a serializer
++ Add ref/unref here too
++ Add constraints to properties, this way we can define enums and ranges
 
