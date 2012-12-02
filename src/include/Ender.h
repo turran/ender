@@ -96,8 +96,8 @@ typedef void (*Ender_New_Callback)(Ender_Element *e, void *data);
 
 typedef enum _Ender_Descriptor_Type
 {
-	ENDER_ABSTRACT,
-	ENDER_CLASS,
+	ENDER_TYPE_ABSTRACT,
+	ENDER_TYPE_CLASS,
 	ENDER_TYPES,
 } Ender_Descriptor_Type;
 

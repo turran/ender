@@ -110,7 +110,7 @@ static void test01_object_register(void)
 			ENDER_CREATOR(dummy_object_new),
 			ENDER_DESTRUCTOR(dummy_object_free),
 			NULL,
-			ENDER_CLASS);
+			ENDER_TYPE_CLASS);
 	/* add the properties */
 	ec = ender_container_new(ENDER_BOOL);
 	prop = ender_descriptor_property_add(descriptor, "bool",

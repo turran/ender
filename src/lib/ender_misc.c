@@ -34,10 +34,10 @@ EAPI const char * ender_descriptor_type_string_to(Ender_Descriptor_Type type)
 {
 	switch (type)
 	{
-		case ENDER_ABSTRACT:
+		case ENDER_TYPE_ABSTRACT:
 		return "ABSTRACT";
 
-		case ENDER_CLASS:
+		case ENDER_TYPE_CLASS:
 		return "CLASS";
 
 		default:
