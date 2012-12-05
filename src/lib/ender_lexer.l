@@ -93,11 +93,11 @@ union			{
 			}
 namespace		return T_NAMESPACE;
 class			{
-				yylval_param->dtype = ENDER_CLASS;
+				yylval_param->dtype = ENDER_TYPE_CLASS;
 				return T_CLASS;
 			}
 abstract		{
-				yylval_param->dtype = ENDER_ABSTRACT;
+				yylval_param->dtype = ENDER_TYPE_ABSTRACT;
 				return T_ABSTRACT;
 			}
 using			return T_USING;
