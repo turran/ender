@@ -68,6 +68,8 @@ static void _property_variable_name(char *dst, const char *ns, const char *oname
 {
 	size_t len;
 
+	printf("%s: %s %s %s\n", __FUNCTION__, ns, oname, pname);
+
 	len = strlen(ns);
 	_upper(ns, len, dst);
 	dst += len;
@@ -345,11 +347,9 @@ static void _generator_on_function(void *data, const char *name, const char *ali
 	fprintf(thiz->out, "\t\tef = ender_descriptor_function_add_list(d, \"%s\",\n", alias ? alias : name);
 	fprintf(thiz->out, "\t\t\t\tENDER_FUNCTION(_%s_%s_%s),\n", thiz->ns_name, thiz->name, fnormalized);
 	fprintf(thiz->out, "\t\t\t\tNULL, ret, args);\n");
-#if 0
 	/* now assing the exported function variable to the recently created function */
-	_function_variable_name(pname, thiz->ns_name, thiz->name, fnormalized);
-	fprintf(thiz->out, "\t\t%s = ep;\n", fname, fname);
-#endif
+	_property_variable_name(fname, thiz->ns_name, thiz->name, fnormalized);
+	fprintf(thiz->out, "\t\t%s = ef;\n", fname, fname);
 	/* close everything */
 	fprintf(thiz->out, "\t}\n");
 }
