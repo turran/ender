@@ -98,6 +98,8 @@ typedef enum _Ender_Descriptor_Type
 {
 	ENDER_TYPE_ABSTRACT,
 	ENDER_TYPE_CLASS,
+	ENDER_TYPE_STRUCT,
+	ENDER_TYPE_UNION,
 	ENDER_TYPES,
 } Ender_Descriptor_Type;
 

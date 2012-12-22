@@ -93,24 +93,32 @@ void dummy_object_function_01(Dummy_Object *thiz)
 	printf("function 01 called\n");
 }
 
-static void test01_object_register(void)
+/*----------------------------------------------------------------------------*
+ *                             Namespace helpers                              *
+ *----------------------------------------------------------------------------*/
+static void test01_namespace_register(void)
 {
 	Ender_Namespace *ns;
-	Ender_Descriptor *descriptor;
-	Ender_Container *ec;
-	Ender_Property *prop;
-	Ender_Function *function;
 
 	/* create a new namespace */
 	ns = ender_namespace_new("test01_namespace", 0);
-	/* add the test01 object */
-	descriptor = ender_namespace_descriptor_add(
-			ns,
-			"test01_object",
-			ENDER_CREATOR(dummy_object_new),
-			ENDER_DESTRUCTOR(dummy_object_free),
-			NULL,
-			ENDER_TYPE_CLASS);
+}
+
+static Ender_Namespace * test01_namespace_get(void)
+{
+	Ender_Namespace *ns;
+
+	ns = ender_namespace_find("test01_namespace", 0);
+	return ns;
+}
+/*----------------------------------------------------------------------------*
+ *                            Properties helpers                              *
+ *----------------------------------------------------------------------------*/
+static void test01_properties_register(Ender_Descriptor *descriptor)
+{
+	Ender_Container *ec;
+	Ender_Property *prop;
+
 	/* add the properties */
 	ec = ender_container_new(ENDER_BOOL);
 	prop = ender_descriptor_property_add(descriptor, "bool",
@@ -172,49 +180,173 @@ static void test01_object_register(void)
 			NULL,
 			NULL,
 			EINA_FALSE);
-	/* add the functions */
-	ender_descriptor_function_add(descriptor, "function_01",
-			ENDER_FUNCTION(dummy_object_function_01),
-			NULL, NULL, NULL);
 }
 
-/* test that the namespace is created */
-Eina_Bool test01_namespace(void)
-{
-	Ender_Namespace *ns;
-
-	ns = ender_namespace_find("test01_namespace", 0);
-	if (!ns)
-	{
-		printf("namespace not found\n");
-		return EINA_FALSE;
-	}
-	return EINA_TRUE;
-}
-
-Eina_Bool test01_properties(void)
+Eina_Bool test01_properties(Ender_Descriptor *desc)
 {
 	Ender_Property *prop;
-	Ender_Descriptor *desc;
-
-	desc = ender_descriptor_find("test01_object");
-	if (!desc)
-	{
-		printf("descriptor not found\n");
-		return EINA_FALSE;
-	}
 	prop = ender_descriptor_property_get(desc, "bool");
 	if (!prop)
 	{
 		printf("no bool property\n");
 		return EINA_FALSE;
 	}
+	printf("Properties found\n");
 	return EINA_TRUE;
 }
 
-Eina_Bool test01_setters_getters(void)
+/*----------------------------------------------------------------------------*
+ *                           Function helpers                                 *
+ *----------------------------------------------------------------------------*/
+static void test01_functions_register(Ender_Descriptor *descriptor)
 {
+	Ender_Function *function;
+	/* add the functions */
+	ender_descriptor_function_add(descriptor, "function_01",
+			ENDER_FUNCTION(dummy_object_function_01),
+			NULL, NULL, NULL);
+}
+
+Eina_Bool test01_functions(Ender_Element *e)
+{
+	ender_element_call(e, "function_01");
+	printf("Functions called\n");
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                              Object helpers                                *
+ *----------------------------------------------------------------------------*/
+static void test01_object_register(void)
+{
+	Ender_Namespace *ns;
+	Ender_Descriptor *descriptor;
+
+	/* get the namespace */
+	ns = test01_namespace_get();
+	if (!ns) return;
+	/* add the object */
+	descriptor = ender_namespace_descriptor_add(
+			ns,
+			"test01_object",
+			ENDER_CREATOR(dummy_object_new),
+			ENDER_DESTRUCTOR(dummy_object_free),
+			NULL,
+			ENDER_TYPE_CLASS);
+	test01_properties_register(descriptor);
+	test01_functions_register(descriptor);
+}
+
+static Ender_Descriptor * test01_object_get(void)
+{
+	Ender_Namespace *ns;
+	Ender_Descriptor *d;
+
+	ns = test01_namespace_get();
+	if (!ns) return NULL;
+	d = ender_namespace_descriptor_find(ns, "test01_object");
+	return d;
+}
+
+static Ender_Element * test01_object_new(void)
+{
+	Ender_Descriptor *d;
 	Ender_Element *e;
+
+	d = test01_object_get();
+	if (!d) return NULL;
+	e = ender_descriptor_element_new(d);
+	return e;
+}
+/*----------------------------------------------------------------------------*
+ *                              Struct helpers                                *
+ *----------------------------------------------------------------------------*/
+static void test01_struct_register(void)
+{
+	Ender_Namespace *ns;
+	Ender_Descriptor *descriptor;
+
+	/* get the namespace */
+	ns = test01_namespace_get();
+	if (!ns) return;
+	/* add the struct */
+	descriptor = ender_namespace_descriptor_add(
+			ns,
+			"test01_struct",
+			ENDER_CREATOR(dummy_object_new),
+			ENDER_DESTRUCTOR(dummy_object_free),
+			NULL,
+			ENDER_TYPE_STRUCT);
+	test01_properties_register(descriptor);
+	test01_functions_register(descriptor);
+}
+
+static Ender_Descriptor * test01_struct_get(void)
+{
+	Ender_Namespace *ns;
+	Ender_Descriptor *d;
+
+	ns = test01_namespace_get();
+	if (!ns) return NULL;
+	d = ender_namespace_descriptor_find(ns, "test01_struct");
+	return d;
+}
+
+static Ender_Element * test01_struct_new(void)
+{
+	Ender_Descriptor *d;
+	Ender_Element *e;
+
+	d = test01_struct_get();
+	if (!d) return NULL;
+	e = ender_descriptor_element_new(d);
+	return e;
+}
+/*----------------------------------------------------------------------------*
+ *                                  Tests                                     *
+ *----------------------------------------------------------------------------*/
+/* test that the namespace is created */
+Eina_Bool test01_namespace(void)
+{
+	Ender_Namespace *ns;
+
+	ns = test01_namespace_get();
+	if (!ns)
+	{
+		printf("namespace not found\n");
+		return EINA_FALSE;
+	}
+	printf("Namespace 'test01' found\n");
+	return EINA_TRUE;
+}
+
+Eina_Bool test01_object_properties(void)
+{
+	Ender_Descriptor *desc;
+
+	desc = test01_object_get();
+	if (!desc)
+	{
+		printf("descriptor not found\n");
+		return EINA_FALSE;
+	}
+	return test01_properties(desc);
+}
+
+Eina_Bool test01_struct_properties(void)
+{
+	Ender_Descriptor *desc;
+
+	desc = ender_descriptor_find("test01_struct");
+	if (!desc)
+	{
+		printf("descriptor not found\n");
+		return EINA_FALSE;
+	}
+	return test01_properties(desc);
+}
+
+Eina_Bool test01_setters_getters(Ender_Element *e)
+{
 	Eina_Bool b;
 	uint32_t u32;
 	double d;
@@ -224,12 +356,6 @@ Eina_Bool test01_setters_getters(void)
 	Ender_Element *ender;
 	Enesim_Matrix matrix;
 
-	e = ender_element_new_with_namespace("test01_object", "test01_namespace", 0);
-	if (!e)
-	{
-		printf("impossible to instantiate an element\n");
-		return EINA_FALSE;
-	}
 	ender_element_value_set(e, "bool", EINA_TRUE, NULL);
 	ender_element_value_get(e, "bool", &b, NULL);
 	if (b != EINA_TRUE)
@@ -248,28 +374,43 @@ Eina_Bool test01_setters_getters(void)
 	return EINA_TRUE;
 }
 
-Eina_Bool test01_functions(void)
+Eina_Bool test01_struct_setters_getters(void)
 {
 	Ender_Element *e;
 
-	e = ender_element_new_with_namespace("test01_object", "test01_namespace", 0);
-	if (!e)
-	{
-		printf("impossible to instantiate an element\n");
-		return EINA_FALSE;
-	}
-	ender_element_call(e, "function_01");
+	e = test01_struct_new();
+	return test01_setters_getters(e);
+}
+
+Eina_Bool test01_object_setters_getters(void)
+{
+	Ender_Element *e;
+
+	e = test01_object_new();
+	return test01_setters_getters(e);
+}
+
+Eina_Bool test01_object_functions(void)
+{
+	Ender_Element *e;
+
+	e = test01_object_new();
+	return test01_functions(e);
 }
 
 int main(int argc, char **argv)
 {
 	ender_init(&argc, &argv);
 
+	test01_namespace_register();
 	test01_object_register();
+	test01_struct_register();
+
 	if (!test01_namespace()) return -1;
-	if (!test01_properties()) return -1;
-	if (!test01_setters_getters()) return -1;
-	if (!test01_functions()) return -1;
+	if (!test01_struct_properties()) return -1;
+	if (!test01_object_properties()) return -1;
+	if (!test01_object_setters_getters()) return -1;
+	if (!test01_object_functions()) return -1;
 	/* test that the object is part of that namespace */
 	/* create the ender */
 	/* add dynamic properties */

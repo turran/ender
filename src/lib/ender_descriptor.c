@@ -17,25 +17,9 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
-/* TODO
- * - Add introspection functions: a way to know the properties, the
- * values, the parent, etc.
- * - For compound types (lists, arrays) add a way to add/remove/clear
- * the property
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Ender_Descriptor_Property
-{
-	Ender_Getter get;
-	Ender_Setter set;
-	Ender_Add add;
-	Ender_Remove remove;
-	Ender_Clear clear;
-	Ender_Is_Set is_set;
-} Ender_Descriptor_Property;
-
 typedef struct _Ender_Descriptor_List_Data
 {
 	Eina_Bool ret;
@@ -54,11 +38,38 @@ typedef void (*Ender_Value_Accessor)(Ender_Value *v, Ender_Accessor acc,
 typedef void (*Ender_Value_Relative_Accessor)(Ender_Value *v, Ender_Accessor acc,
 		Ender_Element *e, void *parent);
 
-
 static Ender_Value_Accessor _setters[ENDER_PROPERTY_TYPES];
 static Ender_Value_Accessor _getters[ENDER_PROPERTY_TYPES];
 static Ender_Value_Relative_Accessor _relative_accessors[ENDER_PROPERTY_TYPES];
+
 static Ender_Property * _descriptor_property_get(Ender_Descriptor *e, const char *name);
+
+static inline void _value_set(Ender_Property *p, Ender_Element *e, Ender_Value *v,
+		Ender_Accessor acc)
+{
+	if (ender_property_is_relative(p))
+	{
+		Ender_Element *parent;
+
+		parent = ender_element_parent_get(e);
+		if (parent)
+		{
+			void *rparent;
+
+			rparent = ender_element_object_get(parent);
+			_relative_accessors[v->container->type](v, acc, e, rparent);
+		}
+		else WRN("Trying to set a relative property with no parent");
+	}
+	else
+	{
+		void *object;
+
+		object = ender_element_object_get(e);
+		_setters[v->container->type](v, acc, object);
+	}
+
+}
 
 static Eina_Bool _descriptor_list_namespace_cb(Ender_Descriptor *thiz, void *user_data)
 {
@@ -104,33 +115,6 @@ static Ender_Property * _descriptor_property_get(Ender_Descriptor *e, const char
 	if (!e->parent) return NULL;
 
 	return _descriptor_property_get(e->parent, name);
-}
-
-static inline void _value_set(Ender_Property *p, Ender_Element *e, Ender_Value *v,
-		Ender_Accessor acc)
-{
-	if (ender_property_is_relative(p))
-	{
-		Ender_Element *parent;
-
-		parent = ender_element_parent_get(e);
-		if (parent)
-		{
-			void *rparent;
-
-			rparent = ender_element_object_get(parent);
-			_relative_accessors[v->container->type](v, acc, e, rparent);
-		}
-		else WRN("Trying to set a relative property with no parent");
-	}
-	else
-	{
-		void *object;
-
-		object = ender_element_object_get(e);
-		_setters[v->container->type](v, acc, object);
-	}
-
 }
 /*----------------------------------------------------------------------------*
  *                     uint32 / in32 / argb / bool                            *
@@ -220,7 +204,6 @@ static void _ender_pointer_get(Ender_Value *v, Ender_Getter get,
 		void *e)
 {
 	/* FIXME here it all depends if the struct is alloc'ed or not */
-	//get(e, &v->data.ptr);
 	get(e, v->data.ptr);
 }
 
@@ -266,7 +249,7 @@ static void _ender_dummy_set(Ender_Value *v, Ender_Setter set,
 
 }
 
-static void _ender_dummy_get(Ender_Value *v, Ender_Setter set,
+static void _ender_dummy_get(Ender_Value *v, Ender_Getter set,
 		void *o)
 {
 
@@ -277,33 +260,39 @@ static void _ender_relative_dummy_set(Ender_Value *v, Ender_Setter set,
 {
 
 }
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
 /*----------------------------------------------------------------------------*
  *                        The property interface                              *
  *----------------------------------------------------------------------------*/
 /* this one is used for set/add/remove */
-
-static void _property_set(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
+void ender_descriptor_object_property_set(Ender_Property *p,
+		Ender_Element *e, Ender_Value *v, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
 
 	_value_set(p, e, v, dprop->set);
 }
 
-static void _property_add(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
+void ender_descriptor_object_property_add(Ender_Property *p,
+		Ender_Element *e, Ender_Value *v, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
 
 	_value_set(p, e, v, dprop->add);
 }
 
-static void _property_remove(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
+void ender_descriptor_object_property_remove(Ender_Property *p,
+		Ender_Element *e, Ender_Value *v, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
 
 	_value_set(p, e, v, dprop->remove);
 }
 
-static void _property_get(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
+void ender_descriptor_object_property_get(Ender_Property *p,
+		Ender_Element *e, Ender_Value *v, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
 	void *object;
@@ -312,7 +301,8 @@ static void _property_get(Ender_Property *p, Ender_Element *e, Ender_Value *v, v
 	_getters[v->container->type](v, dprop->get, object);
 }
 
-static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
+void ender_descriptor_object_property_clear(Ender_Property *p,
+		Ender_Element *e, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
 	void *object;
@@ -321,7 +311,8 @@ static void _property_clear(Ender_Property *p, Ender_Element *e, void *data)
 	dprop->clear(object);
 }
 
-static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *data)
+Eina_Bool ender_descriptor_object_property_is_set(Ender_Property *p,
+		Ender_Element *e, void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
 	void *object;
@@ -330,42 +321,14 @@ static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *dat
 	return dprop->is_set(object);
 }
 
-static void _property_free(void *data)
+void ender_descriptor_object_property_free(void *data)
 {
 	Ender_Descriptor_Property *dprop = data;
 	free(dprop);
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
-		Ender_Creator creator,
-		Ender_Destructor destructor,
-		Ender_Descriptor *parent, Ender_Descriptor_Type type)
-{
-	Ender_Descriptor *desc;
-
-	desc = calloc(1, sizeof(Ender_Descriptor));
-	desc->name = strdup(name);
-	desc->parent = parent;
-	desc->create = creator;
-	desc->destroy = destructor;
-	desc->type = type;
-	desc->ns = ns;
-	desc->properties = eina_ordered_hash_new((Eina_Free_Cb)ender_property_free);
-	desc->functions = eina_ordered_hash_new(NULL);
-
-	return desc;
-}
-
-void ender_descriptor_free(Ender_Descriptor *thiz)
-{
-	if (thiz->name)
-		free(thiz->name);
-	eina_ordered_hash_free(thiz->properties);
-	free(thiz);
-}
-
+/*----------------------------------------------------------------------------*
+ *                       The constructor interface                            *
+ *----------------------------------------------------------------------------*/
 void * ender_descriptor_object_create(Ender_Descriptor *thiz)
 {
 	void *object;
@@ -397,6 +360,35 @@ void ender_descriptor_object_destroy(Ender_Descriptor *thiz, void *object)
 	{
 		destroy(object);
 	}
+}
+
+
+Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
+		Ender_Creator creator,
+		Ender_Destructor destructor,
+		Ender_Descriptor *parent, Ender_Descriptor_Type type)
+{
+	Ender_Descriptor *thiz;
+
+	thiz = calloc(1, sizeof(Ender_Descriptor));
+	thiz->name = strdup(name);
+	thiz->parent = parent;
+	thiz->create = creator;
+	thiz->destroy = destructor;
+	thiz->type = type;
+	thiz->ns = ns;
+	thiz->properties = eina_ordered_hash_new((Eina_Free_Cb)ender_property_free);
+	thiz->functions = eina_ordered_hash_new(NULL);
+
+	return thiz;
+}
+
+void ender_descriptor_free(Ender_Descriptor *thiz)
+{
+	if (thiz->name)
+		free(thiz->name);
+	eina_ordered_hash_free(thiz->properties);
+	free(thiz);
 }
 
 void ender_descriptor_init(void)
@@ -462,6 +454,9 @@ void ender_descriptor_init(void)
 	_relative_accessors[ENDER_LIST] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_STRUCT] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_UNION] = _ender_relative_pointer_set;
+
+	/* now the specific ones */
+	ender_struct_init();
 }
 
 void ender_descriptor_shutdown(void)
@@ -509,7 +504,8 @@ EAPI Ender_Descriptor * ender_descriptor_find(const char *name)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, const char *ns_name, int version)
+EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name,
+		const char *ns_name, int version)
 {
 	Ender_Namespace *ns;
 
@@ -519,40 +515,45 @@ EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name, c
 	return ender_namespace_descriptor_find(ns, name);
 }
 
-EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-		Ender_Is_Set is_set,
-		Eina_Bool relative)
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
+		const char *name, Ender_Container *ec, Ender_Getter get,
+		Ender_Setter set, Ender_Add add, Ender_Remove remove,
+		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative)
 {
 	Ender_Property *prop;
-	Ender_Descriptor_Property *dprop;
 
-	prop = eina_ordered_hash_find(edesc->properties, name);
+	prop = eina_ordered_hash_find(thiz->properties, name);
 	if (prop)
 	{
-		WRN("Property %s already found on %s. Not adding it", name, edesc->name);
+		WRN("Property %s already found on %s. Not adding it", name,
+				thiz->name);
 		return NULL;
 	}
-	dprop = calloc(1, sizeof(Ender_Descriptor_Property));
-	dprop->get = get;
-	dprop->set = set;
-	dprop->add = add;
-	dprop->remove = remove;
-	dprop->clear = clear;
-	dprop->clear = clear;
 
-	prop = ender_property_new(name, ec,
-			get ? _property_get : NULL,
-			set ? _property_set : NULL,
-			add ? _property_add : NULL,
-			remove ? _property_remove : NULL,
-			clear ? _property_clear : NULL,
-			is_set ? _property_is_set : NULL,
-			relative,
-			_property_free, dprop);
-	eina_ordered_hash_add(edesc->properties, name, prop);
-	DBG("Property %s added to %s", name, edesc->name);
+	switch (thiz->type)
+	{
+		case ENDER_TYPE_ABSTRACT:
+		case ENDER_TYPE_CLASS:
+		prop = ender_object_property_add(thiz, name, ec, get, set,
+				add, remove, clear, is_set, relative);
+		break;
+
+		case ENDER_TYPE_STRUCT:
+		prop = ender_struct_property_add(thiz, name, ec, get, set,
+				add, remove, clear, is_set, relative);
+		break;
+
+		case ENDER_TYPE_UNION:
+		prop = ender_union_property_add(thiz, name, ec, get, set,
+				add, remove, clear, is_set, relative);
+		break;
+	}
+	eina_ordered_hash_add(thiz->properties, name, prop);
+	DBG("Property %s added to %s", name, thiz->name);
 
 	return prop;
 }
@@ -561,10 +562,9 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc, con
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Accessor f,
-		Ender_Marshaller marshaller,
-		Ender_Container *ret, ...)
+EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *thiz,
+		const char *name, Ender_Accessor f,
+		Ender_Marshaller marshaller, Ender_Container *ret, ...)
 {
 	Ender_Container *arg;
 	Ender_Function *function;
@@ -577,7 +577,7 @@ EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, con
 		args = eina_list_append(args, arg);
 	}
 	va_end(va_args);
-	function = ender_descriptor_function_add_list(edesc, name, f, marshaller, ret, args);
+	function = ender_descriptor_function_add_list(thiz, name, f, marshaller, ret, args);
 	if (args)
 	{
 		eina_list_free(args);
@@ -589,17 +589,16 @@ EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, con
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc, const char *name,
-		Ender_Accessor f,
-		Ender_Marshaller marshaller,
+EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *thiz,
+		const char *name, Ender_Accessor f, Ender_Marshaller marshaller,
 		Ender_Container *ret, Eina_List *args)
 {
 	Ender_Function *function;
 
-	function = eina_ordered_hash_find(edesc->functions, name);
+	function = eina_ordered_hash_find(thiz->functions, name);
 	if (function)
 	{
-		WRN("Function '%s' already foind on '%s'. Not adding it", name, edesc->name);
+		WRN("Function '%s' already foind on '%s'. Not adding it", name, thiz->name);
 		return NULL;
 	}
 
@@ -610,8 +609,8 @@ EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc
 		return function;
 	}
 
-	eina_ordered_hash_add(edesc->functions, name, function);
-	DBG("Function '%s' added to '%s'", name, edesc->name);
+	eina_ordered_hash_add(thiz->functions, name, function);
+	DBG("Function '%s' added to '%s'", name, thiz->name);
 	return function;
 }
 
@@ -619,24 +618,25 @@ EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *edesc, const char *name)
+EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *thiz, const char *name)
 {
-	if (!edesc) return NULL;
-	return eina_ordered_hash_find(edesc->functions, name);
+	if (!thiz) return NULL;
+	return eina_ordered_hash_find(thiz->functions, name);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_descriptor_function_list(Ender_Descriptor *ed, Ender_Function_List_Callback cb, void *data)
+EAPI void ender_descriptor_function_list(Ender_Descriptor *thiz,
+		Ender_Function_List_Callback cb, void *data)
 {
 	Ender_Function *f;
 	Eina_List *l;
 
-	if (!ed || !cb) return;
+	if (!thiz || !cb) return;
 
-	EINA_LIST_FOREACH(ed->functions->order, l, f)
+	EINA_LIST_FOREACH(thiz->functions->order, l, f)
 	{
 		cb(f, data);
 	}
@@ -646,46 +646,47 @@ EAPI void ender_descriptor_function_list(Ender_Descriptor *ed, Ender_Function_Li
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed)
+EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *thiz)
 {
-	if (!ed) return 0;
-	return ed->type;
+	if (!thiz) return 0;
+	return thiz->type;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * ender_descriptor_name_get(Ender_Descriptor *edesc)
+EAPI const char * ender_descriptor_name_get(Ender_Descriptor *thiz)
 {
-	if (!edesc) return NULL;
+	if (!thiz) return NULL;
 
-	return edesc->name;
+	return thiz->name;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *edesc)
+EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *thiz)
 {
-	if (!edesc) return NULL;
+	if (!thiz) return NULL;
 
-	return edesc->parent;
+	return thiz->parent;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data)
+EAPI void ender_descriptor_property_list(Ender_Descriptor *thiz,
+		Ender_Property_List_Callback cb, void *data)
 {
 	Ender_Property *prop;
 	Eina_List *l;
 
-	if (!ed || !cb) return;
+	if (!thiz || !cb) return;
 
-	EINA_LIST_FOREACH(ed->properties->order, l, prop)
+	EINA_LIST_FOREACH(thiz->properties->order, l, prop)
 	{
 		cb(prop, data);
 	}
@@ -695,7 +696,8 @@ EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_Li
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data)
+EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz,
+		Ender_Property_List_Callback cb, void *data)
 {
 	Ender_Property *prop;
 	Ender_Descriptor *ed;
@@ -714,28 +716,29 @@ EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name)
+EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *thiz,
+		const char *name)
 {
-	if (!ed) return NULL;
-	return _descriptor_property_get(ed, name);
+	if (!thiz) return NULL;
+	return _descriptor_property_get(thiz, name);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed)
+EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *thiz)
 {
-	if (!ed) return NULL;
-	return ed->ns;
+	if (!thiz) return NULL;
+	return thiz->ns;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *desc)
+EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz)
 {
-	return ender_namespace_element_new_from_descriptor(desc->ns, desc);
+	return ender_namespace_element_new_from_descriptor(thiz->ns, thiz);
 }
 

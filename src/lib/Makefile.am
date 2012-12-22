@@ -35,7 +35,10 @@ ender_marshaller.c \
 ender_main.c \
 ender_misc.c \
 ender_namespace.c \
+ender_object.c \
 ender_property.c \
+ender_struct.c \
+ender_union.c \
 ender_value.c \
 tpl/tpl.c \
 tpl/tpl.h

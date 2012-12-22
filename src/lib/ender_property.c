@@ -98,6 +98,11 @@ void ender_property_free(Ender_Property *thiz)
 	free(thiz);
 }
 
+void * ender_property_data_get(Ender_Property *thiz)
+{
+	return thiz->data;
+}
+
 /* TODO add guards, the value type must be equal to the property type */
 void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
 		Ender_Value *v)
