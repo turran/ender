@@ -158,7 +158,7 @@ static void _ender_element_delete(Ender_Element *e)
 
 	/* call the free callback */
 	ender_event_dispatch(e, "Free", NULL);
-	ender_descriptor_object_destroy(desc, e->object);
+	ender_descriptor_native_destroy(desc, e->object);
 	/* free every private data */
 	/* TODO the listeners */
 	eina_hash_free(e->properties);
@@ -273,7 +273,7 @@ Ender_Element * ender_element_new(Ender_Descriptor *desc)
 	}
 
 	DBG("Creating new ender '%s'", desc->name);
-	object = ender_descriptor_object_create(desc);
+	object = ender_descriptor_native_create(desc);
 	if (!object)
 	{
 		ERR("For some reason the creator for '%s' failed", desc->name);

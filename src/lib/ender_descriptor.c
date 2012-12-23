@@ -41,6 +41,7 @@ typedef void (*Ender_Value_Relative_Accessor)(Ender_Value *v, Ender_Accessor acc
 static Ender_Value_Accessor _setters[ENDER_PROPERTY_TYPES];
 static Ender_Value_Accessor _getters[ENDER_PROPERTY_TYPES];
 static Ender_Value_Relative_Accessor _relative_accessors[ENDER_PROPERTY_TYPES];
+static Ender_Descriptor_Backend _backends[ENDER_TYPES];
 
 static Ender_Property * _descriptor_property_get(Ender_Descriptor *e, const char *name);
 
@@ -329,37 +330,14 @@ void ender_descriptor_object_property_free(void *data)
 /*----------------------------------------------------------------------------*
  *                       The constructor interface                            *
  *----------------------------------------------------------------------------*/
-void * ender_descriptor_object_create(Ender_Descriptor *thiz)
+void * ender_descriptor_native_create(Ender_Descriptor *thiz)
 {
-	void *object;
-	if (!thiz->create)
-	{
-		ERR("The descriptor for name '%s' does not have a creator", thiz->name);
-		return NULL;
-	}
-	object = thiz->create();
-	return object;
+	return _backends[thiz->type].creator(thiz);
 }
 
-void ender_descriptor_object_destroy(Ender_Descriptor *thiz, void *object)
+void ender_descriptor_native_destroy(Ender_Descriptor *thiz, void *object)
 {
-	Ender_Destructor destroy;
-
-	destroy = thiz->destroy;
-	while (!destroy)
-	{
-		Ender_Descriptor *parent;
-
-		parent = ender_descriptor_parent(thiz);
-		if (!parent) break;
-
-		destroy = parent->destroy;
-		thiz = parent;
-	}
-	if (destroy)
-	{
-		destroy(object);
-	}
+	_backends[thiz->type].destructor(thiz, object);
 }
 
 
@@ -370,12 +348,17 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 {
 	Ender_Descriptor *thiz;
 
+	/* first create the backend descriptor */
+	if (!_backends[type].validate(name, ns, creator, destructor, parent,
+			type))
+		return NULL;
+
 	thiz = calloc(1, sizeof(Ender_Descriptor));
 	thiz->name = strdup(name);
 	thiz->parent = parent;
+	thiz->type = type;
 	thiz->create = creator;
 	thiz->destroy = destructor;
-	thiz->type = type;
 	thiz->ns = ns;
 	thiz->properties = eina_ordered_hash_new((Eina_Free_Cb)ender_property_free);
 	thiz->functions = eina_ordered_hash_new(NULL);
@@ -457,6 +440,11 @@ void ender_descriptor_init(void)
 
 	/* now the specific ones */
 	ender_struct_init();
+	/* now the backends */
+	_backends[ENDER_TYPE_ABSTRACT] = ender_object_backend;
+	_backends[ENDER_TYPE_CLASS] = ender_object_backend;
+	_backends[ENDER_TYPE_STRUCT] = ender_struct_backend;
+	_backends[ENDER_TYPE_UNION] = ender_union_backend;
 }
 
 void ender_descriptor_shutdown(void)
@@ -526,6 +514,7 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
 {
 	Ender_Property *prop;
 
+	if (!thiz) return NULL;
 	prop = eina_ordered_hash_find(thiz->properties, name);
 	if (prop)
 	{
@@ -533,25 +522,10 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
 				thiz->name);
 		return NULL;
 	}
+	prop = _backends[thiz->type].property_add(thiz, name, ec, get, set,
+			add, remove, clear, is_set, relative);
+	if (!prop) return NULL;
 
-	switch (thiz->type)
-	{
-		case ENDER_TYPE_ABSTRACT:
-		case ENDER_TYPE_CLASS:
-		prop = ender_object_property_add(thiz, name, ec, get, set,
-				add, remove, clear, is_set, relative);
-		break;
-
-		case ENDER_TYPE_STRUCT:
-		prop = ender_struct_property_add(thiz, name, ec, get, set,
-				add, remove, clear, is_set, relative);
-		break;
-
-		case ENDER_TYPE_UNION:
-		prop = ender_union_property_add(thiz, name, ec, get, set,
-				add, remove, clear, is_set, relative);
-		break;
-	}
 	eina_ordered_hash_add(thiz->properties, name, prop);
 	DBG("Property %s added to %s", name, thiz->name);
 

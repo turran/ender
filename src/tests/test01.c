@@ -87,6 +87,15 @@ void dummy_object_surface_get(Dummy_Object *thiz, Enesim_Surface **s)
 	*s = thiz->s;
 }
 
+void dummy_object_ender_set(Dummy_Object *thiz, Ender_Element *e)
+{
+}
+
+void dummy_object_ender_get(Dummy_Object *thiz, Ender_Element **e)
+{
+}
+
+
 /* functions */
 void dummy_object_function_01(Dummy_Object *thiz)
 {
@@ -121,7 +130,7 @@ static void test01_properties_register(Ender_Descriptor *descriptor)
 
 	/* add the properties */
 	ec = ender_container_new(ENDER_BOOL);
-	prop = ender_descriptor_property_add(descriptor, "bool",
+	prop = ender_descriptor_property_add(descriptor, "b",
 			ec,
 			ENDER_GETTER(dummy_object_bool_get),
 			ENDER_SETTER(dummy_object_bool_set),
@@ -131,7 +140,7 @@ static void test01_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			EINA_FALSE);
 	ec = ender_container_new(ENDER_UINT32);
-	prop = ender_descriptor_property_add(descriptor, "uint32",
+	prop = ender_descriptor_property_add(descriptor, "u32",
 			ec,
 			ENDER_GETTER(dummy_object_uint32_get),
 			ENDER_SETTER(dummy_object_uint32_set),
@@ -141,7 +150,7 @@ static void test01_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			EINA_FALSE);
 	ec = ender_container_new(ENDER_DOUBLE);
-	prop = ender_descriptor_property_add(descriptor, "double",
+	prop = ender_descriptor_property_add(descriptor, "d",
 			ec,
 			ENDER_GETTER(dummy_object_double_get),
 			ENDER_SETTER(dummy_object_double_set),
@@ -160,6 +169,26 @@ static void test01_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			EINA_FALSE);
+	ec = ender_container_new(ENDER_STRING);
+	prop = ender_descriptor_property_add(descriptor, "s",
+			ec,
+			ENDER_GETTER(dummy_object_surface_get),
+			ENDER_SETTER(dummy_object_surface_set),
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+	ec = ender_container_new(ENDER_ENDER);
+	prop = ender_descriptor_property_add(descriptor, "ender",
+			ec,
+			ENDER_GETTER(dummy_object_ender_get),
+			ENDER_SETTER(dummy_object_ender_set),
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
 	ec = ender_container_new(ENDER_MATRIX);
 	prop = ender_descriptor_property_add(descriptor, "matrix",
 			ec,
@@ -170,22 +199,12 @@ static void test01_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			EINA_FALSE);
-	ec = ender_container_new(ENDER_SURFACE);
-	prop = ender_descriptor_property_add(descriptor, "surface",
-			ec,
-			ENDER_GETTER(dummy_object_surface_get),
-			ENDER_SETTER(dummy_object_surface_set),
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			EINA_FALSE);
 }
 
 Eina_Bool test01_properties(Ender_Descriptor *desc)
 {
 	Ender_Property *prop;
-	prop = ender_descriptor_property_get(desc, "bool");
+	prop = ender_descriptor_property_get(desc, "b");
 	if (!prop)
 	{
 		printf("no bool property\n");
@@ -272,8 +291,8 @@ static void test01_struct_register(void)
 	descriptor = ender_namespace_descriptor_add(
 			ns,
 			"test01_struct",
-			ENDER_CREATOR(dummy_object_new),
-			ENDER_DESTRUCTOR(dummy_object_free),
+			NULL,
+			NULL,
 			NULL,
 			ENDER_TYPE_STRUCT);
 	test01_properties_register(descriptor);
@@ -336,7 +355,7 @@ Eina_Bool test01_struct_properties(void)
 {
 	Ender_Descriptor *desc;
 
-	desc = ender_descriptor_find("test01_struct");
+	desc = test01_struct_get();
 	if (!desc)
 	{
 		printf("descriptor not found\n");
@@ -356,15 +375,17 @@ Eina_Bool test01_setters_getters(Ender_Element *e)
 	Ender_Element *ender;
 	Enesim_Matrix matrix;
 
-	ender_element_value_set(e, "bool", EINA_TRUE, NULL);
-	ender_element_value_get(e, "bool", &b, NULL);
+	/* first set the different properties */
+	ender_element_value_set(e, "b", EINA_TRUE, NULL);
+	ender_element_value_set(e, "u32", 123456, NULL);
+	/* now get them */
+	ender_element_value_get(e, "b", &b, NULL);
 	if (b != EINA_TRUE)
 	{
 		printf("failed setting/getting the bool\n");
 		return EINA_FALSE;
 	}
-	ender_element_value_set(e, "uint32", 123456, NULL);
-	ender_element_value_get(e, "uint32", &u32, NULL);
+	ender_element_value_get(e, "u32", &u32, NULL);
 	if (u32 != 123456)
 	{
 		printf("failed setting/getting the u32\n");
@@ -408,6 +429,7 @@ int main(int argc, char **argv)
 
 	if (!test01_namespace()) return -1;
 	if (!test01_struct_properties()) return -1;
+	if (!test01_struct_setters_getters()) return -1;
 	if (!test01_object_properties()) return -1;
 	if (!test01_object_setters_getters()) return -1;
 	if (!test01_object_functions()) return -1;

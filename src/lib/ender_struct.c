@@ -36,6 +36,17 @@ static void _ender_struct_property_get_last(Ender_Property *prop, void *data)
 	Ender_Property **ret = data;
 	*ret = prop;
 }
+
+/* get the final size */
+static void _ender_struct_property_get_size(Ender_Property *prop, void *data)
+{
+	Ender_Container *c;
+	size_t *size = data;
+
+	c = ender_property_container_get(prop);
+	*size += ender_container_size_get(c);
+	ender_container_unref(c);
+}
 /*----------------------------------------------------------------------------*
  *                     uint32 / in32 / argb / bool                            *
  *----------------------------------------------------------------------------*/
@@ -136,16 +147,16 @@ static void _property_set(Ender_Property *p, Ender_Element *e, Ender_Value *v, v
 	void *object;
 
 	object = ender_element_object_get(e);
-	_setters[v->container->type](v, object);
+	_setters[v->container->type](v, (char *)object + sprop->offset);
 }
 
 static void _property_get(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
 {
-	Ender_Struct_Property *dprop = data;
+	Ender_Struct_Property *sprop = data;
 	void *object;
 
 	object = ender_element_object_get(e);
-	_getters[v->container->type](v, object);
+	_getters[v->container->type](v, (char *)object + sprop->offset);
 }
 
 static void _property_ext_set(Ender_Property *p, Ender_Element *e, Ender_Value *v, void *data)
@@ -179,14 +190,59 @@ static void _property_free(void *data)
 	Ender_Struct_Property *sprop = data;
 	free(sprop);
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Ender_Property * ender_struct_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-		Ender_Is_Set is_set,
-		Eina_Bool relative)
+
+/*----------------------------------------------------------------------------*
+ *                       The descriptor interface                             *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_struct_validate(const char *name, Ender_Namespace *ns,
+		Ender_Creator creator,
+		Ender_Destructor destructor,
+		Ender_Descriptor *parent, Ender_Descriptor_Type type)
+{
+	if (parent)
+	{
+		ERR("Struct '%s' can not have a parent yet", name);
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static void * _ender_struct_creator(Ender_Descriptor *d)
+{
+	void *ret;
+
+	if (d->create)
+	{
+		ret = d->create();
+	}
+	else
+	{
+		size_t size = 0;
+
+		/* iterate over the list of properties and get the final size */
+		ender_descriptor_property_list(d, _ender_struct_property_get_size, &size);
+		if (!size) return NULL;
+		ret = calloc(1, size);
+	}
+	return ret;
+}
+
+static void _ender_struct_destructor(Ender_Descriptor *d, void *n)
+{
+	if (d->destroy)
+	{
+		d->destroy(n);
+	}
+	else
+	{
+		free(n);
+	}
+}
+
+static Ender_Property * _ender_struct_property_add(Ender_Descriptor *d,
+		const char *name, Ender_Container *ec, Ender_Getter get,
+		Ender_Setter set, Ender_Add add, Ender_Remove remove,
+		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative)
 {
 	Ender_Struct_Property *sprop;
 	Ender_Property *prop;
@@ -206,12 +262,19 @@ Ender_Property * ender_struct_property_add(Ender_Descriptor *edesc, const char *
 	sprop->dprop.clear = clear;
 	sprop->dprop.clear = clear;
 
-	ender_descriptor_property_list(edesc, _ender_struct_property_get_last, &last);
+	ender_descriptor_property_list(d, _ender_struct_property_get_last, &last);
 	/* we have a last property, set the correct offset */
 	if (last)
 	{
 		Ender_Struct_Property *slast;
+		Ender_Container *last_container;
+		size_t last_size;
+
+		last_container = ender_property_container_get(last);
 		slast = ender_property_data_get(last);
+		last_size = ender_container_size_get(last_container);
+		ender_container_unref(last_container);
+		sprop->offset = slast->offset + last_size;
 	}
 
 	prop = ender_property_new(name, ec,
@@ -225,6 +288,15 @@ Ender_Property * ender_struct_property_add(Ender_Descriptor *edesc, const char *
 			_property_free, sprop);
 	return prop;
 }
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Ender_Descriptor_Backend ender_struct_backend = {
+	/* .validate 		= */ _ender_struct_validate,
+	/* .creator 		= */ _ender_struct_creator,
+	/* .destructor 		= */ _ender_struct_destructor,
+	/* .property_add 	= */ _ender_struct_property_add,
+};
 
 void ender_struct_init(void)
 {
@@ -271,6 +343,14 @@ void ender_struct_init(void)
 	_getters[ENDER_LIST] = _ender_matrix_get;
 	_getters[ENDER_STRUCT] = _ender_pointer_get;
 	_getters[ENDER_UNION] = _ender_pointer_get;
+}
+
+void * ender_struct_new(Ender_Descriptor *edesc)
+{
+}
+
+void ender_struct_free(void *s)
+{
 }
 /*============================================================================*
  *                                   API                                      *

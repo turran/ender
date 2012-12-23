@@ -20,6 +20,10 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Ender_Union
+{
+
+} Ender_Union;
 /*----------------------------------------------------------------------------*
  *                        The property interface                              *
  *----------------------------------------------------------------------------*/
@@ -50,17 +54,49 @@ static Eina_Bool _property_is_set(Ender_Property *p, Ender_Element *e, void *dat
 static void _property_free(void *data)
 {
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Ender_Property * ender_union_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-		Ender_Is_Set is_set,
-		Eina_Bool relative)
+
+/*----------------------------------------------------------------------------*
+ *                       The descriptor interface                             *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_union_validate(const char *name, Ender_Namespace *ns,
+		Ender_Creator creator,
+		Ender_Destructor destructor,
+		Ender_Descriptor *parent, Ender_Descriptor_Type type)
+{
+	if (parent)
+	{
+		ERR("Union '%s' can not have a parent yet", name);
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static void * _ender_union_creator(Ender_Descriptor *d)
 {
 	return NULL;
 }
+
+static void _ender_union_destructor(Ender_Descriptor *d, void *n)
+{
+	free(n);
+}
+
+static Ender_Property * _ender_union_property_add(Ender_Descriptor *d,
+		const char *name, Ender_Container *ec, Ender_Getter get,
+		Ender_Setter set, Ender_Add add, Ender_Remove remove,
+		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative)
+{
+	return NULL;
+}
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Ender_Descriptor_Backend ender_union_backend = {
+	/* .validate 		= */ _ender_union_validate,
+	/* .creator 		= */ _ender_union_creator,
+	/* .destructor 		= */ _ender_union_destructor,
+	/* .property_add 	= */ _ender_union_property_add,
+};
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

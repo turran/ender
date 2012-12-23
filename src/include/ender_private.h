@@ -74,6 +74,32 @@ struct _Ender_Value
 	} data;
 };
 
+/* constructor */
+typedef struct _Ender_Constructor Ender_Constructor;
+typedef void (*Ender_Constructor_Free)(void *data);
+
+/* descriptor */
+typedef Eina_Bool (*Ender_Descriptor_Validate)(const char *name, Ender_Namespace *ns,
+		Ender_Creator creator,
+		Ender_Destructor destructor,
+		Ender_Descriptor *parent, Ender_Descriptor_Type type);
+typedef void *(*Ender_Descriptor_Creator)(Ender_Descriptor *d);
+typedef void (*Ender_Descriptor_Destructor)(Ender_Descriptor *d, void *data);
+typedef Ender_Property * (*Ender_Descriptor_Property_Add)(Ender_Descriptor *d,
+		const char *name,
+		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
+		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
+		Ender_Is_Set is_set,
+		Eina_Bool relative);
+
+typedef struct _Ender_Descriptor_Backend
+{
+	Ender_Descriptor_Validate validate;
+	Ender_Descriptor_Creator creator;
+	Ender_Descriptor_Destructor destructor;
+	Ender_Descriptor_Property_Add property_add;
+} Ender_Descriptor_Backend;
+
 struct _Ender_Descriptor
 {
 	char *name;
@@ -84,9 +110,9 @@ struct _Ender_Descriptor
 	Eina_Ordered_Hash *properties;
 	Eina_Ordered_Hash *functions;
 	Ender_Namespace *ns;
+	void *data;
 };
 
-/* descriptor */
 typedef struct _Ender_Descriptor_Property
 {
 	Ender_Getter get;
@@ -96,6 +122,7 @@ typedef struct _Ender_Descriptor_Property
 	Ender_Clear clear;
 	Ender_Is_Set is_set;
 } Ender_Descriptor_Property;
+
 void ender_descriptor_object_property_set(Ender_Property *p,
 		Ender_Element *e, Ender_Value *v, void *data);
 void ender_descriptor_object_property_add(Ender_Property *p,
@@ -110,17 +137,18 @@ Eina_Bool ender_descriptor_object_property_is_set(Ender_Property *p,
 		Ender_Element *e, void *data);
 void ender_descriptor_object_property_free(void *data);
 
+void ender_descriptor_init(void);
+void ender_descriptor_shutdown(void);
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
 		Ender_Destructor destructor,
 		Ender_Descriptor *parent, Ender_Descriptor_Type type);
 void ender_descriptor_free(Ender_Descriptor *thiz);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
-void * ender_descriptor_object_create(Ender_Descriptor *thiz);
-void ender_descriptor_object_destroy(Ender_Descriptor *thiz, void *object);
 Ender_Descriptor * ender_descriptor_find(const char *name);
-void ender_descriptor_init(void);
-void ender_descriptor_shutdown(void);
+
+void * ender_descriptor_native_create(Ender_Descriptor *thiz);
+void ender_descriptor_native_destroy(Ender_Descriptor *thiz, void *object);
 
 /* property */
 typedef void (*Ender_Property_Accessor)(Ender_Property *ep, Ender_Element *e, Ender_Value *v, void *data);
@@ -157,26 +185,13 @@ void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e);
 Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element *e);
 
 /* object */
-Ender_Property * ender_object_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-		Ender_Is_Set is_set,
-		Eina_Bool relative);
-
+extern Ender_Descriptor_Backend ender_object_backend;
 /* struct */
+extern Ender_Descriptor_Backend ender_struct_backend;
 void ender_struct_init(void);
-Ender_Property * ender_struct_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-		Ender_Is_Set is_set,
-		Eina_Bool relative);
 /* union */
+extern Ender_Descriptor_Backend ender_union_backend;
 void ender_union_init(void);
-Ender_Property * ender_union_property_add(Ender_Descriptor *edesc, const char *name,
-		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
-		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
-		Ender_Is_Set is_set,
-		Eina_Bool relative);
 
 /* marshaller */
 void ender_marshaller_init(void);
