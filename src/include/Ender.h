@@ -154,19 +154,15 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
 EAPI Ender_Container * ender_container_ref(Ender_Container *thiz);
 EAPI Ender_Container * ender_container_unref(Ender_Container *thiz);
 
-EAPI void ender_container_register(Ender_Container *thiz, const char *name);
-EAPI Ender_Container * ender_container_find(const char *name);
-
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec);
-EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx);
+EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx, const char **name);
 EAPI Ender_Container * ender_container_compound_get_by_name(Ender_Container *ec, const char *name, unsigned int *idx);
-EAPI void ender_container_compound_get_extended(Ender_Container *ec, unsigned int idx, Ender_Container **c, const char **name);
+
 EAPI size_t ender_container_size_get(Ender_Container *ec);
-EAPI size_t ender_container_compound_size_get(Ender_Container *ec);
+
 EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
 EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Container *sub);
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
-EAPI const char * ender_container_registered_name_get(Ender_Container *thiz);
 
 EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint *c);
 EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *thiz);
@@ -519,6 +515,8 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
  */
 EAPI const char * ender_value_type_string_to(Ender_Value_Type type);
 EAPI const char * ender_descriptor_type_string_to(Ender_Descriptor_Type type);
+EAPI Eina_Bool ender_descriptor_type_value_type_to(Ender_Descriptor_Type d,
+		Ender_Value_Type *v);
 
 /**
  * @}
@@ -537,26 +535,48 @@ EAPI void ender_loader_registry_callback_add(Ender_Loader_Registry_Callback cb, 
  * @{
  */
 
-typedef void (*Ender_Parser_On_Using)(void *data, const char *name);
-typedef void (*Ender_Parser_On_Namespace)(void *data, const char *name,
+typedef struct _Ender_Parser_Definition
+{
+	const char *name;
+	const char *alias;
+} Ender_Parser_Definition;
+
+typedef struct _Ender_Parser_Container
+{
+	Ender_Value_Type type;
+	Eina_List *subcontainers;
+	char *defined;
+} Ender_Parser_Container;
+
+typedef struct _Ender_Parser_Property
+{
+	Ender_Parser_Definition def;
+	Ender_Parser_Container *container;
+	Eina_Bool rel;
+} Ender_Parser_Property;
+
+typedef struct _Ender_Parser_Function
+{
+	Ender_Parser_Definition def;
+	Ender_Parser_Container *ret;
+	Eina_List *args;
+} Ender_Parser_Function;
+
+typedef void (*Ender_Parser_Add_Using)(void *data, const char *name);
+typedef void (*Ender_Parser_Add_Namespace)(void *data, const char *name,
 		int version);
-typedef void (*Ender_Parser_On_Object)(void *data, const char *name,
+typedef void (*Ender_Parser_Add_Native)(void *data, const char *name,
 		Ender_Descriptor_Type type, const char *parent);
-typedef void (*Ender_Parser_On_Property)(void *data, const char *name,
-		const char *alias, Eina_Bool relative, Ender_Container *container);
-typedef void (*Ender_Parser_On_Function)(void *data, const char *name,
-		const char *alias, Ender_Container *ret, Eina_List *args);
-typedef void (*Ender_Parser_On_Container)(void *data, const char *name,
-		Ender_Container *container);
+typedef void (*Ender_Parser_Add_Property)(void *data, Ender_Parser_Property *p);
+typedef void (*Ender_Parser_Add_Function)(void *data, Ender_Parser_Function *f);
 
 typedef struct _Ender_Parser_Descriptor
 {
-	Ender_Parser_On_Using on_using;
-	Ender_Parser_On_Namespace on_namespace;
-	Ender_Parser_On_Object on_object;
-	Ender_Parser_On_Property on_property;
-	Ender_Parser_On_Function on_function;
-	Ender_Parser_On_Container on_container;
+	Ender_Parser_Add_Using add_using;
+	Ender_Parser_Add_Namespace add_namespace;
+	Ender_Parser_Add_Native add_native;
+	Ender_Parser_Add_Property add_property;
+	Ender_Parser_Add_Function add_function;
 } Ender_Parser_Descriptor;
 
 EAPI Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data);

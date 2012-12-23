@@ -225,20 +225,25 @@ void ender_loader_init(void);
 void ender_loader_shutdown(void);
 void ender_loader_load_all(void);
 
-/* the parser */
-typedef struct _Ender_Parser
-{
-	const char *file;
-	Ender_Parser_Descriptor *descriptor;
-	void *data;
-} Ender_Parser;
-
-typedef struct _Ender_Parser_Type
+/* the grammar */
+typedef struct _Ender_Grammar_Type
 {
 	char *name;
 	char *alias;
-	Ender_Container *container;
-} Ender_Parser_Type;
+	Ender_Parser_Container *container;
+} Ender_Grammar_Type;
 
+/* the parser */
+typedef struct _Ender_Parser Ender_Parser;
+void ender_parser_error(Ender_Parser *thiz, const char *str, int line,
+	int col);
+void ender_parser_add_using(Ender_Parser *thiz, Eina_List *using);
+void ender_parser_add_namespace(Ender_Parser *thiz, const char *name,
+		int version);
+void ender_parser_add_native(Ender_Parser *thiz, const char *name,
+		Ender_Descriptor_Type type, const char *parent);
+void ender_parser_add_property(Ender_Parser *thiz, Ender_Parser_Property *p);
+void ender_parser_add_function(Ender_Parser *thiz, Ender_Parser_Function *f);
+void ender_parser_container_free(Ender_Parser_Container *c);
 
 #endif

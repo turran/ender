@@ -83,14 +83,6 @@ ender			{
 				yylval_param->vtype = ENDER_ENDER;
 				return T_ENDER;
 			}
-struct			{
-				yylval_param->vtype = ENDER_STRUCT;
-				return T_STRUCT;
-			}
-union			{
-				yylval_param->vtype = ENDER_UNION;
-				return T_UNION;
-			}
 namespace		return T_NAMESPACE;
 class			{
 				yylval_param->dtype = ENDER_TYPE_CLASS;
@@ -99,6 +91,14 @@ class			{
 abstract		{
 				yylval_param->dtype = ENDER_TYPE_ABSTRACT;
 				return T_ABSTRACT;
+			}
+struct			{
+				yylval_param->vtype = ENDER_TYPE_STRUCT;
+				return T_STRUCT;
+			}
+union			{
+				yylval_param->vtype = ENDER_TYPE_UNION;
+				return T_UNION;
 			}
 using			return T_USING;
 [0-9]* 			{

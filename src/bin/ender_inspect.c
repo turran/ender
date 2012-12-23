@@ -33,9 +33,9 @@ static void _container_compound_dump(Ender_Container *c, int level)
 	for (i = 0; i < ender_container_compound_count(c); i++)
 	{
 		Ender_Container *sub;
-		const char *name;
+		const char *name = NULL;
 
-		ender_container_compound_get_extended(c, i, &sub, &name);
+		sub = ender_container_compound_get(c, i, &name);
 		printf("\t");
 		for (j = 0; j < level; j++)
 			printf("   ");

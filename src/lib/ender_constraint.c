@@ -1,5 +1,5 @@
 /* ENDER - Enesim's descriptor library
- * Copyright (C) 2010 Jorge Luis Zapata
+ * Copyright (C) 2010 - 2012 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,13 +45,18 @@ typedef struct _Ender_Constraint_Enum
 	Eina_List *values;
 } Ender_Constraint_Enum;
 
+typedef struct _Ender_Constraint_Descriptor
+{
+	Ender_Descriptor *descriptor;
+} Ender_Contraint_Descriptor;
+
 struct _Ender_Constraint
 {
 	Ender_Constraint_Type type;
 	union {
 		Ender_Constraint_Range range;
 		Ender_Constraint_Enum en;
-	} data;	
+	} data;
 };
 
 static Ender_Constraint * _ender_constraint_new(Ender_Constraint_Type type)

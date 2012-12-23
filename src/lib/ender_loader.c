@@ -311,10 +311,48 @@ static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namesp
 
 	return desc;
 }
+
+Ender_Container * _loader_get_container(Ender_Loader *thiz,
+		Ender_Parser_Container *c)
+{
+	Ender_Container *ret = NULL;
+	Ender_Parser_Container *spc;
+	Eina_List *l;
+
+	if (!c) return NULL;
+
+	if (c->defined)
+	{
+		Ender_Descriptor *d;
+		Ender_Value_Type vt;
+
+		d = ender_namespace_descriptor_find(thiz->namespace->ns, c->defined);
+		if (!d) return NULL;
+		if (!ender_descriptor_type_value_type_to(ender_descriptor_type(d), &vt))
+			return NULL;
+		ret = ender_container_new(c->type);
+	}
+	else
+	{
+		ret = ender_container_new(c->type);
+	}
+
+	if (!ret) return NULL;
+
+	EINA_LIST_FOREACH (c->subcontainers, l, spc)
+	{
+		Ender_Container *sc;
+		sc = _loader_get_container(thiz, spc);
+#if 0
+		ender_container_add(ret,  sc);
+#endif
+	}
+	return ret;
+}
 /*----------------------------------------------------------------------------*
  *                           The parser insterface                            *
  *----------------------------------------------------------------------------*/
-static void _loader_on_using(void *data, const char *file)
+static void _loader_add_using(void *data, const char *file)
 {
 	char *c_name;
 
@@ -327,7 +365,7 @@ static void _loader_on_using(void *data, const char *file)
 	free(c_name);
 }
 
-static void _loader_on_namespace(void *data, const char *name, int version)
+static void _loader_add_namespace(void *data, const char *name, int version)
 {
 	Ender_Loader *thiz;
 
@@ -335,7 +373,7 @@ static void _loader_on_namespace(void *data, const char *name, int version)
 	thiz->namespace = _loader_namespace_new(name, version);
 }
 
-static void _loader_on_object(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
+static void _loader_add_native(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Loader *thiz;
 	Ender_Descriptor *parent_descriptor = NULL;
@@ -353,11 +391,12 @@ static void _loader_on_object(void *data, const char *name, Ender_Descriptor_Typ
 	thiz->descriptor = _loader_descriptor_new(thiz->namespace, name, parent_descriptor, type);
 }
 
-static void _loader_on_property(void *data, const char *name, const char *alias, Eina_Bool relative, Ender_Container *container)
+static void _loader_add_property(void *data, Ender_Parser_Property *p)
 {
 	Ender_Loader *thiz = data;
 	Ender_Library_Namespace *namespace = thiz->namespace;
 	Ender_Descriptor *edesc = thiz->descriptor;
+	Ender_Container *container;
 	Ender_Getter get;
 	Ender_Setter set;
 	Ender_Add add = NULL;
@@ -373,8 +412,8 @@ static void _loader_on_property(void *data, const char *name, const char *alias,
 
 	ns_name = ender_namespace_name_get(namespace->ns);
 	edesc_name = ender_descriptor_name_get(edesc);
-	DBG("Adding property %s to %s", name, edesc_name);
-	snprintf(prefix, PATH_MAX, "%s_%s_%s_", ns_name, edesc_name, name);
+	DBG("Adding property %s to %s", p->def.name, edesc_name);
+	snprintf(prefix, PATH_MAX, "%s_%s_%s_", ns_name, edesc_name, p->def.name);
 
 	/* the getter */
 	strncpy(func_name, prefix, PATH_MAX);
@@ -400,6 +439,8 @@ static void _loader_on_property(void *data, const char *name, const char *alias,
 	{
 		DBG("No is_set %s for type %s", func_name, edesc_name);
 	}
+	/* create the container */
+	container = _loader_get_container(thiz, p->container);
 	/* in case of a compound property, also try to get the add/remove/clear */
 	if (container->type == ENDER_LIST)
 	{
@@ -428,42 +469,61 @@ static void _loader_on_property(void *data, const char *name, const char *alias,
 			WRN("No clear %s for type %s", func_name, edesc_name);
 		}
 	}
-	ender_descriptor_property_add(edesc, name, container, get, set, add, remove, clear, is_set, relative);
+	ender_descriptor_property_add(edesc,
+			p->def.alias ? p->def.alias : p->def.name, container,
+			get, set, add, remove, clear, is_set, p->rel);
 }
 
-static void _loader_on_function(void *data, const char *name, const char *alias, Ender_Container *ret, Eina_List *args)
+static void _loader_add_function(void *data, Ender_Parser_Function *f)
 {
 	Ender_Loader *thiz = data;
 	Ender_Library_Namespace *namespace = thiz->namespace;
 	Ender_Descriptor *edesc = thiz->descriptor;
-	Ender_Accessor f;
+	Ender_Container *c;
+	Ender_Accessor func;
+	Ender_Parser_Container *pc;
+	Eina_List *l;
+	Eina_List *args = NULL;
 	char func_name[PATH_MAX];
 	const char *edesc_name;
 	const char *ns_name;
+
 	if (!namespace || !namespace->ns || !namespace->lib) return;
 
 	ns_name = ender_namespace_name_get(namespace->ns);
 	edesc_name = ender_descriptor_name_get(edesc);
-	DBG("Adding function %s to %s", name, edesc_name);
-	snprintf(func_name, PATH_MAX, "%s_%s_%s", ns_name, edesc_name, name);
+	DBG("Adding function %s to %s", f->def.name, edesc_name);
+	snprintf(func_name, PATH_MAX, "%s_%s_%s", ns_name, edesc_name, f->def.name);
 
 	/* the function */
-	f = dlsym(namespace->lib->dl_handle, func_name);
-	if (!f)
+	func = dlsym(namespace->lib->dl_handle, func_name);
+	if (!func)
 	{
 		ERR("No function '%s' found", func_name, edesc_name);
 		return;
 	}
-	ender_descriptor_function_add_list(edesc, alias ? alias : name, f, NULL, ret, args);
+	/* get the ret */
+	c = _loader_get_container(thiz, f->ret);
+	/* get the args */
+	EINA_LIST_FOREACH (f->args, l, pc)
+	{
+		Ender_Container *tmp;
+		tmp = _loader_get_container(thiz, pc);
+		args = eina_list_append(args, tmp);
+	}
+	ender_descriptor_function_add_list(edesc,
+			f->def.alias ? f->def.alias : f->def.name, func, NULL,
+			c, args);
+	EINA_LIST_FREE (args, c)
+		ender_container_unref(c);
 }
 
 static Ender_Parser_Descriptor _loader_parser = {
-	/* .on_using 		= */ _loader_on_using,
-	/* .on_namespace 	= */ _loader_on_namespace,
-	/* .on_object 		= */ _loader_on_object,
-	/* .on_property 	= */ _loader_on_property,
-	/* .on_function 	= */ _loader_on_function,
-	/* .on_container 	= */ NULL,
+	/* .add_using 		= */ _loader_add_using,
+	/* .add_namespace 	= */ _loader_add_namespace,
+	/* .add_native 		= */ _loader_add_native,
+	/* .add_property 	= */ _loader_add_property,
+	/* .add_function 	= */ _loader_add_function,
 };
 /*============================================================================*
  *                                 Global                                     *

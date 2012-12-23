@@ -40,9 +40,48 @@ EAPI const char * ender_descriptor_type_string_to(Ender_Descriptor_Type type)
 		case ENDER_TYPE_CLASS:
 		return "CLASS";
 
+		case ENDER_TYPE_STRUCT:
+		return "STRUCT";
+
+		case ENDER_TYPE_UNION:
+		return "UNION";
+
 		default:
 		return NULL;
 	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_descriptor_type_value_type_to(Ender_Descriptor_Type d, Ender_Value_Type *v)
+{
+	Eina_Bool ret = EINA_TRUE;
+
+	switch (d)
+	{
+		case ENDER_TYPE_ABSTRACT:
+		*v = ENDER_OBJECT;
+		break;
+
+		case ENDER_TYPE_CLASS:
+		*v = ENDER_OBJECT;
+		break;
+
+		case ENDER_TYPE_STRUCT:
+		*v = ENDER_STRUCT;
+		break;
+
+		case ENDER_TYPE_UNION:
+		*v = ENDER_UNION;
+		break;
+
+		default:
+		ret = EINA_FALSE;
+		break;
+	}
+	return ret;
 }
 
 /**

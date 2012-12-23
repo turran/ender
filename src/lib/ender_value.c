@@ -83,6 +83,7 @@ EAPI Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
 	Ender_Value *thiz;
 
 	thiz = _ender_value_new(ec);
+#if 0
 	if (ec->type == ENDER_UNION || ec->type == ENDER_STRUCT)
 	{
 		size_t size;
@@ -94,6 +95,7 @@ EAPI Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
 			thiz->owned = EINA_TRUE;
 		}
 	}
+#endif
 	return thiz;
 }
 
@@ -107,8 +109,10 @@ EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
 	Ender_Container *sub;
 
 	ec = ender_container_new(ENDER_LIST);
+#if 0
 	sub = ender_container_new(child_type);
 	ender_container_add(ec, NULL, sub);
+#endif
 
 	return _ender_value_new(ec);
 }
@@ -517,7 +521,7 @@ EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 	if (value->container->type != ENDER_LIST)
 		return;
 
-	sub = ender_container_compound_get(value->container, 0);
+	sub = ender_container_compound_get(value->container, 0, NULL);
 	if (sub->type == ENDER_VALUE)
 	{
 		value->data.ptr = eina_list_append(value->data.ptr, child);

@@ -1,5 +1,5 @@
 /* ENDER - Enesim's descriptor library
- * Copyright (C) 2010 Jorge Luis Zapata
+ * Copyright (C) 2010 - 2012 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -69,7 +69,6 @@ typedef struct _Ender_Container_Sub
 	size_t offset;
 } Ender_Container_Sub;
 
-static Eina_Hash *_structs = NULL;
 static Ender_Container *_basic_containers[ENDER_LIST - ENDER_BOOL];
 
 #ifdef BUILD_SERIALIZE
@@ -325,7 +324,6 @@ void ender_container_init(void)
 {
 	int i;
 
-	_structs = eina_hash_string_superfast_new((Eina_Free_Cb)ender_container_unref);
 	/* define the common (basic) containers here */
 	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
 	{
@@ -337,7 +335,6 @@ void ender_container_shutdown(void)
 {
 	int i;
 
-	eina_hash_free(_structs);
 	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
 	{
 		_basic_containers[i] = ender_container_unref(_basic_containers[i]);
@@ -373,6 +370,15 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Ender_Container * ender_container_list_new(Ender_Value_Type child)
+{
+
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Container * ender_container_ref(Ender_Container *thiz)
 {
 	thiz->ref++;
@@ -394,40 +400,13 @@ EAPI Ender_Container * ender_container_unref(Ender_Container *thiz)
 	return thiz;
 }
 
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_container_register(Ender_Container *thiz, const char *name)
-{
-	if (thiz->type != ENDER_STRUCT && thiz->type != ENDER_UNION) return;
-	if (!name) return;
-
-	thiz->registered_name = strdup(name);
-	eina_hash_add(_structs, thiz->registered_name, thiz);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Ender_Container * ender_container_find(const char *name)
-{
-	Ender_Container *ec;
-
-	ec = eina_hash_find(_structs, name);
-	if (!ec) return NULL;
-	return ender_container_ref(ec);
-}
-
 /**
  * To be documented
  * FIXME: To be fixed
  */
 EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec)
 {
-	if (ec->type == ENDER_LIST || ec->type == ENDER_STRUCT || ec->type == ENDER_UNION)
+	if (ec->type == ENDER_LIST)
 		return EINA_TRUE;
 	return EINA_FALSE;
 }
@@ -436,13 +415,14 @@ EAPI Eina_Bool ender_container_is_compound(Ender_Container *ec)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx)
+EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigned int idx, const char **name)
 {
 	Ender_Container_Sub *sub;
 
 	if (!ender_container_is_compound(ec))
 		return NULL;
 	sub = eina_list_nth(ec->elements, idx);
+	if (name) *name = sub->name;
 	return sub->c;
 }
 
@@ -469,25 +449,6 @@ EAPI Ender_Container * ender_container_compound_get_by_name(Ender_Container *ec,
 		i++;
 	}
 	return NULL;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_container_compound_get_extended(Ender_Container *ec, unsigned int idx, Ender_Container **c, const char **name)
-{
-	Ender_Container_Sub *sub;
-
-	if (!ender_container_is_compound(ec))
-	{
-		if (c) *c = NULL;
-		if (name) *name = NULL;
-		return;
-	}
-	sub = eina_list_nth(ec->elements, idx);
-	if (c) *c = sub->c;
-	if (name) *name = sub->name;
 }
 
 /**
@@ -541,6 +502,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 	return size;
 }
 
+#if 0
 /**
  * To be documented
  * FIXME: To be fixed
@@ -590,6 +552,7 @@ EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
 	}
 	return size;
 }
+#endif
 
 /**
  * To be documented
@@ -603,6 +566,7 @@ EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
 	return eina_list_count(ec->elements);
 }
 
+#if 0
 /**
  * To be documented
  * FIXME: To be fixed
@@ -641,6 +605,7 @@ EAPI void ender_container_add(Ender_Container *thiz, const char *name, Ender_Con
 		return;
 	}
 }
+#endif
 
 /**
  * To be documented
@@ -649,19 +614,6 @@ EAPI void ender_container_add(Ender_Container *thiz, const char *name, Ender_Con
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
 {
 	return c->type;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI const char * ender_container_registered_name_get(Ender_Container *thiz)
-{
-	if (!thiz) return NULL;
-
-	if (!thiz->registered_name)
-		return "anonymous";
-	return thiz->registered_name;
 }
 
 /**
@@ -705,7 +657,7 @@ EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Val
 		case ENDER_STRING:
 		case ENDER_MATRIX:
 		n = tpl_map(thiz->serialize.signature, &v->data);
-		tpl_pack(n, 0); 
+		tpl_pack(n, 0);
 		tpl_dump(n, TPL_MEM, &data, len);
 		tpl_free(n);
 		break;
@@ -757,7 +709,7 @@ EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *thiz, void *
 		case ENDER_MATRIX:
 		n = tpl_map(thiz->serialize.signature, &v->data);
 		tpl_load(n, TPL_MEM, data, len);
-		tpl_unpack(n, 0); 
+		tpl_unpack(n, 0);
 		tpl_free(n);
 		break;
 

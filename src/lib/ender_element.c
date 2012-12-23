@@ -401,7 +401,7 @@ EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_
 		if (!prop) break;
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
-		ec = ender_container_compound_get(ec, 0);
+		ec = ender_container_compound_get(ec, 0, NULL);
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
@@ -458,7 +458,7 @@ EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, 
 		if (!prop) break;
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
-		ec = ender_container_compound_get(ec, 0);
+		ec = ender_container_compound_get(ec, 0, NULL);
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_remove(prop, e, &v);
@@ -815,7 +815,7 @@ EAPI void ender_element_property_value_add_valist(Ender_Element *e, Ender_Proper
 
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
-		ec = ender_container_compound_get(ec, 0);
+		ec = ender_container_compound_get(ec, 0, NULL);
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
@@ -898,7 +898,7 @@ EAPI void ender_element_property_value_remove_valist(Ender_Element *e, Ender_Pro
 
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
-		ec = ender_container_compound_get(ec, 0);
+		ec = ender_container_compound_get(ec, 0, NULL);
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_remove(prop, e, &v);
