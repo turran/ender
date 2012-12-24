@@ -26,17 +26,20 @@ Dummy_Object * dummy_object_new(void)
 	Dummy_Object *thiz;
 
 	thiz = calloc(1, sizeof(Dummy_Object));
+	printf("dummy object created\n");
 	return thiz;
 }
 
 void dummy_object_bool_set(Dummy_Object *thiz, Eina_Bool b)
 {
+	printf("bool_set called with %d\n", b);
 	thiz->b = b;
 }
 
 void dummy_object_bool_get(Dummy_Object *thiz, Eina_Bool *b)
 {
 	*b = thiz->b;
+	printf("bool_get called with %p %d\n", b, *b);
 }
 
 void dummy_object_uint32_set(Dummy_Object *thiz, uint32_t u32)

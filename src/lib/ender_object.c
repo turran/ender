@@ -48,7 +48,6 @@ static void * _ender_object_creator(Ender_Descriptor *d)
 		return NULL;
 	}
 	object = d->create();
-	printf("object created\n");
 	return object;
 }
 
