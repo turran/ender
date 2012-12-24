@@ -126,7 +126,7 @@ static Ender_Namespace * test01_namespace_get(void)
 /*----------------------------------------------------------------------------*
  *                            Properties helpers                              *
  *----------------------------------------------------------------------------*/
-static void test01_properties_register(Ender_Descriptor *descriptor)
+static void test01_object_properties_register(Ender_Descriptor *descriptor)
 {
 	Ender_Container *ec;
 	Ender_Property *prop;
@@ -204,6 +204,84 @@ static void test01_properties_register(Ender_Descriptor *descriptor)
 			EINA_FALSE);
 }
 
+static void test01_struct_properties_register(Ender_Descriptor *descriptor)
+{
+	Ender_Container *ec;
+	Ender_Property *prop;
+
+	/* add the properties */
+	ec = ender_container_new(ENDER_BOOL);
+	prop = ender_descriptor_property_add(descriptor, "b",
+			ec,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+	ec = ender_container_new(ENDER_UINT32);
+	prop = ender_descriptor_property_add(descriptor, "u32",
+			ec,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+	ec = ender_container_new(ENDER_DOUBLE);
+	prop = ender_descriptor_property_add(descriptor, "d",
+			ec,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+	ec = ender_container_new(ENDER_COLOR);
+	prop = ender_descriptor_property_add(descriptor, "color",
+			ec,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+	ec = ender_container_new(ENDER_STRING);
+	prop = ender_descriptor_property_add(descriptor, "s",
+			ec,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+	ec = ender_container_new(ENDER_ENDER);
+	prop = ender_descriptor_property_add(descriptor, "ender",
+			ec,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+	ec = ender_container_new(ENDER_MATRIX);
+	prop = ender_descriptor_property_add(descriptor, "matrix",
+			ec,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			EINA_FALSE);
+}
+
 Eina_Bool test01_properties(Ender_Descriptor *desc)
 {
 	Ender_Property *prop;
@@ -254,7 +332,7 @@ static void test01_object_register(void)
 			ENDER_DESTRUCTOR(dummy_object_free),
 			NULL,
 			ENDER_TYPE_CLASS);
-	test01_properties_register(descriptor);
+	test01_object_properties_register(descriptor);
 	test01_functions_register(descriptor);
 }
 
@@ -298,7 +376,7 @@ static void test01_struct_register(void)
 			NULL,
 			NULL,
 			ENDER_TYPE_STRUCT);
-	test01_properties_register(descriptor);
+	test01_struct_properties_register(descriptor);
 	test01_functions_register(descriptor);
 }
 
@@ -321,6 +399,10 @@ static Ender_Element * test01_struct_new(void)
 	d = test01_struct_get();
 	if (!d) return NULL;
 	e = ender_descriptor_element_new(d);
+	if (e)
+	{
+		printf("dummy struct created\n");
+	}
 	return e;
 }
 /*----------------------------------------------------------------------------*

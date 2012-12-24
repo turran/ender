@@ -72,6 +72,13 @@ Ender_Property * ender_property_new(const char *name,
 {
 	Ender_Property *prop;
 
+	if (!ec)
+	{
+		ERR("Impossible to create the property '%s' without a "
+				"container", name);
+		return NULL;
+	}
+
 	prop = calloc(1, sizeof(Ender_Property));
 	prop->name = strdup(name);
 	prop->get = get;

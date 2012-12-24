@@ -432,6 +432,12 @@ EAPI Ender_Container * ender_container_compound_get(Ender_Container *ec, unsigne
 	if (!ender_container_is_compound(ec))
 		return NULL;
 	sub = eina_list_nth(ec->elements, idx);
+	if (!sub)
+	{
+		ERR("The container '%s' does not have sub-container at %d",
+				ender_value_type_string_to(ec->type), idx);
+		return NULL;
+	}
 	if (name) *name = sub->name;
 	return sub->c;
 }

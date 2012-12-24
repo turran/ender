@@ -278,7 +278,7 @@ static Ender_Library_Namespace * _loader_namespace_new(const char *name, int ver
 	return namespace;
 }
 
-static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, const char *name, Ender_Descriptor *parent, Ender_Descriptor_Type type)
+static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namespace, const char *name, const char *alias, Ender_Descriptor *parent, Ender_Descriptor_Type type)
 {
 	Ender_Descriptor *desc;
 	Ender_Creator creator;
@@ -305,9 +305,9 @@ static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namesp
 		DBG("No destructor found");
 	}
 
-	desc = ender_namespace_descriptor_add(namespace->ns, name, creator, destructor, parent, type);
+	desc = ender_namespace_descriptor_add(namespace->ns, alias ? alias : name, creator, destructor, parent, type);
 	if (!desc) return NULL;
-	DBG("class %s@%s registered correctly %p", name, ns_name, desc);
+	DBG("class %s,%s@%s registered correctly %p", name, alias, ns_name, desc);
 
 	return desc;
 }
@@ -374,7 +374,8 @@ static void _loader_add_namespace(void *data, const char *name, int version)
 	thiz->namespace = _loader_namespace_new(name, version);
 }
 
-static void _loader_add_native(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
+static void _loader_add_native(void *data, const char *name, const char *alias,
+		Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Loader *thiz;
 	Ender_Descriptor *parent_descriptor = NULL;
@@ -389,7 +390,7 @@ static void _loader_add_native(void *data, const char *name, Ender_Descriptor_Ty
 			return;
 		}
 	}
-	thiz->descriptor = _loader_descriptor_new(thiz->namespace, name, parent_descriptor, type);
+	thiz->descriptor = _loader_descriptor_new(thiz->namespace, name, alias, parent_descriptor, type);
 }
 
 static void _loader_add_property(void *data, Ender_Parser_Property *p)

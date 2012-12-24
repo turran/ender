@@ -178,7 +178,8 @@ static void _generator_add_namespace(void *data, const char *name, int version)
 	thiz->ns_version = version;
 }
 
-static void _generator_add_native(void *data, const char *name, Ender_Descriptor_Type type, const char *parent)
+static void _generator_add_native(void *data, const char *name, const char *alias,
+		Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Generator *thiz;
 
@@ -219,11 +220,11 @@ static void _generator_add_native(void *data, const char *name, Ender_Descriptor
 	}
 	if (type == ENDER_TYPE_ABSTRACT)
 		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", NULL, ENDER_DESTRUCTOR(_%s_%s_delete), parent, ENDER_TYPE_%s);\n",
-				thiz->name, thiz->ns_name, thiz->name,
+				alias ? alias : name, thiz->ns_name, thiz->name,
 				ender_descriptor_type_string_to(type));
 	else
 		fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", ENDER_CREATOR(_%s_%s_new), ENDER_DESTRUCTOR(_%s_%s_delete), parent, ENDER_TYPE_%s);\n",
-				thiz->name, thiz->ns_name, name, thiz->ns_name, name,
+				alias ? alias : name, thiz->ns_name, name, thiz->ns_name, name,
 				ender_descriptor_type_string_to(type));
 	fprintf(thiz->out, "\tif (!d) return;\n");
 }

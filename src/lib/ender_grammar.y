@@ -124,9 +124,9 @@ descriptor_type
 	;
 
 descriptor
-	: descriptor_type T_INLINE_STRING object_inheritance
+	: descriptor_type T_INLINE_STRING alias object_inheritance
 	{
-		ender_parser_add_native(parser, $2, $1, $3);
+		ender_parser_add_native(parser, $2, $3, $1, $4);
 		if ($3)
 			free($3);
 		free($2);

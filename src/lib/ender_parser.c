@@ -49,10 +49,10 @@ void ender_parser_add_namespace(Ender_Parser *thiz, const char *name,
 }
 
 void ender_parser_add_native(Ender_Parser *thiz, const char *name,
-		Ender_Descriptor_Type type, const char *parent)
+		const char *alias, Ender_Descriptor_Type type, const char *parent)
 {
 	if (thiz->descriptor->add_native)
-		thiz->descriptor->add_native(thiz->data, name, type, parent);
+		thiz->descriptor->add_native(thiz->data, name, alias, type, parent);
 }
 
 void ender_parser_add_property(Ender_Parser *thiz, Ender_Parser_Property *p)

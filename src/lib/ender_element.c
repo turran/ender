@@ -402,6 +402,12 @@ EAPI void ender_element_value_add_valist(Ender_Element *e, const char *name, va_
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0, NULL);
+		if (!ec)
+		{
+			ERR("Property '%s' does not have a sub-container",
+					ender_property_name_get(prop));
+			break;
+		}
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
@@ -459,6 +465,12 @@ EAPI void ender_element_value_remove_valist(Ender_Element *e, const char *name, 
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0, NULL);
+		if (!ec)
+		{
+			ERR("Property '%s' does not have a sub-container",
+					ender_property_name_get(prop));
+			break;
+		}
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_remove(prop, e, &v);
@@ -816,6 +828,12 @@ EAPI void ender_element_property_value_add_valist(Ender_Element *e, Ender_Proper
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0, NULL);
+		if (!ec)
+		{
+			ERR("Property '%s' does not have a sub-container",
+					ender_property_name_get(prop));
+			break;
+		}
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_add(prop, e, &v);
@@ -899,6 +917,12 @@ EAPI void ender_element_property_value_remove_valist(Ender_Element *e, Ender_Pro
 		ec = ender_property_container_get(prop);
 		if (ender_container_type_get(ec) != ENDER_LIST) break;
 		ec = ender_container_compound_get(ec, 0, NULL);
+		if (!ec)
+		{
+			ERR("Property '%s' does not have a sub-container",
+					ender_property_name_get(prop));
+			break;
+		}
 
 		ENDER_VALUE_FROM_DATA(v, ec, var_args);
 		ender_property_element_value_remove(prop, e, &v);

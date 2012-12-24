@@ -576,11 +576,14 @@ typedef struct _Ender_Parser_Function
 	Eina_List *args;
 } Ender_Parser_Function;
 
+/* FIXME this functions will be evolving until all of them
+ * are similar to the add_property
+ */
 typedef void (*Ender_Parser_Add_Using)(void *data, const char *name);
 typedef void (*Ender_Parser_Add_Namespace)(void *data, const char *name,
 		int version);
 typedef void (*Ender_Parser_Add_Native)(void *data, const char *name,
-		Ender_Descriptor_Type type, const char *parent);
+		const char *alias, Ender_Descriptor_Type type, const char *parent);
 typedef void (*Ender_Parser_Add_Property)(void *data, Ender_Parser_Property *p);
 typedef void (*Ender_Parser_Add_Function)(void *data, Ender_Parser_Function *f);
 
