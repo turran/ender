@@ -205,8 +205,6 @@ Eina_Bool ender_function_call(Ender_Function *thiz, void *o,
 		Ender_Value *ret, Eina_List *args);
 
 /* container */
-void ender_container_init(void);
-void ender_container_shutdown(void);
 
 /* namespace */
 typedef void (*Ender_Namespace_Initialize)(Ender_Namespace *thiz, void *data);

@@ -114,13 +114,23 @@ static void _find_container(Ender_Generator *thiz,
 	_tabs(thiz, level);
 	fprintf(thiz->out, "Ender_Value_Type tmp%d;\n", level + 1);
 	_tabs(thiz, level);
+	fprintf(thiz->out, "Ender_Constraint *tmp%d;\n", level + 2);
+	_tabs(thiz, level);
 	fprintf(thiz->out, "tmp%d = ender_namespace_descriptor_find(ns, \"%s\");\n", level, c->defined);
 	_tabs(thiz, level);
 	fprintf(thiz->out, "if (tmp%d)\n", level);
 	_tabs(thiz, level + 1);
 	fprintf(thiz->out, "if (ender_descriptor_type_value_type_to(ender_descriptor_type(tmp%d), &tmp%d))\n", level, level + 1);
+	_tabs(thiz, level + 1);
+	fprintf(thiz->out, "{\n");
+	_tabs(thiz, level + 2);
+	fprintf(thiz->out, "tmp%d = ender_constraint_descriptor_new(tmp%d);\n", level + 2, level);
 	_tabs(thiz, level + 2);
 	fprintf(thiz->out, "tmp%d = ender_container_new(tmp%d);\n", level - 1, level + 1);
+	_tabs(thiz, level + 2);
+	fprintf(thiz->out, "ender_container_constraint_set(tmp%d, tmp%d);\n", level -1, level + 2);
+	_tabs(thiz, level + 1);
+	fprintf(thiz->out, "}\n");
 }
 
 static void _dump_container_recursive(Ender_Generator *thiz,

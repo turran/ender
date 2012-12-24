@@ -312,7 +312,7 @@ static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namesp
 	return desc;
 }
 
-Ender_Container * _loader_get_container(Ender_Loader *thiz,
+static Ender_Container * _loader_get_container(Ender_Loader *thiz,
 		Ender_Parser_Container *c)
 {
 	Ender_Container *ret = NULL;
@@ -325,12 +325,15 @@ Ender_Container * _loader_get_container(Ender_Loader *thiz,
 	{
 		Ender_Descriptor *d;
 		Ender_Value_Type vt;
+		Ender_Constraint *cnst;
 
 		d = ender_namespace_descriptor_find(thiz->namespace->ns, c->defined);
 		if (!d) return NULL;
 		if (!ender_descriptor_type_value_type_to(ender_descriptor_type(d), &vt))
 			return NULL;
 		ret = ender_container_new(c->type);
+		cnst = ender_constraint_descriptor_new(d);
+		ender_container_constraint_set(ret, cnst);
 	}
 	else
 	{
@@ -343,9 +346,7 @@ Ender_Container * _loader_get_container(Ender_Loader *thiz,
 	{
 		Ender_Container *sc;
 		sc = _loader_get_container(thiz, spc);
-#if 0
-		ender_container_add(ret,  sc);
-#endif
+		ender_container_add(ret, NULL, sc);
 	}
 	return ret;
 }

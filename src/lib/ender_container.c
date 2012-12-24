@@ -69,8 +69,6 @@ typedef struct _Ender_Container_Sub
 	size_t offset;
 } Ender_Container_Sub;
 
-static Ender_Container *_basic_containers[ENDER_LIST - ENDER_BOOL];
-
 #ifdef BUILD_SERIALIZE
 static void _ender_container_serialize_add(Ender_Value_Type t)
 {
@@ -323,31 +321,6 @@ static void _ender_container_struct_add(Ender_Container *thiz, const char *name,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void ender_container_init(void)
-{
-	int i;
-
-	/* define the common (basic) containers here */
-	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
-	{
-		_basic_containers[i] = _ender_container_new(i);
-	}
-}
-
-void ender_container_shutdown(void)
-{
-	int i;
-
-	for (i = 0; i < sizeof(_basic_containers) / sizeof(Ender_Container *); i++)
-	{
-		_basic_containers[i] = ender_container_unref(_basic_containers[i]);
-		if (_basic_containers[i])
-			printf("refcount error %d on type %s\n",
-					_basic_containers[i]->ref,
-					ender_value_type_string_to(_basic_containers[i]->type));
-	}
-}
-
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -359,12 +332,6 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 {
 	Ender_Container *ec;
 
-	/* if it is a basic type, just get it from the list */
-	/* FIXME this can be changed to is_compound */
-	if (t >= ENDER_BOOL && t < ENDER_LIST)
-	{
-		return ender_container_ref(_basic_containers[t]);
-	}
 	ec = _ender_container_new(t);
 	return ec;
 }
