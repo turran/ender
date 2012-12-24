@@ -716,3 +716,11 @@ EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz)
 	return ender_namespace_element_new_from_descriptor(thiz->ns, thiz);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI size_t ender_descriptor_size_get(Ender_Descriptor *thiz)
+{
+	return _backends[thiz->type].size_get(thiz);
+}

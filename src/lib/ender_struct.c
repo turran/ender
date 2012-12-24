@@ -246,8 +246,10 @@ static Ender_Property * _ender_struct_property_add(Ender_Descriptor *d,
 {
 	Ender_Struct_Property *sprop;
 	Ender_Property *prop;
-	Ender_Property *last = NULL;
+	size_t size;
 
+	size = ender_descriptor_size_get(d);
+		
 	if (relative)
 	{
 		ERR("Structs do not support relative properties");
@@ -261,6 +263,24 @@ static Ender_Property * _ender_struct_property_add(Ender_Descriptor *d,
 	sprop->dprop.remove = remove;
 	sprop->dprop.clear = clear;
 	sprop->dprop.clear = clear;
+	sprop->offset = size;
+
+	prop = ender_property_new(name, ec,
+			get ? _property_ext_get : _property_get,
+			set ? _property_ext_set : _property_set,
+			add ? _property_ext_set : NULL,
+			remove ? _property_ext_set : NULL,
+			clear ? _property_ext_clear : NULL,
+			is_set ? _property_ext_is_set : NULL,
+			relative,
+			_property_free, sprop);
+	return prop;
+}
+
+static size_t _ender_struct_size_get(Ender_Descriptor *d)
+{
+	Ender_Property *last = NULL;
+	size_t size = 0;
 
 	ender_descriptor_property_list(d, _ender_struct_property_get_last, &last);
 	/* we have a last property, set the correct offset */
@@ -274,19 +294,9 @@ static Ender_Property * _ender_struct_property_add(Ender_Descriptor *d,
 		slast = ender_property_data_get(last);
 		last_size = ender_container_size_get(last_container);
 		ender_container_unref(last_container);
-		sprop->offset = slast->offset + last_size;
+		size = slast->offset + last_size;
 	}
-
-	prop = ender_property_new(name, ec,
-			get ? _property_ext_get : _property_get,
-			set ? _property_ext_set : _property_set,
-			add ? _property_ext_set : NULL,
-			remove ? _property_ext_set : NULL,
-			clear ? _property_ext_clear : NULL,
-			is_set ? _property_ext_is_set : NULL,
-			relative,
-			_property_free, sprop);
-	return prop;
+	return size;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -296,6 +306,7 @@ Ender_Descriptor_Backend ender_struct_backend = {
 	/* .creator 		= */ _ender_struct_creator,
 	/* .destructor 		= */ _ender_struct_destructor,
 	/* .property_add 	= */ _ender_struct_property_add,
+	/* .size_get 		= */ _ender_struct_size_get,
 };
 
 void ender_struct_init(void)
@@ -343,14 +354,6 @@ void ender_struct_init(void)
 	_getters[ENDER_LIST] = _ender_matrix_get;
 	_getters[ENDER_STRUCT] = _ender_pointer_get;
 	_getters[ENDER_UNION] = _ender_pointer_get;
-}
-
-void * ender_struct_new(Ender_Descriptor *edesc)
-{
-}
-
-void ender_struct_free(void *s)
-{
 }
 /*============================================================================*
  *                                   API                                      *

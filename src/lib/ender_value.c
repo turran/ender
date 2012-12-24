@@ -83,19 +83,30 @@ EAPI Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
 	Ender_Value *thiz;
 
 	thiz = _ender_value_new(ec);
-#if 0
+	/* for structs and unions get the size of the native object */
 	if (ec->type == ENDER_UNION || ec->type == ENDER_STRUCT)
 	{
+		const Ender_Constraint *cnst;
+		Ender_Constraint_Type cnst_type;
+		Ender_Descriptor *descriptor;
 		size_t size;
 
-		size = ender_container_compound_size_get(ec);
-		if (size)
-		{
-			thiz->data.ptr = calloc(1, size);
-			thiz->owned = EINA_TRUE;
-		}
+		cnst = ender_container_constraint_get(ec);
+		if (!cnst) return thiz;
+
+		cnst_type = ender_constraint_type_get(cnst);
+		if (cnst_type != ENDER_CONSTRAINT_DESCRIPTOR)
+			return thiz;
+		descriptor = ender_constraint_descriptor_descriptor_get(cnst);
+		if (!descriptor)
+			return thiz;
+
+		size = ender_descriptor_size_get(descriptor);
+		if (!size) return thiz;
+
+		thiz->data.ptr = calloc(1, size);
+		thiz->owned = EINA_TRUE;
 	}
-#endif
 	return thiz;
 }
 

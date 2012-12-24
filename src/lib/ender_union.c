@@ -88,6 +88,11 @@ static Ender_Property * _ender_union_property_add(Ender_Descriptor *d,
 {
 	return NULL;
 }
+
+static size_t _ender_union_size_get(Ender_Descriptor *d)
+{
+	return 0;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -96,6 +101,7 @@ Ender_Descriptor_Backend ender_union_backend = {
 	/* .creator 		= */ _ender_union_creator,
 	/* .destructor 		= */ _ender_union_destructor,
 	/* .property_add 	= */ _ender_union_property_add,
+	/* .size_get	 	= */ _ender_union_size_get,
 };
 /*============================================================================*
  *                                   API                                      *

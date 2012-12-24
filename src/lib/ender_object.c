@@ -101,6 +101,11 @@ static Ender_Property * _ender_object_property_add(Ender_Descriptor *d,
 			ender_descriptor_object_property_free, dprop);
 	return prop;
 }
+
+static size_t _ender_object_size_get(Ender_Descriptor *d)
+{
+	return 0;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -109,6 +114,7 @@ Ender_Descriptor_Backend ender_object_backend = {
 	/* .creator 		= */ _ender_object_creator,
 	/* .destructor 		= */ _ender_object_destructor,
 	/* .property_add 	= */ _ender_object_property_add,
+	/* .size_get 		= */ _ender_object_size_get,
 };
 /*============================================================================*
  *                                   API                                      *

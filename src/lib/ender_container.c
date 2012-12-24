@@ -200,6 +200,11 @@ static void _ender_container_delete(Ender_Container *thiz)
 {
 	Ender_Container_Sub *s;
 
+#if 0
+	if (thiz->constraint)
+		ender_constraint_free(thiz->constraint);
+#endif
+
 	EINA_LIST_FREE(thiz->elements, s)
 	{
 		if (s->name)
@@ -207,8 +212,6 @@ static void _ender_container_delete(Ender_Container *thiz)
 		ender_container_unref(s->c);
 		free(s);
 	}
-	if (thiz->registered_name)
-		free(thiz->registered_name);
 	free(thiz);
 }
 
@@ -370,9 +373,49 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Container * ender_container_list_new(Ender_Value_Type child)
+EAPI Ender_Container * ender_container_list_new(Ender_Container *child)
 {
+	Ender_Container *thiz;
 
+	thiz = _ender_container_new(ENDER_LIST);
+	ender_container_add(thiz, "data", child);
+	return thiz;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Container * ender_container_struct_new(Ender_Descriptor *descriptor)
+{
+	Ender_Container *thiz;
+
+	thiz = _ender_container_new(ENDER_STRUCT);
+	if (descriptor)
+	{
+		Ender_Constraint *constraint;
+		constraint = ender_constraint_descriptor_new(descriptor);
+		ender_container_constraint_set(thiz, constraint);
+	}
+	return thiz;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Container * ender_container_union_new(Ender_Descriptor *descriptor)
+{
+	Ender_Container *thiz;
+
+	thiz = _ender_container_new(ENDER_UNION);
+	if (descriptor)
+	{
+		Ender_Constraint *constraint;
+		constraint = ender_constraint_descriptor_new(descriptor);
+		ender_container_constraint_set(thiz, constraint);
+	}
+	return thiz;
 }
 
 /**
@@ -502,58 +545,6 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 	return size;
 }
 
-#if 0
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI size_t ender_container_compound_size_get(Ender_Container *ec)
-{
-	Ender_Container_Sub *sub;
-	Eina_List *l;
-	size_t size = 0;
-
-	switch (ec->type)
-	{
-		case ENDER_STRUCT:
-		EINA_LIST_FOREACH(ec->elements, l, sub)
-		{
-			if (sub->c->type == ENDER_STRUCT || sub->c->type == ENDER_UNION)
-				size += ender_container_compound_size_get(sub->c);
-			else
-				size += ender_container_size_get(sub->c);
-		}
-		break;
-
-		case ENDER_LIST:
-		if (!ec->elements) break;
-		sub = eina_list_data_get(ec->elements);
-		size = ender_container_size_get(sub->c);
-		break;
-
-		case ENDER_UNION:
-		EINA_LIST_FOREACH(ec->elements, l, sub)
-		{
-			size_t new_size;
-
-			if (sub->c->type == ENDER_STRUCT || sub->c->type == ENDER_UNION)
-				new_size = ender_container_compound_size_get(sub->c);
-			else
-				new_size = ender_container_size_get(sub->c);
-			if (new_size > size)
-				size = new_size;
-		}
-		/* add the space for the integer type */
-		size += 4;
-		break;
-
-		default:
-		return 0;
-	}
-	return size;
-}
-#endif
-
 /**
  * To be documented
  * FIXME: To be fixed
@@ -566,7 +557,6 @@ EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
 	return eina_list_count(ec->elements);
 }
 
-#if 0
 /**
  * To be documented
  * FIXME: To be fixed
@@ -586,26 +576,7 @@ EAPI void ender_container_add(Ender_Container *thiz, const char *name, Ender_Con
 		sub->name = strdup(name);
 	/* own the sub container */
 	sub->c = s;
-	switch (thiz->type)
-	{
-		case ENDER_STRUCT:
-
-		_ender_container_struct_add(thiz, name, sub);
-		break;
-
-		case ENDER_UNION:
-		_ender_container_union_add(thiz, name, sub);
-		break;
-
-		case ENDER_LIST:
-		_ender_container_list_add(thiz, name, sub);
-		break;
-
-		default:
-		return;
-	}
 }
-#endif
 
 /**
  * To be documented
@@ -631,7 +602,7 @@ EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint
  */
 EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *thiz)
 {
-	return NULL;
+	return thiz->constraint;
 }
 
 /**

@@ -43,14 +43,11 @@ typedef struct _Ender_Container_Serialize
 
 struct _Ender_Container
 {
-	/* common */
-	char *registered_name;
 	Ender_Value_Type type;
 	int ref;
-	/* structs */
-	int num_elements;
+	/* sub containers */
 	Eina_List *elements;
-	/* relative to a parent container */
+	Ender_Constraint *constraint;
 #if BUILD_SERIALIZE
 	Ender_Container_Serialize serialize;
 #endif
@@ -91,6 +88,7 @@ typedef Ender_Property * (*Ender_Descriptor_Property_Add)(Ender_Descriptor *d,
 		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
 		Ender_Is_Set is_set,
 		Eina_Bool relative);
+typedef size_t (*Ender_Descriptor_Size_Get)(Ender_Descriptor *d);
 
 typedef struct _Ender_Descriptor_Backend
 {
@@ -98,6 +96,7 @@ typedef struct _Ender_Descriptor_Backend
 	Ender_Descriptor_Creator creator;
 	Ender_Descriptor_Destructor destructor;
 	Ender_Descriptor_Property_Add property_add;
+	Ender_Descriptor_Size_Get size_get;
 } Ender_Descriptor_Backend;
 
 struct _Ender_Descriptor

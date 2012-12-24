@@ -48,12 +48,13 @@ typedef struct _Ender_Constraint_Enum
 typedef struct _Ender_Constraint_Descriptor
 {
 	Ender_Descriptor *descriptor;
-} Ender_Contraint_Descriptor;
+} Ender_Constraint_Descriptor;
 
 struct _Ender_Constraint
 {
 	Ender_Constraint_Type type;
 	union {
+		Ender_Constraint_Descriptor descriptor;
 		Ender_Constraint_Range range;
 		Ender_Constraint_Enum en;
 	} data;
@@ -78,7 +79,7 @@ static Ender_Constraint * _ender_constraint_new(Ender_Constraint_Type type)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Constraint_Type ender_constraint_type_get(Ender_Constraint *thiz)
+EAPI Ender_Constraint_Type ender_constraint_type_get(const Ender_Constraint *thiz)
 {
 	return thiz->type;
 }
@@ -101,11 +102,34 @@ EAPI Ender_Constraint * ender_constraint_range_new(Ender_Value_Type type)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Ender_Constraint * ender_constraint_descriptor_new(
+	Ender_Descriptor *descriptor)
+{
+	Ender_Constraint *thiz;
+
+	thiz = _ender_constraint_new(ENDER_CONSTRAINT_DESCRIPTOR);
+	thiz->data.descriptor.descriptor = descriptor;
+	return thiz;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Descriptor * ender_constraint_descriptor_descriptor_get(
+	const Ender_Constraint *thiz)
+{
+	return thiz->data.descriptor.descriptor;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Constraint * ender_constraint_enum_new(void)
 {
 	Ender_Constraint *c;
 
-	/* TODO check for the type */
 	c = _ender_constraint_new(ENDER_CONSTRAINT_ENUM);
 
 	return c;

@@ -151,6 +151,10 @@ EAPI void ender_shutdown(void);
  * @{
  */
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
+EAPI Ender_Container * ender_container_list_new(Ender_Container *child);
+EAPI Ender_Container * ender_container_struct_new(Ender_Descriptor *descriptor);
+EAPI Ender_Container * ender_container_union_new(Ender_Descriptor *descriptor);
+
 EAPI Ender_Container * ender_container_ref(Ender_Container *thiz);
 EAPI Ender_Container * ender_container_unref(Ender_Container *thiz);
 
@@ -346,25 +350,26 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 		Ender_Clear clear,
 		Ender_Is_Set is_set,
 		Eina_Bool relative);
-EAPI void ender_descriptor_property_list(Ender_Descriptor *ed, Ender_Property_List_Callback cb, void *data);
+EAPI void ender_descriptor_property_list(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
-EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *ed, const char *name);
+EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *thiz, const char *name);
 
 EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
 		Ender_Accessor f, Ender_Marshaller marshaller, Ender_Container *ret, ...);
 EAPI Ender_Function * ender_descriptor_function_add_list(Ender_Descriptor *edesc, const char *name,
 		Ender_Accessor f, Ender_Marshaller marshaller, Ender_Container *ret,
 		Eina_List *args);
-EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *ed, const char *name);
-EAPI void ender_descriptor_function_list(Ender_Descriptor *ed, Ender_Function_List_Callback cb, void *data);
+EAPI Ender_Function * ender_descriptor_function_get(Ender_Descriptor *thiz, const char *name);
+EAPI void ender_descriptor_function_list(Ender_Descriptor *thiz, Ender_Function_List_Callback cb, void *data);
 
 EAPI void ender_descriptor_list(Ender_Descriptor_List_Callback cb, void *data);
 EAPI Eina_Bool ender_descriptor_exists(const char *name);
-EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *ed);
-EAPI const char * ender_descriptor_name_get(Ender_Descriptor *ed);
-EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *ed);
-EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *ed);
-EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *desc);
+EAPI Ender_Descriptor_Type ender_descriptor_type(Ender_Descriptor *thiz);
+EAPI const char * ender_descriptor_name_get(Ender_Descriptor *thiz);
+EAPI size_t ender_descriptor_size_get(Ender_Descriptor *thiz);
+EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *thiz);
+EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *thiz);
+EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz);
 /**
  * @}
  * @defgroup Ender_Element_Group Element
@@ -467,12 +472,21 @@ typedef enum _Ender_Constraint_Type
 {
 	ENDER_CONSTRAINT_RANGE,
 	ENDER_CONSTRAINT_ENUM,
+	ENDER_CONSTRAINT_DESCRIPTOR,
+	ENDER_CONSTRAINTS,
 } Ender_Constraint_Type;
 
-EAPI Ender_Constraint_Type ender_constraint_type_get(Ender_Constraint *thiz);
+EAPI Ender_Constraint_Type ender_constraint_type_get(const Ender_Constraint *thiz);
+
 EAPI Ender_Constraint * ender_constraint_range_new(Ender_Value_Type type);
+
 EAPI Ender_Constraint * ender_constraint_enum_new(void);
 EAPI void ender_constraint_enum_append(Ender_Constraint *thiz, const char *name, int value);
+
+EAPI Ender_Constraint * ender_constraint_descriptor_new(
+	Ender_Descriptor *descriptor);
+EAPI Ender_Descriptor * ender_constraint_descriptor_descriptor_get(
+	const Ender_Constraint *thiz);
 
 /**
  * @}
