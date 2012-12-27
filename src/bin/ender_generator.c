@@ -17,6 +17,8 @@
  */
 
 #include <ctype.h>
+#include <unistd.h>
+#include <getopt.h>
 
 #include "Ender.h"
 #include "ender_private.h"
@@ -24,6 +26,14 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define F(f, level, format, ...) \
+	_tabs(f, level); \
+	fprintf(f, format "\n", __VA_ARGS__);
+
+static Eina_Bool use_extended = EINA_FALSE;
+static Eina_Bool use_offsetof = EINA_TRUE;
+static Eina_Bool use_sizeof = EINA_TRUE;
+
 typedef struct _Ender_Generator
 {
 	char *ns_name;
@@ -37,12 +47,12 @@ typedef struct _Ender_Generator
 	Eina_Bool container_initialized;
 } Ender_Generator;
 
-static void _tabs(Ender_Generator *thiz, int count)
+static void _tabs(FILE *out, int count)
 {
 	int i;
 
 	for (i = 0; i < count; i++)
-		fprintf(thiz->out, "\t");
+		fprintf(out, "\t");
 }
 
 /* some function to filter the names of things
@@ -69,7 +79,9 @@ static void _property_variable_name(char *dst, const char *ns, const char *oname
 {
 	size_t len;
 
+#if 0
 	printf("%s: %s %s %s\n", __FUNCTION__, ns, oname, pname);
+#endif
 
 	len = strlen(ns);
 	_upper(ns, len, dst);
@@ -110,28 +122,17 @@ static void _property_normalized(char *dst, const char *name)
 static void _find_container(Ender_Generator *thiz,
 		Ender_Parser_Container *c, int level)
 {
-	_tabs(thiz, level);
-	fprintf(thiz->out, "Ender_Descriptor *tmp%d = ender_namespace_descriptor_find(ns, \"%s\");\n", level, c->defined);
-	_tabs(thiz, level);
-	fprintf(thiz->out, "Ender_Value_Type tmp%d;\n", level + 1);
-	_tabs(thiz, level);
-	fprintf(thiz->out, "Ender_Constraint *tmp%d;\n", level + 2);
-	_tabs(thiz, level);
-	fprintf(thiz->out, "tmp%d = ender_namespace_descriptor_find(ns, \"%s\");\n", level, c->defined);
-	_tabs(thiz, level);
-	fprintf(thiz->out, "if (tmp%d)\n", level);
-	_tabs(thiz, level + 1);
-	fprintf(thiz->out, "if (ender_descriptor_type_value_type_to(ender_descriptor_type(tmp%d), &tmp%d))\n", level, level + 1);
-	_tabs(thiz, level + 1);
-	fprintf(thiz->out, "{\n");
-	_tabs(thiz, level + 2);
-	fprintf(thiz->out, "tmp%d = ender_constraint_descriptor_new(tmp%d);\n", level + 2, level);
-	_tabs(thiz, level + 2);
-	fprintf(thiz->out, "tmp%d = ender_container_new(tmp%d);\n", level - 1, level + 1);
-	_tabs(thiz, level + 2);
-	fprintf(thiz->out, "ender_container_constraint_set(tmp%d, tmp%d);\n", level -1, level + 2);
-	_tabs(thiz, level + 1);
-	fprintf(thiz->out, "}\n");
+	F(thiz->out, level, "Ender_Descriptor *tmp%d = ender_namespace_descriptor_find(ns, \"%s\");", level, c->defined);
+	F(thiz->out, level, "Ender_Value_Type tmp%d;", level + 1);
+	F(thiz->out, level, "Ender_Constraint *tmp%d;\n", level + 2);
+	F(thiz->out, level, "tmp%d = ender_namespace_descriptor_find(ns, \"%s\");", level, c->defined);
+	F(thiz->out, level, "if (tmp%d)", level);
+	F(thiz->out, level + 1, "if (ender_descriptor_type_value_type_to(ender_descriptor_type(tmp%d), &tmp%d))", level, level + 1);
+	F(thiz->out, level + 1, "{", NULL);
+	F(thiz->out, level + 2, "tmp%d = ender_constraint_descriptor_new(tmp%d);", level + 2, level);
+	F(thiz->out, level + 2, "tmp%d = ender_container_new(tmp%d);", level - 1, level + 1);
+	F(thiz->out, level + 2, "ender_container_constraint_set(tmp%d, tmp%d);", level -1, level + 2);
+	F(thiz->out, level + 1, "}", NULL);
 }
 
 static void _dump_container_recursive(Ender_Generator *thiz,
@@ -141,30 +142,25 @@ static void _dump_container_recursive(Ender_Generator *thiz,
 	Eina_List *l;
 
 	/* dump the main container variable */
-	_tabs(thiz, level);
-	fprintf(thiz->out, "Ender_Container *tmp%d = NULL;\n", level);
-	_tabs(thiz, level);
+	F(thiz->out, level, "Ender_Container *tmp%d = NULL;", level);
 	/* in case we have a name, we need to find it */
 	if (c->defined)
 	{
-		fprintf(thiz->out, "{\n");
+		F(thiz->out, level, "{", NULL);
 		_find_container(thiz, c, level + 1);
-		_tabs(thiz, level);
-		fprintf(thiz->out, "}\n");
+		F(thiz->out, level, "}", NULL);
 	}
 	/* in case we have a value type use it */
 	else
 	{
-		fprintf(thiz->out, "tmp%d = ender_container_new(ENDER_%s);\n", level, ender_value_type_string_to(c->type));
+		F(thiz->out, level, "tmp%d = ender_container_new(ENDER_%s);", level, ender_value_type_string_to(c->type));
 	}
 	/* now the subcontainers */
 	EINA_LIST_FOREACH (c->subcontainers, l, sc)
 	{
-		_tabs(thiz, level + 1);
-		fprintf(thiz->out, "{\n");
+		F(thiz->out, level + 1, "{", NULL);
 		_dump_container_recursive(thiz, sc, level + 2);
-		_tabs(thiz, level + 1);
-		fprintf(thiz->out, "}\n");
+		F(thiz->out, level + 1, "}", NULL);
 	}
 }
 /*----------------------------------------------------------------------------*
@@ -259,6 +255,8 @@ static void _generator_add_property(void *data, Ender_Parser_Property *p)
 	Ender_Value_Type type;
 	char pname[PATH_MAX];
 	char pnormalized[PATH_MAX];
+	char getter[PATH_MAX];
+	char setter[PATH_MAX];
 	char offset[PATH_MAX];
 	char *real_offset = NULL;
 
@@ -275,8 +273,10 @@ static void _generator_add_property(void *data, Ender_Parser_Property *p)
 	fprintf(thiz->out, "\t\tec = tmp2;\n");
 	fprintf(thiz->out, "\t\tep = ender_descriptor_property_add(d, \"%s\",\n", p->def.name);
 	fprintf(thiz->out, "\t\t\t\tec,\n");
-	fprintf(thiz->out, "\t\t\t\tENDER_GETTER(_%s_%s_%s_get),\n", thiz->ns_name, thiz->name, pnormalized);
-	fprintf(thiz->out, "\t\t\t\tENDER_SETTER(_%s_%s_%s_set),\n", thiz->ns_name, thiz->name, pnormalized);
+	sprintf(getter, "_%s_%s_%s_get", thiz->ns_name, thiz->name, pnormalized);
+	sprintf(setter, "_%s_%s_%s_set", thiz->ns_name, thiz->name, pnormalized);
+	fprintf(thiz->out, "\t\t\t\tENDER_GETTER(%s),\n", getter);
+	fprintf(thiz->out, "\t\t\t\tENDER_SETTER(%s),\n", setter);
 	if (p->container->type == ENDER_LIST)
 	{
 		fprintf(thiz->out, "\t\t\t\tENDER_ADD(_%s_%s_%s_add),\n", thiz->ns_name, thiz->name, pnormalized);
@@ -290,12 +290,12 @@ static void _generator_add_property(void *data, Ender_Parser_Property *p)
 		fprintf(thiz->out, "\t\t\t\tNULL,\n");
 	}
 	/* the is_set is part of the extended functions */
-	if (thiz->extended)
+	if (use_extended)
 		fprintf(thiz->out, "\t\t\t\tENDER_IS_SET(_%s_%s_%s_is_set),\n", thiz->ns_name, thiz->name, pnormalized);
 	else
 		fprintf(thiz->out, "\t\t\t\tNULL,\n");
 	fprintf(thiz->out, "\t\t\t\t%s,\n", p->rel ? "EINA_TRUE" : "EINA_FALSE");
-	if (thiz->descriptor_type == ENDER_TYPE_STRUCT)
+	if (thiz->descriptor_type == ENDER_TYPE_STRUCT && use_offsetof)
 	{
 		char *cns_name = ender_name_structify(thiz->ns_name);
 		char *cname = ender_name_structify(thiz->name);
@@ -362,7 +362,7 @@ static Ender_Parser_Descriptor _generator_parser = {
 	/* .add_function 	= */ _generator_add_function,
 };
 
-static void _generator_run(Eina_Bool extended, const char *i, const char *element, const char *o)
+static void _generator_run(const char *i, const char *element, const char *o)
 {
 	Ender_Generator thiz;
 	FILE *out;
@@ -373,7 +373,6 @@ static void _generator_run(Eina_Bool extended, const char *i, const char *elemen
 	thiz.out = out;
 	thiz.found = EINA_FALSE;
 	thiz.name_matched = EINA_FALSE;
-	thiz.extended = extended;
 	thiz.container_initialized = EINA_FALSE;
 
 	ender_parser_parse(i, &_generator_parser, &thiz);
@@ -400,6 +399,8 @@ static void help(void)
 	printf("Where:\n");
 	printf("OPTION can be one of the following:\n");
 	printf("  x Use the extended properties (is_set and unset)\n");
+	printf("  s Do not use sizeof to define structs sizes\n");
+	printf("  o Do not use offsetof to define structs property offsets\n");
 	printf("INPUT is the ender file to load\n");
 	printf("NAME is the element name to dump\n");
 	printf("and OUTPUT is the c file to save\n");
@@ -409,28 +410,65 @@ static void help(void)
  *============================================================================*/
 int main(int argc, char **argv)
 {
-	ender_init(&argc, &argv);
-	/* now parse the file input output */
-	if (argc < 4 || argc > 5)
+	char *in;
+	char *out;
+	char *name;
+	char *short_options = "xsoh";
+	struct option long_options[] = {
+		{"extended", 0, 0, 'x'},
+		{"nosizeof", 0, 0, 's'},
+		{"nooffsetof", 0, 0, 'o'},
+		{"help", 0, 0, 'h'},
+		{0, 0, 0, 0}
+	};
+	int c;
+	int option;
+
+	/* handle the parameters */
+	while ((c = getopt_long(argc, argv, short_options, long_options,
+			&option)) != -1)
+	{
+		switch (c)
+		{
+			case 'h':
+			help();
+			return 0;
+
+			case 'x':
+			use_extended = EINA_TRUE;
+			break;
+
+			case 's':
+			use_sizeof = EINA_FALSE;
+			break;
+
+			case 'o':
+			use_offsetof = EINA_FALSE;
+			break;
+
+			default:
+			break;
+		}
+	}
+
+	if (optind >= argc)
 	{
 		help();
-		return -1;
+		return 0;
 	}
 
-	if (argc == 5)
+	if (argc - optind < 3)
 	{
-		if (*argv[1] != 'x')
-		{
-			help();
-			return -1;
-		}
-		_generator_run(EINA_TRUE, argv[2], argv[3], argv[4]);
-	}
-	else
-	{
-		_generator_run(EINA_FALSE, argv[1], argv[2], argv[3]);
+		help();
+		return 0;
 	}
 
+	in = argv[argc - 3];
+	name = argv[argc - 2];
+	out = argv[argc - 1];
+
+	ender_init(0, NULL);
+	_generator_run(in, name, out);
 	ender_shutdown();
 
 	return 0;
