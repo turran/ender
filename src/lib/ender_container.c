@@ -549,6 +549,7 @@ EAPI void ender_container_add(Ender_Container *thiz, const char *name, Ender_Con
 		sub->name = strdup(name);
 	/* own the sub container */
 	sub->c = s;
+	thiz->elements = eina_list_append(thiz->elements, sub);
 }
 
 /**

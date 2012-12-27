@@ -521,7 +521,7 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
 	prop = eina_ordered_hash_find(thiz->properties, name);
 	if (prop)
 	{
-		WRN("Property %s already found on %s. Not adding it", name,
+		WRN("Property '%s' already found on '%s'. Not adding it", name,
 				thiz->name);
 		return NULL;
 	}
@@ -530,7 +530,8 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
 	if (!prop) return NULL;
 
 	eina_ordered_hash_add(thiz->properties, name, prop);
-	DBG("Property %s added to %s", name, thiz->name);
+	DBG("Property '%s' of type '%s' added to '%s'", name,
+			ender_value_type_string_to(ec->type), thiz->name);
 
 	return prop;
 }

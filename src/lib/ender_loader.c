@@ -331,7 +331,7 @@ static Ender_Container * _loader_get_container(Ender_Loader *thiz,
 		if (!d) return NULL;
 		if (!ender_descriptor_type_value_type_to(ender_descriptor_type(d), &vt))
 			return NULL;
-		ret = ender_container_new(c->type);
+		ret = ender_container_new(vt);
 		cnst = ender_constraint_descriptor_new(d);
 		ender_container_constraint_set(ret, cnst);
 	}
@@ -345,6 +345,7 @@ static Ender_Container * _loader_get_container(Ender_Loader *thiz,
 	EINA_LIST_FOREACH (c->subcontainers, l, spc)
 	{
 		Ender_Container *sc;
+
 		sc = _loader_get_container(thiz, spc);
 		ender_container_add(ret, NULL, sc);
 	}

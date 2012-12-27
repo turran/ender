@@ -70,7 +70,7 @@ Ender_Property * ender_property_new(const char *name,
 		Ender_Property_Free free,
 		void *data)
 {
-	Ender_Property *prop;
+	Ender_Property *thiz;
 
 	if (!ec)
 	{
@@ -79,20 +79,20 @@ Ender_Property * ender_property_new(const char *name,
 		return NULL;
 	}
 
-	prop = calloc(1, sizeof(Ender_Property));
-	prop->name = strdup(name);
-	prop->get = get;
-	prop->set = set;
-	prop->add = add;
-	prop->remove = remove;
-	prop->clear = clear;
+	thiz = calloc(1, sizeof(Ender_Property));
+	thiz->name = strdup(name);
+	thiz->get = get;
+	thiz->set = set;
+	thiz->add = add;
+	thiz->remove = remove;
+	thiz->clear = clear;
 	/* own the container */
-	prop->container = ec;
-	prop->relative = relative;
-	prop->data = data;
-	prop->free = free;
+	thiz->container = ec;
+	thiz->relative = relative;
+	thiz->data = data;
+	thiz->free = free;
 
-	return prop;
+	return thiz;
 }
 
 void ender_property_free(Ender_Property *thiz)
@@ -111,52 +111,52 @@ void * ender_property_data_get(Ender_Property *thiz)
 }
 
 /* TODO add guards, the value type must be equal to the property type */
-void ender_property_element_value_set(Ender_Property *ep, Ender_Element *e,
+void ender_property_element_value_set(Ender_Property *thiz, Ender_Element *e,
 		Ender_Value *v)
 {
-	if (!ep->set) return;
-	ep->set(ep, e, v, ep->data);
+	if (!thiz->set) return;
+	thiz->set(thiz, e, v, thiz->data);
 
-	_ender_property_mutation_dispatch(e, v, ep, ENDER_EVENT_MUTATION_SET);
+	_ender_property_mutation_dispatch(e, v, thiz, ENDER_EVENT_MUTATION_SET);
 }
 
-void ender_property_element_value_get(Ender_Property *ep, Ender_Element *e,
+void ender_property_element_value_get(Ender_Property *thiz, Ender_Element *e,
 		Ender_Value *v)
 {
-	if (!ep->get) return;
-	ep->get(ep, e, v, ep->data);
+	if (!thiz->get) return;
+	thiz->get(thiz, e, v, thiz->data);
 }
 
-void ender_property_element_value_add(Ender_Property *ep, Ender_Element *e,
+void ender_property_element_value_add(Ender_Property *thiz, Ender_Element *e,
 		Ender_Value *v)
 {
-	if (!ep->add) return;
-	ep->add(ep, e, v, ep->data);
+	if (!thiz->add) return;
+	thiz->add(thiz, e, v, thiz->data);
 
-	_ender_property_mutation_dispatch(e, v, ep, ENDER_EVENT_MUTATION_ADD);
+	_ender_property_mutation_dispatch(e, v, thiz, ENDER_EVENT_MUTATION_ADD);
 }
 
-void ender_property_element_value_remove(Ender_Property *ep, Ender_Element *e,
+void ender_property_element_value_remove(Ender_Property *thiz, Ender_Element *e,
 		Ender_Value *v)
 {
-	if (!ep->remove) return;
-	ep->remove(ep, e, v, ep->data);
+	if (!thiz->remove) return;
+	thiz->remove(thiz, e, v, thiz->data);
 
-	_ender_property_mutation_dispatch(e, v, ep, ENDER_EVENT_MUTATION_REMOVE);
+	_ender_property_mutation_dispatch(e, v, thiz, ENDER_EVENT_MUTATION_REMOVE);
 }
 
-void ender_property_element_value_clear(Ender_Property *ep, Ender_Element *e)
+void ender_property_element_value_clear(Ender_Property *thiz, Ender_Element *e)
 {
-	if (!ep->clear) return;
-	ep->clear(ep, e, ep->data);
+	if (!thiz->clear) return;
+	thiz->clear(thiz, e, thiz->data);
 
-	_ender_property_mutation_dispatch(e, NULL, ep, ENDER_EVENT_MUTATION_CLEAR);
+	_ender_property_mutation_dispatch(e, NULL, thiz, ENDER_EVENT_MUTATION_CLEAR);
 }
 
-Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element *e)
+Eina_Bool ender_property_element_value_is_set(Ender_Property *thiz, Ender_Element *e)
 {
-	if (!ep->is_set) return EINA_TRUE;
-	return ep->is_set(ep, e, ep->data);
+	if (!thiz->is_set) return EINA_TRUE;
+	return thiz->is_set(thiz, e, thiz->data);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -165,53 +165,53 @@ Eina_Bool ender_property_element_value_is_set(Ender_Property *ep, Ender_Element 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Container * ender_property_container_get(Ender_Property *p)
+EAPI Ender_Container * ender_property_container_get(Ender_Property *thiz)
 {
-	if (!p) return NULL;
-	return ender_container_ref(p->container);
+	if (!thiz) return NULL;
+	return ender_container_ref(thiz->container);
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Value_Type ender_property_type_get(Ender_Property *p)
+EAPI Ender_Value_Type ender_property_type_get(Ender_Property *thiz)
 {
-	return p->container->type;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Eina_Bool ender_property_is_relative(Ender_Property *p)
-{
-	return p->relative;
+	return thiz->container->type;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * ender_property_name_get(Ender_Property *p)
+EAPI Eina_Bool ender_property_is_relative(Ender_Property *thiz)
 {
-	return p->name;
+	return thiz->relative;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *p)
+EAPI const char * ender_property_name_get(Ender_Property *thiz)
+{
+	return thiz->name;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Ender_Property_Flag ender_property_flags_get(Ender_Property *thiz)
 {
 	Ender_Property_Flag flags = 0;
 
-	if (!p) return flags;
-	if (p->get) flags |= ENDER_GET;
-	if (p->set) flags |= ENDER_SET;
-	if (p->add) flags |= ENDER_ADD;
-	if (p->remove) flags |= ENDER_REMOVE;
-	if (p->clear) flags |= ENDER_CLEAR;
-	if (p->is_set) flags |= ENDER_IS_SET;
+	if (!thiz) return flags;
+	if (thiz->get) flags |= ENDER_GET;
+	if (thiz->set) flags |= ENDER_SET;
+	if (thiz->add) flags |= ENDER_ADD;
+	if (thiz->remove) flags |= ENDER_REMOVE;
+	if (thiz->clear) flags |= ENDER_CLEAR;
+	if (thiz->is_set) flags |= ENDER_IS_SET;
 
 	return flags;
 }
