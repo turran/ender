@@ -285,9 +285,9 @@ EAPI void ender_namespace_descriptor_list(Ender_Namespace *thiz,
 EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *thiz,
 		const char *name);
 EAPI Ender_Descriptor * ender_namespace_descriptor_add(Ender_Namespace *ens,
-		const char *name,
-		Ender_Creator creator, Ender_Destructor destructor,
-		Ender_Descriptor *parent, Ender_Descriptor_Type type);
+		const char *name, Ender_Creator creator,
+		Ender_Destructor destructor, Ender_Descriptor *parent,
+		Ender_Descriptor_Type type, int size);
 EAPI const char * ender_namespace_name_get(Ender_Namespace *thiz);
 EAPI int ender_namespace_version_get(Ender_Namespace *thiz);
 EAPI Ender_Element * ender_namespace_element_new(Ender_Namespace *thiz, const char *name);
@@ -349,7 +349,8 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 		Ender_Remove remove,
 		Ender_Clear clear,
 		Ender_Is_Set is_set,
-		Eina_Bool relative);
+		Eina_Bool relative,
+		int offset);
 EAPI void ender_descriptor_property_list(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *thiz, const char *name);

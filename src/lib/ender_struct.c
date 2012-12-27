@@ -30,6 +30,8 @@ typedef void (*Ender_Value_Accessor)(Ender_Value *v, void *o);
 static Ender_Value_Accessor _setters[ENDER_PROPERTY_TYPES];
 static Ender_Value_Accessor _getters[ENDER_PROPERTY_TYPES];
 
+static size_t _ender_struct_size_get(Ender_Descriptor *d);
+
 /* just pick the last property */
 static void _ender_struct_property_get_last(Ender_Property *prop, void *data)
 {
@@ -242,14 +244,12 @@ static void _ender_struct_destructor(Ender_Descriptor *d, void *n)
 static Ender_Property * _ender_struct_property_add(Ender_Descriptor *d,
 		const char *name, Ender_Container *ec, Ender_Getter get,
 		Ender_Setter set, Ender_Add add, Ender_Remove remove,
-		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative)
+		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative,
+		int offset)
 {
 	Ender_Struct_Property *sprop;
 	Ender_Property *prop;
-	size_t size;
 
-	size = ender_descriptor_size_get(d);
-		
 	if (relative)
 	{
 		ERR("Structs do not support relative properties");
@@ -263,7 +263,12 @@ static Ender_Property * _ender_struct_property_add(Ender_Descriptor *d,
 	sprop->dprop.remove = remove;
 	sprop->dprop.clear = clear;
 	sprop->dprop.clear = clear;
-	sprop->offset = size;
+	/* in case the property does not have an offset, use the last
+	 * known size for it
+	 */
+	if (offset < 0)
+		offset = _ender_struct_size_get(d);
+	sprop->offset = offset;
 
 	prop = ender_property_new(name, ec,
 			get ? _property_ext_get : _property_get,

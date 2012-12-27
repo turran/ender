@@ -87,7 +87,8 @@ typedef Ender_Property * (*Ender_Descriptor_Property_Add)(Ender_Descriptor *d,
 		Ender_Container *ec, Ender_Getter get, Ender_Setter set,
 		Ender_Add add, Ender_Remove remove, Ender_Clear clear,
 		Ender_Is_Set is_set,
-		Eina_Bool relative);
+		Eina_Bool relative,
+		int offset);
 typedef size_t (*Ender_Descriptor_Size_Get)(Ender_Descriptor *d);
 
 typedef struct _Ender_Descriptor_Backend
@@ -102,6 +103,7 @@ typedef struct _Ender_Descriptor_Backend
 struct _Ender_Descriptor
 {
 	char *name;
+	int size;
 	Ender_Descriptor_Type type;
 	Ender_Descriptor *parent;
 	Ender_Creator create;
@@ -141,7 +143,8 @@ void ender_descriptor_shutdown(void);
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
 		Ender_Destructor destructor,
-		Ender_Descriptor *parent, Ender_Descriptor_Type type);
+		Ender_Descriptor *parent, Ender_Descriptor_Type type,
+		int size);
 void ender_descriptor_free(Ender_Descriptor *thiz);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
@@ -205,6 +208,9 @@ Eina_Bool ender_function_call(Ender_Function *thiz, void *o,
 		Ender_Value *ret, Eina_List *args);
 
 /* container */
+/* misc */
+char * ender_name_camelize(const char *name, Eina_Bool skip);
+char * ender_name_structify(const char *name);
 
 /* namespace */
 typedef void (*Ender_Namespace_Initialize)(Ender_Namespace *thiz, void *data);

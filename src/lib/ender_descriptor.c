@@ -344,7 +344,8 @@ void ender_descriptor_native_destroy(Ender_Descriptor *thiz, void *object)
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
 		Ender_Destructor destructor,
-		Ender_Descriptor *parent, Ender_Descriptor_Type type)
+		Ender_Descriptor *parent, Ender_Descriptor_Type type,
+		int size)
 {
 	Ender_Descriptor *thiz;
 
@@ -355,6 +356,7 @@ Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 
 	thiz = calloc(1, sizeof(Ender_Descriptor));
 	thiz->name = strdup(name);
+	thiz->size = size;
 	thiz->parent = parent;
 	thiz->type = type;
 	thiz->create = creator;
@@ -510,7 +512,8 @@ EAPI Ender_Descriptor * ender_descriptor_find_with_namespace(const char *name,
 EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
 		const char *name, Ender_Container *ec, Ender_Getter get,
 		Ender_Setter set, Ender_Add add, Ender_Remove remove,
-		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative)
+		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative,
+		int offset)
 {
 	Ender_Property *prop;
 
@@ -523,7 +526,7 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
 		return NULL;
 	}
 	prop = _backends[thiz->type].property_add(thiz, name, ec, get, set,
-			add, remove, clear, is_set, relative);
+			add, remove, clear, is_set, relative, offset);
 	if (!prop) return NULL;
 
 	eina_ordered_hash_add(thiz->properties, name, prop);
@@ -722,5 +725,8 @@ EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz)
  */
 EAPI size_t ender_descriptor_size_get(Ender_Descriptor *thiz)
 {
+	if (!thiz) return 0;
+	if (thiz->size > 0)
+		return thiz->size;
 	return _backends[thiz->type].size_get(thiz);
 }

@@ -23,6 +23,52 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+char * ender_name_camelize(const char *name, Eina_Bool skip)
+{
+	Eina_Bool upper = EINA_TRUE;
+	char *ret;
+	char *tmp;
+
+	if (!name) return NULL;
+	ret = tmp = calloc(1, strlen(name));
+	while (*name)
+	{
+		if (*name == '_')
+		{
+			upper = EINA_TRUE;
+			if (!skip)
+			{
+				*tmp = *name;
+			}
+			goto next;
+		}
+		if (upper)
+		{
+			if (isalpha(*name))
+			{
+				*tmp = toupper(*name);
+				upper = EINA_FALSE;
+			}
+			else
+			{
+				*tmp = *name;
+			}
+		}
+		else
+		{
+			*tmp = *name;
+		}
+next:			
+		name++;
+		tmp++;
+	}
+	return ret;
+}
+
+char * ender_name_structify(const char *name)
+{
+	return ender_name_camelize(name, EINA_FALSE);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -147,3 +193,5 @@ EAPI const char * ender_value_type_string_to(Ender_Value_Type type)
 		return "UNKNOWN";
 	}
 }
+
+

@@ -305,7 +305,7 @@ static Ender_Descriptor * _loader_descriptor_new(Ender_Library_Namespace *namesp
 		DBG("No destructor found");
 	}
 
-	desc = ender_namespace_descriptor_add(namespace->ns, alias ? alias : name, creator, destructor, parent, type);
+	desc = ender_namespace_descriptor_add(namespace->ns, alias ? alias : name, creator, destructor, parent, type, -1);
 	if (!desc) return NULL;
 	DBG("class %s,%s@%s registered correctly %p", name, alias, ns_name, desc);
 
@@ -473,7 +473,7 @@ static void _loader_add_property(void *data, Ender_Parser_Property *p)
 	}
 	ender_descriptor_property_add(edesc,
 			p->def.alias ? p->def.alias : p->def.name, container,
-			get, set, add, remove, clear, is_set, p->rel);
+			get, set, add, remove, clear, is_set, p->rel, -1);
 }
 
 static void _loader_add_function(void *data, Ender_Parser_Function *f)

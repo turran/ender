@@ -141,7 +141,7 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_UINT32);
 	prop = ender_descriptor_property_add(descriptor, "u32",
 			ec,
@@ -151,7 +151,7 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_DOUBLE);
 	prop = ender_descriptor_property_add(descriptor, "d",
 			ec,
@@ -161,7 +161,7 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_COLOR);
 	prop = ender_descriptor_property_add(descriptor, "color",
 			ec,
@@ -171,7 +171,7 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_STRING);
 	prop = ender_descriptor_property_add(descriptor, "s",
 			ec,
@@ -181,7 +181,7 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_ENDER);
 	prop = ender_descriptor_property_add(descriptor, "ender",
 			ec,
@@ -191,7 +191,7 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_MATRIX);
 	prop = ender_descriptor_property_add(descriptor, "matrix",
 			ec,
@@ -201,7 +201,7 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 }
 
 static void test01_struct_properties_register(Ender_Descriptor *descriptor)
@@ -219,7 +219,7 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_UINT32);
 	prop = ender_descriptor_property_add(descriptor, "u32",
 			ec,
@@ -229,7 +229,7 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_DOUBLE);
 	prop = ender_descriptor_property_add(descriptor, "d",
 			ec,
@@ -239,7 +239,7 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_COLOR);
 	prop = ender_descriptor_property_add(descriptor, "color",
 			ec,
@@ -249,7 +249,7 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_STRING);
 	prop = ender_descriptor_property_add(descriptor, "s",
 			ec,
@@ -259,7 +259,7 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_ENDER);
 	prop = ender_descriptor_property_add(descriptor, "ender",
 			ec,
@@ -269,7 +269,7 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_MATRIX);
 	prop = ender_descriptor_property_add(descriptor, "matrix",
 			ec,
@@ -279,7 +279,7 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			NULL,
-			EINA_FALSE);
+			EINA_FALSE, -1);
 }
 
 Eina_Bool test01_properties(Ender_Descriptor *desc)
@@ -331,7 +331,7 @@ static void test01_object_register(void)
 			ENDER_CREATOR(dummy_object_new),
 			ENDER_DESTRUCTOR(dummy_object_free),
 			NULL,
-			ENDER_TYPE_CLASS);
+			ENDER_TYPE_CLASS, -1);
 	test01_object_properties_register(descriptor);
 	test01_functions_register(descriptor);
 }
@@ -375,7 +375,7 @@ static void test01_struct_register(void)
 			NULL,
 			NULL,
 			NULL,
-			ENDER_TYPE_STRUCT);
+			ENDER_TYPE_STRUCT, -1);
 	test01_struct_properties_register(descriptor);
 	test01_functions_register(descriptor);
 }

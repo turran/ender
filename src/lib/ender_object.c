@@ -76,7 +76,8 @@ static void _ender_object_destructor(Ender_Descriptor *d, void *n)
 static Ender_Property * _ender_object_property_add(Ender_Descriptor *d,
 		const char *name, Ender_Container *ec, Ender_Getter get,
 		Ender_Setter set, Ender_Add add, Ender_Remove remove,
-		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative)
+		Ender_Clear clear, Ender_Is_Set is_set, Eina_Bool relative,
+		int offset)
 {
 	Ender_Descriptor_Property *dprop;
 	Ender_Property *prop;
