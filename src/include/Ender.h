@@ -19,7 +19,6 @@
 #define _ENDER_H
 
 #include <Eina.h>
-#include <Enesim.h>
 
 #ifdef EAPI
 # undef EAPI
@@ -207,11 +206,11 @@ EAPI uint64_t ender_value_uint64_get(const Ender_Value *value);
 EAPI void ender_value_double_set(Ender_Value *value, double d);
 EAPI double ender_value_double_get(const Ender_Value *value);
 
-EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb);
-EAPI Enesim_Argb ender_value_argb_get(const Ender_Value *value);
+EAPI void ender_value_argb_set(Ender_Value *value, uint32_t argb);
+EAPI uint32_t ender_value_argb_get(const Ender_Value *value);
 
-EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color argb);
-EAPI Enesim_Color ender_value_color_get(const Ender_Value *value);
+EAPI void ender_value_color_set(Ender_Value *value, uint32_t argb);
+EAPI uint32_t ender_value_color_get(const Ender_Value *value);
 
 EAPI void ender_value_string_set(Ender_Value *value, char * string);
 EAPI void ender_value_static_string_set(Ender_Value *value, const char * string);

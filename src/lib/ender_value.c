@@ -260,7 +260,7 @@ EAPI double ender_value_double_get(const Ender_Value *value)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb)
+EAPI void ender_value_argb_set(Ender_Value *value, uint32_t argb)
 {
 	if (value->container->type != ENDER_ARGB)
 		return;
@@ -271,7 +271,7 @@ EAPI void ender_value_argb_set(Ender_Value *value, Enesim_Argb argb)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Argb ender_value_argb_get(const Ender_Value *value)
+EAPI uint32_t ender_value_argb_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_ARGB)
 		return 0;
@@ -282,7 +282,7 @@ EAPI Enesim_Argb ender_value_argb_get(const Ender_Value *value)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color color)
+EAPI void ender_value_color_set(Ender_Value *value, uint32_t color)
 {
 	if (value->container->type != ENDER_COLOR)
 		return;
@@ -293,7 +293,7 @@ EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color color)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Color ender_value_color_get(const Ender_Value *value)
+EAPI uint32_t ender_value_color_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_COLOR)
 		return 0;

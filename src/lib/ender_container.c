@@ -554,7 +554,7 @@ EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint
 	if (thiz->contraint)
 		ender_constraint_free(thiz->constraint);
 #endif
-	thiz->contraint = c;
+	thiz->constraint = c;
 }
 
 /**

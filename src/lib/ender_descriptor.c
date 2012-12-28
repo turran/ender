@@ -494,7 +494,11 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
 	}
 	prop = _backends[thiz->type].property_add(thiz, name, ec, get, set,
 			add, remove, clear, is_set, relative, offset);
-	if (!prop) return NULL;
+	if (!prop)
+	{
+		ERR("Property '%s' can not be added on '%s'", name, thiz->name);
+		return NULL;
+	}
 
 	eina_ordered_hash_add(thiz->properties, name, prop);
 	DBG("Property '%s' of type '%s' added to '%s'", name,
