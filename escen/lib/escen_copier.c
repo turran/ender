@@ -442,7 +442,7 @@ static Eina_Bool _copy_union(Ender_Container *dst_cont,
 		else if (utype == ENDER_INT32)
 		{
 			uid = ender_value_int32_get(uvalue);
-			ender_container_compound_get_extended(dst_cont, uid, &ucont, NULL);
+			ucont = ender_container_compound_get(dst_cont, uid, NULL);
 		}
 
 		if (!ucont)
