@@ -1211,8 +1211,6 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
 	}
 }
 
-#if 0
-
 /**
  * To be documented
  * FIXME: To be fixed
@@ -1226,14 +1224,3 @@ EAPI void * ender_element_marshal(Ender_Element *e, unsigned int *len)
 	 * eet descriptor
 	 */
 }
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Ender_Element * ender_element_unmarshal(void *data, unsigned int len)
-{
-
-}
-
-#endif

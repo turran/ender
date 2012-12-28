@@ -314,6 +314,11 @@ void ender_descriptor_native_destroy(Ender_Descriptor *thiz, void *object)
 	_backends[thiz->type].destructor(thiz, object);
 }
 
+void * ender_descriptor_element_marshal(Ender_Descriptor *thiz,
+		Ender_Element *e, unsigned int *len)
+{
+
+}
 
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
@@ -686,6 +691,19 @@ EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *thiz)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI size_t ender_descriptor_size_get(Ender_Descriptor *thiz)
+{
+	if (!thiz) return 0;
+	if (thiz->size > 0)
+		return thiz->size;
+	return _backends[thiz->type].size_get(thiz);
+}
+
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz)
 {
 	return ender_namespace_element_new_from_descriptor(thiz->ns, thiz);
@@ -695,10 +713,8 @@ EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI size_t ender_descriptor_size_get(Ender_Descriptor *thiz)
+EAPI Ender_Element * ender_descriptor_element_unmarshal(Ender_Descriptor *thiz,
+		void *data, unsigned int len)
 {
-	if (!thiz) return 0;
-	if (thiz->size > 0)
-		return thiz->size;
-	return _backends[thiz->type].size_get(thiz);
+
 }

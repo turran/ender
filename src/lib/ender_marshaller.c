@@ -50,6 +50,10 @@ void ender_marshaller_shutdown(void)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
 		Eina_List *args)
 {
@@ -94,6 +98,10 @@ EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
 	return marshaller;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Marshaller ender_marshaller_find(Ender_Container *ret,
 		...)
 {
@@ -117,6 +125,10 @@ EAPI Ender_Marshaller ender_marshaller_find(Ender_Container *ret,
 }
 
 /* generic marshallers */
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Eina_Bool ender_marshaller_void__void(void *data, Ender_Accessor f,
 		Ender_Value *ret, Eina_List *args)
 {
@@ -128,6 +140,10 @@ EAPI Eina_Bool ender_marshaller_void__void(void *data, Ender_Accessor f,
 	return EINA_TRUE;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Eina_Bool ender_marshaller_string__string(void *data, Ender_Accessor f,
 		Ender_Value *ret, Eina_List *args)
 {

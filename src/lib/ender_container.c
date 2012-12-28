@@ -69,6 +69,33 @@ typedef struct _Ender_Container_Sub
 	size_t offset;
 } Ender_Container_Sub;
 
+typedef void * (*Ender_Container_Serializer)(Ender_Container *thiz,
+		const Ender_Value *v, unsigned int *len);
+typedef Ender_Value * (*Ender_Container_Unserializer)(Ender_Container *thiz,
+		void *data, unsigned int len);
+
+static Ender_Container_Serializer _serializer[ENDER_TYPES];
+static Ender_Container_Unserializer _unserializer[ENDER_TYPES];
+
+static _ender_container_add(Ender_Container *thiz, const char *name,
+		Ender_Container *s)
+{
+	Ender_Container_Sub *sub;
+
+	if (!thiz) return;
+	if (!s) return;
+
+	if (!ender_container_is_compound(thiz))
+		return;
+
+	sub = calloc(1, sizeof(Ender_Container_Sub));
+	if (name)
+		sub->name = strdup(name);
+	/* own the sub container */
+	sub->c = s;
+	thiz->elements = eina_list_append(thiz->elements, sub);
+}
+
 #ifdef BUILD_SERIALIZE
 static void _ender_container_serialize_add(Ender_Value_Type t)
 {
@@ -205,107 +232,6 @@ static void _ender_container_delete(Ender_Container *thiz)
 	}
 	free(thiz);
 }
-
-static void _ender_container_list_add(Ender_Container *thiz, const char *name,
-		Ender_Container_Sub *sub)
-{
-	/* for list type, only limit the number
-	 * of child to one  */
-	if (thiz->elements)
-	{
-		if (sub->name)
-			free(sub->name);
-		free(sub);
-		return;
-	}
-
-	thiz->elements = eina_list_append(thiz->elements, sub);
-	sub->offset = 0;
-#if BUILD_SERIALIZE
-#if 0
-	switch (sub->c->type)
-	{
-		case ENDER_BOOL:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "bool", data.i32, EET_T_CHAR);
-		break;
-
-		case ENDER_UINT32:
-		case ENDER_COLOR:
-		case ENDER_ARGB:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint32", data.i32, EET_T_UINT);
-		break;
-
-		case ENDER_INT32:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int32", data.i32, EET_T_INT);
-		break;
-
-		case ENDER_UINT64:
-		/* for this we need an id */
-		case ENDER_OBJECT:
-		case ENDER_ENDER:
-		case ENDER_POINTER:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint64", data.u64, EET_T_ULONG_LONG);
-		break;
-
-		case ENDER_INT64:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "int64", data.i64, EET_T_LONG_LONG);
-		break;
-
-		case ENDER_DOUBLE:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "d", data.d, EET_T_DOUBLE);
-		break;
-
-		case ENDER_STRING:
-		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "s", data.d, EET_T_INLINED_STRING);
-		break;
-
-		/* the compound sub types will be added on its own function */
-		case ENDER_STRUCT:
-		case ENDER_UNION:
-		EET_DATA_DESCRIPTOR_ADD_LIST(thiz->edd, Ender_Value, "list", data.ptr, sub->c->compound);
-		break;
-
-		case ENDER_LIST:
-		case ENDER_VALUE:
-		ERR("value not supported yet");
-		break;
-	}
-#endif
-#endif
-}
-
-static void _ender_container_union_add(Ender_Container *thiz, const char *name,
-		Ender_Container_Sub *sub)
-{
-	thiz->elements = eina_list_append(thiz->elements, sub);
-	/* always leave 4 bytes for the integer type */
-	sub->offset = 4;
-#if BUILD_SERIALIZE
-#endif
-}
-
-static void _ender_container_struct_add(Ender_Container *thiz, const char *name,
-		Ender_Container_Sub *sub)
-{
-	ssize_t prev_offset = 0;
-	size_t prev_size = 0;
-
-	if (thiz->elements)
-	{
-		Ender_Container_Sub *prev;
-
-		prev = eina_list_data_get(eina_list_last(thiz->elements));
-		prev_offset = prev->offset;
-		prev_size = ender_container_size_get(prev->c);
-	}
-	thiz->elements = eina_list_append(thiz->elements, sub);
-	sub->offset = prev_offset + prev_size;
-#if BUILD_SERIALIZE
-	/* destroy the old definition and create a new one */
-	/* replace the descriptor sub with this one */
-	//EET_DATA_DESCRIPTOR_ADD_SUB(edd, struct_type, name, member, subtype);
-#endif
-}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -333,7 +259,7 @@ EAPI Ender_Container * ender_container_list_new(Ender_Container *child)
 	Ender_Container *thiz;
 
 	thiz = _ender_container_new(ENDER_LIST);
-	ender_container_add(thiz, "data", child);
+	_ender_container_add(thiz, "data", child);
 	return thiz;
 }
 
@@ -517,28 +443,6 @@ EAPI unsigned int ender_container_compound_count(Ender_Container *ec)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_container_add(Ender_Container *thiz, const char *name, Ender_Container *s)
-{
-	Ender_Container_Sub *sub;
-
-	if (!thiz) return;
-	if (!s) return;
-
-	if (!ender_container_is_compound(thiz))
-		return;
-
-	sub = calloc(1, sizeof(Ender_Container_Sub));
-	if (name)
-		sub->name = strdup(name);
-	/* own the sub container */
-	sub->c = s;
-	thiz->elements = eina_list_append(thiz->elements, sub);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
 {
 	return c->type;
@@ -596,16 +500,36 @@ EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Val
 		/* for external objects, fetch it into a local var
 		 * then call the callback and set it on the value
 		 */
-		case ENDER_OBJECT:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
+		case ENDER_LIST:
+		ERR("Marshaling of type %s is not supported yet",
+				ender_value_type_string_to(thiz->type));
+		break;
 
 		/* for structs/unions allocate the needed size and assign it to the void * */
 		/* for lists, iterate over each element on the array and add it to the list, then assign the
 		 * the list to the void * */
-		case ENDER_LIST:
+		case ENDER_OBJECT:
 		case ENDER_STRUCT:
 		case ENDER_UNION:
+		{
+			const Ender_Constraint *c;
+
+			c = ender_container_constraint_get(thiz);
+			if ((!c) || (ender_constraint_type_get(c) !=
+					ENDER_CONSTRAINT_DESCRIPTOR))
+			{
+				ERR("For type %s we need a descriptor "
+						"constraint or we can not "
+						"identify the members",
+						ender_value_type_string_to(
+						thiz->type));
+				break;
+			}
+			/* now marshal the native object */
+			
+		}
 		break;
 	}
 	return data;

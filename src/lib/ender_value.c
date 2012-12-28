@@ -114,17 +114,11 @@ EAPI Ender_Value * ender_value_new_container_static_from(Ender_Container *ec)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type)
+EAPI Ender_Value * ender_value_list_new(Ender_Container *child)
 {
 	Ender_Container *ec;
-	Ender_Container *sub;
 
-	ec = ender_container_new(ENDER_LIST);
-#if 0
-	sub = ender_container_new(child_type);
-	ender_container_add(ec, NULL, sub);
-#endif
-
+	ec = ender_container_list_new(child);
 	return _ender_value_new(ec);
 }
 

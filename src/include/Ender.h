@@ -162,7 +162,6 @@ EAPI Ender_Container * ender_container_compound_get_by_name(Ender_Container *ec,
 EAPI size_t ender_container_size_get(Ender_Container *ec);
 
 EAPI unsigned int ender_container_compound_count(Ender_Container *ec);
-EAPI void ender_container_add(Ender_Container *ec, const char *name, Ender_Container *sub);
 EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
 
 EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint *c);
@@ -180,7 +179,7 @@ EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *c, void *dat
 typedef void (*Ender_Value_Free)(Ender_Value *value, void *data);
 
 EAPI Ender_Value * ender_value_basic_new(Ender_Value_Type type);
-EAPI Ender_Value * ender_value_list_new(Ender_Value_Type child_type);
+EAPI Ender_Value * ender_value_list_new(Ender_Container *child);
 EAPI Ender_Value * ender_value_new_container_from(Ender_Container *container);
 EAPI Ender_Value * ender_value_new_container_static_from(Ender_Container *ec);
 EAPI Ender_Container * ender_value_container_get(const Ender_Value *value);

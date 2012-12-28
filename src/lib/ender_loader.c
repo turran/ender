@@ -316,11 +316,11 @@ static Ender_Container * _loader_get_container(Ender_Loader *thiz,
 		Ender_Parser_Container *c)
 {
 	Ender_Container *ret = NULL;
-	Ender_Parser_Container *spc;
 	Eina_List *l;
 
 	if (!c) return NULL;
 
+	/* the defined works only on structs/unions/objects */
 	if (c->defined)
 	{
 		Ender_Descriptor *d;
@@ -341,18 +341,26 @@ static Ender_Container * _loader_get_container(Ender_Loader *thiz,
 	}
 	else
 	{
-		ret = ender_container_new(c->type);
+		if (c->type == ENDER_LIST)
+		{
+			Ender_Container *sc;
+			Ender_Parser_Container *spc;
+
+			if (!c->subcontainers)
+			{
+				ERR("List without a subcontainer");
+				return NULL;
+			}
+			spc = c->subcontainers->data;
+			sc = _loader_get_container(thiz, spc);
+			ret = ender_container_list_new(sc);
+		}
+		else
+		{
+			ret = ender_container_new(c->type);
+		}
 	}
 
-	if (!ret) return NULL;
-
-	EINA_LIST_FOREACH (c->subcontainers, l, spc)
-	{
-		Ender_Container *sc;
-
-		sc = _loader_get_container(thiz, spc);
-		ender_container_add(ret, NULL, sc);
-	}
 	return ret;
 }
 /*----------------------------------------------------------------------------*
