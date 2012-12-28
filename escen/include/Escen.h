@@ -2,9 +2,7 @@
 #define _ESCEN_H
 
 #include <Eina.h>
-#include <Enesim.h>
 #include <Etch.h>
-#include <Emage.h>
 #include <Ender.h>
 
 #ifdef EAPI
@@ -39,7 +37,7 @@
  *
  * @section dependencies Dependencies
  * - Eina
- * - Enesim
+ * - Etch
  *
  * @file
  * @brief Escen API
@@ -58,8 +56,6 @@ typedef struct _Escen_Animation Escen_Animation;
 typedef struct _Escen_Animation_Key Escen_Animation_Key;
 typedef struct _Escen_Script Escen_Script;
 
-typedef Enesim_Surface * (*Escen_Surface_Loader)(const char *file);
-typedef Enesim_Surface * (*Escen_Surface_Creator)(int w, int h);
 typedef void (*Escen_Instance_New_Callback)(Escen_Instance *eei, void *data);
 /**
  * @defgroup Escen_Core Core
@@ -71,11 +67,6 @@ EAPI void escen_version(unsigned int *major, unsigned int *minor, unsigned int *
 
 EAPI Escen * escen_new(void);
 EAPI void escen_delete(Escen *e);
-EAPI void escen_surface_path_append(Escen *e, const char *path);
-EAPI void escen_surface_loader_set(Escen *e, Escen_Surface_Loader loader);
-EAPI void escen_surface_creator_set(Escen *e, Escen_Surface_Creator creator);
-EAPI Enesim_Surface * escen_surface_default_loader(const char *file);
-EAPI Enesim_Surface * escen_surface_default_creator(int w, int h);
 
 EAPI void escen_fps_set(Escen *e, unsigned int fps);
 EAPI unsigned int escen_fps_get(Escen *e);

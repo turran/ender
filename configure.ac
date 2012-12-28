@@ -25,6 +25,9 @@ LT_INIT([win32-dll])
 version_info="lt_cur:lt_rev:lt_age"
 AC_SUBST([version_info])
 
+AC_DEFINE_UNQUOTED([VERSION_MAJOR], [v_maj], [Major version])
+AC_DEFINE_UNQUOTED([VERSION_MINOR], [v_min], [Minor version])
+AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 
 ### Needed information
 
@@ -32,6 +35,7 @@ AC_CANONICAL_HOST
 
 have_win32="no"
 ENDER_BUILD=""
+ESCEN_BUILD=""
 case "$host_os" in
    mingw*)
       ENDER_BUILD="-DENDER_BUILD"
@@ -40,6 +44,7 @@ case "$host_os" in
    ;;
 esac
 AC_SUBST([ENDER_BUILD])
+AC_SUBST([ESCEN_BUILD])
 
 AM_CONDITIONAL([HAVE_WIN32], [test "x${have_win32}" = "xyes"])
 

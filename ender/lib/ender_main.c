@@ -95,3 +95,15 @@ EAPI void ender_shutdown(void)
 	}
 	_init--;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *micro)
+{
+	if (major) *major = VERSION_MAJOR;
+	if (minor) *minor = VERSION_MINOR;
+	if (micro) *micro = VERSION_MICRO;
+}
+

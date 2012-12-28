@@ -48,48 +48,11 @@ struct _Escen
 	char *version;
 	unsigned int fps;
 	Eina_Ordered_Hash *enders;
-	Escen_Surface_Loader loader;
-	Escen_Surface_Creator creator;
 	Eina_Array *paths;
 };
 
 static Eina_Hash *_image_cache = NULL;
 
-Enesim_Surface * enesim_surface_load(Escen *e, const char *file)
-{
-	Enesim_Surface *s = NULL;
-
-	/* check if it is relative */
-	if (*file == '/')
-	{
-		s = e->loader(file);
-	}
-	/* try to find the file on every path */
-	else
-	{
-		Eina_Iterator *iter;
-		char *path;
-
-		iter = eina_array_iterator_new(e->paths);
-		while (eina_iterator_next(iter, (void **)&path))
-		{
-			char realfile[PATH_MAX];
-			struct stat st;
-
-			snprintf(realfile, PATH_MAX, "%s/%s", path, file);
-			//printf("trying %s\n", realfile);
-			if (!stat(realfile, &st))
-			{
-				s = e->loader(realfile);
-				if (s) break;
-			}
-		}
-		eina_iterator_free(iter);
-	}
-	/* TODO add the surface to the cache */
-	//printf("ret = %d %p\n", ret, s);
-	return s;
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -104,8 +67,6 @@ EAPI Escen * escen_new(void)
 	e = calloc(1, sizeof(Escen));
 	e->fps = 30;
 	e->enders = eina_ordered_hash_new(NULL);
-	e->loader = escen_surface_default_loader;
-	e->creator = escen_surface_default_creator;
 	e->paths = eina_array_new(1);
 
 	return e;
@@ -152,56 +113,6 @@ EAPI unsigned int escen_fps_get(Escen *e)
 EAPI void escen_surface_path_append(Escen *e, const char *path)
 {
 	eina_array_push(e->paths, strdup(path));
-}
-
-/**
- * TODO we should be able to make the application developer use their own
- * image loader but also provide an emage one
- *
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Surface * escen_surface_default_loader(const char *file)
-{
-	Enesim_Surface *s = NULL;
-	Eina_Bool ret;
-
-	printf("loading surface %s\n", file);
-	ret = emage_file_load(file, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL);
-	if (!ret) return NULL;
-
-	return s;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Surface * escen_surface_default_creator(int w, int h)
-{
-	printf("%s TODO\n", __FILE__);
-	return NULL;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void escen_surface_loader_set(Escen *e, Escen_Surface_Loader loader)
-{
-	if (!e) return;
-	e->loader = loader;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void escen_surface_creator_set(Escen *e, Escen_Surface_Creator creator)
-{
-	if (!e) return;
-	e->creator = creator;
-
 }
 
 /**

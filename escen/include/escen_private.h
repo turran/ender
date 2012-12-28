@@ -48,7 +48,6 @@ extern Escen_Scriptor escen_scriptor_neko;
 #endif
 
 /* escen_main */
-Enesim_Surface * enesim_surface_load(Escen *e, const char *file);
 /* escen_animation */
 void escen_animation_instance_set(Escen_Animation *ea, Escen_Instance *eei,
 		Etch_Time time);
@@ -79,7 +78,7 @@ void escen_instance_animation_instance_add(Escen_Instance *ei, Escen_Animation_I
 Escen_State * escen_state_new(Escen_Ender *ee, const char *name);
 
 /* escen_misc */
-Enesim_Argb enesim_color_lut_get(const char *name);
+//Enesim_Argb enesim_color_lut_get(const char *name);
 void escen_misc_init(void);
 
 /* escen_script */

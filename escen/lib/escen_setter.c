@@ -56,19 +56,7 @@ void escen_setter_instance_set(Escen_Setter *thiz, Escen_Instance *eei)
 		return;
 	}
 
-	/* handle the surface case */
-	if (ptype == ENDER_SURFACE)
-	{
-		Enesim_Surface *s;
-
-		s = enesim_surface_load(e, ender_value_string_get(value));
-		if (s)
-			ender_element_property_value_set(ender, property, s, NULL);
-	}
-	else
-	{
-		ender_element_property_value_set_simple(ender, property, value);
-	}
+	ender_element_property_value_set_simple(ender, property, value);
 	ender_value_unref(value);
 }
 /*============================================================================*

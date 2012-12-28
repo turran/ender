@@ -12,6 +12,6 @@ if BUILD_SCRIPT_NEKO
 
 SUBDIRS += neko
 
-libescen_script_la_LIBADD += $(top_builddir)/src/lib/script/neko/libescen_script_neko.la
+libescen_script_la_LIBADD += $(top_builddir)/escen/lib/script/neko/libescen_script_neko.la
 
 endif

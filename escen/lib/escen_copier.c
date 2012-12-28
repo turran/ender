@@ -56,7 +56,7 @@ static void _parsed_value_set(Ender_Container *src_c, Ender_Value *v, void *data
 		break;
 
 		case ENDER_COLOR:
-		*(Enesim_Color *)data = ender_value_argb_get(v);
+		*(uint32_t *)data = ender_value_argb_get(v);
 		break;
 
 		case ENDER_STRING:
@@ -64,7 +64,7 @@ static void _parsed_value_set(Ender_Container *src_c, Ender_Value *v, void *data
 		break;
 
 		case ENDER_ARGB:
-		*(Enesim_Argb *)data = ender_value_argb_get(v);
+		*(uint32_t *)data = ender_value_argb_get(v);
 		break;
 
 		case ENDER_BOOL:
@@ -97,8 +97,6 @@ static void _parsed_value_set(Ender_Container *src_c, Ender_Value *v, void *data
 		*(Ender_Element **)data = ender_value_ender_get(v);
 		break;
 
-		case ENDER_SURFACE:
-		case ENDER_MATRIX:
 		default:
 		printf("UNSUPPORTED TYPE\n");
 		break;
@@ -137,7 +135,7 @@ static Eina_Bool _struct_from_list(Eina_List *l,
 			printf("Empty value??\n");
 			break;
 		}
-		sc = ender_container_compound_get(dst_cont, i);
+		sc = ender_container_compound_get(dst_cont, i, NULL);
 		st = ender_container_type_get(sc);
 		lt = ender_value_type_get(lv);
 
@@ -309,56 +307,6 @@ static Eina_Bool _copy_double(Ender_Container *dst_cont,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _copy_matrix(Ender_Container *dst_cont,
-		Ender_Value **dst, Ender_Value *src,
-		Ender_Value_Type src_type)
-{
-	*dst = ender_value_new_container_from(dst_cont);
-	switch (src_type)
-	{
-		case ENDER_MATRIX:
-		*dst = ender_value_ref(src);
-		break;
-
-		default:
-		return EINA_FALSE;
-	}
-	return EINA_TRUE;
-}
-
-static Eina_Bool _copy_surface(Ender_Container *dst_cont,
-		Ender_Value **dst, Ender_Value *src,
-		Ender_Value_Type src_type)
-{
-	switch (src_type)
-	{
-		case ENDER_SURFACE:
-		*dst = ender_value_ref(src);
-		break;
-
-		case ENDER_STRING:
-		*dst = ender_value_basic_new(ENDER_STRING);
-		ender_value_static_string_set(*dst, ender_value_string_get(src));
-		break;
-
-		/* TODO render the renderer into a surface */
-		case ENDER_OBJECT:
-		return EINA_FALSE;
-
-		/* TODO render the ender into a surface */
-		case ENDER_ENDER:
-		return EINA_FALSE;
-
-		/* TODO here we should handle to receive an escen too */
-		case ENDER_POINTER:
-		return EINA_FALSE;
-
-		default:
-		return EINA_FALSE;
-	}
-	return EINA_TRUE;
-}
-
 static Eina_Bool _copy_string(Ender_Container *dst_cont,
 		Ender_Value **dst, Ender_Value *src,
 		Ender_Value_Type src_type)
@@ -412,21 +360,21 @@ static Eina_Bool _copy_object(Ender_Container *dst_cont,
 	Ender_Element *e;
 	Escen_Ender *ee;
 	Escen_Instance *ei;
-	Enesim_Renderer *r;
+	void *native;
 
 	switch (src_type)
 	{
 		case ENDER_ENDER:
 		*dst = ender_value_basic_new(ENDER_OBJECT);
 		e = ender_value_ender_get(src);
-		r = ender_element_object_get(e);
-		ender_value_object_set(*dst, r);
+		native = ender_element_object_get(e);
+		ender_value_object_set(*dst, native);
 		break;
 
 		case ENDER_OBJECT:
 		*dst = ender_value_basic_new(ENDER_OBJECT);
-		r = ender_value_object_get(src);
-		ender_value_object_set(*dst, r);
+		native = ender_value_object_get(src);
+		ender_value_object_set(*dst, native);
 		break;
 
 		/* here we assume the pointer is an escen ender */
@@ -435,8 +383,8 @@ static Eina_Bool _copy_object(Ender_Container *dst_cont,
 		ee = ender_value_pointer_get(src);
 		ei = escen_instance_new(ee, EINA_TRUE);
 		e = escen_instance_ender_get(ei);
-		r = ender_element_object_get(e);
-		ender_value_object_set(*dst, r);
+		native = ender_element_object_get(e);
+		ender_value_object_set(*dst, native);
 		break;
 
 		default:
@@ -610,10 +558,9 @@ static Eina_Bool _copy_list(Ender_Container *dst_cont,
 	}
 #endif
 
-	lc = ender_container_compound_get(dst_cont, 0);
+	lc = ender_container_compound_get(dst_cont, 0, NULL);
 	s = ender_container_size_get(lc);
-	lt = ender_container_type_get(lc);
-	*dst = ender_value_list_new(lt);
+	*dst = ender_value_list_new(lc);
 
 	l = (Eina_List *)ender_value_list_get(src);
 	EINA_LIST_FOREACH(l, ll, lv)
@@ -705,9 +652,7 @@ void escen_copier_init(void)
 	_copiers[ENDER_ARGB] = _copy_argb;
 	_copiers[ENDER_COLOR] = _copy_color;
 	_copiers[ENDER_STRING] = _copy_string;
-	_copiers[ENDER_MATRIX] = _copy_matrix;
 	_copiers[ENDER_OBJECT] = _copy_object;
-	_copiers[ENDER_SURFACE] = _copy_surface;
 	_copiers[ENDER_ENDER] = _copy_ender;
 	_copiers[ENDER_LIST] = _copy_list;
 	_copiers[ENDER_STRUCT] = _copy_struct;

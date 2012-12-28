@@ -43,7 +43,6 @@ void escen_error(void *data, void *scanner, Escen_Parser *parser, const char *st
 	Ender_Descriptor *edesc;
 	Escen_Ender *ed;
 	Eina_List *list;
-	Enesim_Matrix m;
 	Escen_Time time;
 	Etch_Interpolator_Type atype;
 	Eina_Bool boolean;
@@ -95,15 +94,7 @@ void escen_error(void *data, void *scanner, Escen_Parser *parser, const char *st
 /* escen related tokens */
 %token ESCEN
 
-%type <m> rotate
-%type <m> rotate_values
-%type <m> translate
-%type <m> scale
-%type <m> matrix
-%type <m> quad
 %type <value> value
-%type <m> transformation
-%type <list> transformation_list
 %type <list> state_inherit_list
 %type <list> state_inherit
 %type <ed> ender
@@ -450,89 +441,6 @@ animate_keys
 	}
 	;
 
-rotate
-	: ROTATE '(' rotate_values ')' { $$ = $3; }
-	;
-
-rotate_values
-	: NUMBER
-	{
-		enesim_matrix_rotate(&$$, $1);
-	}
-	| NUMBER ',' NUMBER ',' NUMBER
-	{
-		Enesim_Matrix m;
-
-		enesim_matrix_translate(&m, $3, $5);
-		enesim_matrix_rotate(&$$, $1);
-		enesim_matrix_compose(&m, &$$, &$$);
-		enesim_matrix_translate(&m, -$3, -$5);
-		enesim_matrix_compose(&$$, &m, &$$);
-	}
-	;
-
-translate
-	: TRANSLATE '(' NUMBER ',' NUMBER ')'
-	{
-		enesim_matrix_translate(&$$, $3, $5);
-	}
-
-scale
-	: SCALE '(' NUMBER ',' NUMBER ')'
-	{
-		enesim_matrix_scale(&$$, $3, $5);
-	}
-	;
-
-matrix
-	: MATRIX '(' NUMBER ',' NUMBER ',' NUMBER ','
-	NUMBER ',' NUMBER ',' NUMBER ','
-	NUMBER ',' NUMBER ',' NUMBER ')'
-	{
-		enesim_matrix_values_set(&$$, $3, $5, $7, $9, $11, $13, $15, $17, $19);
-	}
-
-quad
-	: QUAD '(' NUMBER ',' NUMBER ',' NUMBER ',' NUMBER ','
-	NUMBER ',' NUMBER ',' NUMBER ',' NUMBER ','
-	NUMBER ',' NUMBER ',' NUMBER ',' NUMBER ','
-	NUMBER ',' NUMBER ',' NUMBER ',' NUMBER ')'
-	{
-		Enesim_Quad q0, q1;
-
-		enesim_quad_coords_set(&q0, $3, $5, $7, $9, $11, $13, $15, $17);
-		enesim_quad_coords_set(&q1, $19, $21, $23, $25, $27, $29, $31, $33);
-		enesim_matrix_quad_quad_to(&$$, &q1, &q0);
-	}
-
-transformation_list
-	: transformation
-	{
-		Enesim_Matrix *m;
-
-		m = malloc(sizeof(Enesim_Matrix));
-		*m = $1;
-		$$ = eina_list_prepend(NULL, m);
-	}
-	| transformation ',' transformation_list
-	{
-		Enesim_Matrix *m;
-
-		m = malloc(sizeof(Enesim_Matrix));
-		*m = $1;
-		$$ = eina_list_prepend($3, m);
-	}
-	;
-
-
-transformation
-	: rotate { $$ = $1; }
-	| translate { $$ = $1; }
-	| scale { $$ = $1; }
-	| matrix { $$ = $1; }
-	| quad { $$ = $1; }
-	;
-
 struct
 	: '{' value_list '}'
 	{
@@ -587,22 +495,6 @@ value
 	| struct
 	{
 		$$ = $1;
-	}
-	| transformation_list
-	{
-		Enesim_Matrix m;
-		Enesim_Matrix *pm;
-		Eina_List *l, *l_next;
-
-		enesim_matrix_identity(&m);
-		EINA_LIST_FOREACH_SAFE($1, l, l_next, pm)
-		{
-			enesim_matrix_compose(&m, pm, &m);
-			free(pm);
-			$1 = eina_list_remove_list($1, l);
-		}
-		$$ = ender_value_basic_new(ENDER_MATRIX);
-		ender_value_static_matrix_set($$, &m);
 	}
 	;
 

@@ -27,7 +27,7 @@ static void _color_lut_generate(Eina_Hash **lut)
 	typedef struct _Escen_Color_Entry
 	{
 		const char *name;
-		Enesim_Color color;
+		uint32_t color;
 	} Escen_Color_Entry;
 
 	Escen_Color_Entry colors[] = {
@@ -184,9 +184,9 @@ static void _color_lut_generate(Eina_Hash **lut)
 	*lut = eina_hash_string_superfast_new(NULL);
 	for (i = 0; i < sizeof(colors) / sizeof(Escen_Color_Entry); i++)
 	{
-		Enesim_Color *color;
+		uint32_t *color;
 
-		color = malloc(sizeof(Enesim_Color));
+		color = malloc(sizeof(uint32_t));
 		*color = colors[i].color;
 		eina_hash_add(*lut, colors[i].name, color);
 	}
@@ -194,9 +194,9 @@ static void _color_lut_generate(Eina_Hash **lut)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Argb enesim_color_lut_get(const char *name)
+uint32_t enesim_color_lut_get(const char *name)
 {
-	Enesim_Argb *argb;
+	uint32_t *argb;
 
 	argb = eina_hash_find(_color_lut, name);
 	if (!argb) return 0xff000000;

@@ -38,7 +38,7 @@ escen_script.c \
 escen_scriptor.c \
 escen_state.c
 
-libescen_la_LIBADD = $(top_builddir)/src/lib/script/libescen_script.la \
+libescen_la_LIBADD = $(top_builddir)/escen/lib/script/libescen_script.la \
 @ESCEN_LIBS@ \
 @LEXLIB@
 libescen_la_LDFLAGS = -no-undefined -version-info @version_info@

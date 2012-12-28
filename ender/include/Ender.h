@@ -141,6 +141,7 @@ typedef enum _Ender_Property_Flag
  */
 EAPI void ender_init(void);
 EAPI void ender_shutdown(void);
+EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *micro);
 
 /**
  * @}

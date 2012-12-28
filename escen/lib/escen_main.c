@@ -40,9 +40,8 @@ EAPI void escen_init(void)
 		escen_log_dom = eina_log_domain_register("escen", NULL);
 		escen_copier_init();
 		escen_misc_init();
-		ender_init(NULL, NULL);
+		ender_init();
 		etch_init();
-		emage_init();
 		/* TODO get the variable from the environment */
 		escen_scriptor_init();
 		/* setup the copiers */
@@ -58,7 +57,6 @@ EAPI void escen_shutdown(void)
 	if (!_init == 1)
 	{
 		escen_scriptor_shutdown();
-		emage_shutdown();
 		etch_shutdown();
 		ender_shutdown();
 		eina_log_domain_unregister(escen_log_dom);

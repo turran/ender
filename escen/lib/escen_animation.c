@@ -69,9 +69,7 @@ static void _etch_data_from_ender_value(Etch_Data *d, Etch_Data_Type type, Ender
 		case ENDER_STRING:
 		break;
 
-		case ENDER_MATRIX:
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_LIST:
 		case ENDER_STRUCT:
@@ -96,7 +94,7 @@ static void _animation_callback(Etch_Animation_Keyframe *k,
 	element = escen_instance_ender_get(eai->eei);
 	if (ender_property_type_get(eai->property) == ENDER_COLOR)
 	{
-		Enesim_Color color;
+		uint32_t color;
 
 		color = enesim_color_argb_from(curr->data.u32);
 		ender_element_property_value_set(element, eai->property, color, NULL);
@@ -178,9 +176,7 @@ void escen_animation_instance_set(Escen_Animation *ea, Escen_Instance *eei,
 		dtype = ETCH_STRING;
 		break;
 
-		case ENDER_MATRIX:
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_LIST:
 		case ENDER_STRUCT:
