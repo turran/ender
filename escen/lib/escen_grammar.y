@@ -84,11 +84,6 @@ void escen_error(void *data, void *scanner, Escen_Parser *parser, const char *st
 %token <s> T_WORD
 %token <s> STRING
 %token <d> NUMBER
-%token ROTATE
-%token TRANSLATE
-%token SCALE
-%token MATRIX
-%token QUAD
 %token <boolean> T_TRUE
 %token <boolean> T_FALSE
 /* escen related tokens */

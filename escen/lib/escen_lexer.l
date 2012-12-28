@@ -81,11 +81,6 @@ CUBIC			{
 script			return SCRIPT;
 
 escen			return ESCEN;
-rotate			return ROTATE;
-translate		return TRANSLATE;
-scale			return SCALE;
-matrix			return MATRIX;
-quad			return QUAD;
 
 0[xX][a-fA-F0-9]+ {
 	yylval_param->d = strtod(yytext, NULL);
