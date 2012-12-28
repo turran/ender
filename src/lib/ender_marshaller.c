@@ -85,7 +85,7 @@ EAPI Ender_Marshaller ender_marshaller_find_list(Ender_Container *ret,
 		strcat(name, "_");
 		_ender_marshaller_arg_append(name, arg);
 	}
-	DBG("Looking for %s %p\n", name, marshaller);
+	DBG("Looking for %s %p", name, marshaller);
 	marshaller = eina_hash_find(_marshallers, name);
 	if (!marshaller)
 	{

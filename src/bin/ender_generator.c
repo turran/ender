@@ -179,7 +179,6 @@ static void _generator_add_native(void *data, const char *name, const char *alia
 		Ender_Descriptor_Type type, const char *parent)
 {
 	Ender_Generator *thiz;
-	const char *real_parent = NULL;
 	const char *real_creator = NULL;
 	const char *real_size = NULL;
 	char creator[PATH_MAX] = { 0 };
@@ -239,11 +238,10 @@ static void _generator_add_native(void *data, const char *name, const char *alia
 	}
 	fprintf(thiz->out, "\td = ender_namespace_descriptor_add(ns, \"%s\", "
 			"ENDER_CREATOR(%s), ENDER_DESTRUCTOR(_%s_%s_delete), "
-			"%s, ENDER_TYPE_%s, %s);\n",
+			"parent, ENDER_TYPE_%s, %s);\n",
 			alias ? alias : name,
 			real_creator ? real_creator : "NULL",
 			thiz->ns_name, name,
-			real_parent ? real_parent : "NULL",
 			ender_descriptor_type_string_to(type),
 			real_size ? real_size : "-1");
 	fprintf(thiz->out, "\tif (!d) return;\n");
