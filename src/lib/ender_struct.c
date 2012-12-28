@@ -86,23 +86,6 @@ static void _ender_double_set(Ender_Value *v, void *o)
 	*(double *)o = v->data.d;
 }
 /*----------------------------------------------------------------------------*
- *                                   matrix                                   *
- *----------------------------------------------------------------------------*/
-/* the matrix case is different and might be similar to the struct case
- * basically you just pass a pointer for both the get/set, the values are
- * *copied* so you need to have the requested alloced data in the ender value
- */
-static void _ender_matrix_get(Ender_Value *v, void *o)
-{
-	v->data.matrix = *(Enesim_Matrix *)o;
-}
-
-/* used for string, surface, struct, matrix, object */
-static void _ender_matrix_set(Ender_Value *v, void *o)
-{
-	v->data.matrix = *(Enesim_Matrix *)o = v->data.matrix;
-}
-/*----------------------------------------------------------------------------*
  *                                  pointer                                   *
  *----------------------------------------------------------------------------*/
 /* used for known pointers: struct, unions, etc */
@@ -111,7 +94,7 @@ static void _ender_pointer_get(Ender_Value *v, void *o)
 	v->data.ptr = *(void **)o;
 }
 
-/* used for string, surface, struct, union, object */
+/* used for string, struct, union, object */
 static void _ender_pointer_set(Ender_Value *v, void *o)
 {
 	*(void **)o = v->data.ptr;
@@ -119,7 +102,7 @@ static void _ender_pointer_set(Ender_Value *v, void *o)
 /*----------------------------------------------------------------------------*
  *                                 objects                                    *
  *----------------------------------------------------------------------------*/
-/* valid for every object: surface, ender, object, etc ... */
+/* valid for every object: ender, object, etc ... */
 static void _ender_object_get(Ender_Value *v, void *o)
 {
 	v->data.ptr = *(void **)o;
@@ -334,9 +317,7 @@ void ender_struct_init(void)
 	_setters[ENDER_ARGB] = _ender_int32_set;
 	_setters[ENDER_COLOR] = _ender_int32_set;
 	_setters[ENDER_STRING] = _ender_pointer_set;
-	_setters[ENDER_MATRIX] = _ender_pointer_set;
 	_setters[ENDER_OBJECT] = _ender_object_set;
-	_setters[ENDER_SURFACE] = _ender_object_set;
 	_setters[ENDER_ENDER] = _ender_object_set;
 	_setters[ENDER_LIST] = _ender_pointer_set;
 	_setters[ENDER_STRUCT] = _ender_pointer_set;
@@ -351,12 +332,9 @@ void ender_struct_init(void)
 	_getters[ENDER_ARGB] = _ender_int32_get;
 	_getters[ENDER_COLOR] = _ender_int32_get;
 	_getters[ENDER_STRING] = _ender_object_get;
-	/* the special matrix case */
-	_getters[ENDER_MATRIX] = _ender_matrix_get;
 	_getters[ENDER_OBJECT] = _ender_object_get;
-	_getters[ENDER_SURFACE] = _ender_object_get;
 	_getters[ENDER_ENDER] = _ender_object_get;
-	_getters[ENDER_LIST] = _ender_matrix_get;
+	_getters[ENDER_LIST] = _ender_object_get;
 	_getters[ENDER_STRUCT] = _ender_pointer_get;
 	_getters[ENDER_UNION] = _ender_pointer_get;
 }

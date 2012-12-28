@@ -7,9 +7,7 @@ typedef struct _Dummy_Object {
 	double d;
 	Enesim_Color color;
 	char *string;
-	Enesim_Surface *s;
 	Ender_Element *ender;
-	Enesim_Matrix matrix;
 	/* the list */
 	Eina_List *childs;
 } Dummy_Object;
@@ -70,24 +68,6 @@ void dummy_object_color_set(Dummy_Object *thiz, Enesim_Color c)
 void dummy_object_color_get(Dummy_Object *thiz, Enesim_Color *c)
 {
 	*c = thiz->color;
-}
-
-void dummy_object_matrix_set(Dummy_Object *thiz, Enesim_Matrix *m)
-{
-}
-
-void dummy_object_matrix_get(Dummy_Object *thiz, Enesim_Matrix *m)
-{
-}
-
-void dummy_object_surface_set(Dummy_Object *thiz, Enesim_Surface *s)
-{
-	thiz->s = s;
-}
-
-void dummy_object_surface_get(Dummy_Object *thiz, Enesim_Surface **s)
-{
-	*s = thiz->s;
 }
 
 void dummy_object_ender_set(Dummy_Object *thiz, Ender_Element *e)
@@ -172,31 +152,11 @@ static void test01_object_properties_register(Ender_Descriptor *descriptor)
 			NULL,
 			NULL,
 			EINA_FALSE, -1);
-	ec = ender_container_new(ENDER_STRING);
-	prop = ender_descriptor_property_add(descriptor, "s",
-			ec,
-			ENDER_GETTER(dummy_object_surface_get),
-			ENDER_SETTER(dummy_object_surface_set),
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_ENDER);
 	prop = ender_descriptor_property_add(descriptor, "ender",
 			ec,
 			ENDER_GETTER(dummy_object_ender_get),
 			ENDER_SETTER(dummy_object_ender_set),
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			EINA_FALSE, -1);
-	ec = ender_container_new(ENDER_MATRIX);
-	prop = ender_descriptor_property_add(descriptor, "matrix",
-			ec,
-			ENDER_GETTER(dummy_object_matrix_get),
-			ENDER_SETTER(dummy_object_matrix_set),
 			NULL,
 			NULL,
 			NULL,
@@ -262,16 +222,6 @@ static void test01_struct_properties_register(Ender_Descriptor *descriptor)
 			EINA_FALSE, -1);
 	ec = ender_container_new(ENDER_ENDER);
 	prop = ender_descriptor_property_add(descriptor, "ender",
-			ec,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			EINA_FALSE, -1);
-	ec = ender_container_new(ENDER_MATRIX);
-	prop = ender_descriptor_property_add(descriptor, "matrix",
 			ec,
 			NULL,
 			NULL,
@@ -456,9 +406,7 @@ Eina_Bool test01_setters_getters(Ender_Element *e)
 	double d;
 	Enesim_Color color;
 	char *string;
-	Enesim_Surface *s;
 	Ender_Element *ender;
-	Enesim_Matrix matrix;
 
 	/* first set the different properties */
 	ender_element_value_set(e, "b", EINA_TRUE, NULL);
@@ -506,7 +454,7 @@ Eina_Bool test01_object_functions(void)
 
 int main(int argc, char **argv)
 {
-	ender_init(&argc, &argv);
+	ender_init();
 
 	test01_namespace_register();
 	test01_object_register();

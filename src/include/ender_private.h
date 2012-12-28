@@ -67,7 +67,6 @@ struct _Ender_Value
 		uint64_t u64;
 		double d;
 		void *ptr;
-		Enesim_Matrix matrix;
 	} data;
 };
 

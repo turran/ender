@@ -42,7 +42,7 @@ AC_SUBST([ENDER_BUILD])
 
 AM_CONDITIONAL([HAVE_WIN32], [test "x${have_win32}" = "xyes"])
 
-requirements_ender="enesim >= 0.0.15 eina >= 1.0.0"
+requirements_ender="eina >= 1.0.0"
 AC_SUBST([requirements_ender])
 
 LT_SYS_MODULE_EXT

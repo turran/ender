@@ -61,19 +61,9 @@ double			{
 				yylval_param->vtype = ENDER_DOUBLE;
 				return T_DOUBLE;
 			}
-surface			{
-
-				yylval_param->vtype = ENDER_SURFACE;
-				return T_SURFACE;
-			}
-
 string			{
 				yylval_param->vtype = ENDER_STRING;
 				return T_STRING;
-			}
-matrix			{
-				yylval_param->vtype = ENDER_MATRIX;
-				return T_MATRIX;
 			}
 object			{
 				yylval_param->vtype = ENDER_OBJECT;

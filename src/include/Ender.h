@@ -115,9 +115,7 @@ typedef enum _Ender_Value_Type
 	ENDER_COLOR,
 	ENDER_ARGB,
 	ENDER_STRING,
-	ENDER_MATRIX,
 	ENDER_OBJECT,
-	ENDER_SURFACE,
 	ENDER_ENDER,
 	ENDER_POINTER,
 	ENDER_VALUE,
@@ -142,7 +140,7 @@ typedef enum _Ender_Property_Flag
  * @defgroup Ender_Main_Group Main
  * @{
  */
-EAPI void ender_init(int *argc, char ***argv);
+EAPI void ender_init(void);
 EAPI void ender_shutdown(void);
 
 /**
@@ -215,10 +213,6 @@ EAPI Enesim_Argb ender_value_argb_get(const Ender_Value *value);
 EAPI void ender_value_color_set(Ender_Value *value, Enesim_Color argb);
 EAPI Enesim_Color ender_value_color_get(const Ender_Value *value);
 
-EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix);
-EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix *matrix);
-EAPI Enesim_Matrix * ender_value_matrix_get(const Ender_Value *value);
-
 EAPI void ender_value_string_set(Ender_Value *value, char * string);
 EAPI void ender_value_static_string_set(Ender_Value *value, const char * string);
 EAPI const char * ender_value_string_get(const Ender_Value *value);
@@ -234,9 +228,6 @@ EAPI void * ender_value_object_get(const Ender_Value *value);
 
 EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender);
 EAPI Ender_Element * ender_value_ender_get(const Ender_Value *value);
-
-EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface);
-EAPI Enesim_Surface * ender_value_surface_get(const Ender_Value *value);
 
 EAPI void ender_value_pointer_set(Ender_Value *value, void *ptr, Ender_Value_Free free_cb, void *user_data);
 EAPI void * ender_value_pointer_get(const Ender_Value *value);

@@ -56,9 +56,7 @@ void ender_error(void *lloc, void *scanner, Ender_Parser *parser, const char *st
 %token <vtype> T_ARGB
 %token <vtype> T_DOUBLE
 %token <vtype> T_IMAGE
-%token <vtype> T_SURFACE
 %token <vtype> T_STRING
-%token <vtype> T_MATRIX
 %token <vtype> T_OBJECT
 %token <vtype> T_ENDER
 %token <dtype> T_ABSTRACT
@@ -155,10 +153,8 @@ basic_type
 	| T_ARGB { $$ = $1; }
 	| T_DOUBLE { $$ = $1; }
 	| T_STRING { $$ = $1; }
-	| T_SURFACE { $$ = $1; }
 	| T_OBJECT { $$ = $1; }
 	| T_ENDER { $$ = $1; }
-	| T_MATRIX { $$ = $1; }
 	;
 
 defined_type

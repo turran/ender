@@ -1,4 +1,28 @@
 namespace "enesim" : 0 {
+
+	struct "matrix" {
+		double "xx";
+		double "xy";
+		double "xz";
+		double "yx";
+		double "yy";
+		double "yz";
+		double "zx";
+		double "zy";
+		double "zz";
+	};
+
+	struct "rectangle" {
+		double "x";
+		double "y";
+		double "w";
+		double "h";
+	};
+
+	class "surface" {
+
+	};
+
 	abstract "renderer" {
 		bool "visibility";
 		string "name";
@@ -12,6 +36,7 @@ namespace "enesim" : 0 {
 		int "rop" [ "blend", "fill" ];
 		object "mask";
 	};
+
 };
 
 namespace "enesim.renderer" : 0 {

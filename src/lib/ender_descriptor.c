@@ -172,32 +172,6 @@ static void _ender_relative_double_set(Ender_Value *v, Ender_Setter set, Ender_E
 	set(parent, e, v->data.d);
 }
 /*----------------------------------------------------------------------------*
- *                                   matrix                                   *
- *----------------------------------------------------------------------------*/
-/* the matrix case is different and might be similar to the struct case
- * basically you just pass a pointer for both the get/set, the values are
- * *copied* so you need to have the requested alloced data in the ender value
- */
-static void _ender_matrix_get(Ender_Value *v, Ender_Getter get,
-		void *e)
-{
-	get(e, &v->data.matrix);
-}
-
-/* used for string, surface, struct, matrix, object */
-static void _ender_matrix_set(Ender_Value *v, Ender_Setter set,
-		void *e)
-{
-	set(e, v->data.matrix);
-}
-
-/* used for string, surface, struct, matrix, object */
-static void _ender_relative_matrix_set(Ender_Value *v, Ender_Setter set,
-		Ender_Element *e, void *parent)
-{
-	set(parent, e, v->data.matrix);
-}
-/*----------------------------------------------------------------------------*
  *                                  pointer                                   *
  *----------------------------------------------------------------------------*/
 /* used for known pointers: struct, unions, etc */
@@ -208,14 +182,14 @@ static void _ender_pointer_get(Ender_Value *v, Ender_Getter get,
 	get(e, v->data.ptr);
 }
 
-/* used for string, surface, struct, union, object */
+/* used for string, struct, union, object */
 static void _ender_pointer_set(Ender_Value *v, Ender_Setter set,
 		void *e)
 {
 	set(e, v->data.ptr);
 }
 
-/* used for string, surface, struct, union, object */
+/* used for string, struct, union, object */
 static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
 		Ender_Element *e, void *parent)
 {
@@ -224,7 +198,7 @@ static void _ender_relative_pointer_set(Ender_Value *v, Ender_Setter set,
 /*----------------------------------------------------------------------------*
  *                                 objects                                    *
  *----------------------------------------------------------------------------*/
-/* valid for every object: surface, ender, object, etc ... */
+/* valid for every object: ender, object, etc ... */
 static void _ender_object_get(Ender_Value *v, Ender_Getter get,
 		void *object)
 {
@@ -397,9 +371,7 @@ void ender_descriptor_init(void)
 	_setters[ENDER_ARGB] = _ender_int32_set;
 	_setters[ENDER_COLOR] = _ender_int32_set;
 	_setters[ENDER_STRING] = _ender_pointer_set;
-	_setters[ENDER_MATRIX] = _ender_pointer_set;
 	_setters[ENDER_OBJECT] = _ender_object_set;
-	_setters[ENDER_SURFACE] = _ender_object_set;
 	_setters[ENDER_ENDER] = _ender_object_set;
 	_setters[ENDER_LIST] = _ender_pointer_set;
 	_setters[ENDER_STRUCT] = _ender_pointer_set;
@@ -414,12 +386,9 @@ void ender_descriptor_init(void)
 	_getters[ENDER_ARGB] = _ender_int32_get;
 	_getters[ENDER_COLOR] = _ender_int32_get;
 	_getters[ENDER_STRING] = _ender_object_get;
-	/* the special matrix case */
-	_getters[ENDER_MATRIX] = _ender_matrix_get;
 	_getters[ENDER_OBJECT] = _ender_object_get;
-	_getters[ENDER_SURFACE] = _ender_object_get;
 	_getters[ENDER_ENDER] = _ender_object_get;
-	_getters[ENDER_LIST] = _ender_matrix_get;
+	_getters[ENDER_LIST] = _ender_object_get;
 	_getters[ENDER_STRUCT] = _ender_pointer_get;
 	_getters[ENDER_UNION] = _ender_pointer_get;
 	/* relative setters */
@@ -432,9 +401,7 @@ void ender_descriptor_init(void)
 	_relative_accessors[ENDER_ARGB] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_COLOR] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_STRING] = _ender_relative_pointer_set;
-	_relative_accessors[ENDER_MATRIX] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_OBJECT] = _ender_relative_object_set;
-	_relative_accessors[ENDER_SURFACE] = _ender_relative_object_set;
 	_relative_accessors[ENDER_ENDER] = _ender_relative_object_set;
 	_relative_accessors[ENDER_LIST] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_STRUCT] = _ender_relative_pointer_set;

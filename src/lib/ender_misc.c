@@ -58,7 +58,7 @@ char * ender_name_camelize(const char *name, Eina_Bool skip)
 		{
 			*tmp = *name;
 		}
-next:			
+next:
 		name++;
 		tmp++;
 	}
@@ -162,14 +162,8 @@ EAPI const char * ender_value_type_string_to(Ender_Value_Type type)
 		case ENDER_STRING:
 		return "STRING";
 
-		case ENDER_MATRIX:
-		return "MATRIX";
-
 		case ENDER_OBJECT:
 		return "OBJECT";
-
-		case ENDER_SURFACE:
-		return "SURFACE";
 
 		case ENDER_ENDER:
 		return "ENDER";

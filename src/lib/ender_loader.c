@@ -328,7 +328,11 @@ static Ender_Container * _loader_get_container(Ender_Loader *thiz,
 		Ender_Constraint *cnst;
 
 		d = ender_namespace_descriptor_find(thiz->namespace->ns, c->defined);
-		if (!d) return NULL;
+		if (!d)
+		{
+			ERR("Impossible to find the descriptor '%s'", c->defined);
+			return NULL;
+		}
 		if (!ender_descriptor_type_value_type_to(ender_descriptor_type(d), &vt))
 			return NULL;
 		ret = ender_container_new(vt);
@@ -444,6 +448,7 @@ static void _loader_add_property(void *data, Ender_Parser_Property *p)
 	}
 	/* create the container */
 	container = _loader_get_container(thiz, p->container);
+	if (!container) return;
 	/* in case of a compound property, also try to get the add/remove/clear */
 	if (container->type == ENDER_LIST)
 	{
@@ -507,6 +512,7 @@ static void _loader_add_function(void *data, Ender_Parser_Function *f)
 	}
 	/* get the ret */
 	c = _loader_get_container(thiz, f->ret);
+	if (!c) return;
 	/* get the args */
 	EINA_LIST_FOREACH (f->args, l, pc)
 	{

@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 	/* if we have an ender name, first try to match a renderer
 	 * then an abstract and then a namespace
 	 */
-	ender_init(&argc, &argv);
+	ender_init();
 	if (argc < 2)
 	{
 		ender_descriptor_list(_list_cb, NULL);

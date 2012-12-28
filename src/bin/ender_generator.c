@@ -467,7 +467,7 @@ int main(int argc, char **argv)
 	name = argv[argc - 2];
 	out = argv[argc - 1];
 
-	ender_init(0, NULL);
+	ender_init();
 	_generator_run(in, name, out);
 	ender_shutdown();
 

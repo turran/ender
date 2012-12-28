@@ -87,7 +87,6 @@ static void _ender_container_serialize_add(Ender_Value_Type t)
 
 		case ENDER_UINT64:
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
 		break;
@@ -107,7 +106,6 @@ static void _ender_container_serialize_add(Ender_Value_Type t)
 		case ENDER_UNION:
 		break;
 
-		case ENDER_MATRIX:
 		case ENDER_VALUE:
 		ERR("value not supported yet");
 		break;
@@ -138,7 +136,6 @@ static void _ender_container_serialize_new(Ender_Container_Serialize *s, Ender_V
 
 		/* for this we need an id */
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
 		s->signature = "U";
@@ -155,10 +152,6 @@ static void _ender_container_serialize_new(Ender_Container_Serialize *s, Ender_V
 
 		case ENDER_STRING:
 		s->signature = "s";
-		break;
-
-		case ENDER_MATRIX:
-		s->signature = "S(fffffffff)";
 		break;
 
 		/* the compound sub types will be added on its own function */
@@ -249,7 +242,6 @@ static void _ender_container_list_add(Ender_Container *thiz, const char *name,
 		case ENDER_UINT64:
 		/* for this we need an id */
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
 		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "uint64", data.u64, EET_T_ULONG_LONG);
@@ -265,10 +257,6 @@ static void _ender_container_list_add(Ender_Container *thiz, const char *name,
 
 		case ENDER_STRING:
 		EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Ender_Value, "s", data.d, EET_T_INLINED_STRING);
-		break;
-
-		case ENDER_MATRIX:
-		EET_DATA_DESCRIPTOR_ADD_LIST(thiz->edd, Ender_Value, "list", data.ptr, _matrix_descriptor);
 		break;
 
 		/* the compound sub types will be added on its own function */
@@ -498,12 +486,7 @@ EAPI size_t ender_container_size_get(Ender_Container *ec)
 		size = sizeof(char *);
 		break;
 
-		case ENDER_MATRIX:
-		size = sizeof(Enesim_Matrix);
-		break;
-
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_LIST:
 		case ENDER_STRUCT:
@@ -600,7 +583,6 @@ EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Val
 		case ENDER_UINT64:
 		case ENDER_DOUBLE:
 		case ENDER_STRING:
-		case ENDER_MATRIX:
 		n = tpl_map(thiz->serialize.signature, &v->data);
 		tpl_pack(n, 0);
 		tpl_dump(n, TPL_MEM, &data, len);
@@ -611,7 +593,6 @@ EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Val
 		 * then call the callback and set it on the value
 		 */
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
 
@@ -651,7 +632,6 @@ EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *thiz, void *
 		case ENDER_UINT64:
 		case ENDER_DOUBLE:
 		case ENDER_STRING:
-		case ENDER_MATRIX:
 		n = tpl_map(thiz->serialize.signature, &v->data);
 		tpl_load(n, TPL_MEM, data, len);
 		tpl_unpack(n, 0);
@@ -662,7 +642,6 @@ EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *thiz, void *
 		 * then call the callback and set it on the value
 		 */
 		case ENDER_OBJECT:
-		case ENDER_SURFACE:
 		case ENDER_ENDER:
 		case ENDER_POINTER:
 

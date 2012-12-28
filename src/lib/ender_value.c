@@ -304,47 +304,6 @@ EAPI Enesim_Color ender_value_color_get(const Ender_Value *value)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_value_matrix_set(Ender_Value *value, Enesim_Matrix *matrix)
-{
-	if (value->container->type != ENDER_MATRIX)
-		return;
-
-	value->data.ptr = matrix;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_value_static_matrix_set(Ender_Value *value, const Enesim_Matrix *matrix)
-{
-	Enesim_Matrix *m;
-
-	if (value->container->type != ENDER_MATRIX)
-		return;
-
-	m = malloc(sizeof(Enesim_Matrix));
-	*m = *matrix;
-	value->data.ptr = m;
-	value->owned = EINA_TRUE;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Matrix * ender_value_matrix_get(const Ender_Value *value)
-{
-	if (value->container->type != ENDER_MATRIX)
-		return NULL;
-
-	return value->data.ptr;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void ender_value_string_set(Ender_Value *value, char * string)
 {
 	if (value->container->type != ENDER_STRING)
@@ -471,28 +430,6 @@ EAPI void ender_value_ender_set(Ender_Value *value, Ender_Element *ender)
 EAPI Ender_Element * ender_value_ender_get(const Ender_Value *value)
 {
 	if (value->container->type != ENDER_ENDER)
-		return NULL;
-	return value->data.ptr;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_value_surface_set(Ender_Value *value, Enesim_Surface *surface)
-{
-	if (value->container->type != ENDER_SURFACE)
-		return;
-	value->data.ptr = surface;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Surface * ender_value_surface_get(const Ender_Value *value)
-{
-	if (value->container->type != ENDER_SURFACE)
 		return NULL;
 	return value->data.ptr;
 }

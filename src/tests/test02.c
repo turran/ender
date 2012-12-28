@@ -8,9 +8,7 @@ ENDER_DOUBLE,
 ENDER_COLOR,
 ENDER_ARGB,
 ENDER_STRING,
-ENDER_MATRIX,
-ENDER_RENDERER,
-ENDER_SURFACE,
+ENDER_OBJECT,
 ENDER_ENDER,
 ENDER_POINTER,
 ENDER_VALUE,
@@ -129,7 +127,7 @@ int main(int argc, char **argv)
 {
 	Eina_Bool ret;
 
-	ender_init(&argc, &argv);
+	ender_init();
 
 	/* just test the value types */
 	ret = test_bool();

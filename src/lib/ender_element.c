@@ -52,8 +52,6 @@
 			case ENDER_STRUCT:				\
 			case ENDER_UNION:				\
 			case ENDER_STRING:				\
-			case ENDER_SURFACE:				\
-			case ENDER_MATRIX:				\
 			case ENDER_OBJECT:				\
 			case ENDER_ENDER:				\
 			case ENDER_LIST:				\
@@ -91,17 +89,11 @@
 			case ENDER_STRUCT:				\
 			case ENDER_UNION:				\
 			case ENDER_STRING:				\
-			case ENDER_SURFACE:				\
 			case ENDER_OBJECT:				\
 			case ENDER_ENDER:				\
 			case ENDER_LIST:				\
 			case ENDER_VALUE:				\
 			*(va_arg(var_args, void**)) = v.data.ptr;	\
-			break;						\
-									\
-			case ENDER_MATRIX:				\
-			*(va_arg(var_args, Enesim_Matrix*)) = 		\
-					v.data.matrix;			\
 			break;						\
 									\
 			default:					\
@@ -1101,7 +1093,7 @@ EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, 
 
 
 /**
- * Get the enesim object associated with an ender
+ * Get the native object associated with an ender
  * @param e
  * @return
  */
