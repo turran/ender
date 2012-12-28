@@ -1,0 +1,19 @@
+escen {
+	namespace = "enesim_renderer";
+	path "path01" {
+		default {
+			set { fill_color = 0xff0000ff; };
+			set { stroke_color = 0xffff0000; };
+			set { stroke_weight = 3; };
+			set { draw_mode = 3; };
+			set { command = [
+				{"m", {30, 30}},
+				{"l", {30, 100}},
+				{"l", {100, 100}},
+				{"l", {100, 30}},
+				{"z", {1}}
+				];
+			};
+		};
+	};
+};

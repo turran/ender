@@ -1,0 +1,16 @@
+escen {
+	namespace = "enesim_renderer";
+	line "line01" {
+		default {
+			set { fill_color = 0xff00ffff; };
+			set { stroke_color = 0xffff0000; };
+			set { stroke_weight = 25; };
+			set { x0 = 25; };
+			set { y0 = 25; };
+			set { x1 = 128; };
+			set { y1 = 128; };
+			set { stroke_cap = 1; };
+		};
+	};
+};
+

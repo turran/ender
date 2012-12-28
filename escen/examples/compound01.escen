@@ -1,0 +1,29 @@
+escen {
+	namespace = "enesim_renderer";
+	compound "compound01" {
+		default {
+			set {
+				layer = [
+					stripes "stripe01" {
+						default {
+							set { odd_color = 0xffffff00; };
+							set { even_color = 0xff000000; };
+							set { odd_thickness = 25; };
+							set { even_thickness = 25; };
+							set { rop = 1; };
+						};
+					},
+					checker "checker01" {
+						default {
+							set { odd_color = 0xaaaa00aa; };
+							set { even_color = 0xaa000000; };
+							set { width = 10; };
+							set { height = 10; };
+							set { rop = 0; };
+						};
+					}
+				];
+			};
+		};
+	};
+};

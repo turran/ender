@@ -1,0 +1,34 @@
+escen {
+	namespace = "enesim_renderer";
+	dispmap "dispmap01" {
+		default {
+			set { x_channel = 0; };
+			set { y_channel = 1; };
+			set { factor = 64; };
+			set { map = "data/dispmap-rotate20.png"; };
+			set { src = "data/checker.png"; };
+		};
+
+		state "animate1" {
+			animate {
+				property = factor;
+				key {
+					value = 64;
+					time = 0.2;
+					type = LINEAR;
+				};
+				key {
+					value = 0;
+					time = 1.5;
+					type = LINEAR;
+				};
+				key {
+					value = 64;
+					time = 3;
+					type = LINEAR;
+				};
+			};
+		};
+	};
+};
+

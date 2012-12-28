@@ -1,0 +1,15 @@
+using "enesim" : 0;
+
+namespace "escen_test" : 0 {
+	struct "s" {
+		int "i";
+		double "d";
+	};
+	class "datatype" : "renderer" {
+		int "i";
+		double "d";
+		[double] "ld";
+		[s] "ls";
+		s "s";
+	};
+};

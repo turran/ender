@@ -1,0 +1,35 @@
+escen {
+	namespace = "enesim_renderer";
+	circle "circle1" {
+		default {
+			set { fill_color = 0xffffffff; };
+			set { stroke_color = 0xffff0000; };
+			set { stroke_weight = 3; };
+			set { stroke_renderer = stripes "stripes1" {
+					default {
+						set { odd_color = 0xffffff00; };
+						set { even_color = 0xff000000; };
+						set { odd_thickness = 25; };
+						set { even_thickness = 25; };
+					};
+				};
+			};
+			set { fill_renderer = stripes "stripes1" {
+					default {
+						set { odd_color = 0xffffff00; };
+						set { even_color = 0xff000000; };
+						set { odd_thickness = 25; };
+						set { even_thickness = 25; };
+					};
+				};
+			};
+			set { radius = 128; };
+			set { x = 128; };
+			set { y = 128; };
+			set { draw_mode = 3; };
+			set { x_origin = 10; };
+			set { y_origin = 10; };
+		};
+	};
+};
+

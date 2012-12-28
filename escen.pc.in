@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: Escen
+Description: Escen
+@pkgconfig_requires_private@: @requirements_escen@
+Version: @VERSION@
+Libs.private: @NEKO_LIBS@
+Libs: -L${libdir} -lescen
+Cflags: -I${includedir}

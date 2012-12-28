@@ -1,0 +1,17 @@
+escen {
+	namespace = "enesim_renderer";
+	rectangle "rectangle01" {
+		default {
+			set { fill_color = 0xff00ffff; };
+			set { stroke_color = 0xffffff00; };
+			set { stroke_weight = 1.5; };
+			set { x = 0.2; };
+			set { y = 0.2; };
+			set { width = 252; };
+			set { height = 252; };
+			set { draw_mode = 3; };
+		};
+	};
+};
+
+

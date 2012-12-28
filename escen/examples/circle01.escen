@@ -1,0 +1,47 @@
+escen {
+	namespace = "enesim_renderer";
+	circle "circle1" {
+		default {
+			set { fill_color = 0xff00ffff; };
+			set { stroke_color = 0xffff0000; };
+			set { stroke_weight = 3; };
+			set { radius = 128; };
+			set { x = 128; };
+			set { y = 128; };
+			set { draw_mode = 3; };
+		};
+		state "state01" {
+			set { fill_color = 0xff00ff00; };
+			set { radius = 10; };
+			animate {
+				property = radius;
+				wait = TRUE;
+				key {
+					value = 10;
+					time = 0.23;
+					type = LINEAR;
+				};
+				key {
+					value = 128;
+					time = 1.5;
+					type = LINEAR;
+				};
+			};
+		};
+		state "state02" {
+			animate {
+				property = fill_color;
+				key {
+					value = 0xff00ffff;
+					time = 0.23;
+					type = LINEAR;
+				};
+				key {
+					value = 0xffff0000;
+					time = 1.5;
+					type = LINEAR;
+				};
+			};
+		};
+	};
+};

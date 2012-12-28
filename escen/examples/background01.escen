@@ -1,0 +1,9 @@
+escen {
+	namespace = "enesim_renderer";
+	background "background01" {
+		default {
+			set { color = 0xff00ffff; };
+		};
+	};
+};
+

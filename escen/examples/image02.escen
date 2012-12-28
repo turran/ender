@@ -1,0 +1,12 @@
+escen {
+	namespace = "enesim_renderer";
+	image "image01" {
+		default {
+			set { src = "data/dispmap-sphere.png"; };
+			set { width = 256; };
+			set { height = 256; };
+			set { transformation = scale(2, 2), rotate(1.14); };
+		};
+	};
+};
+

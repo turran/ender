@@ -1,0 +1,12 @@
+escen {
+	namespace = "enesim_renderer";
+	blur "blur01" {
+		default {
+			set { src = "data/checker.png"; };
+			set { radius_x = 3; };
+			set { radius_y = 3; };
+			set { channel = 0; };
+		};
+	};
+};
+

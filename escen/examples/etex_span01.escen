@@ -1,0 +1,13 @@
+escen {
+	namespace = "etex";
+	span "span01" {
+		default {
+			set { text = "Hello World!"; };
+			set { font_name = "/usr/share/fonts/truetype/freefont/FreeSans.ttf"; };
+			set { size = 30; };
+			set { color = 0xffff0000; };
+			set { x_origin = 30; };
+			set { y_origin = 50; };
+		};
+	};
+};

@@ -1,0 +1,12 @@
+escen {
+	namespace = "enesim_renderer";
+	checker "checker1" {
+		default {
+			set { even_color = 0xff0000ff; };
+			set { odd_color = 0xff8080ff; };
+			set { width = 20; };
+			set { height = 20; };
+			set { transformation = matrix(1, 0, 0, 0, 1, 0, 0, 0, 1); };
+		};
+	};
+};

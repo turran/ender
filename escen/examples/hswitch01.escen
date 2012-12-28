@@ -1,0 +1,55 @@
+escen {
+	namespace = "enesim_renderer";
+	hswitch "hswitch01" {
+		default {
+			set { w = 128; };
+			set { h = 128; };
+			set { setp = 1; };
+			set { left = circle "circle01" {
+					default {
+						set { fill_color = 0xff00ffff; };
+						set { stroke_color = 0xffff0000; };
+						set { stroke_weight = 3; };
+						set { radius = 128; };
+						set { x = 128; };
+						set { y = 128; };
+						set { draw_mode = 2; };
+					};
+				};
+			};
+			set { right = rectangle "rectangle01" {
+					default {
+						set { fill_color = 0xff00ffff; };
+						set { stroke_color = 0xffff0000; };
+						set { stroke_weight = 3; };
+						set { width = 128; };
+						set { height = 128; };
+						set { draw_mode = 2; };
+						set { corner_radius = 15; };
+						set { top_left_corner = 1; };
+						set { bottom_right_corner = 1; };
+						set { x_origin = 15; };
+						set { y_origin = 15; };
+					};
+				};
+			};
+		};
+		state "state01" {
+			animate {
+				property = step;
+				key {
+					value = 0;
+					time = 0.1;
+					type = LINEAR;
+				};
+				key {
+					value = 1;
+					time = 2;
+					type = LINEAR;
+				};
+			};
+		};
+	};
+};
+
+
