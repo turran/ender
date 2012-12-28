@@ -550,7 +550,11 @@ EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c)
  */
 EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint *c)
 {
-
+#if 0
+	if (thiz->contraint)
+		ender_constraint_free(thiz->constraint);
+#endif
+	thiz->contraint = c;
 }
 
 /**
