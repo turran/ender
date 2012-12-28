@@ -2,9 +2,10 @@ MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/src/include \
--I$(top_srcdir)/src/lib/tpl \
--I$(top_builddir)/src/include \
+-I$(top_srcdir) \
+-I$(top_srcdir)/ender/include \
+-I$(top_srcdir)/ender/lib/tpl \
+-I$(top_builddir)/ender/include \
 -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
 @ENDER_BUILD@ \
 @ENDER_CFLAGS@
