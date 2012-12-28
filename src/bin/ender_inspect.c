@@ -53,7 +53,7 @@ static void _container_compound_dump(Ender_Container *c, int level)
 	printf("\t");
 	for (i = 0; i < level - 1; i++)
 		printf("   ");
-	printf("};\n");
+	printf("};");
 }
 
 static void _container_dump(Ender_Container *c, int level)
@@ -61,7 +61,6 @@ static void _container_dump(Ender_Container *c, int level)
 	printf("%s", ender_value_type_string_to(ender_container_type_get(c)));
 	if (ender_container_is_compound(c))
 		_container_compound_dump(c, level + 1);
-	printf("\n");
 }
 
 static void _prop_cb(Ender_Property *p, void *data)
@@ -73,6 +72,41 @@ static void _prop_cb(Ender_Property *p, void *data)
 	name = ender_property_name_get(p);
 	printf("\t%s%s: ", ender_property_is_relative(p) ? "rel " : "", name);
 	_container_dump(c, 0);
+	printf("\n");
+}
+
+static void _fn_cb(Ender_Function *f, void *data)
+{
+	Ender_Container *c;
+	const Eina_List *args;
+	const Eina_List *l;
+	Eina_Bool first = EINA_TRUE;
+
+	c = ender_function_ret_get(f);
+	args = ender_function_args_get(f);
+	printf("\t");
+	if (c)
+	{
+		_container_dump(c, 0);
+	}
+	else
+	{
+		printf("void");
+	}
+	printf(" %s (", ender_function_name_get(f));
+	EINA_LIST_FOREACH(args, l, c)
+	{
+		if (!first)
+		{
+			printf(",");
+		}
+		else
+		{
+			first = EINA_FALSE;
+		}
+		_container_dump(c, 0);
+	}
+	printf(")\n");
 }
 
 static void _inheritance_dump(Ender_Descriptor *e, int level)
@@ -112,6 +146,8 @@ static void _descriptor_dump(const char *name)
 	printf("\ttype = %s\n", ender_descriptor_type_string_to(ender_descriptor_type(ed)));
 	printf("Properties:\n");
 	ender_descriptor_property_list(ed, _prop_cb, ed);
+	printf("Functions:\n");
+	ender_descriptor_function_list(ed, _fn_cb, ed);
 }
 
 int main(int argc, char **argv)

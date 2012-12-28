@@ -487,7 +487,7 @@ static void _loader_add_function(void *data, Ender_Parser_Function *f)
 	Ender_Loader *thiz = data;
 	Ender_Library_Namespace *namespace = thiz->namespace;
 	Ender_Descriptor *edesc = thiz->descriptor;
-	Ender_Container *c;
+	Ender_Container *c = NULL;
 	Ender_Accessor func;
 	Ender_Parser_Container *pc;
 	Eina_List *l;
@@ -500,8 +500,8 @@ static void _loader_add_function(void *data, Ender_Parser_Function *f)
 
 	ns_name = ender_namespace_name_get(namespace->ns);
 	edesc_name = ender_descriptor_name_get(edesc);
-	DBG("Adding function %s to %s", f->def.name, edesc_name);
 	snprintf(func_name, PATH_MAX, "%s_%s_%s", ns_name, edesc_name, f->def.name);
+	DBG("Adding function '%s' to '%s' ('%s')", f->def.name, edesc_name, func_name);
 
 	/* the function */
 	func = dlsym(namespace->lib->dl_handle, func_name);
@@ -511,8 +511,15 @@ static void _loader_add_function(void *data, Ender_Parser_Function *f)
 		return;
 	}
 	/* get the ret */
-	c = _loader_get_container(thiz, f->ret);
-	if (!c) return;
+	if (f->ret)
+	{
+		c = _loader_get_container(thiz, f->ret);
+		if (!c)
+		{
+			ERR("No container for return value");
+			return;
+		}
+	}
 	/* get the args */
 	EINA_LIST_FOREACH (f->args, l, pc)
 	{
@@ -523,8 +530,6 @@ static void _loader_add_function(void *data, Ender_Parser_Function *f)
 	ender_descriptor_function_add_list(edesc,
 			f->def.alias ? f->def.alias : f->def.name, func, NULL,
 			c, args);
-	EINA_LIST_FREE (args, c)
-		ender_container_unref(c);
 }
 
 static Ender_Parser_Descriptor _loader_parser = {
