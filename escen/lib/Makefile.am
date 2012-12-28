@@ -3,10 +3,11 @@ MAINTAINERCLEANFILES = Makefile.in
 SUBDIRS = script
 
 AM_CPPFLAGS = \
--I$(top_srcdir)/src/include \
--I$(top_builddir)/src/include \
+-I$(top_builddir) \
+-I$(top_srcdir)/ender/include \
+-I$(top_srcdir)/escen/include \
 -I. \
-@EFL_ESCEN_BUILD@ \
+@ESCEN_BUILD@ \
 @ESCEN_CFLAGS@
 
 AM_YFLAGS = -d -p escen_

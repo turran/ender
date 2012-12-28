@@ -35,6 +35,7 @@ ENDER_BUILD=""
 case "$host_os" in
    mingw*)
       ENDER_BUILD="-DENDER_BUILD"
+      ESCEN_BUILD="-DESCEN_BUILD"
       have_win32="yes"
    ;;
 esac
@@ -44,6 +45,40 @@ AM_CONDITIONAL([HAVE_WIN32], [test "x${have_win32}" = "xyes"])
 
 requirements_ender="eina >= 1.0.0"
 AC_SUBST([requirements_ender])
+
+requirements_escen="etch >= 0.0.6 eina >= 1.0.0"
+AC_SUBST([requirements_escen])
+PKG_CHECK_MODULES(ESCEN, [${requirements_escen}],
+   [have_escen="yes"],
+   [have_escen="no"])
+AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
+
+# Scripting
+## Neko
+have_neko="no"
+NEKO_LIBS=""
+AC_CHECK_LIB([neko],
+   [neko_val_callEx],
+   [have_neko="yes"],
+   [have_neko="no"])
+
+if test "x${have_neko}" = "xyes" ; then
+   AC_CHECK_HEADERS([neko.h neko_vm.h],
+      [have_neko="yes"],
+      [have_neko="no"])
+fi
+
+if test "x${have_neko}" = "xyes" ; then
+  AC_CHECK_PROG([have_neko_bin], [nekoc], [yes], [no])
+fi
+
+if test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes" ; then
+   NEKO_LIBS=-lneko
+   AC_DEFINE([BUILD_SCRIPT_NEKO], [1], [Build support for NekoVM scripts])
+fi
+
+AM_CONDITIONAL([BUILD_SCRIPT_NEKO], [test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes"])
+AC_SUBST([NEKO_LIBS])
 
 LT_SYS_MODULE_EXT
 
@@ -93,12 +128,19 @@ EFL_CHECK_DLOPEN
 AC_CONFIG_FILES([
 Makefile
 ender.pc
+escen.pc
 ender/Makefile
 ender/data/Makefile
 ender/lib/Makefile
 ender/include/Makefile
 ender/bin/Makefile
 ender/tests/Makefile
+escen/Makefile
+escen/lib/Makefile
+escen/lib/script/Makefile
+escen/lib/script/neko/Makefile
+escen/tests/Makefile
+escen/include/Makefile
 ])
 
 AC_OUTPUT
@@ -115,6 +157,8 @@ echo "------------------------------------------------------------------------"
 echo
 echo
 echo "Configuration Options Summary:"
+echo
+echo "Escen........................................: ${have_escen}"
 echo
 echo "Compilation............: make (or gmake)"
 echo "  CPPFLAGS.............: $CPPFLAGS"
