@@ -441,9 +441,11 @@ struct
 	{
 		Eina_List *l, *l_next;
 		Ender_Value *v;
+		Ender_Container *c;
 
 		printf("handling the struct/union case\n");
-		$$ = ender_value_list_new(ENDER_VALUE);
+		c = ender_container_new(ENDER_VALUE);
+		$$ = ender_value_list_new(c);
 		EINA_LIST_FOREACH_SAFE($2, l, l_next, v)
 		{
 			ender_value_list_add($$, v);
@@ -456,9 +458,11 @@ list	: '[' value_list ']'
 	{
 		Eina_List *l, *l_next;
 		Ender_Value *v;
+		Ender_Container *c;
 
 		printf("handling the list case\n");
-		$$ = ender_value_list_new(ENDER_VALUE);
+		c = ender_container_new(ENDER_VALUE);
+		$$ = ender_value_list_new(c);
 		EINA_LIST_FOREACH_SAFE($2, l, l_next, v)
 		{
 			ender_value_list_add($$, v);
