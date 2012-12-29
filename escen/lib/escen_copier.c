@@ -397,6 +397,7 @@ static Eina_Bool _copy_union(Ender_Container *dst_cont,
 		Ender_Value **dst, Ender_Value *src,
 		Ender_Value_Type src_type)
 {
+#if 0
 	/* a list should always be formed of two values
 	 * one that describes the specific union member to use
 	 * and the other the list of the union member data
@@ -492,12 +493,15 @@ static Eina_Bool _copy_union(Ender_Container *dst_cont,
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
+#endif
+	return EINA_FALSE;
 }
 
 static Eina_Bool _copy_struct(Ender_Container *dst_cont,
 		Ender_Value **dst, Ender_Value *src,
 		Ender_Value_Type src_type)
 {
+#if 0
 	if (src_type == ENDER_LIST)
 	{
 		Eina_List *l;
@@ -529,6 +533,8 @@ static Eina_Bool _copy_struct(Ender_Container *dst_cont,
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
+#endif
+	return EINA_FALSE;
 }
 
 /* for the list case is just a matter of creating a new list
