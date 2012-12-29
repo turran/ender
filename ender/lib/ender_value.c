@@ -464,6 +464,11 @@ EAPI void ender_value_list_add(Ender_Value *value, Ender_Value *child)
 		return;
 
 	sub = ender_container_compound_get(value->container, 0, NULL);
+	if (!sub)
+	{
+		ERR("List without sub-container");
+		return;
+	}
 	if (sub->type == ENDER_VALUE)
 	{
 		value->data.ptr = eina_list_append(value->data.ptr, child);

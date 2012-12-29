@@ -533,6 +533,7 @@ static void _loader_add_function(void *data, Ender_Parser_Function *f)
 	{
 		Ender_Container *tmp;
 		tmp = _loader_get_container(thiz, pc);
+		if (!tmp) continue;
 		args = eina_list_append(args, tmp);
 	}
 	ender_descriptor_function_add_list(edesc,

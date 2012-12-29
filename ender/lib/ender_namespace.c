@@ -278,9 +278,15 @@ EAPI Ender_Namespace * ender_namespace_find(const char *name, int version)
  */
 EAPI Ender_Descriptor * ender_namespace_descriptor_find(Ender_Namespace *thiz, const char *name)
 {
+	Ender_Descriptor *ret;
 	if (!thiz || !name) return NULL;
 
-	return eina_hash_find(thiz->descriptors, name);
+	ret = eina_hash_find(thiz->descriptors, name);
+	if (!ret)
+	{
+		/* TODO look for its "using"? */
+	}
+	return ret;
 }
 
 /**
