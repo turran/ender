@@ -22,8 +22,6 @@
 #include "config.h"
 #endif
 
-#define BUILD_SERIALIZE 1
-
 #include <dlfcn.h>
 
 /* core */
@@ -33,14 +31,6 @@
 #define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
 extern int ender_log_dom;
 
-#if BUILD_SERIALIZE
-typedef struct _Ender_Container_Serialize
-{
-	char *signature;
-	Eina_Bool external;
-} Ender_Container_Serialize;
-#endif
-
 struct _Ender_Container
 {
 	Ender_Value_Type type;
@@ -48,9 +38,7 @@ struct _Ender_Container
 	/* sub containers */
 	Eina_List *elements;
 	Ender_Constraint *constraint;
-#if BUILD_SERIALIZE
-	Ender_Container_Serialize serialize;
-#endif
+	void *serialize_data;
 };
 
 struct _Ender_Value

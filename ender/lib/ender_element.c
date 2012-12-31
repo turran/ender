@@ -1280,4 +1280,5 @@ EAPI void * ender_element_marshal(Ender_Element *e, unsigned int *len)
 	 * or either whenever a descriptor is added, also create its
 	 * eet descriptor
 	 */
+	return NULL;
 }

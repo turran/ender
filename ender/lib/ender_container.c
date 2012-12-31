@@ -17,48 +17,6 @@
  */
 #include "Ender.h"
 #include "ender_private.h"
-#include "tpl.h"
-
-/* In order to serialize values we need:
- * 1. Simple container types (int, double, etc) just require the
- * main eet data descriptor to be the Ender_Value_Data union
- * so we just "decode" into it directly
- * 2. Lists, require that the children are allocated and thus
- * we need to create a data descriptor for each basic type. In case the
- * list has a compound type like a struct or union we need to
- * be able to create such malloced data by eet itself
- * 3. Unions/Structs requires eet to define its descriptor dynamically
- * based on the children container type not the container descriptor
- * 4. Pointers (enders, objects, surfaces, etc) require the user to
- * provide an "id" number for them. This "id" must be provided
- * and calculated by the user. Given that it is the most
- * difficult part, it will be done at the end.
- *
- * Problems with eet tha ive seen so far:
- * 1. You can only serialize full structs, not single values
- * 2. Given the nature of the compound containers (structs and unions)
- * where you can add elements incrementally, you need to know beforehand
- * the full siz eof your struct which is false of course. An option
- * is to destroy the previous descriptor and create a new one, but then
- * every container referencing this (struct inside struct) must be aware of
- * it
- * Other alternatives:
- * http://tpl.sourceforge.net/userguide.html
- * http://gwlib.com/
- * http://s11n.net/c11n/
- * http://avro.apache.org/docs/current/api/c/index.html
- *
- * Ok, now that we have committed tpl here, we need to start doing the
- * encoding/decoding of the values.
- * 1. Every container must have a string referring to its mapping
- * 2. Looks like we can unmap single struct fields, if that's the case
- * when unmapping structs, instead of unmapping the whole struct just iterate
- * over it an decode single values, when a an object is decoded, trigger the
- * callback. We can mark a struct as if it has or not a foreign reference
- *
- * We need to avoid the user to modify a container after it is assigned
- * into a property. So we can fixate a container when it is assigned.
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -95,108 +53,6 @@ static _ender_container_add(Ender_Container *thiz, const char *name,
 	sub->c = s;
 	thiz->elements = eina_list_append(thiz->elements, sub);
 }
-
-#ifdef BUILD_SERIALIZE
-static void _ender_container_serialize_add(Ender_Value_Type t)
-{
-	switch (t)
-	{
-		case ENDER_BOOL:
-		break;
-
-		case ENDER_UINT32:
-		case ENDER_COLOR:
-		case ENDER_ARGB:
-		break;
-
-		case ENDER_INT32:
-		break;
-
-		case ENDER_UINT64:
-		case ENDER_OBJECT:
-		case ENDER_ENDER:
-		case ENDER_POINTER:
-		break;
-
-		case ENDER_INT64:
-		break;
-
-		case ENDER_DOUBLE:
-		break;
-
-		case ENDER_STRING:
-		break;
-
-		/* the compound sub types will be added on its own function */
-		case ENDER_LIST:
-		case ENDER_STRUCT:
-		case ENDER_UNION:
-		break;
-
-		case ENDER_VALUE:
-		ERR("value not supported yet");
-		break;
-	}
-}
-
-static void _ender_container_serialize_new(Ender_Container_Serialize *s, Ender_Value_Type t)
-{
-	switch (t)
-	{
-		case ENDER_BOOL:
-		s->signature = "c";
-		break;
-
-		case ENDER_UINT32:
-		case ENDER_COLOR:
-		case ENDER_ARGB:
-		s->signature = "u";
-		break;
-
-		case ENDER_INT32:
-		s->signature = "i";
-		break;
-
-		case ENDER_UINT64:
-		s->signature = "U";
-		break;
-
-		/* for this we need an id */
-		case ENDER_OBJECT:
-		case ENDER_ENDER:
-		case ENDER_POINTER:
-		s->signature = "U";
-		s->external = EINA_TRUE;
-		break;
-
-		case ENDER_INT64:
-		s->signature = "I";
-		break;
-
-		case ENDER_DOUBLE:
-		s->signature = "f";
-		break;
-
-		case ENDER_STRING:
-		s->signature = "s";
-		break;
-
-		/* the compound sub types will be added on its own function */
-		case ENDER_LIST:
-		s->signature = "A()";
-		break;
-
-		case ENDER_STRUCT:
-		case ENDER_UNION:
-		s->signature = "S()";
-		break;
-
-		case ENDER_VALUE:
-		WRN("value not supported yet");
-		break;
-	}
-}
-#endif
 
 
 static Ender_Container * _ender_container_new(Ender_Value_Type t)
@@ -476,66 +332,7 @@ EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *th
  */
 EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Value *v, unsigned int *len)
 {
-#if BUILD_SERIALIZE
-	tpl_node *n;
-	void *data = NULL;
-
-	switch (thiz->type)
-	{
-		case ENDER_INT32:
-		case ENDER_UINT32:
-		case ENDER_COLOR:
-		case ENDER_ARGB:
-		case ENDER_BOOL:
-		case ENDER_INT64:
-		case ENDER_UINT64:
-		case ENDER_DOUBLE:
-		case ENDER_STRING:
-		n = tpl_map(thiz->serialize.signature, &v->data);
-		tpl_pack(n, 0);
-		tpl_dump(n, TPL_MEM, &data, len);
-		tpl_free(n);
-		break;
-
-		/* for external objects, fetch it into a local var
-		 * then call the callback and set it on the value
-		 */
-		case ENDER_ENDER:
-		case ENDER_POINTER:
-		case ENDER_LIST:
-		ERR("Marshaling of type %s is not supported yet",
-				ender_value_type_string_to(thiz->type));
-		break;
-
-		/* for structs/unions allocate the needed size and assign it to the void * */
-		/* for lists, iterate over each element on the array and add it to the list, then assign the
-		 * the list to the void * */
-		case ENDER_OBJECT:
-		case ENDER_STRUCT:
-		case ENDER_UNION:
-		{
-			const Ender_Constraint *c;
-
-			c = ender_container_constraint_get(thiz);
-			if ((!c) || (ender_constraint_type_get(c) !=
-					ENDER_CONSTRAINT_DESCRIPTOR))
-			{
-				ERR("For type %s we need a descriptor "
-						"constraint or we can not "
-						"identify the members",
-						ender_value_type_string_to(
-						thiz->type));
-				break;
-			}
-			/* now marshal the native object */
-			
-		}
-		break;
-	}
-	return data;
-#else
 	return NULL;
-#endif
 }
 
 /**
@@ -544,47 +341,5 @@ EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Val
  */
 EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *thiz, void *data, unsigned int len)
 {
-#if BUILD_SERIALIZE
-	Ender_Value *v;
-	tpl_node *n;
-
-	v = ender_value_new_container_from(thiz);
-	switch (thiz->type)
-	{
-		case ENDER_INT32:
-		case ENDER_UINT32:
-		case ENDER_COLOR:
-		case ENDER_ARGB:
-		case ENDER_BOOL:
-		case ENDER_INT64:
-		case ENDER_UINT64:
-		case ENDER_DOUBLE:
-		case ENDER_STRING:
-		n = tpl_map(thiz->serialize.signature, &v->data);
-		tpl_load(n, TPL_MEM, data, len);
-		tpl_unpack(n, 0);
-		tpl_free(n);
-		break;
-
-		/* for external objects, fetch it into a local var
-		 * then call the callback and set it on the value
-		 */
-		case ENDER_OBJECT:
-		case ENDER_ENDER:
-		case ENDER_POINTER:
-
-		/* for structs/unions allocate the needed size and assign it to the void * */
-		/* for lists, iterate over each element on the array and add it to the list, then assign the
-		 * the list to the void * */
-		case ENDER_LIST:
-		case ENDER_STRUCT:
-		case ENDER_UNION:
-		break;
-	}
-	return v;
-#else
 	return NULL;
-#endif
 }
-
-

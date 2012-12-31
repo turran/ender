@@ -317,7 +317,7 @@ void ender_descriptor_native_destroy(Ender_Descriptor *thiz, void *object)
 void * ender_descriptor_element_marshal(Ender_Descriptor *thiz,
 		Ender_Element *e, unsigned int *len)
 {
-
+	return NULL;
 }
 
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
@@ -727,5 +727,5 @@ EAPI Ender_Element * ender_descriptor_element_new_from_data(
 EAPI Ender_Element * ender_descriptor_element_unmarshal(Ender_Descriptor *thiz,
 		void *data, unsigned int len)
 {
-
+	return NULL;
 }

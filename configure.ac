@@ -48,46 +48,6 @@ AC_SUBST([ESCEN_BUILD])
 
 AM_CONDITIONAL([HAVE_WIN32], [test "x${have_win32}" = "xyes"])
 
-requirements_ender="eina >= 1.0.0"
-AC_SUBST([requirements_ender])
-
-requirements_escen="etch >= 0.0.6 eina >= 1.0.0"
-AC_SUBST([requirements_escen])
-PKG_CHECK_MODULES(ESCEN, [${requirements_escen}],
-   [have_escen="yes"],
-   [have_escen="no"])
-AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
-
-# Scripting
-## Neko
-have_neko="no"
-NEKO_LIBS=""
-AC_CHECK_LIB([neko],
-   [neko_val_callEx],
-   [have_neko="yes"],
-   [have_neko="no"])
-
-if test "x${have_neko}" = "xyes" ; then
-   AC_CHECK_HEADERS([neko.h neko_vm.h],
-      [have_neko="yes"],
-      [have_neko="no"])
-fi
-
-if test "x${have_neko}" = "xyes" ; then
-  AC_CHECK_PROG([have_neko_bin], [nekoc], [yes], [no])
-fi
-
-if test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes" ; then
-   NEKO_LIBS=-lneko
-   AC_DEFINE([BUILD_SCRIPT_NEKO], [1], [Build support for NekoVM scripts])
-fi
-
-AM_CONDITIONAL([BUILD_SCRIPT_NEKO], [test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes"])
-AC_SUBST([NEKO_LIBS])
-
-LT_SYS_MODULE_EXT
-
-
 ### Checks for programs
 
 AC_PROG_CC
@@ -119,10 +79,55 @@ fi
 # doxygen program for documentation building
 EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
+requirements_ender="eina >= 1.0.0"
+AC_SUBST([requirements_ender])
+
+requirements_escen="etch >= 0.0.6 eina >= 1.0.0"
+AC_SUBST([requirements_escen])
+
+LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
 PKG_CHECK_MODULES([ENDER], [${requirements_ender}])
+
+PKG_CHECK_MODULES([EET], [eet >= 1.3],
+   [have_eet="yes"],
+   [have_eet="no"])
+AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes" && test "x${have_eet_bin}" = "xyes"])
+
+PKG_CHECK_MODULES([ESCEN], [${requirements_escen}],
+   [have_escen="yes"],
+   [have_escen="no"])
+AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
+
+# Scripting
+## Neko
+have_neko="no"
+NEKO_LIBS=""
+AC_CHECK_LIB([neko],
+   [neko_val_callEx],
+   [have_neko="yes"],
+   [have_neko="no"])
+
+if test "x${have_neko}" = "xyes" ; then
+   AC_CHECK_HEADERS([neko.h neko_vm.h],
+      [have_neko="yes"],
+      [have_neko="no"])
+fi
+
+if test "x${have_neko}" = "xyes" ; then
+  AC_CHECK_PROG([have_neko_bin], [nekoc], [yes], [no])
+fi
+
+if test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes" ; then
+   NEKO_LIBS=-lneko
+   AC_DEFINE([BUILD_SCRIPT_NEKO], [1], [Build support for NekoVM scripts])
+fi
+
+AM_CONDITIONAL([BUILD_SCRIPT_NEKO], [test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes"])
+AC_SUBST([NEKO_LIBS])
+
 
 ### Checks for library functions
 
@@ -162,6 +167,10 @@ echo "------------------------------------------------------------------------"
 echo
 echo
 echo "Configuration Options Summary:"
+echo "Ender........................................: yes"
+echo "  Serialization:"
+echo "  Eet........................................: ${have_eet}"
+echo "  TPL........................................: no"
 echo
 echo "Escen........................................: ${have_escen}"
 echo
