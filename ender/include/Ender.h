@@ -307,6 +307,8 @@ EAPI Eina_Bool ender_marshaller_string__string(void *data, Ender_Accessor f,
 		Ender_Value *ret, Eina_List *args);
 EAPI Eina_Bool ender_marshaller_ender__string(void *data, Ender_Accessor f,
 		Ender_Value *ret, Eina_List *args);
+EAPI Eina_Bool ender_marshaller_ender__void(void *data, Ender_Accessor f,
+		Ender_Value *ret, Eina_List *args);
 
 /**
  * @}
@@ -361,6 +363,8 @@ EAPI size_t ender_descriptor_size_get(Ender_Descriptor *thiz);
 EAPI Ender_Descriptor * ender_descriptor_parent(Ender_Descriptor *thiz);
 EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *thiz);
 EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz);
+EAPI Ender_Element * ender_descriptor_element_new_from_data(
+		Ender_Descriptor *thiz, void *data);
 /**
  * @}
  * @defgroup Ender_Element_Group Element
@@ -435,10 +439,10 @@ EAPI void * ender_element_object_get(Ender_Element *e);
 
 EAPI Ender_Element * ender_element_parent_get(Ender_Element *e);
 
-EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_list va_args);
-EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...);
-EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, va_list va_args);
-EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, ...);
+EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, void *ret, va_list va_args);
+EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, void *ret, ...);
+EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, void *ret, va_list va_args);
+EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, void *ret, ...);
 EAPI Eina_Bool ender_element_function_call_simple(Ender_Element *e,
 		Ender_Function *f, Ender_Value *ret, Eina_List *args);
 

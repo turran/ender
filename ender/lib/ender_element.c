@@ -102,6 +102,44 @@
 		}							\
 	}								\
 
+#define ENDER_VALUE_FETCH(v, cnt, fetch)				\
+	{								\
+		switch (cnt->type)					\
+		{							\
+			case ENDER_COLOR:				\
+			case ENDER_ARGB:				\
+			case ENDER_UINT32:				\
+			case ENDER_INT32:				\
+			case ENDER_BOOL:				\
+			*((uint32_t*)fetch) = v.data.u32;		\
+			break;						\
+									\
+			case ENDER_UINT64:				\
+			case ENDER_INT64:				\
+			*((uint64_t*)fetch) = v.data.u64;		\
+			break;						\
+									\
+			case ENDER_DOUBLE:				\
+			*((double*)fetch) = v.data.d;			\
+			break;						\
+									\
+			case ENDER_STRUCT:				\
+			case ENDER_UNION:				\
+			case ENDER_STRING:				\
+			case ENDER_OBJECT:				\
+			case ENDER_ENDER:				\
+			case ENDER_LIST:				\
+			case ENDER_VALUE:				\
+			*((void**)fetch) = v.data.ptr;			\
+			break;						\
+									\
+			default:					\
+			ERR("Unsupported data type %d", cnt->type);	\
+			break;						\
+		}							\
+	}								\
+
+
 typedef struct _Ender_Listener_Container
 {
 	char *name;
@@ -253,9 +291,24 @@ static void _property_free(void *data)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Ender_Element * ender_element_new_from_data(Ender_Descriptor *desc, void *data)
+{
+	Ender_Element *thiz;
+
+	thiz = calloc(1, sizeof(Ender_Element));
+	EINA_MAGIC_SET(thiz, ENDER_MAGIC);
+	thiz->object = data;
+	thiz->descriptor = desc;
+	thiz->listeners = eina_hash_string_superfast_new(NULL);
+	thiz->properties = eina_hash_string_superfast_new((Eina_Free_Cb)ender_property_free);
+	thiz->data = eina_hash_string_superfast_new(NULL);
+	thiz->ref = 1;
+
+	return thiz;
+}
+
 Ender_Element * ender_element_new(Ender_Descriptor *desc)
 {
-	Ender_Element *ender;
 	void *object;
 
 	if (!desc)
@@ -272,17 +325,7 @@ Ender_Element * ender_element_new(Ender_Descriptor *desc)
 		return NULL;
 	}
 	DBG("Element '%s' created correctly", desc->name);
-
-	ender = calloc(1, sizeof(Ender_Element));
-	EINA_MAGIC_SET(ender, ENDER_MAGIC);
-	ender->object = object;
-	ender->descriptor = desc;
-	ender->listeners = eina_hash_string_superfast_new(NULL);
-	ender->properties = eina_hash_string_superfast_new((Eina_Free_Cb)ender_property_free);
-	ender->data = eina_hash_string_superfast_new(NULL);
-	ender->ref = 1;
-
-	return ender;
+	return ender_element_new_from_data(desc, object);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -1003,33 +1046,36 @@ EAPI Eina_Bool ender_element_property_value_is_set(Ender_Element *e, Ender_Prope
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, va_list va_args)
+EAPI Eina_Bool ender_element_call_valist(Ender_Element *e, const char *name, void *ret, va_list va_args)
 {
 	Ender_Function *f;
 	Ender_Descriptor *d;
 
 	ENDER_MAGIC_CHECK(e);
+	if (!name) return EINA_FALSE;
+
 	/* get the function associated */
 	d = ender_element_descriptor_get(e);
 	f = ender_descriptor_function_get(d, name);
 	if (!f) return EINA_FALSE;
 
-	return ender_element_function_call_valist(e, f, va_args);
+	return ender_element_function_call_valist(e, f, ret, va_args);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...)
+EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, void *arg_ret, ...)
 {
 	Eina_Bool ret;
 	va_list va_args;
 
 	ENDER_MAGIC_CHECK(e);
+	if (!name) return EINA_FALSE;
 
-	va_start(va_args, name);
-	ret = ender_element_call_valist(e, name, va_args);
+	va_start(va_args, arg_ret);
+	ret = ender_element_call_valist(e, name, arg_ret, va_args);
 	va_end(va_args);
 	return ret;
 }
@@ -1038,20 +1084,21 @@ EAPI Eina_Bool ender_element_call(Ender_Element *e, const char *name, ...)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, va_list va_args)
+EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Function *f, void *ret, va_list va_args)
 {
 	Eina_List *largs = NULL;
 	Eina_List *lvalues = NULL;
 	Eina_List *l;
 	Ender_Container *c;
-	Ender_Value ret;
+	Ender_Value vret = { 0 };
 
 	ENDER_MAGIC_CHECK(e);
+	if (!f) return EINA_FALSE;
 
 	largs = (Eina_List *) ender_function_args_get(f);
 	/* add a value for the ret */
 	c = ender_function_ret_get(f);
-	ret.container = c;
+	vret.container = c;
 	EINA_LIST_FOREACH (largs, l, c)
 	{
 		Ender_Value *value;
@@ -1061,7 +1108,13 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 		lvalues = eina_list_append(lvalues, value);
 	}
 	/* call the real function */
-	return ender_function_call(f, e->object, &ret, lvalues);
+	if (!ender_function_call(f, e->object, &vret, lvalues))
+		return EINA_FALSE;
+	if (ret)
+	{
+		ENDER_VALUE_FETCH(vret, vret.container, ret);
+	}
+	return EINA_TRUE;
 }
 
 /**
@@ -1071,6 +1124,9 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 EAPI Eina_Bool ender_element_function_call_simple(Ender_Element *e,
 		Ender_Function *f, Ender_Value *ret, Eina_List *args)
 {
+	ENDER_MAGIC_CHECK(e);
+	if (!f) return EINA_FALSE;
+
 	return ender_function_call(f, e->object, ret, args);
 }
 
@@ -1078,15 +1134,16 @@ EAPI Eina_Bool ender_element_function_call_simple(Ender_Element *e,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, ...)
+EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, void *arg_ret, ...)
 {
 	Eina_Bool ret;
 	va_list va_args;
 
 	ENDER_MAGIC_CHECK(e);
+	if (!f) return EINA_FALSE;
 
-	va_start(va_args, f);
-	ret = ender_element_function_call_valist(e, f, va_args);
+	va_start(va_args, arg_ret);
+	ret = ender_element_function_call_valist(e, f, arg_ret, va_args);
 	va_end(va_args);
 	return ret;
 }

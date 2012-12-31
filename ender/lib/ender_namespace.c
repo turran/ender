@@ -96,7 +96,9 @@ Ender_Element * ender_namespace_element_new_from_descriptor(Ender_Namespace *thi
 	Ender_New_Listener *listener;
 	Eina_List *l;
 
-	/* TODO check that we have been initialized */
+	/* given tha the initialize usually calls the libname_init on the loader
+	 * we can not share this code with the one from data
+	 */
 	if (!thiz->initialized)
 	{
 		if (thiz->initialize)
@@ -112,7 +114,30 @@ Ender_Element * ender_namespace_element_new_from_descriptor(Ender_Namespace *thi
 	return element;
 }
 
-/* FIXME maybe in the future we want this event to be added and also exported */
+Ender_Element * ender_namespace_element_new_from_descriptor_and_data(
+		Ender_Namespace *thiz, Ender_Descriptor *desc, void *data)
+{
+	Ender_Element *element;
+	Ender_New_Listener *listener;
+	Eina_List *l;
+
+	if (!thiz->initialized)
+	{
+		if (thiz->initialize)
+			thiz->initialize(thiz, thiz->initialize_data);
+		thiz->initialized = EINA_TRUE;
+	}
+	element = ender_element_new_from_data(desc, data);
+	/* call the constructor callback */
+	EINA_LIST_FOREACH(thiz->new_callbacks, l, listener)
+	{
+		listener->callback(element, listener->data);
+	}
+}
+
+/* FIXME maybe in the future we want this event to be added and also exported?
+ * this initialize cb is only used on the loader to actually call libname_init()
+ */
 void ender_namespace_initialize_cb_set(Ender_Namespace *thiz, Ender_Namespace_Initialize cb, void *data)
 {
 	thiz->initialize = cb;

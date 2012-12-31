@@ -713,6 +713,17 @@ EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Ender_Element * ender_descriptor_element_new_from_data(
+		Ender_Descriptor *thiz, void *data)
+{
+	return ender_namespace_element_new_from_descriptor_and_data(thiz->ns,
+		thiz, data);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Element * ender_descriptor_element_unmarshal(Ender_Descriptor *thiz,
 		void *data, unsigned int len)
 {

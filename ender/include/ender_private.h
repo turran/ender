@@ -218,9 +218,12 @@ void ender_namespace_init(void);
 void ender_namespace_shutdown(void);
 void ender_namespace_dump(Ender_Namespace *ns);
 Ender_Element * ender_namespace_element_new_from_descriptor(Ender_Namespace *thiz, Ender_Descriptor *desc);
+Ender_Element * ender_namespace_element_new_from_descriptor_and_data(
+		Ender_Namespace *thiz, Ender_Descriptor *desc, void *data);
 
 /* element */
 Ender_Element * ender_element_new(Ender_Descriptor *d);
+Ender_Element * ender_element_new_from_data(Ender_Descriptor *desc, void *data);
 
 /* the loader */
 void ender_loader_init(void);

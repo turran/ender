@@ -41,6 +41,7 @@ void ender_marshaller_init(void)
 	eina_hash_add(_marshallers, "void__STRING_STRING", ender_marshaller_void__string_string);
 	eina_hash_add(_marshallers, "ENDER__STRING", ender_marshaller_ender__string);
 	eina_hash_add(_marshallers, "STRING__STRING", ender_marshaller_string__string);
+	eina_hash_add(_marshallers, "ENDER__void", ender_marshaller_ender__void);
 }
 
 void ender_marshaller_shutdown(void)
@@ -212,3 +213,18 @@ EAPI Eina_Bool ender_marshaller_ender__string(void *data, Ender_Accessor f,
 	return EINA_TRUE;
 }
 
+EAPI Eina_Bool ender_marshaller_ender__void(void *data, Ender_Accessor f,
+		Ender_Value *ret, Eina_List *args)
+{
+	typedef Ender_Element * (*_Function)(void *o);
+	_Function _f;
+	Ender_Element *e;
+	const char *str;
+
+	_f = (_Function)(f);
+	e = _f(data);
+	/* set the return value */
+	ender_value_ender_set(ret, e);
+
+	return EINA_TRUE;
+}
