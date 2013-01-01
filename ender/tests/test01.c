@@ -5,7 +5,7 @@ typedef struct _Dummy_Object {
 	Eina_Bool b;
 	uint32_t u32;
 	double d;
-	Enesim_Color color;
+	uint32_t color;
 	char *string;
 	Ender_Element *ender;
 	/* the list */
@@ -60,12 +60,12 @@ void dummy_object_double_get(Dummy_Object *thiz, double *d)
 	*d = thiz->d;
 }
 
-void dummy_object_color_set(Dummy_Object *thiz, Enesim_Color c)
+void dummy_object_color_set(Dummy_Object *thiz, uint32_t c)
 {
 	thiz->color = c;
 }
 
-void dummy_object_color_get(Dummy_Object *thiz, Enesim_Color *c)
+void dummy_object_color_get(Dummy_Object *thiz, uint32_t *c)
 {
 	*c = thiz->color;
 }
@@ -259,7 +259,7 @@ static void test01_functions_register(Ender_Descriptor *descriptor)
 
 Eina_Bool test01_functions(Ender_Element *e)
 {
-	ender_element_call(e, "function_01");
+	ender_element_call(e, "function_01", NULL, NULL);
 	printf("Functions called\n");
 	return EINA_TRUE;
 }
@@ -404,7 +404,7 @@ Eina_Bool test01_setters_getters(Ender_Element *e)
 	Eina_Bool b;
 	uint32_t u32;
 	double d;
-	Enesim_Color color;
+	uint32_t color;
 	char *string;
 	Ender_Element *ender;
 
