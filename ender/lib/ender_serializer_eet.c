@@ -102,7 +102,6 @@ static const char * _serializer_eet_value_type_get(const void *data,
 	const Ender_Value_Type *d = data;
 	int i;
 
-	printf("getting type for %p\n", data);
 	//printf("getting type for %s\n", ender_value_type_string_to(*d));
 	if (unknown)
 		*unknown = EINA_FALSE;
@@ -125,7 +124,7 @@ static Eina_Bool _serializer_eet_value_type_set(const char *type,
 	Ender_Value_Type *d = data;
 	int i;
 
-	printf("setting type for %s\n", type);
+	//printf("setting type for %s\n", type);
 	if (unknown)
 		return EINA_FALSE;
 
@@ -174,19 +173,19 @@ static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(voi
 	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "a", d);
 
 	d = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "u64", i32, EET_T_LONG_LONG);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "u64", u64, EET_T_LONG_LONG);
 	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "u64", d);
 
 	d = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "i64", i32, EET_T_ULONG_LONG);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "i64", i64, EET_T_ULONG_LONG);
 	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "i64", d);
 
 	d = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "d", i32, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "d", d, EET_T_DOUBLE);
 	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "d", d);
 
 	d = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "s", i32, EET_T_STRING);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "s", ptr, EET_T_STRING);
 	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "s", d);
 
 	return ret;
@@ -234,7 +233,6 @@ static void * _serializer_eet_container_new(Ender_Container *c)
 		ERR("value not supported yet");
 		break;
 	}
-	printf("container new %p %s\n", ret, ender_value_type_string_to(c->type));
 	return ret;
 }
 
@@ -262,7 +260,6 @@ static void * _serializer_eet_value_marshal(void *sd,
 	Ender_Serializer_Eet_Value nv;
 	void *ret = NULL;
 
-	printf("marshal a value %p\n", sd);
 	if (!sd) return NULL;
 
 	nv.data = v->data;
@@ -285,14 +282,17 @@ static Ender_Value * _serializer_eet_value_unmarshal(
 	Ender_Serializer_Eet_Value *nv;
 	Ender_Value *ret;
 
-	printf("unmarshal a value %p %p %d\n", sd, data, len);
 	if (!sd) return NULL;
 
+	/* TODO we need to avoid this double malloc, for that
+	 * we need to wrap Ender_Value instead of Ender_Serializer_Eet_Value
+	 * that means, we need to add a "type" field
+	 */
 	nv = eet_data_descriptor_decode(sd, data, len);
-	printf("unmarshalled a value %p\n", nv);
 
 	ret = ender_value_new_container_from(c);
 	ret->data = nv->data;
+	free(nv);
 
 	return ret;
 }
