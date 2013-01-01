@@ -4,7 +4,7 @@ AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/ender/include \
 -I$(top_srcdir)/escen/include \
-@ESCEN_BUILD@ \
+-DESCEN_BUILD \
 @ESCEN_CFLAGS@
 
 noinst_LTLIBRARIES = libescen_script_neko.la

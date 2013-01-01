@@ -86,14 +86,22 @@ void * ender_serializer_container_new(Ender_Container *ec)
 
 	thiz = _ender_serializer_selected_get();
 	if (!thiz) return NULL;
+	if (!thiz->container_new)
+		return NULL;
+	return thiz->container_new(ec);
 }
 
 void * ender_serializer_element_marshal(Ender_Element *e, unsigned int *len)
 {
 	Ender_Serializer *thiz;
+	Ender_Descriptor *d;
 
 	thiz = _ender_serializer_selected_get();
 	if (!thiz) return NULL;
+	if (!thiz->element_marshal)
+		return NULL;
+	d = ender_element_descriptor_get(e);
+	return thiz->element_marshal(d, e, len);
 }
 
 Ender_Element * ender_serializer_element_unmarshal(Ender_Descriptor *d,
@@ -103,6 +111,9 @@ Ender_Element * ender_serializer_element_unmarshal(Ender_Descriptor *d,
 
 	thiz = _ender_serializer_selected_get();
 	if (!thiz) return NULL;
+	if (!thiz->element_unmarshal)
+		return NULL;
+	return thiz->element_unmarshal(d, data, len);
 }
 
 Ender_Value * ender_serializer_value_unmarshal(Ender_Container *ec,
@@ -112,6 +123,9 @@ Ender_Value * ender_serializer_value_unmarshal(Ender_Container *ec,
 
 	thiz = _ender_serializer_selected_get();
 	if (!thiz) return NULL;
+	if (!thiz->value_unmarshal)
+		return NULL;
+	return thiz->value_unmarshal(ec->serialize_data, data, len);
 }
 
 void * ender_serializer_value_marshal(const Ender_Value *v, unsigned int *len)
@@ -120,7 +134,9 @@ void * ender_serializer_value_marshal(const Ender_Value *v, unsigned int *len)
 
 	thiz = _ender_serializer_selected_get();
 	if (!thiz) return NULL;
-
+	if (!thiz->value_marshal)
+		return NULL;
+	return thiz->value_marshal(v->container->serialize_data, v, len);
 }
 /*============================================================================*
  *                                   API                                      *

@@ -37,6 +37,8 @@ ender_namespace.c \
 ender_object.c \
 ender_parser.c \
 ender_property.c \
+ender_serializer.c \
+ender_serializer_eet.c \
 ender_struct.c \
 ender_union.c \
 ender_value.c \

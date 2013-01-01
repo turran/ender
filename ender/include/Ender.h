@@ -168,7 +168,6 @@ EAPI Ender_Value_Type ender_container_type_get(Ender_Container *c);
 EAPI void ender_container_constraint_set(Ender_Container *thiz, Ender_Constraint *c);
 EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *thiz);
 
-EAPI void * ender_container_value_marshal(Ender_Container *c, const Ender_Value *v, unsigned int *len);
 EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *c, void *data, unsigned int len);
 
 /**

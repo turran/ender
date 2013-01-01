@@ -195,6 +195,33 @@ Eina_Bool ender_function_call(Ender_Function *thiz, void *o,
 		Ender_Value *ret, Eina_List *args);
 
 /* container */
+/* serializer */
+typedef void * (*Ender_Serializer_Container_New)(Ender_Container *c);
+typedef void * (*Ender_Serializer_Element_Marshal)(Ender_Descriptor *d,
+		Ender_Element *e, unsigned int *len);
+typedef Ender_Element * (*Ender_Serializer_Element_Unmarshal)(
+		Ender_Descriptor *d, void *data, unsigned int len);
+typedef void * (*Ender_Serializer_Value_Marshal)(void *sd,
+		const Ender_Value *v, unsigned int *len);
+typedef Ender_Value * (*Ender_Serializer_Value_Unmarshal)(
+		void *sd, void *data, unsigned int len);
+
+typedef struct _Ender_Serializer {
+	Ender_Serializer_Container_New container_new;
+	Ender_Serializer_Element_Marshal element_marshal;
+	Ender_Serializer_Element_Unmarshal element_unmarshal;
+	Ender_Serializer_Value_Marshal value_marshal;
+	Ender_Serializer_Value_Unmarshal value_unmarshal;
+} Ender_Serializer;
+
+void * ender_serializer_container_new(Ender_Container *ec);
+void * ender_serializer_element_marshal(Ender_Element *e, unsigned int *len);
+Ender_Element * ender_serializer_element_unmarshal(Ender_Descriptor *d,
+		void *data, unsigned int len);
+Ender_Value * ender_serializer_value_unmarshal(Ender_Container *ec,
+		void *data, unsigned int len);
+void * ender_serializer_value_marshal(const Ender_Value *v, unsigned int *len);
+
 /* misc */
 char * ender_name_camelize(const char *name, Eina_Bool skip);
 char * ender_name_structify(const char *name);

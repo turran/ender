@@ -1274,11 +1274,5 @@ EAPI void ender_event_dispatch(Ender_Element *e, const char *event_name, void *e
  */
 EAPI void * ender_element_marshal(Ender_Element *e, unsigned int *len)
 {
-	/* always marshal first the element name */
-	/* then iterate every property and based on the container type
-	 * create a descriptor for "name" "value"
-	 * or either whenever a descriptor is added, also create its
-	 * eet descriptor
-	 */
-	return NULL;
+	return ender_serializer_element_marshal(e, len);
 }

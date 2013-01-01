@@ -330,16 +330,7 @@ EAPI const Ender_Constraint * ender_container_constraint_get(Ender_Container *th
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void * ender_container_value_marshal(Ender_Container *thiz, const Ender_Value *v, unsigned int *len)
-{
-	return NULL;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Ender_Value * ender_container_value_unmarshal(Ender_Container *thiz, void *data, unsigned int len)
 {
-	return NULL;
+	return ender_serializer_value_unmarshal(thiz, data, len);
 }
