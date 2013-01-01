@@ -76,14 +76,15 @@ typedef struct _Ender_Serializer_Eet_Value
 
 static Eet_Data_Descriptor *_ender_value_descriptor;
 static Eet_Data_Descriptor *_ender_value_data_descriptor;
+static Eet_Data_Descriptor *_ender_element_descriptor;
 /*----------------------------------------------------------------------------*
- *                         Ender_Value descriptor                             *
+ *                      Ender_Value_Data descriptor                           *
  *----------------------------------------------------------------------------*/
 struct
 {
 	Ender_Value_Type d;
 	const char *name;
-} _ender_value_mapping[] = {
+} _ender_value_data_mapping[] = {
 	{ ENDER_BOOL, "b" },
 	{ ENDER_UINT32, "u32" },
 	{ ENDER_COLOR, "c" },
@@ -106,10 +107,10 @@ static const char * _serializer_eet_value_type_get(const void *data,
 	if (unknown)
 		*unknown = EINA_FALSE;
 
-	for (i = 0; _ender_value_mapping[i].name != NULL; ++i)
+	for (i = 0; _ender_value_data_mapping[i].name != NULL; ++i)
 	{
-		if (*d == _ender_value_mapping[i].d)
-			return _ender_value_mapping[i].name;
+		if (*d == _ender_value_data_mapping[i].d)
+			return _ender_value_data_mapping[i].name;
 	}
 
 	if (unknown)
@@ -128,11 +129,11 @@ static Eina_Bool _serializer_eet_value_type_set(const char *type,
 	if (unknown)
 		return EINA_FALSE;
 
-	for (i = 0; _ender_value_mapping[i].name != NULL; ++i)
+	for (i = 0; _ender_value_data_mapping[i].name != NULL; ++i)
 	{
-		if (strcmp(_ender_value_mapping[i].name, type) == 0)
+		if (strcmp(_ender_value_data_mapping[i].name, type) == 0)
 		{
-			*d = _ender_value_mapping[i].d;
+			*d = _ender_value_data_mapping[i].d;
 			return EINA_TRUE;
 		}
 	}
@@ -189,6 +190,14 @@ static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(voi
 	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "s", d);
 
 	return ret;
+}
+/*----------------------------------------------------------------------------*
+ *                        Ender_Element descriptor                             *
+ *----------------------------------------------------------------------------*/
+static Eet_Data_Descriptor * _serializer_eet_ender_element_descriptor_get(void)
+{
+	/* TODO */
+	return NULL;
 }
 /*----------------------------------------------------------------------------*
  *                       The serializer interface                             *
@@ -318,6 +327,7 @@ Ender_Serializer * ender_serializer_eet_get(void)
 		Eet_Data_Descriptor *d;
 		eet_init();
 
+		//* we need a common eet descriptor for basic types */
 		/* first the Ender_Value_Data descriptor */
 		d = _serializer_eet_ender_value_data_descriptor_get();
 		_ender_value_data_descriptor = d;
@@ -330,10 +340,12 @@ Ender_Serializer * ender_serializer_eet_get(void)
 				data, type, _ender_value_data_descriptor);
 		_ender_value_descriptor = d;
 
-		/* we need a common eet descriptor for basic types
-		 * we need another eet descriptor for structs, unions and
-		 * enders
-		 * and lastly a new descriptor for each kind of list
+		 /* we need another eet descriptor for structs, unions and
+		 * enders, i.e property list
+		 */
+		d = _serializer_eet_ender_element_descriptor_get();
+		_ender_element_descriptor = d;
+		 /* and lastly a new descriptor for each kind of list
 		 */
 
 	}
