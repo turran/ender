@@ -51,11 +51,11 @@ typedef union _Ender_Serializer_Eet_Value_Data
 } Ender_Serializer_Eet_Value_Data;
 
 /* description used for a property */
-typedef struct _Ender_Serializer_Eet_Value
+typedef struct _Ender_Serializer_Eet_Property
 {
 	Ender_Serializer_Eet_Value_Type type;
 	Ender_Serializer_Eet_Value_Data data;
-} Ender_Serializer_Value;
+} Ender_Serializer_Eet_Property;
 
 /* description of an element
  * it is composed of a list of int -> value (static properties)
@@ -65,11 +65,138 @@ typedef struct _Ender_Serializer_Element
 {
 	Eina_List *properties;
 } Ender_Serializer_Element;
+
+/* common eet descriptors */
+/* our own representation of a serialized basic value */
+typedef struct _Ender_Serializer_Eet_Value
+{
+	Ender_Value_Type type;
+	Ender_Value_Data data;
+} Ender_Serializer_Eet_Value;
+
+static Eet_Data_Descriptor *_ender_value_descriptor;
+static Eet_Data_Descriptor *_ender_value_data_descriptor;
+/*----------------------------------------------------------------------------*
+ *                         Ender_Value descriptor                             *
+ *----------------------------------------------------------------------------*/
+struct
+{
+	Ender_Value_Type d;
+	const char *name;
+} _ender_value_mapping[] = {
+	{ ENDER_BOOL, "b" },
+	{ ENDER_UINT32, "u32" },
+	{ ENDER_COLOR, "c" },
+	{ ENDER_ARGB, "a" },
+	{ ENDER_INT32, "i32" },
+	{ ENDER_UINT64, "u64" },
+	{ ENDER_INT64, "i64" },
+	{ ENDER_DOUBLE, "d" },
+	{ ENDER_STRING, "s" },
+	{ ENDER_VALUE, NULL }
+};
+
+static const char * _serializer_eet_value_type_get(const void *data,
+		Eina_Bool *unknown)
+{
+	const Ender_Value_Type *d = data;
+	int i;
+
+	printf("getting type for %p\n", data);
+	//printf("getting type for %s\n", ender_value_type_string_to(*d));
+	if (unknown)
+		*unknown = EINA_FALSE;
+
+	for (i = 0; _ender_value_mapping[i].name != NULL; ++i)
+	{
+		if (*d == _ender_value_mapping[i].d)
+			return _ender_value_mapping[i].name;
+	}
+
+	if (unknown)
+		*unknown = EINA_TRUE;
+
+	return NULL;
+}
+
+static Eina_Bool _serializer_eet_value_type_set(const char *type,
+		void *data, Eina_Bool unknown)
+{
+	Ender_Value_Type *d = data;
+	int i;
+
+	printf("setting type for %s\n", type);
+	if (unknown)
+		return EINA_FALSE;
+
+	for (i = 0; _ender_value_mapping[i].name != NULL; ++i)
+	{
+		if (strcmp(_ender_value_mapping[i].name, type) == 0)
+		{
+			*d = _ender_value_mapping[i].d;
+			return EINA_TRUE;
+		}
+	}
+
+	return EINA_FALSE;
+}
+
+static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(void)
+{
+	Eet_Data_Descriptor_Class eddc;
+	Eet_Data_Descriptor *ret;
+	Eet_Data_Descriptor *d;
+
+	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Value_Data);
+	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
+	eddc.func.type_get = _serializer_eet_value_type_get;
+	eddc.func.type_set = _serializer_eet_value_type_set;
+	ret = eet_data_descriptor_stream_new(&eddc);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "b", i32, EET_T_INT);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "b", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "i32", i32, EET_T_INT);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "i32", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "u32", u32, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "u32", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "u32", u32, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "c", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "u32", u32, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "a", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "u64", i32, EET_T_LONG_LONG);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "u64", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "i64", i32, EET_T_ULONG_LONG);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "i64", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "d", i32, EET_T_DOUBLE);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "d", d);
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "s", i32, EET_T_STRING);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "s", d);
+
+	return ret;
+}
 /*----------------------------------------------------------------------------*
  *                       The serializer interface                             *
  *----------------------------------------------------------------------------*/
 static void * _serializer_eet_container_new(Ender_Container *c)
 {
+	void *ret = NULL;
 	switch (c->type)
 	{
 		/* for simple types, just marshal the Ender_Value */
@@ -82,6 +209,7 @@ static void * _serializer_eet_container_new(Ender_Container *c)
 		case ENDER_INT64:
 		case ENDER_DOUBLE:
 		case ENDER_STRING:
+		ret = _ender_value_descriptor;
 		break;
 
 		/* for element types, marshal a list of eet values */
@@ -106,6 +234,8 @@ static void * _serializer_eet_container_new(Ender_Container *c)
 		ERR("value not supported yet");
 		break;
 	}
+	printf("container new %p %s\n", ret, ender_value_type_string_to(c->type));
+	return ret;
 }
 
 static void * _serializer_eet_element_marshal(Ender_Descriptor *d,
@@ -129,20 +259,42 @@ static Ender_Element * _serializer_eet_element_unmarshal(
 static void * _serializer_eet_value_marshal(void *sd,
 		const Ender_Value *v, unsigned int *len)
 {
+	Ender_Serializer_Eet_Value nv;
+	void *ret = NULL;
+
+	printf("marshal a value %p\n", sd);
+	if (!sd) return NULL;
+
+	nv.data = v->data;
+	nv.type = v->container->type;
+
+	ret = eet_data_descriptor_encode(sd, &nv, len);
 	/* check if the descriptor is a basic descriptor */
 	/* if so, encode directly */
 	/* if it is a value that holds an element, check the
 	 * descriptor constraint and marshal it if possible
 	 */
 	/* if it is a list, marshal it using its own descriptor */
-	return NULL;
+	return ret;
 
 }
 
 static Ender_Value * _serializer_eet_value_unmarshal(
-		void *sd, void *data, unsigned int len)
+		Ender_Container *c, void *sd, void *data, unsigned int len)
 {
-	return NULL;
+	Ender_Serializer_Eet_Value *nv;
+	Ender_Value *ret;
+
+	printf("unmarshal a value %p %p %d\n", sd, data, len);
+	if (!sd) return NULL;
+
+	nv = eet_data_descriptor_decode(sd, data, len);
+	printf("unmarshalled a value %p\n", nv);
+
+	ret = ender_value_new_container_from(c);
+	ret->data = nv->data;
+
+	return ret;
 }
 
 static Ender_Serializer _ender_serializer_eet = {
@@ -162,7 +314,22 @@ Ender_Serializer * ender_serializer_eet_get(void)
 	static int _init = 0;
 	if (!_init++)
 	{
+		Eet_Data_Descriptor_Class eddc;
+		Eet_Data_Descriptor *d;
 		eet_init();
+
+		/* first the Ender_Value_Data descriptor */
+		d = _serializer_eet_ender_value_data_descriptor_get();
+		_ender_value_data_descriptor = d;
+
+		/* now the Ender_Serializer_Eet_Value descriptor */
+		EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Serializer_Eet_Value);
+		d = eet_data_descriptor_stream_new(&eddc);
+
+		EET_DATA_DESCRIPTOR_ADD_UNION(d, Ender_Serializer_Eet_Value, "data",
+				data, type, _ender_value_data_descriptor);
+		_ender_value_descriptor = d;
+
 		/* we need a common eet descriptor for basic types
 		 * we need another eet descriptor for structs, unions and
 		 * enders

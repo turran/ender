@@ -6,7 +6,8 @@ AM_CPPFLAGS = \
 -I$(top_srcdir)/ender/lib/tpl \
 -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
 -DENDER_BUILD \
-@ENDER_CFLAGS@
+@ENDER_CFLAGS@ \
+@EET_CFLAGS@
 
 AM_YFLAGS = -d -p ender_
 AM_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
@@ -50,6 +51,6 @@ libender_la_SOURCES += tpl/mmap.c tpl/mman.h
 endif
 
 libender_la_LIBADD = \
-@ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@
+@ENDER_LIBS@ @LEXLIB@ @EFL_DLOPEN_LIBS@ @EET_LIBS@
 
 libender_la_LDFLAGS = -no-undefined -version-info @version_info@

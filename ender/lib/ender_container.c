@@ -100,10 +100,11 @@ static void _ender_container_delete(Ender_Container *thiz)
  */
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 {
-	Ender_Container *ec;
+	Ender_Container *thiz;
 
-	ec = _ender_container_new(t);
-	return ec;
+	thiz = _ender_container_new(t);
+	thiz->serialize_data = ender_serializer_container_new(thiz);
+	return thiz;
 }
 
 /**
@@ -114,8 +115,14 @@ EAPI Ender_Container * ender_container_list_new(Ender_Container *child)
 {
 	Ender_Container *thiz;
 
+	if (!child)
+	{
+		ERR("Impossible to create a struct type without sub-container");
+		return NULL;
+	}
 	thiz = _ender_container_new(ENDER_LIST);
 	_ender_container_add(thiz, "data", child);
+	thiz->serialize_data = ender_serializer_container_new(thiz);
 	return thiz;
 }
 
@@ -134,6 +141,7 @@ EAPI Ender_Container * ender_container_struct_new(Ender_Descriptor *descriptor)
 		constraint = ender_constraint_descriptor_new(descriptor);
 		ender_container_constraint_set(thiz, constraint);
 	}
+	thiz->serialize_data = ender_serializer_container_new(thiz);
 	return thiz;
 }
 
@@ -152,6 +160,7 @@ EAPI Ender_Container * ender_container_union_new(Ender_Descriptor *descriptor)
 		constraint = ender_constraint_descriptor_new(descriptor);
 		ender_container_constraint_set(thiz, constraint);
 	}
+	thiz->serialize_data = ender_serializer_container_new(thiz);
 	return thiz;
 }
 

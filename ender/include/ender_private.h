@@ -41,6 +41,16 @@ struct _Ender_Container
 	void *serialize_data;
 };
 
+typedef struct _Ender_Value_Data
+{
+	int32_t i32;
+	uint32_t u32;
+	int64_t i64;
+	uint64_t u64;
+	double d;
+	void *ptr;
+} Ender_Value_Data;
+
 struct _Ender_Value
 {
 	Ender_Container *container;
@@ -48,14 +58,7 @@ struct _Ender_Value
 	Ender_Value_Free free_cb;
 	void *free_cb_data;
 	Eina_Bool owned;
-	union {
-		int32_t i32;
-		uint32_t u32;
-		int64_t i64;
-		uint64_t u64;
-		double d;
-		void *ptr;
-	} data;
+	Ender_Value_Data data;
 };
 
 /* constructor */
@@ -204,7 +207,7 @@ typedef Ender_Element * (*Ender_Serializer_Element_Unmarshal)(
 typedef void * (*Ender_Serializer_Value_Marshal)(void *sd,
 		const Ender_Value *v, unsigned int *len);
 typedef Ender_Value * (*Ender_Serializer_Value_Unmarshal)(
-		void *sd, void *data, unsigned int len);
+		Ender_Container *c, void *sd, void *data, unsigned int len);
 
 typedef struct _Ender_Serializer {
 	Ender_Serializer_Container_New container_new;

@@ -125,7 +125,7 @@ Ender_Value * ender_serializer_value_unmarshal(Ender_Container *ec,
 	if (!thiz) return NULL;
 	if (!thiz->value_unmarshal)
 		return NULL;
-	return thiz->value_unmarshal(ec->serialize_data, data, len);
+	return thiz->value_unmarshal(ec, ec->serialize_data, data, len);
 }
 
 void * ender_serializer_value_marshal(const Ender_Value *v, unsigned int *len)

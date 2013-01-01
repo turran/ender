@@ -88,7 +88,10 @@ PKG_CHECK_MODULES([ENDER], [${requirements_ender}])
 PKG_CHECK_MODULES([EET], [eet >= 1.3],
    [have_eet="yes"],
    [have_eet="no"])
-AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes" && test "x${have_eet_bin}" = "xyes"])
+AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes"])
+if test "x${have_eet}" = "xyes" ; then
+   AC_DEFINE(BUILD_SERIALIZER_EET, 1, [Build support for EET serializer])
+fi
 
 PKG_CHECK_MODULES([ESCEN], [${requirements_escen}],
    [have_escen="yes"],
