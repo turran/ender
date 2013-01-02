@@ -450,6 +450,7 @@ static void * _serializer_eet_value_descriptor_marshal(void *sd,
 	Ender_Descriptor *descriptor;
 	const Ender_Constraint *cnst;
 	Ender_Serializer_Eet_Value nv;
+	Ender_Serializer_Eet_Element se;
 	Ender_Value_Type type;
 	Eina_List *properties;
 	void *ret = NULL;
@@ -476,7 +477,8 @@ static void * _serializer_eet_value_descriptor_marshal(void *sd,
 	if (!properties)
 		goto element_done;
 
-	nv.data.ptr = properties;
+	se.properties = properties;
+	nv.data.ptr = &se;
 	nv.type = ENDER_POINTER;
 	ret = eet_data_descriptor_encode(sd, &nv, len);
 
