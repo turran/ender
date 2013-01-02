@@ -32,10 +32,13 @@
 		v.container = cnt;					\
 		switch (cnt->type)					\
 		{							\
+			case ENDER_INT32:				\
+			v.data.i32 = va_arg(args, int32_t);		\
+			break;						\
+									\
 			case ENDER_COLOR:				\
 			case ENDER_ARGB:				\
 			case ENDER_UINT32:				\
-			case ENDER_INT32:				\
 			case ENDER_BOOL:				\
 			v.data.u32 = va_arg(args, uint32_t);		\
 			break;						\

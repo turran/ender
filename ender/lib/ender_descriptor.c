@@ -118,7 +118,7 @@ static Ender_Property * _descriptor_property_get(Ender_Descriptor *e, const char
 	return _descriptor_property_get(e->parent, name);
 }
 /*----------------------------------------------------------------------------*
- *                     uint32 / in32 / argb / bool                            *
+ *                                  int32                                     *
  *----------------------------------------------------------------------------*/
 static void _ender_int32_get(Ender_Value *v, Ender_Getter get, void *e)
 {
@@ -134,6 +134,24 @@ static void _ender_relative_int32_set(Ender_Value *v, Ender_Setter set,
 		Ender_Element *e, void *parent)
 {
 	set(parent, e, v->data.i32);
+}
+/*----------------------------------------------------------------------------*
+ *                         uint32 / argb / bool                               *
+ *----------------------------------------------------------------------------*/
+static void _ender_uint32_get(Ender_Value *v, Ender_Getter get, void *e)
+{
+	get(e, &v->data.u32);
+}
+
+static void _ender_uint32_set(Ender_Value *v, Ender_Setter set, void *e)
+{
+	set(e, v->data.u32);
+}
+
+static void _ender_relative_uint32_set(Ender_Value *v, Ender_Setter set,
+		Ender_Element *e, void *parent)
+{
+	set(parent, e, v->data.u32);
 }
 /*----------------------------------------------------------------------------*
  *                              uint64 / in64                                 *
@@ -361,14 +379,14 @@ void ender_descriptor_init(void)
 		_relative_accessors[i] = _ender_relative_dummy_set;
 	}
 	/* setters */
-	_setters[ENDER_BOOL] = _ender_int32_set;
-	_setters[ENDER_UINT32] = _ender_int32_set;
+	_setters[ENDER_BOOL] = _ender_uint32_set;
+	_setters[ENDER_UINT32] = _ender_uint32_set;
 	_setters[ENDER_INT32] = _ender_int32_set;
 	_setters[ENDER_UINT64] = _ender_int64_set;
 	_setters[ENDER_INT64] = _ender_int64_set;
 	_setters[ENDER_DOUBLE] = _ender_double_set;
-	_setters[ENDER_ARGB] = _ender_int32_set;
-	_setters[ENDER_COLOR] = _ender_int32_set;
+	_setters[ENDER_ARGB] = _ender_uint32_set;
+	_setters[ENDER_COLOR] = _ender_uint32_set;
 	_setters[ENDER_STRING] = _ender_pointer_set;
 	_setters[ENDER_OBJECT] = _ender_object_set;
 	_setters[ENDER_ENDER] = _ender_object_set;
@@ -376,14 +394,14 @@ void ender_descriptor_init(void)
 	_setters[ENDER_STRUCT] = _ender_pointer_set;
 	_setters[ENDER_UNION] = _ender_pointer_set;
 	/* getters */
-	_getters[ENDER_BOOL] = _ender_int32_get;
-	_getters[ENDER_UINT32] = _ender_int32_get;
-	_getters[ENDER_INT32] = _ender_int32_get;
+	_getters[ENDER_BOOL] = _ender_uint32_get;
+	_getters[ENDER_UINT32] = _ender_uint32_get;
+	_getters[ENDER_INT32] = _ender_uint32_get;
 	_getters[ENDER_UINT64] = _ender_int64_get;
 	_getters[ENDER_INT64] = _ender_int64_get;
 	_getters[ENDER_DOUBLE] = _ender_double_get;
-	_getters[ENDER_ARGB] = _ender_int32_get;
-	_getters[ENDER_COLOR] = _ender_int32_get;
+	_getters[ENDER_ARGB] = _ender_uint32_get;
+	_getters[ENDER_COLOR] = _ender_uint32_get;
 	_getters[ENDER_STRING] = _ender_object_get;
 	_getters[ENDER_OBJECT] = _ender_object_get;
 	_getters[ENDER_ENDER] = _ender_object_get;
@@ -391,14 +409,14 @@ void ender_descriptor_init(void)
 	_getters[ENDER_STRUCT] = _ender_pointer_get;
 	_getters[ENDER_UNION] = _ender_pointer_get;
 	/* relative setters */
-	_relative_accessors[ENDER_BOOL] = _ender_relative_int32_set;
-	_relative_accessors[ENDER_UINT32] = _ender_relative_int32_set;
+	_relative_accessors[ENDER_BOOL] = _ender_relative_uint32_set;
+	_relative_accessors[ENDER_UINT32] = _ender_relative_uint32_set;
 	_relative_accessors[ENDER_INT32] = _ender_relative_int32_set;
 	_relative_accessors[ENDER_UINT64] = _ender_relative_int64_set;
 	_relative_accessors[ENDER_INT64] = _ender_relative_int64_set;
 	_relative_accessors[ENDER_DOUBLE] = _ender_relative_double_set;
-	_relative_accessors[ENDER_ARGB] = _ender_relative_int32_set;
-	_relative_accessors[ENDER_COLOR] = _ender_relative_int32_set;
+	_relative_accessors[ENDER_ARGB] = _ender_relative_uint32_set;
+	_relative_accessors[ENDER_COLOR] = _ender_relative_uint32_set;
 	_relative_accessors[ENDER_STRING] = _ender_relative_pointer_set;
 	_relative_accessors[ENDER_OBJECT] = _ender_relative_object_set;
 	_relative_accessors[ENDER_ENDER] = _ender_relative_object_set;
