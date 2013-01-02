@@ -50,7 +50,7 @@ static void _ender_struct_property_get_size(Ender_Property *prop, void *data)
 	ender_container_unref(c);
 }
 /*----------------------------------------------------------------------------*
- *                     uint32 / in32 / argb / bool                            *
+ *                                 int32                                      *
  *----------------------------------------------------------------------------*/
 static void _ender_int32_get(Ender_Value *v, void *o)
 {
@@ -60,6 +60,18 @@ static void _ender_int32_get(Ender_Value *v, void *o)
 static void _ender_int32_set(Ender_Value *v, void *o)
 {
 	*(int32_t *)o = v->data.i32;
+}
+/*----------------------------------------------------------------------------*
+ *                        uint32 / argb / bool                                *
+ *----------------------------------------------------------------------------*/
+static void _ender_uint32_get(Ender_Value *v, void *o)
+{
+	v->data.u32 = *(uint32_t *)o;
+}
+
+static void _ender_uint32_set(Ender_Value *v, void *o)
+{
+	*(uint32_t *)o = v->data.u32;
 }
 /*----------------------------------------------------------------------------*
  *                              uint64 / in64                                 *
@@ -308,14 +320,14 @@ void ender_struct_init(void)
 		_getters[i] = _ender_dummy_get;
 	}
 	/* setters */
-	_setters[ENDER_BOOL] = _ender_int32_set;
-	_setters[ENDER_UINT32] = _ender_int32_set;
+	_setters[ENDER_BOOL] = _ender_uint32_set;
+	_setters[ENDER_UINT32] = _ender_uint32_set;
 	_setters[ENDER_INT32] = _ender_int32_set;
 	_setters[ENDER_UINT64] = _ender_int64_set;
 	_setters[ENDER_INT64] = _ender_int64_set;
 	_setters[ENDER_DOUBLE] = _ender_double_set;
-	_setters[ENDER_ARGB] = _ender_int32_set;
-	_setters[ENDER_COLOR] = _ender_int32_set;
+	_setters[ENDER_ARGB] = _ender_uint32_set;
+	_setters[ENDER_COLOR] = _ender_uint32_set;
 	_setters[ENDER_STRING] = _ender_pointer_set;
 	_setters[ENDER_OBJECT] = _ender_object_set;
 	_setters[ENDER_ENDER] = _ender_object_set;
@@ -323,14 +335,14 @@ void ender_struct_init(void)
 	_setters[ENDER_STRUCT] = _ender_pointer_set;
 	_setters[ENDER_UNION] = _ender_pointer_set;
 	/* getters */
-	_getters[ENDER_BOOL] = _ender_int32_get;
-	_getters[ENDER_UINT32] = _ender_int32_get;
+	_getters[ENDER_BOOL] = _ender_uint32_get;
+	_getters[ENDER_UINT32] = _ender_uint32_get;
 	_getters[ENDER_INT32] = _ender_int32_get;
 	_getters[ENDER_UINT64] = _ender_int64_get;
 	_getters[ENDER_INT64] = _ender_int64_get;
 	_getters[ENDER_DOUBLE] = _ender_double_get;
-	_getters[ENDER_ARGB] = _ender_int32_get;
-	_getters[ENDER_COLOR] = _ender_int32_get;
+	_getters[ENDER_ARGB] = _ender_uint32_get;
+	_getters[ENDER_COLOR] = _ender_uint32_get;
 	_getters[ENDER_STRING] = _ender_object_get;
 	_getters[ENDER_OBJECT] = _ender_object_get;
 	_getters[ENDER_ENDER] = _ender_object_get;
