@@ -33,14 +33,6 @@
  * and calculated by the user. Given that it is the most
  * difficult part, it will be done at the end.
  *
- * Problems with eet tha ive seen so far:
- * 1. You can only serialize full structs, not single values
- * 2. Given the nature of the compound containers (structs and unions)
- * where you can add elements incrementally, you need to know beforehand
- * the full siz eof your struct which is false of course. An option
- * is to destroy the previous descriptor and create a new one, but then
- * every container referencing this (struct inside struct) must be aware of
- * it
  * Other alternatives:
  * http://tpl.sourceforge.net/userguide.html
  * http://gwlib.com/

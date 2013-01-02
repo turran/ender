@@ -224,6 +224,7 @@ Ender_Element * ender_serializer_element_unmarshal(Ender_Descriptor *d,
 Ender_Value * ender_serializer_value_unmarshal(Ender_Container *ec,
 		void *data, unsigned int len);
 void * ender_serializer_value_marshal(const Ender_Value *v, unsigned int *len);
+Ender_Serializer * ender_serializer_eet_get(void);
 
 /* misc */
 char * ender_name_camelize(const char *name, Eina_Bool skip);

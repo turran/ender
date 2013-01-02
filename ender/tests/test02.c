@@ -1,6 +1,7 @@
 /* This test should check that the element/value marshallers works correctly */
 #include "test_dummy.h"
 
+#define V_C 0xff00ff00
 #define V_I32 -123456
 #define V_U32 123456
 #define V_B EINA_TRUE
@@ -157,6 +158,7 @@ int main(int argc, char **argv)
 	ender_element_value_set(e, "b", V_B, NULL);
 	ender_element_value_set(e, "u32", V_U32, NULL);
 	ender_element_value_set(e, "i32", V_I32, NULL);
+	ender_element_value_set(e, "color", V_C, NULL);
 	ender_element_value_set(e, "d", V_D, NULL);
 
 	/* marshal the element itself */

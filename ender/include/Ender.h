@@ -102,6 +102,7 @@ typedef enum _Ender_Descriptor_Type
 	ENDER_TYPES,
 } Ender_Descriptor_Type;
 
+/* TODO add an UNKNOWN */
 typedef enum _Ender_Value_Type
 {
 	/* basic types */
@@ -120,6 +121,7 @@ typedef enum _Ender_Value_Type
 	ENDER_VALUE,
 	/* compound types */
 	ENDER_LIST,
+	/* descriptor based types? */
 	ENDER_STRUCT,
 	ENDER_UNION,
 	ENDER_PROPERTY_TYPES,
@@ -345,6 +347,7 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 EAPI void ender_descriptor_property_list(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *thiz, const char *name);
+EAPI Ender_Property * ender_descriptor_property_get_at(Ender_Descriptor *thiz, int idx);
 
 EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *edesc, const char *name,
 		Ender_Accessor f, Ender_Marshaller marshaller, Ender_Container *ret, ...);

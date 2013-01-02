@@ -693,6 +693,41 @@ EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *thiz,
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Ender_Property * ender_descriptor_property_get_at(Ender_Descriptor *thiz,
+		int idx)
+{
+	Ender_Property *ret = NULL;
+	Eina_List *hierarchy = NULL;
+	int start = 0;
+
+	if (!thiz) return NULL;
+	/* create a list with the first level of the hierarchy first, then the
+	 * second, etc, etc
+	 */
+	while (thiz)
+	{
+		hierarchy = eina_list_prepend(hierarchy, thiz);
+		thiz = thiz->parent;
+	}
+	EINA_LIST_FREE(hierarchy, thiz)
+	{
+		int length;
+
+		length = eina_ordered_hash_count(thiz->properties);
+		if (idx >= length)
+		{
+			start = length;
+			continue;
+		}
+		ret = eina_ordered_hash_nth_get(thiz->properties, idx - start);
+	}
+	return ret;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *thiz)
 {
 	if (!thiz) return NULL;

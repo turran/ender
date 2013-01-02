@@ -21,6 +21,19 @@
 #if BUILD_SERIALIZER_EET
 #include "Eet.h"
 #endif
+
+/* Problems with eet tha ive seen so far:
+ * 1. You can only serialize full structs, not single values
+ * 2. Given the nature of the compound containers (structs and unions)
+ * where you can add elements incrementally, you need to know beforehand
+ * the full siz eof your struct which is false of course. An option
+ * is to destroy the previous descriptor and create a new one, but then
+ * every container referencing this (struct inside struct) must be aware of
+ * it
+ * Ways of improving eet
+ * 1. dont let it allocate the data for you, pass the pointer to store it
+ * 2. the union case is hiper complicated
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -54,10 +67,15 @@ typedef struct _Ender_Serializer_Eet_Property
 typedef struct _Ender_Serializer_Eet_Element
 {
 	Eina_List *properties;
-	Ender_Element *e;
-	int idx;
 } Ender_Serializer_Eet_Element;
 
+/* definition of the data passed on the properties get function */
+typedef struct _Ender_Descriptor_Property_List_Data
+{
+	Eina_List *properties;
+	Ender_Element *e;
+	int idx;
+} Ender_Descriptor_Property_List_Data;
 
 static Eet_Data_Descriptor *_ender_value_descriptor;
 static Eet_Data_Descriptor *_ender_value_data_descriptor;
@@ -79,6 +97,7 @@ struct
 	{ ENDER_INT64, "i64" },
 	{ ENDER_DOUBLE, "d" },
 	{ ENDER_STRING, "s" },
+	{ ENDER_POINTER, "p" },
 	{ ENDER_VALUE, NULL }
 };
 
@@ -126,7 +145,9 @@ static Eina_Bool _serializer_eet_value_type_set(const char *type,
 	return EINA_FALSE;
 }
 
-static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(void)
+/* this will create the descriptor for a value data, only for basic types */
+static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(
+		void)
 {
 	Eet_Data_Descriptor_Class eddc;
 	Eet_Data_Descriptor *ret;
@@ -138,8 +159,10 @@ static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(voi
 	eddc.func.type_set = _serializer_eet_value_type_set;
 	ret = eet_data_descriptor_stream_new(&eddc);
 
+	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Value_Data);
+	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
 	d = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "b", i32, EET_T_INT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "b", u32, EET_T_UINT);
 	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "b", d);
 
 	d = eet_data_descriptor_stream_new(&eddc);
@@ -176,12 +199,25 @@ static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(voi
 
 	return ret;
 }
+
+/* extend the basic type to support elements/structs/objects/etc */
+static void _serializer_eet_ender_value_data_descriptor_extend(void)
+{
+	Eet_Data_Descriptor_Class eddc;
+	Eet_Data_Descriptor *ret = _ender_value_data_descriptor;
+	Eet_Data_Descriptor *d;
+
+	d = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_SUB(d, Ender_Value_Data, "p", ptr,
+			_ender_element_descriptor);
+	EET_DATA_DESCRIPTOR_ADD_MAPPING(ret, "p", d);
+}
 /*----------------------------------------------------------------------------*
  *                        Ender_Element descriptor                             *
  *----------------------------------------------------------------------------*/
 static void _serializer_eet_property_marshal_cb(Ender_Property *p, void *data)
 {
-	Ender_Serializer_Eet_Element *v = data;
+	Ender_Descriptor_Property_List_Data *v = data;
 	Ender_Container *c;
 	Eina_Bool set;
 
@@ -230,31 +266,59 @@ done:
 	v->idx++;
 }
 
-static void _serializer_eet_property_unmarshal_cb(Ender_Property *p, void *data)
+static Eina_List * _serializer_eet_ender_element_get_properties(
+		Ender_Element *e, Ender_Descriptor *d)
 {
-	Ender_Serializer_Eet_Element *v = data;
+	Ender_Descriptor_Property_List_Data data;
+
+	data.idx = 0;
+	data.e = e;
+	data.properties = NULL;
+	/* iterate over the descriptor properties and marshal them */
+	ender_descriptor_property_list_recursive(d,
+		_serializer_eet_property_marshal_cb, &data);
+	return data.properties;
+}
+
+static void _serializer_eet_ender_element_set_properties(Ender_Element *e,
+		Ender_Descriptor *d, Eina_List *properties)
+{
 	Ender_Serializer_Eet_Property *prop;
 	Eina_List *l;
 
-	EINA_LIST_FOREACH (v->properties, l, prop)
+	/* for each property, set it */
+	EINA_LIST_FOREACH(properties, l, prop)
 	{
+		Ender_Property *p;
 		Ender_Value value;
 		Ender_Container *c;
 
 		/* only static properties */
 		if (prop->type->type != ENDER_INT32)
 			continue;
-		if (prop->type->data.i32 != v->idx)
+		p = ender_descriptor_property_get_at(d, prop->type->data.i32);
+		if (!p)
 			continue;
 		/* TODO check the container type */
 		c = ender_property_container_get(p);
 
 		value.container = c;
 		value.data = prop->data->data;
-		ender_element_property_value_set_simple(v->e, p, &value);
+		ender_element_property_value_set_simple(e, p, &value);
 		ender_container_unref(c);
 	}
-	v->idx++;
+}
+
+static void _serializer_eet_ender_element_properties_free(Eina_List *properties)
+{
+	Ender_Serializer_Eet_Property *prop;
+
+	EINA_LIST_FREE(properties, prop)
+	{
+		free(prop->type);
+		free(prop->data);
+		free(prop);
+	}
 }
 
 static Eet_Data_Descriptor * _serializer_eet_ender_element_descriptor_get(void)
@@ -298,15 +362,11 @@ static void * _serializer_eet_container_new(Ender_Container *c)
 		case ENDER_INT64:
 		case ENDER_DOUBLE:
 		case ENDER_STRING:
-		ret = _ender_value_descriptor;
-		break;
-
-		/* for element types, marshal a list of properties */
 		case ENDER_OBJECT:
 		case ENDER_STRUCT:
 		case ENDER_ENDER:
 		case ENDER_UNION:
-		ret = _ender_element_descriptor;
+		ret = _ender_value_descriptor;
 		break;
 
 		/* for lists, marshal a list of its sub container
@@ -333,12 +393,8 @@ static void * _serializer_eet_element_marshal(Ender_Descriptor *d,
 	Ender_Serializer_Eet_Element v;
 	void *ret;
 
-	v.idx = 0;
-	v.e = e;
-	v.properties = NULL;
-	/* iterate over the descriptor properties and marshal them */
-	ender_descriptor_property_list_recursive(d,
-		_serializer_eet_property_marshal_cb, &v);
+	v.properties = _serializer_eet_ender_element_get_properties(
+		e, d);
 	if (!v.properties)
 	{
 		ERR("Nothing to marshal");
@@ -348,6 +404,8 @@ static void * _serializer_eet_element_marshal(Ender_Descriptor *d,
 
 	/* finally encode it */
 	ret = eet_data_descriptor_encode(_ender_element_descriptor, &v.properties, len);
+	_serializer_eet_ender_element_properties_free(v.properties);
+
 	return ret;
 }
 
@@ -367,37 +425,115 @@ static Ender_Element * _serializer_eet_element_unmarshal(
 
 	/* create an element */
 	e = ender_descriptor_element_new(d);
-	v->e = e;
-	v->idx = 0;
-	/* iterate over the generate struct and set the properties
-	 * TODO here we can iterate over the unmarshalled list of properties
-	 * but then we'll need a way to fetch properties by idx, too lazy :)
-	 */
-	ender_descriptor_property_list_recursive(d,
-		_serializer_eet_property_unmarshal_cb, v);
-	/* TODO free correctly */
+	_serializer_eet_ender_element_set_properties(e, d, v->properties);
+	_serializer_eet_ender_element_properties_free(v->properties);
+	free(v);
 	return NULL;
 }
 
-static void * _serializer_eet_value_marshal(void *sd,
+static void * _serializer_eet_value_basic_marshal(void *sd,
 		const Ender_Value *v, unsigned int *len)
 {
 	Ender_Serializer_Eet_Value nv;
 	void *ret = NULL;
 
-	if (!sd) return NULL;
-
 	nv.data = v->data;
 	nv.type = v->container->type;
-
 	ret = eet_data_descriptor_encode(sd, &nv, len);
-	/* check if the descriptor is a basic descriptor */
-	/* if so, encode directly */
-	/* if it is a value that holds an element, check the
-	 * descriptor constraint and marshal it if possible
-	 */
-	/* if it is a list, marshal it using its own descriptor */
 	return ret;
+}
+
+static void * _serializer_eet_value_descriptor_marshal(void *sd,
+		const Ender_Value *v, unsigned int *len)
+{
+	Ender_Element *e;
+	Ender_Descriptor *descriptor;
+	const Ender_Constraint *cnst;
+	Ender_Serializer_Eet_Value nv;
+	Ender_Value_Type type;
+	Eina_List *properties;
+	void *ret = NULL;
+
+	cnst = ender_container_constraint_get(v->container);
+	if (!cnst || ender_constraint_type_get(cnst) !=
+			ENDER_CONSTRAINT_DESCRIPTOR)
+		return NULL;
+	descriptor = ender_constraint_descriptor_descriptor_get(cnst);
+	if (!descriptor) return NULL;
+
+	type = v->container->type;
+	if (type != ENDER_ENDER)
+	{
+		/* create a new temporary element */
+		e = ender_descriptor_element_new_from_data(descriptor, v->data.ptr);
+	}
+	else
+	{
+		e = ender_value_ender_get(v);
+	}
+	properties = _serializer_eet_ender_element_get_properties(e,
+		descriptor);
+	if (!properties)
+		goto element_done;
+
+	nv.data.ptr = properties;
+	nv.type = ENDER_POINTER;
+	ret = eet_data_descriptor_encode(sd, &nv, len);
+
+element_done:
+	if (type != ENDER_ENDER)
+	{
+		/* remove the temporary ender */
+		ender_element_unref(e);
+	}
+	_serializer_eet_ender_element_properties_free(properties);
+	return ret;
+}
+
+static void * _serializer_eet_value_marshal(void *sd,
+		const Ender_Value *v, unsigned int *len)
+{
+	Ender_Value_Type type;
+
+	if (!sd) return NULL;
+	type = v->container->type;
+	switch (type)
+	{
+		/* basic types */
+		case ENDER_BOOL:
+		case ENDER_UINT32:
+		case ENDER_INT32:
+		case ENDER_UINT64:
+		case ENDER_INT64:
+		case ENDER_DOUBLE:
+		case ENDER_COLOR:
+		case ENDER_ARGB:
+		case ENDER_STRING:
+		return _serializer_eet_value_basic_marshal(sd, v, len);
+		break;
+
+		/* descriptor types */
+		/* if it is a value that holds an element, check the
+		 * descriptor constraint and marshal it if possible
+		 */
+		case ENDER_OBJECT:
+		case ENDER_ENDER:
+		case ENDER_STRUCT:
+		case ENDER_UNION:
+		return _serializer_eet_value_descriptor_marshal(sd, v, len);
+		break;
+
+		case ENDER_POINTER:
+		case ENDER_VALUE:
+		/* TODO if it is a list, marshal it using its own descriptor */
+		case ENDER_LIST:
+		default:
+		ERR("Type '%s' not supported yet",
+				ender_value_type_string_to(type));
+		return NULL;
+	}
+
+	return NULL;
 
 }
 
@@ -461,6 +597,10 @@ Ender_Serializer * ender_serializer_eet_get(void)
 		 */
 		d = _serializer_eet_ender_element_descriptor_get();
 		_ender_element_descriptor = d;
+		/* given that the value and element descriptor depend on each
+		 * other, we need to extend the value descriptor later
+		 */
+		_serializer_eet_ender_value_data_descriptor_extend();
 		 /* and lastly a new descriptor for each kind of list
 		 */
 

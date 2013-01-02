@@ -183,20 +183,24 @@ struct _Ender_Element
 	Eina_Hash *properties;
 	Eina_Hash *data;
 	int ref;
+	Eina_Bool owned;
 };
 
-static void _ender_element_delete(Ender_Element *e)
+static void _ender_element_delete(Ender_Element *thiz)
 {
-	Ender_Descriptor *desc = e->descriptor;
+	Ender_Descriptor *desc = thiz->descriptor;
 
 	/* call the free callback */
-	ender_event_dispatch(e, "Free", NULL);
-	ender_descriptor_native_destroy(desc, e->object);
+	ender_event_dispatch(thiz, "Free", NULL);
+	if (thiz->owned)
+	{
+		ender_descriptor_native_destroy(desc, thiz->object);
+	}
 	/* free every private data */
 	/* TODO the listeners */
-	eina_hash_free(e->properties);
-	eina_hash_free(e->data);
-	free(e);
+	eina_hash_free(thiz->properties);
+	eina_hash_free(thiz->data);
+	free(thiz);
 }
 
 static Ender_Property * _ender_element_property_get_simple(Ender_Element *e,
@@ -306,12 +310,14 @@ Ender_Element * ender_element_new_from_data(Ender_Descriptor *desc, void *data)
 	thiz->properties = eina_hash_string_superfast_new((Eina_Free_Cb)ender_property_free);
 	thiz->data = eina_hash_string_superfast_new(NULL);
 	thiz->ref = 1;
+	thiz->owned = EINA_FALSE;
 
 	return thiz;
 }
 
 Ender_Element * ender_element_new(Ender_Descriptor *desc)
 {
+	Ender_Element *thiz;
 	void *object;
 
 	if (!desc)
@@ -328,7 +334,11 @@ Ender_Element * ender_element_new(Ender_Descriptor *desc)
 		return NULL;
 	}
 	DBG("Element '%s' created correctly", desc->name);
-	return ender_element_new_from_data(desc, object);
+	thiz = ender_element_new_from_data(desc, object);
+	/* set the owned flag */
+	thiz->owned = EINA_TRUE;
+
+	return thiz;
 }
 /*============================================================================*
  *                                   API                                      *
