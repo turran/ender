@@ -207,6 +207,8 @@ static void _serializer_eet_ender_value_data_descriptor_extend(void)
 	Eet_Data_Descriptor *ret = _ender_value_data_descriptor;
 	Eet_Data_Descriptor *d;
 
+	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Value_Data);
+	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
 	d = eet_data_descriptor_stream_new(&eddc);
 	EET_DATA_DESCRIPTOR_ADD_SUB(d, Ender_Value_Data, "p", ptr,
 			_ender_element_descriptor);
@@ -328,7 +330,7 @@ static Eet_Data_Descriptor * _serializer_eet_ender_element_descriptor_get(void)
 	Eet_Data_Descriptor *d;
 	Eet_Data_Descriptor *property;
 
-	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Value_Data);
+	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Serializer_Eet_Property);
 	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
 	/* first the property descriptor */
 	d = eet_data_descriptor_stream_new(&eddc);
@@ -339,6 +341,7 @@ static Eet_Data_Descriptor * _serializer_eet_ender_element_descriptor_get(void)
 	property = d;
 
 	/* now the element descriptor */
+	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Serializer_Eet_Element);
 	ret = eet_data_descriptor_stream_new(&eddc);
 	EET_DATA_DESCRIPTOR_ADD_LIST(ret, Ender_Serializer_Eet_Element,
 		"properties", properties, property);
