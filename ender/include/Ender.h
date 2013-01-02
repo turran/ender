@@ -364,6 +364,9 @@ EAPI Ender_Namespace * ender_descriptor_namespace_get(Ender_Descriptor *thiz);
 EAPI Ender_Element * ender_descriptor_element_new(Ender_Descriptor *thiz);
 EAPI Ender_Element * ender_descriptor_element_new_from_data(
 		Ender_Descriptor *thiz, void *data);
+
+EAPI Ender_Element * ender_descriptor_element_unmarshal(Ender_Descriptor *thiz,
+		void *data, unsigned int len);
 /**
  * @}
  * @defgroup Ender_Element_Group Element
@@ -444,6 +447,8 @@ EAPI Eina_Bool ender_element_function_call_valist(Ender_Element *e, Ender_Functi
 EAPI Eina_Bool ender_element_function_call(Ender_Element *e, Ender_Function *f, void *ret, ...);
 EAPI Eina_Bool ender_element_function_call_simple(Ender_Element *e,
 		Ender_Function *f, Ender_Value *ret, Eina_List *args);
+
+EAPI void * ender_element_marshal(Ender_Element *e, unsigned int *len);
 
 /**
  * @}
