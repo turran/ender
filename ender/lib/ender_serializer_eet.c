@@ -567,22 +567,22 @@ static void * _serializer_eet_native_marshal(Ender_Descriptor *d,
 		void *native, unsigned int *len)
 {
 	Ender_Serializer_Eet_Element v;
+	Ender_Element *e;
 	void *ret = NULL;
 
-#if 0
+	e = ender_element_new_from_data(d, native);
 	v.properties = _serializer_eet_ender_element_get_properties(
 		e, d);
 	if (!v.properties)
 	{
 		ERR("Nothing to marshal");
-		return NULL;
+		goto done;
 	}
-	/* TODO iterate over the element properties only and marshal them */
-
 	/* finally encode it */
 	ret = eet_data_descriptor_encode(_ender_element_descriptor, &v.properties, len);
 	_serializer_eet_ender_element_properties_free(v.properties);
-#endif
+done:
+	ender_element_unref(e);
 	return ret;
 }
 
@@ -590,8 +590,9 @@ static void * _serializer_eet_native_unmarshal(
 		Ender_Descriptor *d, void *data, unsigned int len)
 {
 	Ender_Serializer_Eet_Element *v;
+	Ender_Element *e;
+	void *native = NULL;
 
-#if 0
 	/* decode the data */
 	v = eet_data_descriptor_decode(_ender_element_descriptor, data, len);
 	if (!v)
@@ -601,12 +602,16 @@ static void * _serializer_eet_native_unmarshal(
 	}
 
 	/* create an element */
-	e = ender_descriptor_element_new(d);
+	native = ender_descriptor_native_create(d);
+	if (!native) return NULL;
+
+	e = ender_element_new_from_data(d, native);
 	_serializer_eet_ender_element_set_properties(e, d, v->properties);
 	_serializer_eet_ender_element_properties_free(v->properties);
 	free(v);
-#endif
-	return NULL;
+	ender_element_unref(e);
+
+	return native;
 }
 
 static Ender_Serializer _ender_serializer_eet = {

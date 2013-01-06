@@ -776,3 +776,24 @@ EAPI Ender_Element * ender_descriptor_element_unmarshal(Ender_Descriptor *thiz,
 {
 	return ender_serializer_element_unmarshal(thiz, data, len);
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_descriptor_native_marshal(Ender_Descriptor *thiz,
+		void *data, unsigned int *len)
+{
+	return ender_serializer_native_marshal(thiz, data, len);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_descriptor_native_unmarshal(Ender_Descriptor *thiz,
+		void *data, unsigned int len)
+{
+	return ender_serializer_native_unmarshal(thiz, data, len);
+}
+

@@ -370,6 +370,10 @@ EAPI Ender_Element * ender_descriptor_element_new_from_data(
 
 EAPI Ender_Element * ender_descriptor_element_unmarshal(Ender_Descriptor *thiz,
 		void *data, unsigned int len);
+EAPI void * ender_descriptor_native_marshal(Ender_Descriptor *thiz,
+		void *data, unsigned int *len);
+EAPI void * ender_descriptor_native_unmarshal(Ender_Descriptor *thiz,
+		void *data, unsigned int len);
 /**
  * @}
  * @defgroup Ender_Element_Group Element

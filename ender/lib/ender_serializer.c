@@ -139,7 +139,7 @@ void * ender_serializer_native_marshal(Ender_Descriptor *d, void *native, unsign
 	if (!thiz) return NULL;
 	if (!thiz->native_marshal)
 		return NULL;
-	return thiz->value_marshal(d, native, len);
+	return thiz->native_marshal(d, native, len);
 }
 
 void * ender_serializer_native_unmarshal(Ender_Descriptor *d,
