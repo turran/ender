@@ -194,7 +194,7 @@ static void _ender_element_delete(Ender_Element *thiz)
 	ender_event_dispatch(thiz, "Free", NULL);
 	if (thiz->owned)
 	{
-		ender_descriptor_native_destroy(desc, thiz->object);
+		ender_descriptor_native_free(desc, thiz->object);
 	}
 	/* free every private data */
 	/* TODO the listeners */
@@ -327,7 +327,7 @@ Ender_Element * ender_element_new(Ender_Descriptor *desc)
 	}
 
 	DBG("Creating new ender '%s'", desc->name);
-	object = ender_descriptor_native_create(desc);
+	object = ender_descriptor_native_new(desc);
 	if (!object)
 	{
 		ERR("For some reason the creator for '%s' failed", desc->name);

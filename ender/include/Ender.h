@@ -374,6 +374,9 @@ EAPI void * ender_descriptor_native_marshal(Ender_Descriptor *thiz,
 		void *data, unsigned int *len);
 EAPI void * ender_descriptor_native_unmarshal(Ender_Descriptor *thiz,
 		void *data, unsigned int len);
+EAPI void * ender_descriptor_native_new(Ender_Descriptor *thiz);
+EAPI void ender_descriptor_native_free(Ender_Descriptor *thiz, void *object);
+
 /**
  * @}
  * @defgroup Ender_Element_Group Element

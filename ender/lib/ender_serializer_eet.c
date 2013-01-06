@@ -602,7 +602,7 @@ static void * _serializer_eet_native_unmarshal(
 	}
 
 	/* create an element */
-	native = ender_descriptor_native_create(d);
+	native = ender_descriptor_native_new(d);
 	if (!native) return NULL;
 
 	e = ender_element_new_from_data(d, native);

@@ -139,9 +139,6 @@ void ender_descriptor_free(Ender_Descriptor *thiz);
 const char * ender_descriptor_name_get(Ender_Descriptor *edesc);
 Ender_Descriptor * ender_descriptor_find(const char *name);
 
-void * ender_descriptor_native_create(Ender_Descriptor *thiz);
-void ender_descriptor_native_destroy(Ender_Descriptor *thiz, void *object);
-
 /* property */
 typedef void (*Ender_Property_Accessor)(Ender_Property *ep, Ender_Element *e, Ender_Value *v, void *data);
 typedef Eina_Bool (*Ender_Property_Is_Set)(Ender_Property *ep, Ender_Element *e, void *data);

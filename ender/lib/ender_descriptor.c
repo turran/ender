@@ -322,16 +322,6 @@ void ender_descriptor_object_property_free(void *data)
 /*----------------------------------------------------------------------------*
  *                       The constructor interface                            *
  *----------------------------------------------------------------------------*/
-void * ender_descriptor_native_create(Ender_Descriptor *thiz)
-{
-	return _backends[thiz->type].creator(thiz);
-}
-
-void ender_descriptor_native_destroy(Ender_Descriptor *thiz, void *object)
-{
-	_backends[thiz->type].destructor(thiz, object);
-}
-
 Ender_Descriptor * ender_descriptor_new(const char *name, Ender_Namespace *ns,
 		Ender_Creator creator,
 		Ender_Destructor destructor,
@@ -796,4 +786,25 @@ EAPI void * ender_descriptor_native_unmarshal(Ender_Descriptor *thiz,
 {
 	return ender_serializer_native_unmarshal(thiz, data, len);
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_descriptor_native_new(Ender_Descriptor *thiz)
+{
+	if (!thiz) return NULL;
+	return _backends[thiz->type].creator(thiz);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_descriptor_native_free(Ender_Descriptor *thiz, void *object)
+{
+	if (!thiz) return NULL;
+	_backends[thiz->type].destructor(thiz, object);
+}
+
 
