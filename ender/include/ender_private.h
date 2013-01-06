@@ -208,6 +208,10 @@ typedef void * (*Ender_Serializer_Value_Marshal)(void *sd,
 		const Ender_Value *v, unsigned int *len);
 typedef Ender_Value * (*Ender_Serializer_Value_Unmarshal)(
 		Ender_Container *c, void *sd, void *data, unsigned int len);
+typedef void * (*Ender_Serializer_Native_Marshal)(Ender_Descriptor *d,
+		void *native, unsigned int *len);
+typedef void * (*Ender_Serializer_Native_Unmarshal)(
+		Ender_Descriptor *d, void *data, unsigned int len);
 
 typedef struct _Ender_Serializer {
 	Ender_Serializer_Container_New container_new;
@@ -215,6 +219,8 @@ typedef struct _Ender_Serializer {
 	Ender_Serializer_Element_Unmarshal element_unmarshal;
 	Ender_Serializer_Value_Marshal value_marshal;
 	Ender_Serializer_Value_Unmarshal value_unmarshal;
+	Ender_Serializer_Native_Marshal native_marshal;
+	Ender_Serializer_Native_Unmarshal native_unmarshal;
 } Ender_Serializer;
 
 void * ender_serializer_container_new(Ender_Container *ec);
@@ -224,6 +230,9 @@ Ender_Element * ender_serializer_element_unmarshal(Ender_Descriptor *d,
 Ender_Value * ender_serializer_value_unmarshal(Ender_Container *ec,
 		void *data, unsigned int len);
 void * ender_serializer_value_marshal(const Ender_Value *v, unsigned int *len);
+void * ender_serializer_native_marshal(Ender_Descriptor *d, void *native, unsigned int *len);
+void * ender_serializer_native_unmarshal(Ender_Descriptor *d,
+		void *data, unsigned int len);
 Ender_Serializer * ender_serializer_eet_get(void);
 
 /* misc */

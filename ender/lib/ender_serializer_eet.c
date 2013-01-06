@@ -381,7 +381,7 @@ static void * _serializer_eet_container_new(Ender_Container *c)
 		break;
 
 		/* a pointer is a not known type, we can not marshal it */
-		/* for a value, we dont know yet :P */ 
+		/* for a value, we dont know yet :P */
 		case ENDER_VALUE:
 		case ENDER_POINTER:
 		ERR("value not supported yet");
@@ -431,7 +431,7 @@ static Ender_Element * _serializer_eet_element_unmarshal(
 	_serializer_eet_ender_element_set_properties(e, d, v->properties);
 	_serializer_eet_ender_element_properties_free(v->properties);
 	free(v);
-	return NULL;
+	return e;
 }
 
 static void * _serializer_eet_value_basic_marshal(void *sd,
@@ -563,12 +563,60 @@ static Ender_Value * _serializer_eet_value_unmarshal(
 	return ret;
 }
 
+static void * _serializer_eet_native_marshal(Ender_Descriptor *d,
+		void *native, unsigned int *len)
+{
+	Ender_Serializer_Eet_Element v;
+	void *ret = NULL;
+
+#if 0
+	v.properties = _serializer_eet_ender_element_get_properties(
+		e, d);
+	if (!v.properties)
+	{
+		ERR("Nothing to marshal");
+		return NULL;
+	}
+	/* TODO iterate over the element properties only and marshal them */
+
+	/* finally encode it */
+	ret = eet_data_descriptor_encode(_ender_element_descriptor, &v.properties, len);
+	_serializer_eet_ender_element_properties_free(v.properties);
+#endif
+	return ret;
+}
+
+static void * _serializer_eet_native_unmarshal(
+		Ender_Descriptor *d, void *data, unsigned int len)
+{
+	Ender_Serializer_Eet_Element *v;
+
+#if 0
+	/* decode the data */
+	v = eet_data_descriptor_decode(_ender_element_descriptor, data, len);
+	if (!v)
+	{
+		ERR("Nothing to unmarshal");
+		return NULL;
+	}
+
+	/* create an element */
+	e = ender_descriptor_element_new(d);
+	_serializer_eet_ender_element_set_properties(e, d, v->properties);
+	_serializer_eet_ender_element_properties_free(v->properties);
+	free(v);
+#endif
+	return NULL;
+}
+
 static Ender_Serializer _ender_serializer_eet = {
 	/* .container_new	= */ _serializer_eet_container_new,
 	/* .element_marshal	= */ _serializer_eet_element_marshal,
 	/* .element_unmarshal	= */ _serializer_eet_element_unmarshal,
 	/* .value_marshal	= */ _serializer_eet_value_marshal,
 	/* .value_unmarshal 	= */ _serializer_eet_value_unmarshal,
+	/* .native_marshal	= */ _serializer_eet_native_marshal,
+	/* .native_unmarshal 	= */ _serializer_eet_native_unmarshal,
 };
 #endif
 /*============================================================================*

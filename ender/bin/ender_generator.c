@@ -21,8 +21,6 @@
 #include <getopt.h>
 
 #include "Ender.h"
-#include "ender_private.h"
-
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -73,6 +71,53 @@ static void _upper(const char *src, size_t len, char *dst)
 			d = s;
 		*dst++ = d;
 	}
+}
+
+char * _name_camelize(const char *name, Eina_Bool skip)
+{
+	Eina_Bool upper = EINA_TRUE;
+	char *ret;
+	char *tmp;
+
+	if (!name) return NULL;
+	ret = tmp = calloc(1, strlen(name));
+	while (*name)
+	{
+		if (*name == '_')
+		{
+			upper = EINA_TRUE;
+			if (!skip)
+			{
+				*tmp = *name;
+			}
+			goto next;
+		}
+		if (upper)
+		{
+			if (isalpha(*name))
+			{
+				*tmp = toupper(*name);
+				upper = EINA_FALSE;
+			}
+			else
+			{
+				*tmp = *name;
+			}
+		}
+		else
+		{
+			*tmp = *name;
+		}
+next:
+		name++;
+		tmp++;
+	}
+	return ret;
+}
+
+static char * _name_structify(const char *name)
+{
+	return _name_camelize(name, EINA_FALSE);
 }
 
 static void _property_variable_name(char *dst, const char *ns, const char *oname, const char *pname)
@@ -159,7 +204,7 @@ static void _dump_container_recursive(Ender_Generator *thiz,
 
 			if (!c->subcontainers)
 			{
-				ERR("List without a subcontainer");
+				printf("List without a subcontainer");
 				return;
 			}
 			spc = c->subcontainers->data;
@@ -239,8 +284,8 @@ static void _generator_add_native(void *data, const char *name, const char *alia
 
 		if (type == ENDER_TYPE_STRUCT)
 		{
-			char *cns_name = ender_name_structify(thiz->ns_name);
-			char *cname = ender_name_structify(name);
+			char *cns_name = _name_structify(thiz->ns_name);
+			char *cname = _name_structify(name);
 			sprintf(size, "sizeof(%s_%s)", cns_name, cname);
 			real_size = size;
 			free (cns_name);
@@ -306,8 +351,8 @@ static void _generator_add_property(void *data, Ender_Parser_Property *p)
 	fprintf(thiz->out, "\t\t\t\t%s,\n", p->rel ? "EINA_TRUE" : "EINA_FALSE");
 	if (thiz->descriptor_type == ENDER_TYPE_STRUCT && use_offsetof)
 	{
-		char *cns_name = ender_name_structify(thiz->ns_name);
-		char *cname = ender_name_structify(thiz->name);
+		char *cns_name = _name_structify(thiz->ns_name);
+		char *cname = _name_structify(thiz->name);
 
 		sprintf(offset, "offsetof(%s_%s, %s)", cns_name, cname, pnormalized);
 		real_offset = offset;

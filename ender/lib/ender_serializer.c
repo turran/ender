@@ -130,6 +130,29 @@ void * ender_serializer_value_marshal(const Ender_Value *v, unsigned int *len)
 		return NULL;
 	return thiz->value_marshal(v->container->serialize_data, v, len);
 }
+
+void * ender_serializer_native_marshal(Ender_Descriptor *d, void *native, unsigned int *len)
+{
+	Ender_Serializer *thiz;
+
+	thiz = _ender_serializer_selected_get();
+	if (!thiz) return NULL;
+	if (!thiz->native_marshal)
+		return NULL;
+	return thiz->value_marshal(d, native, len);
+}
+
+void * ender_serializer_native_unmarshal(Ender_Descriptor *d,
+		void *data, unsigned int len)
+{
+	Ender_Serializer *thiz;
+
+	thiz = _ender_serializer_selected_get();
+	if (!thiz) return NULL;
+	if (!thiz->native_unmarshal)
+		return NULL;
+	return thiz->native_unmarshal(d, data, len);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
