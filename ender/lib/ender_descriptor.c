@@ -782,9 +782,26 @@ EAPI void * ender_descriptor_native_marshal(Ender_Descriptor *thiz,
  * FIXME: To be fixed
  */
 EAPI void * ender_descriptor_native_unmarshal(Ender_Descriptor *thiz,
-		void *data, unsigned int len)
+		const void *data, unsigned int len)
 {
-	return ender_serializer_native_unmarshal(thiz, data, len);
+	void *native;
+
+	/* create a native representation */
+	native = ender_descriptor_native_new(thiz);
+	if (!native) return NULL;
+
+	ender_serializer_native_unmarshal(thiz, native, data, len);
+	return native;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_descriptor_native_unmarshal_inplace(Ender_Descriptor *thiz,
+		void *native, const void *data, unsigned int len)
+{
+	ender_serializer_native_unmarshal(thiz, native, data, len);
 }
 
 /**

@@ -586,32 +586,26 @@ done:
 	return ret;
 }
 
-static void * _serializer_eet_native_unmarshal(
-		Ender_Descriptor *d, void *data, unsigned int len)
+static void _serializer_eet_native_unmarshal(
+		Ender_Descriptor *d, void *native, const void *data,
+		unsigned int len)
 {
 	Ender_Serializer_Eet_Element *v;
 	Ender_Element *e;
-	void *native = NULL;
 
 	/* decode the data */
 	v = eet_data_descriptor_decode(_ender_element_descriptor, data, len);
 	if (!v)
 	{
 		ERR("Nothing to unmarshal");
-		return NULL;
+		return;
 	}
-
-	/* create an element */
-	native = ender_descriptor_native_new(d);
-	if (!native) return NULL;
 
 	e = ender_element_new_from_data(d, native);
 	_serializer_eet_ender_element_set_properties(e, d, v->properties);
 	_serializer_eet_ender_element_properties_free(v->properties);
 	free(v);
 	ender_element_unref(e);
-
-	return native;
 }
 
 static Ender_Serializer _ender_serializer_eet = {

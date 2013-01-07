@@ -373,7 +373,9 @@ EAPI Ender_Element * ender_descriptor_element_unmarshal(Ender_Descriptor *thiz,
 EAPI void * ender_descriptor_native_marshal(Ender_Descriptor *thiz,
 		void *data, unsigned int *len);
 EAPI void * ender_descriptor_native_unmarshal(Ender_Descriptor *thiz,
-		void *data, unsigned int len);
+		const void *data, unsigned int len);
+EAPI void ender_descriptor_native_unmarshal_inplace(Ender_Descriptor *thiz,
+		void *native, const void *data, unsigned int len);
 EAPI void * ender_descriptor_native_new(Ender_Descriptor *thiz);
 EAPI void ender_descriptor_native_free(Ender_Descriptor *thiz, void *object);
 
