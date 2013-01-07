@@ -7,6 +7,9 @@
 
 %{
 #include <stdio.h>
+#ifdef _WIN32
+# include <Evil.h>
+#endif
 #include "Ender.h"
 #include "ender_private.h"
 

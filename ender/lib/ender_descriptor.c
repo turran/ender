@@ -803,7 +803,7 @@ EAPI void * ender_descriptor_native_new(Ender_Descriptor *thiz)
  */
 EAPI void ender_descriptor_native_free(Ender_Descriptor *thiz, void *object)
 {
-	if (!thiz) return NULL;
+	if (!thiz) return;
 	_backends[thiz->type].destructor(thiz, object);
 }
 

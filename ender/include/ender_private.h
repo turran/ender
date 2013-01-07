@@ -22,8 +22,6 @@
 #include "config.h"
 #endif
 
-#include <dlfcn.h>
-
 /* core */
 #define ERR(...) EINA_LOG_DOM_ERR(ender_log_dom, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(ender_log_dom, __VA_ARGS__)
@@ -231,10 +229,6 @@ void * ender_serializer_native_marshal(Ender_Descriptor *d, void *native, unsign
 void * ender_serializer_native_unmarshal(Ender_Descriptor *d,
 		void *data, unsigned int len);
 Ender_Serializer * ender_serializer_eet_get(void);
-
-/* misc */
-char * ender_name_camelize(const char *name, Eina_Bool skip);
-char * ender_name_structify(const char *name);
 
 /* namespace */
 typedef void (*Ender_Namespace_Initialize)(Ender_Namespace *thiz, void *data);

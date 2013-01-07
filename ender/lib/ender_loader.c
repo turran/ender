@@ -15,13 +15,16 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Ender.h"
-#include "ender_private.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifndef _WIN32
-#include <unistd.h>
+# include <unistd.h>
+#else
+# include <Evil.h>
 #endif
+#include <dlfcn.h>
+#include "Ender.h"
+#include "ender_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

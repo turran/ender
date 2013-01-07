@@ -1,13 +1,13 @@
 #ifndef _ESCEN_PRIVATE_H
 #define _ESCEN_PRIVATE_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define ERR(...) EINA_LOG_DOM_ERR(escen_log_dom, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(escen_log_dom, __VA_ARGS__)

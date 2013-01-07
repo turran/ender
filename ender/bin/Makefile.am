@@ -8,7 +8,6 @@ AM_CPPFLAGS = \
 
 bin_PROGRAMS = ender_inspect ender_generator
 
-ender_inspect_DEPENDENCIES = $(top_builddir)/ender/lib/libender.la
 ender_inspect_LDADD = \
 $(top_builddir)/ender/lib/libender.la \
 @ENDER_LIBS@
@@ -16,7 +15,6 @@ $(top_builddir)/ender/lib/libender.la \
 ender_inspect_SOURCES = \
 ender_inspect.c
 
-ender_generator_DEPENDENCIES = $(top_builddir)/ender/lib/libender.la
 ender_generator_LDADD = \
 $(top_builddir)/ender/lib/libender.la \
 @ENDER_LIBS@

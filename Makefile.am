@@ -1,21 +1,27 @@
-## Process this file with automake to produce Makefile.in
+ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = ender escen
+SUBDIRS = ender
+
+if HAVE_ESCEN
+SUBDIRS += escen
+endif
 
 MAINTAINERCLEANFILES = \
 Makefile.in \
 aclocal.m4 \
+build-stamp \
 config.guess \
+config.h \
+config.h.in \
 config.sub \
 configure \
+configure-stamp \
+depcomp \
 install-sh \
 ltconfig \
 ltmain.sh \
 missing mkinstalldirs \
 stamp-h.in \
-build-stamp \
-configure-stamp \
-depcomp \
 ender.pc \
 escen.pc
 
@@ -31,5 +37,8 @@ m4/efl_dlfcn.m4 \
 m4/efl_doxygen.m4
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = ender.pc escen.pc
-ACLOCAL_AMFLAGS = -I m4
+pkgconfig_DATA = ender.pc
+
+if HAVE_ESCEN
+pkgconfig_DATA += escen.pc
+endif

@@ -15,6 +15,7 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
+#include "Enesim.h"
 #include "Escen.h"
 #include "escen_private.h"
 /*============================================================================*

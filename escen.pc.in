@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: Escen
 Description: Escen
-@pkgconfig_requires_private@: @requirements_escen@
+@pkgconfig_requires_private@: @requirements_deps_escen@
 Version: @VERSION@
 Libs.private: @NEKO_LIBS@
 Libs: -L${libdir} -lescen

@@ -29,7 +29,11 @@ AC_DEFINE_UNQUOTED([VERSION_MAJOR], [v_maj], [Major version])
 AC_DEFINE_UNQUOTED([VERSION_MINOR], [v_min], [Minor version])
 AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 
-### Needed information
+### Additional options to configure
+
+EFL_WITH_BIN([ender], [ender-generator])
+
+### default values
 
 AC_CANONICAL_HOST
 
@@ -73,25 +77,33 @@ fi
 # doxygen program for documentation building
 EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
-requirements_ender="eina >= 1.0.0"
-AC_SUBST([requirements_ender])
-
-requirements_escen="etch >= 0.0.6 eina >= 1.0.0"
-AC_SUBST([requirements_escen])
-
 LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
+if test "x${have_win32}" = "xyes" ; then
+   requirements_ender="${requirements_ender} evil >= 1.7.0"
+fi
+
+requirements_ender="${requirements_ender} eina >= 1.0.0"
+
+PKG_CHECK_EXISTS([eet >= 1.3],
+   [
+    have_eet="yes"
+    AC_DEFINE(BUILD_SERIALIZER_EET, 1, [Build support for EET serializer])
+    requirements_ender="${requirements_ender} eet >= 1.3"
+   ],
+   [have_eet="no"])
+
+AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes"])
+
+AC_SUBST([requirements_ender])
+
 PKG_CHECK_MODULES([ENDER], [${requirements_ender}])
 
-PKG_CHECK_MODULES([EET], [eet >= 1.3],
-   [have_eet="yes"],
-   [have_eet="no"])
-AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes"])
-if test "x${have_eet}" = "xyes" ; then
-   AC_DEFINE(BUILD_SERIALIZER_EET, 1, [Build support for EET serializer])
-fi
+requirements_escen="etch >= 0.0.6 enesim >= 0.0.16 eina >= 1.0.0"
+requirements_deps_escen="ender >= $VERSION ${requirements_escen}"
+AC_SUBST([requirements_deps_escen])
 
 PKG_CHECK_MODULES([ESCEN], [${requirements_escen}],
    [have_escen="yes"],

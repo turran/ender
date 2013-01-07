@@ -35,7 +35,7 @@ typedef Ender_Value * (*Ender_Container_Unserializer)(Ender_Container *thiz,
 static Ender_Container_Serializer _serializer[ENDER_TYPES];
 static Ender_Container_Unserializer _unserializer[ENDER_TYPES];
 
-static _ender_container_add(Ender_Container *thiz, const char *name,
+static void _ender_container_add(Ender_Container *thiz, const char *name,
 		Ender_Container *s)
 {
 	Ender_Container_Sub *sub;

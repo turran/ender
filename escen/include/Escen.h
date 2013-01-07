@@ -15,10 +15,10 @@
 #   define EAPI __declspec(dllexport)
 #  else
 #   define EAPI
-#  endif /* ! DLL_EXPORT */
+#  endif
 # else
 #  define EAPI __declspec(dllimport)
-# endif /* ! ESCEN_BUILD */
+# endif
 #else
 # ifdef __GNUC__
 #  if __GNUC__ >= 4
