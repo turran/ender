@@ -18,7 +18,7 @@ escen_datatype_ender.c: $(top_srcdir)/escen/tests/escen_datatype.ender
 if HAVE_ENDER_GENERATOR
 	$(ender_verbose)@ender_generator@ $(top_srcdir)/escen/tests/escen_datatype.ender datatype $@
 else
-	$(ender_verbose)@${top_builddir}/ender/bin/ender_generator $(top_srcdir)/escen/tests/escen_datatype.ender datatype $@
+	$(ender_verbose)${top_builddir}/ender/bin/ender_generator $(top_srcdir)/escen/tests/escen_datatype.ender datatype $@
 endif
 
 clean-local:
