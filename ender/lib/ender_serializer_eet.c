@@ -38,6 +38,14 @@
  *                                  Local                                     *
  *============================================================================*/
 #if BUILD_SERIALIZER_EET
+
+/* we overwrite the eina macro to put smaller names, no need to put the whole
+ * struct name here
+ */
+#define SERIALIZER_EET_CLASS(clas, name, type) \
+		(eet_eina_stream_data_descriptor_class_set(clas, \
+		sizeof (*(clas)), name, sizeof(type)))
+
 /* common eet descriptors */
 /* our own representation of a serialized basic value
  * FIXME in case we use the Ender_Value directly
@@ -153,13 +161,15 @@ static Eet_Data_Descriptor * _serializer_eet_ender_value_data_descriptor_get(
 	Eet_Data_Descriptor *ret;
 	Eet_Data_Descriptor *d;
 
-	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Value_Data);
+	/* create the value data type */
+	SERIALIZER_EET_CLASS(&eddc, "vd", Ender_Value_Data);
 	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
 	eddc.func.type_get = _serializer_eet_value_type_get;
 	eddc.func.type_set = _serializer_eet_value_type_set;
 	ret = eet_data_descriptor_stream_new(&eddc);
 
-	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Value_Data);
+	/* add all the possible union types */
+	SERIALIZER_EET_CLASS(&eddc, "vd", Ender_Value_Data);
 	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
 	d = eet_data_descriptor_stream_new(&eddc);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(d, Ender_Value_Data, "b", u32, EET_T_UINT);
@@ -207,7 +217,7 @@ static void _serializer_eet_ender_value_data_descriptor_extend(void)
 	Eet_Data_Descriptor *ret = _ender_value_data_descriptor;
 	Eet_Data_Descriptor *d;
 
-	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Value_Data);
+	SERIALIZER_EET_CLASS(&eddc, "vd", Ender_Value_Data);
 	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
 	d = eet_data_descriptor_stream_new(&eddc);
 	EET_DATA_DESCRIPTOR_ADD_SUB(d, Ender_Value_Data, "p", ptr,
@@ -330,7 +340,7 @@ static Eet_Data_Descriptor * _serializer_eet_ender_element_descriptor_get(void)
 	Eet_Data_Descriptor *d;
 	Eet_Data_Descriptor *property;
 
-	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Serializer_Eet_Property);
+	SERIALIZER_EET_CLASS(&eddc, "p", Ender_Serializer_Eet_Property);
 	eddc.version = EET_DATA_DESCRIPTOR_CLASS_VERSION;
 	/* first the property descriptor */
 	d = eet_data_descriptor_stream_new(&eddc);
@@ -341,7 +351,7 @@ static Eet_Data_Descriptor * _serializer_eet_ender_element_descriptor_get(void)
 	property = d;
 
 	/* now the element descriptor */
-	EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Serializer_Eet_Element);
+	SERIALIZER_EET_CLASS(&eddc, "e", Ender_Serializer_Eet_Element);
 	ret = eet_data_descriptor_stream_new(&eddc);
 	EET_DATA_DESCRIPTOR_ADD_LIST(ret, Ender_Serializer_Eet_Element,
 		"properties", properties, property);
@@ -637,7 +647,7 @@ Ender_Serializer * ender_serializer_eet_get(void)
 		_ender_value_data_descriptor = d;
 
 		/* now the Ender_Serializer_Eet_Value descriptor */
-		EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, Ender_Serializer_Eet_Value);
+		SERIALIZER_EET_CLASS(&eddc, "v", Ender_Serializer_Eet_Value);
 		d = eet_data_descriptor_stream_new(&eddc);
 
 		EET_DATA_DESCRIPTOR_ADD_UNION(d, Ender_Serializer_Eet_Value, "data",
