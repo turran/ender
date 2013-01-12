@@ -273,7 +273,6 @@ static void _ender_serializer_eet_value_descriptor_extend(void)
 static void _ender_serializer_eet_value_free(Ender_Serializer_Eet_Value *v)
 {
 	/* check the type and free it */
-	printf("freeing value at %p with str at %p\n", v, v->data.ptr);
 	free(v);
 }
 /*----------------------------------------------------------------------------*
