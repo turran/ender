@@ -518,6 +518,18 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *thiz,
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Ender_Property * ender_descriptor_struct_property_add(
+		Ender_Descriptor *thiz, const char *name, Ender_Container *ec,
+		int offset)
+{
+	return ender_descriptor_property_add(thiz, name, ec, NULL, NULL, NULL,
+			NULL, NULL, NULL, EINA_FALSE, offset);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Ender_Function * ender_descriptor_function_add(Ender_Descriptor *thiz,
 		const char *name, Ender_Accessor f,
 		Ender_Marshaller marshaller, Ender_Container *ret, ...)

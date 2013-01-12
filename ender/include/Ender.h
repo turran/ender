@@ -344,6 +344,9 @@ EAPI Ender_Property * ender_descriptor_property_add(Ender_Descriptor *edesc,
 		Ender_Is_Set is_set,
 		Eina_Bool relative,
 		int offset);
+EAPI Ender_Property * ender_descriptor_struct_property_add(
+		Ender_Descriptor *thiz,
+		const char *name, Ender_Container *ec, int offset);
 EAPI void ender_descriptor_property_list(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI void ender_descriptor_property_list_recursive(Ender_Descriptor *thiz, Ender_Property_List_Callback cb, void *data);
 EAPI Ender_Property * ender_descriptor_property_get(Ender_Descriptor *thiz, const char *name);
