@@ -1,5 +1,8 @@
 Ender:
 
++ Make every call to a function return an Eina_Error, this way we can make every binding
+  handle execeptions easily
++ Add bindings for ender
 + Add mutation events per property
 + Add a serializer
 + Add ref/unref here too
