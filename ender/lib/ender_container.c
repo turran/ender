@@ -107,6 +107,23 @@ EAPI Ender_Container * ender_container_new(Ender_Value_Type t)
 	return thiz;
 }
 
+EAPI Ender_Container * ender_container_new_descriptor_from(Ender_Descriptor *descriptor)
+{
+	Ender_Container *thiz;
+	Ender_Constraint *cnst;
+	Ender_Value_Type type;
+	Ender_Descriptor_Type dtype;
+
+	dtype = ender_descriptor_type(descriptor);
+	if (!ender_descriptor_type_value_type_to(dtype, &type))
+		return NULL;
+
+	thiz = ender_container_new(type);
+	cnst = ender_constraint_descriptor_new(descriptor);
+	ender_container_constraint_set(thiz, cnst);
+	return thiz;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed

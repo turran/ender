@@ -151,6 +151,7 @@ EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *
  * @{
  */
 EAPI Ender_Container * ender_container_new(Ender_Value_Type t);
+EAPI Ender_Container * ender_container_new_descriptor_from(Ender_Descriptor *descriptor);
 EAPI Ender_Container * ender_container_list_new(Ender_Container *child);
 EAPI Ender_Container * ender_container_struct_new(Ender_Descriptor *descriptor);
 EAPI Ender_Container * ender_container_union_new(Ender_Descriptor *descriptor);
@@ -328,6 +329,21 @@ EAPI const char * ender_function_name_get(Ender_Function *thiz);
  * @defgroup Ender_Descriptor_Group Descriptor
  * @{
  */
+
+#define ENDER_DESCRIPTOR_PROPERTY_ADD_SIMPLE(d, name, vtype, prefix)		\
+	ender_descriptor_property_add(d, #name, ender_container_new(vtype),	\
+			prefix##_##name##_get, prefix##_##name##_set, 		\
+			NULL, NULL, NULL,					\
+			prefix##_##_name##_is_set,				\
+			EINA_FALSE, -1)
+#define ENDER_DESCRIPTOR_PROPERTY_ADD_DESCRIPTOR(d, name, pd, prefix)		\
+	ender_descriptor_property_add(d, #name, 				\
+			ender_container_new_descriptor_from(pd), 		\
+			prefix##_##name##_get, prefix##_##name##_set, 		\
+			NULL, NULL, NULL,					\
+			prefix##_##_name##_is_set,				\
+			EINA_FALSE, -1)
+
 typedef void (*Ender_Property_List_Callback)(Ender_Property *prop, void *data);
 typedef void (*Ender_Function_List_Callback)(Ender_Function *func, void *data);
 
