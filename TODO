@@ -7,7 +7,7 @@ Ender:
 + Add a serializer
 + Add ref/unref here too
 + Add constraints to properties, this way we can define enums and ranges
-
++ Make every function that sets user provided data also receive a callback to free it
 
 Escen:
 + Add an "external" type. So escen instead of creating the element, you'll need to pass it and then escen will animate it

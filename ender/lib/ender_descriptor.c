@@ -836,4 +836,20 @@ EAPI void ender_descriptor_native_free(Ender_Descriptor *thiz, void *object)
 	_backends[thiz->type].destructor(thiz, object);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void ender_descriptor_data_set(Ender_Descriptor *thiz, void *data)
+{
+	thiz->data = data;
+}
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * ender_descriptor_data_get(Ender_Descriptor *thiz)
+{
+	return thiz->data;
+}

@@ -397,6 +397,8 @@ EAPI void ender_descriptor_native_unmarshal_inplace(Ender_Descriptor *thiz,
 		void *native, const void *data, unsigned int len);
 EAPI void * ender_descriptor_native_new(Ender_Descriptor *thiz);
 EAPI void ender_descriptor_native_free(Ender_Descriptor *thiz, void *object);
+EAPI void ender_descriptor_data_set(Ender_Descriptor *thiz, void *data);
+EAPI void * ender_descriptor_data_get(Ender_Descriptor *thiz);
 
 /**
  * @}
