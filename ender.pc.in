@@ -2,12 +2,13 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
+pkgincludedir=@pkgincludedir@-@VMAJ@
 datarootdir=@datarootdir@
-datadir=@datadir@/@PACKAGE@
+pkgdatadir=@pkgdatadir@
 
 Name: Ender
-Description: Ender
-@pkgconfig_requires_private@: @requirements_ender@
 Version: @VERSION@
+Description: Ender
+Requires.private: @requirements_ender_pc@
 Libs: -L${libdir} -lender
 Cflags: -I${includedir}

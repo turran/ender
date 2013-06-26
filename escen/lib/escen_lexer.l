@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "Escen.h"
 #include "escen_private.h"
-#include "libescen_la-escen_grammar.h"
+#include "escen_lib_libescen_la-escen_grammar.h"
 
 #define YY_USER_ACTION { yylloc->first_line = yylineno; yylloc->last_line = yylineno; }
 

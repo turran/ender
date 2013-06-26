@@ -28,6 +28,8 @@ struct _Escen_Parser
 	char *ns;
 };
 
+Escen_Proxy * escen_proxy_new(Escen_Ender *ee, const char *name, const char *dst_name);
+
 struct _Escen_Scriptor
 {
 	void *(*load)(const char *script_text);

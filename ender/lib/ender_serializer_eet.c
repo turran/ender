@@ -115,7 +115,7 @@ static void _ender_serializer_descriptor_class_set(Eet_Data_Descriptor_Class *ed
 	eet_eina_stream_data_descriptor_class_set(eddc, eddc_size, name, size);
 	/* now overwrite the string functions */
 	eddc->func.str_alloc = (char *(*)(const char *))strdup;
-	eddc->func.str_free = free;
+	eddc->func.str_free = (Eet_Descriptor_Str_Free_Callback)free;
 }
 /*----------------------------------------------------------------------------*
  *                       Ender_Serializer_Eet_Value                           *

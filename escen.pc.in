@@ -2,11 +2,12 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
+pkgincludedir=@includedir@/escen-@VMAJ@
 
 Name: Escen
-Description: Escen
-@pkgconfig_requires_private@: @requirements_deps_escen@
 Version: @VERSION@
-Libs.private: @NEKO_LIBS@
+Description: Escen
+Requires.private: @requirements_deps_escen_pc@
+Libs.private: @requirements_escen_libs@
 Libs: -L${libdir} -lescen
 Cflags: -I${includedir}

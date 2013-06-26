@@ -29,6 +29,9 @@ AC_DEFINE_UNQUOTED([VERSION_MAJOR], [v_maj], [Major version])
 AC_DEFINE_UNQUOTED([VERSION_MINOR], [v_min], [Minor version])
 AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 
+VMAJ=v_maj
+AC_SUBST([VMAJ])
+
 ### Additional options to configure
 
 EFL_WITH_BIN([ender], [ender-generator])
@@ -55,12 +58,9 @@ AM_PROG_CC_C_O
 PKG_PROG_PKG_CONFIG
 
 # Check whether pkg-config supports Requires.private
-if $PKG_CONFIG --atleast-pkgconfig-version 0.22; then
-   pkgconfig_requires_private="Requires.private"
-else
-   pkgconfig_requires_private="Requires"
+if ! $PKG_CONFIG --atleast-pkgconfig-version 0.22; then
+   AC_MSG_ERROR([pkg-config >= 0.22 is required])
 fi
-AC_SUBST([pkgconfig_requires_private])
 
 # lex
 
@@ -75,37 +75,37 @@ if test "x$ac_cv_prog_YACC" = "x"; then
 fi
 
 # doxygen program for documentation building
-EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
+ENS_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
 if test "x${have_win32}" = "xyes" ; then
-   requirements_ender="${requirements_ender} evil >= 1.7.0"
+   requirements_ender_pc="${requirements_ender_pc} evil >= 1.7.0"
 fi
 
-requirements_ender="${requirements_ender} eina >= 1.0.0"
+requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0"
 
-PKG_CHECK_EXISTS([eet >= 1.3],
+PKG_CHECK_EXISTS([eet >= 1.7.0],
    [
     have_eet="yes"
     AC_DEFINE(BUILD_SERIALIZER_EET, 1, [Build support for EET serializer])
-    requirements_ender="${requirements_ender} eet >= 1.3"
+    requirements_ender_pc="${requirements_ender_pc} eet >= 1.3"
    ],
    [have_eet="no"])
 
 AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes"])
 
-AC_SUBST([requirements_ender])
+AC_SUBST([requirements_ender_pc])
 
-PKG_CHECK_MODULES([ENDER], [${requirements_ender}])
+PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc}])
 
-requirements_escen="etch >= 0.0.6 enesim >= 0.0.16 eina >= 1.0.0"
-requirements_deps_escen="ender >= $VERSION ${requirements_escen}"
-AC_SUBST([requirements_deps_escen])
+requirements_escen_pc="etch >= 0.0.6 enesim >= 0.0.16 eina >= 1.7.0"
+requirements_deps_escen_pc="ender >= $VERSION ${requirements_escen_pc}"
+AC_SUBST([requirements_deps_escen_pc])
 
-PKG_CHECK_MODULES([ESCEN], [${requirements_escen}],
+PKG_CHECK_MODULES([ESCEN], [${requirements_escen_pc}],
    [have_escen="yes"],
    [have_escen="no"])
 AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
@@ -130,12 +130,12 @@ if test "x${have_neko}" = "xyes" ; then
 fi
 
 if test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes" ; then
-   NEKO_LIBS=-lneko
+   requirements_escen_libs=-lneko
    AC_DEFINE([BUILD_SCRIPT_NEKO], [1], [Build support for NekoVM scripts])
 fi
 
 AM_CONDITIONAL([BUILD_SCRIPT_NEKO], [test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes"])
-AC_SUBST([NEKO_LIBS])
+AC_SUBST([requirements_escen_libs])
 
 
 ### Checks for library functions
@@ -146,20 +146,7 @@ EFL_CHECK_DLOPEN
 
 AC_CONFIG_FILES([
 Makefile
-ender.pc
-escen.pc
-ender/Makefile
-ender/data/Makefile
-ender/lib/Makefile
-ender/include/Makefile
-ender/bin/Makefile
-ender/tests/Makefile
-escen/Makefile
-escen/lib/Makefile
-escen/lib/script/Makefile
-escen/lib/script/neko/Makefile
-escen/tests/Makefile
-escen/include/Makefile
+doc/Doxyfile
 ])
 
 AC_OUTPUT
