@@ -11,4 +11,4 @@ Version: @VERSION@
 Description: Ender
 Requires.private: @requirements_ender_pc@
 Libs: -L${libdir} -lender
-Cflags: -I${includedir}
+Cflags: -I${pkgincludedir}

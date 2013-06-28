@@ -10,4 +10,4 @@ Description: Escen
 Requires.private: @requirements_deps_escen_pc@
 Libs.private: @requirements_escen_libs@
 Libs: -L${libdir} -lescen
-Cflags: -I${includedir}
+Cflags: -I${includedir}/escen-@VMAJ@
