@@ -29,7 +29,6 @@ if HAVE_ESCEN
 CLEAN_LOCAL += escen.pc
 
 include escen/lib/Makefile.mk
-include ender/bin/Makefile.mk
 #include escen/tests/Makefile.mk
 
 endif
@@ -40,13 +39,15 @@ include src/lib/Makefile.mk
 
 ### Binary
 
+include src/bin/Makefile.mk
+
 ### Tests
 
 include src/tests/Makefile.mk
 
 ### Data
 
-include src/data/Makefile.mk
+include data/Makefile.mk
 
 ### Documentation
 

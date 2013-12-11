@@ -15,7 +15,7 @@
 
 #define YY_USER_ACTION { yylloc->first_line = yylineno; yylloc->last_line = yylineno; }
 
-#include "ender_lib_libender_la-ender_grammar.h"
+#include "src_lib_libender_la-ender_grammar.h"
 #define YY_NO_UNISTD_H
 %}
 
