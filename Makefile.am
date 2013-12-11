@@ -27,25 +27,26 @@ CLEAN_LOCAL = ender.pc
 
 if HAVE_ESCEN
 CLEAN_LOCAL += escen.pc
+
+include escen/lib/Makefile.mk
+include ender/bin/Makefile.mk
+#include escen/tests/Makefile.mk
+
 endif
 
 ### Library
 
-include ender/lib/Makefile.mk
-include escen/lib/Makefile.mk
+include src/lib/Makefile.mk
 
 ### Binary
 
-include ender/bin/Makefile.mk
-
 ### Tests
 
-include ender/tests/Makefile.mk
-#include escen/tests/Makefile.mk
+include src/tests/Makefile.mk
 
 ### Data
 
-include ender/data/Makefile.mk
+include src/data/Makefile.mk
 
 ### Documentation
 
