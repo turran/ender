@@ -32,6 +32,9 @@ AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 VMAJ=v_maj
 AC_SUBST([VMAJ])
 
+## Add parameters for aclocal (keep in sync with Makefile.am)
+AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
+
 ### Additional options to configure
 
 EFL_WITH_BIN([ender], [ender-generator])
@@ -108,7 +111,8 @@ AC_SUBST([requirements_deps_escen_pc])
 PKG_CHECK_MODULES([ESCEN], [${requirements_escen_pc}],
    [have_escen="yes"],
    [have_escen="no"])
-AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
+#AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
+AM_CONDITIONAL([HAVE_ESCEN], [test "x${want_escen}" = "xyes"])
 
 # Scripting
 ## Neko
