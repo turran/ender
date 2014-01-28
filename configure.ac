@@ -3,7 +3,7 @@
 
 m4_define([v_maj], [0])
 m4_define([v_min], [0])
-m4_define([v_mic], [8])
+m4_define([v_mic], [9])
 m4_define([v_ver], [v_maj.v_min.v_mic])
 
 m4_define([lt_cur], m4_eval(v_maj + v_min))
@@ -67,16 +67,6 @@ fi
 
 # lex
 
-AM_PROG_LEX
-if test "x$ac_cv_prog_LEX" = "x"; then
-   AC_MSG_ERROR(Cannot find flex)
-fi
-
-AC_PROG_YACC
-if test "x$ac_cv_prog_YACC" = "x"; then
-   AC_MSG_ERROR(Cannot find bison)
-fi
-
 # doxygen program for documentation building
 ENS_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
@@ -84,63 +74,9 @@ LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
-if test "x${have_win32}" = "xyes" ; then
-   requirements_ender_pc="${requirements_ender_pc} evil >= 1.7.0"
-fi
-
-requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0"
-
-PKG_CHECK_EXISTS([eet >= 1.7.0],
-   [
-    have_eet="yes"
-    AC_DEFINE(BUILD_SERIALIZER_EET, 1, [Build support for EET serializer])
-    requirements_ender_pc="${requirements_ender_pc} eet >= 1.3"
-   ],
-   [have_eet="no"])
-
-AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes"])
-
+requirements_ender_pc="egueb-dom egueb-smil"
 AC_SUBST([requirements_ender_pc])
-
 PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc}])
-
-requirements_escen_pc="etch >= 0.0.6 enesim >= 0.0.16 eina >= 1.7.0"
-requirements_deps_escen_pc="ender >= $VERSION ${requirements_escen_pc}"
-AC_SUBST([requirements_deps_escen_pc])
-
-PKG_CHECK_MODULES([ESCEN], [${requirements_escen_pc}],
-   [have_escen="yes"],
-   [have_escen="no"])
-#AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
-AM_CONDITIONAL([HAVE_ESCEN], [test "x${want_escen}" = "xyes"])
-
-# Scripting
-## Neko
-have_neko="no"
-NEKO_LIBS=""
-AC_CHECK_LIB([neko],
-   [neko_val_callEx],
-   [have_neko="yes"],
-   [have_neko="no"])
-
-if test "x${have_neko}" = "xyes" ; then
-   AC_CHECK_HEADERS([neko.h neko_vm.h],
-      [have_neko="yes"],
-      [have_neko="no"])
-fi
-
-if test "x${have_neko}" = "xyes" ; then
-  AC_CHECK_PROG([have_neko_bin], [nekoc], [yes], [no])
-fi
-
-if test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes" ; then
-   requirements_escen_libs=-lneko
-   AC_DEFINE([BUILD_SCRIPT_NEKO], [1], [Build support for NekoVM scripts])
-fi
-
-AM_CONDITIONAL([BUILD_SCRIPT_NEKO], [test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes"])
-AC_SUBST([requirements_escen_libs])
-
 
 ### Checks for library functions
 
@@ -171,8 +107,6 @@ echo "Ender........................................: yes"
 echo "  Serialization:"
 echo "  Eet........................................: ${have_eet}"
 echo "  TPL........................................: no"
-echo
-echo "Escen........................................: ${have_escen}"
 echo
 echo "Compilation............: make (or gmake)"
 echo "  CPPFLAGS.............: $CPPFLAGS"

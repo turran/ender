@@ -1,5 +1,14 @@
 
-bin_PROGRAMS = src/bin/ender_inspect src/bin/ender_generator
+bin_PROGRAMS = src/bin/ender_loader
+#ender_inspect src/bin/ender_generator
+
+src_bin_ender_loader_LDADD = \
+$(top_builddir)/src/lib/libender.la \
+@ENDER_LIBS@
+
+src_bin_ender_loader_CPPFLAGS = \
+-I$(top_srcdir)/src/lib \
+@ENDER_CFLAGS@
 
 src_bin_ender_inspect_LDADD = \
 $(top_builddir)/src/lib/libender.la \

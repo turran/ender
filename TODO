@@ -1,3 +1,20 @@
+
++ Make both libs use the egueb's dom interface 
++ Remove the ender/escen difference
++ Sample scene file
+
+<ender namespace="enesim">
+  <background color="red"/>
+  <states>
+    <state name="default">
+      <set color="blue"/>
+    </state>
+    <state name="selected">
+      <set color="white"/>
+    </state>
+  </states>
+</ender>
+
 Ender:
 
 + Make every call to a function return an Eina_Error, this way we can make every binding

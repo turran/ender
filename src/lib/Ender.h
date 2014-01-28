@@ -19,6 +19,7 @@
 #define _ENDER_H
 
 #include <Eina.h>
+#include <Egueb_Dom.h>
 
 #ifdef EAPI
 # undef EAPI
@@ -50,6 +51,7 @@
 extern "C" {
 #endif
 
+#if 0
 /**
  * @mainpage Ender
  * @section intro Introduction
@@ -649,7 +651,7 @@ EAPI void * eina_ordered_hash_nth_get(Eina_Ordered_Hash *thiz, int nth);
 EAPI void * eina_ordered_hash_find(Eina_Ordered_Hash *thiz, const char *key);
 EAPI void eina_ordered_hash_add(Eina_Ordered_Hash *thiz, const char *name, void *data);
 EAPI void eina_ordered_hash_del(Eina_Ordered_Hash *thiz, const char *name, void *data);
-
+#endif
 /**
  * @}
  */
