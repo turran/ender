@@ -1,0 +1,7 @@
+<ender namespace="enesim">
+	<object name="circle">
+	<states>
+		<state name="default">
+		</state>
+	</states>
+</ender>
