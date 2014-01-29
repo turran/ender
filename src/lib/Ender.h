@@ -51,6 +51,20 @@
 extern "C" {
 #endif
 
+EAPI void ender_init(void);
+EAPI void ender_shutdown(void);
+EAPI Egueb_Dom_Node * ender_document_new(void);
+EAPI Egueb_Dom_Node * ender_element_ender_new(void);
+EAPI Egueb_Dom_Node * ender_element_state_new(void);
+EAPI Egueb_Dom_Node * ender_element_states_new(void);
+EAPI Egueb_Dom_Node * ender_element_object_new(void);
+
+/* Shared strings */
+EAPI extern Egueb_Dom_String *ENDER_ELEMENT_ENDER;
+EAPI extern Egueb_Dom_String *ENDER_ELEMENT_OBJECT;
+EAPI extern Egueb_Dom_String *ENDER_ELEMENT_STATES;
+EAPI extern Egueb_Dom_String *ENDER_ELEMENT_STATE;
+
 #if 0
 /**
  * @mainpage Ender

@@ -22,39 +22,6 @@
  *                                  Local                                     *
  *============================================================================*/
 static int _init = 0;
-static Eina_Bool _enable_parse = EINA_TRUE;
-
-/* TODO something to do on the future */
-#if 0
-
-static void _remove_option(int idx, int *argc, char ***argv)
-{
-	while (idx < *argc - 1)
-	{
-		(*argv)[idx] = (*argv)[idx+1];
-		idx++;
-	}
-	*argc = *argc - 1;
-}
-
-static void _parse(int *argc, char ***argv)
-{
-	int i;
-	char **option;
-
-	if (!argc || !argv) return;
-	option = *argv;
-	for (i = 0; i < *argc; i++)
-	{
-		if (!strcmp("--disable-parse", option[i]))
-		{
-			_remove_option(i, argc, argv);
-			_enable_parse = EINA_FALSE;
-			i--;
-		}
-	}
-}
-#endif
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -62,6 +29,11 @@ int ender_log_dom = -1;
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+Egueb_Dom_String *ENDER_ELEMENT_ENDER;
+Egueb_Dom_String *ENDER_ELEMENT_OBJECT;
+Egueb_Dom_String *ENDER_ELEMENT_STATES;
+Egueb_Dom_String *ENDER_ELEMENT_STATE;
+
 /**
  * Initialize the ender library
  */
@@ -69,13 +41,12 @@ EAPI void ender_init(void)
 {
 	if (!_init++)
 	{
-		eina_init();
+		egueb_dom_init();
+ 		ENDER_ELEMENT_ENDER = egueb_dom_string_new_with_string("ender");
+ 		ENDER_ELEMENT_OBJECT = egueb_dom_string_new_with_string("object");
+ 		ENDER_ELEMENT_STATES = egueb_dom_string_new_with_string("states");
+ 		ENDER_ELEMENT_STATE = egueb_dom_string_new_with_string("state");
 		ender_log_dom = eina_log_domain_register("ender", NULL);
-		ender_descriptor_init();
-		ender_namespace_init();
-		ender_marshaller_init();
-		ender_loader_init();
-		ender_loader_load_all();
 	}
 }
 
@@ -86,12 +57,12 @@ EAPI void ender_shutdown(void)
 {
 	if (_init == 1)
 	{
-		ender_loader_shutdown();
-		ender_namespace_shutdown();
-		ender_descriptor_shutdown();
-		ender_marshaller_shutdown();
 		eina_log_domain_unregister(ender_log_dom);
-		eina_shutdown();
+		egueb_dom_string_unref(ENDER_ELEMENT_ENDER);
+		egueb_dom_string_unref(ENDER_ELEMENT_OBJECT);
+		egueb_dom_string_unref(ENDER_ELEMENT_STATES);
+		egueb_dom_string_unref(ENDER_ELEMENT_STATE);
+		egueb_dom_shutdown();
 	}
 	_init--;
 }

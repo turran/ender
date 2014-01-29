@@ -4,15 +4,16 @@
 + Sample scene file
 
 <ender namespace="enesim">
-  <background color="red"/>
-  <states>
-    <state name="default">
-      <set color="blue"/>
-    </state>
-    <state name="selected">
-      <set color="white"/>
-    </state>
-  </states>
+  <object name="background"/>
+    <states>
+      <state name="default">
+        <set color="blue"/>
+      </state>
+      <state name="selected">
+        <set color="white"/>
+      </state>
+    </states>
+  </object>
 </ender>
 
 Ender:

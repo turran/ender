@@ -35,10 +35,12 @@ src/lib/tpl/tpl.c \
 src/lib/tpl/tpl.h
 
 src_lib_libender_la_SOURCES = \
+src/lib/ender_document.c \
 src/lib/ender_element_ender.c \
+src/lib/ender_element_object.c \
 src/lib/ender_element_states.c \
 src/lib/ender_element_state.c \
-src/lib/ender_document.c
+src/lib/ender_main.c
 
 if HAVE_WIN32
 src_lib_libender_la_SOURCES += \

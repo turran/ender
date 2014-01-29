@@ -28,7 +28,24 @@ static Egueb_Dom_Node * _ender_document_element_create(Egueb_Dom_Node *n,
 {
 	/* we can only create states/state/set/animate */
 	/* any other object needs to be created using the topmost ender */
-	printf("trying to create element %s\n", name);
+	if (!strcmp(name, "states"))
+	{
+		return ender_element_states_new();
+	}
+	else if (!strcmp(name, "state"))
+	{
+		return ender_element_state_new();
+
+	}
+	else if (!strcmp(name, "object"))
+	{
+		return ender_element_object_new();
+	}
+	else if (!strcmp(name, "ender"))
+	{
+		return ender_element_ender_new();
+	}
+
 	return NULL;
 }
 

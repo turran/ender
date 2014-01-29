@@ -20,6 +20,18 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Egueb_Dom_String * _ender_element_state_tag_name_get(
+		Egueb_Dom_Node *node, void *data)
+{
+	return egueb_dom_string_ref(ENDER_ELEMENT_STATE);
+}
+
+static Egueb_Dom_Element_External_Descriptor _descriptor = {
+	/* init 		= */ NULL,
+	/* deinit 		= */ NULL,
+	/* tag_name_get		= */ _ender_element_state_tag_name_get,
+	/* process 		= */ NULL,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -28,6 +40,6 @@
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_element_state_new(void)
 {
-
+	return egueb_dom_element_external_new(&_descriptor, NULL);
 }
 

@@ -24,6 +24,37 @@ typedef struct _Ender_Element_Ender
 {
 	Egueb_Dom_Node *n;
 } Ender_Element_Ender;
+
+static Egueb_Dom_String * _ender_element_ender_tag_name_get(
+		Egueb_Dom_Node *node, void *data)
+{
+	return egueb_dom_string_ref(ENDER_ELEMENT_ENDER);
+}
+
+static Eina_Bool _ender_element_ender_child_appendable(Egueb_Dom_Node *n,
+		Egueb_Dom_Node *child)
+{
+	Egueb_Dom_String *name;
+	Eina_Bool ret = EINA_FALSE;
+
+	if (egueb_dom_node_type_get(child) != EGUEB_DOM_NODE_TYPE_ELEMENT_NODE)
+		return ret;
+
+	name = egueb_dom_element_name_get(child);
+	if (name == ENDER_ELEMENT_OBJECT)
+		ret = EINA_TRUE;
+	egueb_dom_string_unref(name);
+
+	return ret;
+}
+
+static Egueb_Dom_Element_External_Descriptor _descriptor = {
+	/* init 		= */ NULL,
+	/* deinit 		= */ NULL,
+	/* tag_name_get		= */ _ender_element_ender_tag_name_get,
+	/* child_appendable 	= */ _ender_element_ender_child_appendable,
+	/* process 		= */ NULL,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -32,5 +63,5 @@ typedef struct _Ender_Element_Ender
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_element_ender_new(void)
 {
-
+	return egueb_dom_element_external_new(&_descriptor, NULL);
 }
