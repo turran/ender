@@ -20,72 +20,46 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Ender_Document
-{
-	/* a list of every instance created */
-	Eina_List *instances;
-} Ender_Document;
-/*----------------------------------------------------------------------------*
- *                     The exernal document interface                         *
- *----------------------------------------------------------------------------*/
-static Egueb_Dom_Node * _ender_document_element_create(Egueb_Dom_Node *n,
-		void *data, const char *name)
-{
-	/* we can only create states/state/set/animate */
-	/* any other object needs to be created using the topmost ender */
-	if (!strcmp(name, "states"))
-	{
-		return ender_element_states_new();
-	}
-	else if (!strcmp(name, "state"))
-	{
-		return ender_element_state_new();
-	}
-	else if (!strcmp(name, "object"))
-	{
-		return ender_element_object_new();
-	}
-	else if (!strcmp(name, "ender"))
-	{
-		return ender_element_ender_new();
-	}
+typedef struct _Ender_Instance {
+	Egueb_Dom_Node *rel;
+	void *object;
+} Ender_Instance;
 
-	return NULL;
+static Egueb_Dom_String * _ender_element_instance_tag_name_get(
+		Egueb_Dom_Node *node, void *data)
+{
+	return egueb_dom_string_ref(ENDER_ELEMENT_INSTANCE);
 }
 
-static Egueb_Dom_Document_External_Descriptor _descriptor = {
+static Egueb_Dom_Element_External_Descriptor _descriptor = {
 	/* init 		= */ NULL,
 	/* deinit 		= */ NULL,
-	/* element_create	= */ _ender_document_element_create,
+	/* tag_name_get		= */ _ender_element_instance_tag_name_get,
+	/* child_appendable 	= */ NULL,
 	/* process 		= */ NULL,
-	/* needs process 	= */ NULL,
 };
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Egueb_Dom_Node * ender_element_instance_new(Egueb_Dom_Node *rel)
+{
+	Ender_Instance *thiz;
+	Egueb_Dom_Node *n;
+
+	thiz = calloc(1, sizeof(Ender_Instance));
+	thiz->rel = rel;
+
+	n = egueb_dom_element_external_new(&_descriptor, thiz);
+
+	return n;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Egueb_Dom_Node * ender_document_new(void)
+EAPI void * ender_element_instance_object_get(Egueb_Dom_Node *n)
 {
-	return egueb_dom_document_external_new(&_descriptor, NULL);
-}
+	Ender_Instance *thiz;
 
-EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
-		const char *id, Eina_Error *err)
-{
-	Egueb_Dom_Node *ret;
-	Egueb_Dom_Node *rel;
-	Egueb_Dom_String *sid;
-	
-	sid = egueb_dom_string_new_with_static_string(id);
-	rel = egueb_dom_document_element_get_by_id(n, sid, err);
-	egueb_dom_string_unref(sid);
-	if (!rel) return NULL;
-
-	if (!ender_element_is_object(n))
-		return NULL;
-
-	ret = ender_element_instance_new(rel);
-	return ret;
+	thiz = egueb_dom_element_external_data_get(n);
+	return thiz->object;
 }

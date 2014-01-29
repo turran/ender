@@ -1,5 +1,5 @@
 <ender namespace="enesim">
-	<object name="circle">
+	<object name="circle" id="circle01">
 	<states>
 		<state name="default">
 		</state>

@@ -37,6 +37,7 @@ src/lib/tpl/tpl.h
 src_lib_libender_la_SOURCES = \
 src/lib/ender_document.c \
 src/lib/ender_element_ender.c \
+src/lib/ender_element_instance.c \
 src/lib/ender_element_object.c \
 src/lib/ender_element_states.c \
 src/lib/ender_element_state.c \

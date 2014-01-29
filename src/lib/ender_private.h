@@ -29,6 +29,8 @@
 #define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
 extern int ender_log_dom;
 
+Egueb_Dom_Node * ender_element_instance_new(Egueb_Dom_Node *rel);
+
 #if 0
 struct _Ender_Container
 {

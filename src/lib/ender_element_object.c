@@ -53,6 +53,17 @@ static Egueb_Dom_Element_External_Descriptor _descriptor = {
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Eina_Bool ender_element_is_object(Egueb_Dom_Node *n)
+{
+	Egueb_Dom_String *name;
+	Eina_Bool ret = EINA_FALSE;
+
+	name = egueb_dom_element_name_get(n);
+	if (name == ENDER_ELEMENT_OBJECT)
+		ret = EINA_TRUE;
+	egueb_dom_string_unref(name);
+	return ret;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

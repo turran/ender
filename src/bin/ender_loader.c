@@ -22,7 +22,10 @@
  *============================================================================*/
 static void help(void)
 {
-	printf("Usage: ender_loader FILE.ender\n");
+	printf("Usage: ender_loader FILE.ender ID STATE\n");
+	printf("Where:\n");
+	printf("  ID is the id of the object you want to instantiate\n");
+	printf("  STATE the state you want to set\n");
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -30,9 +33,11 @@ static void help(void)
 int main(int argc, char *argv[])
 {
 	Egueb_Dom_Node *doc = NULL;
+	Egueb_Dom_Node *instance;
 	Enesim_Stream *stream;
+	Eina_Error err = 0;
 
-	if (argc < 2)
+	if (argc < 4)
 	{
 		help();
 		return -1;
@@ -43,7 +48,7 @@ int main(int argc, char *argv[])
 	if (!stream)
 	{
 		printf("Fail to read %s\n", argv[1]);
-		return -1;
+		goto failed_file;
 	}
 
 	/* create the document */
@@ -51,9 +56,18 @@ int main(int argc, char *argv[])
 	egueb_dom_parser_parse(stream, doc);
 	enesim_stream_unref(stream);
 
+	instance = ender_document_instance_new(doc, argv[2], &err);
+	if (!instance)
+	{
+		printf("Instance %s not found (%s)\n", argv[2],
+				err ? eina_error_msg_get(err): "unknown");
+		goto failed_instance;
+	}
+
+failed_instance:
 	if (doc)
 		egueb_dom_node_unref(doc);
-
+failed_file:
 	ender_shutdown();
 	return 0;
 }
