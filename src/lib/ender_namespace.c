@@ -150,32 +150,23 @@ void ender_namespace_initialize_cb_set(Ender_Namespace *thiz, Ender_Namespace_In
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Namespace * ender_namespace_new(const char *name, int version)
+EAPI Ender_Namespace * ender_namespace_register(const char *name)
 {
 	Ender_Namespace *thiz;
-	Eina_List *namespaces, *tmp;
 
 	if (!name) return NULL;
 
-	namespaces = eina_hash_find(_namespaces, name);
-	/* check if we already have the namespace */
-	EINA_LIST_FOREACH(namespaces, tmp, thiz)
-	{
-		if (thiz->version == version)
-			return thiz;
-		else if (thiz->version > version)
-			break;
-	}
+	thiz = eina_hash_find(name);
+	if (thiz) return thiz;
+
 	/* if not append it */
 	thiz = calloc(1, sizeof(Ender_Namespace));
 	thiz->name = strdup(name);
-	thiz->version = version;
 	thiz->descriptors = eina_hash_string_superfast_new(
 			(Eina_Free_Cb)ender_descriptor_free);
 
-	tmp = eina_list_append_relative_list(namespaces, thiz, tmp);
 	/* add it */
-	eina_hash_set(_namespaces, name, tmp);
+	eina_hash_add(_namespaces, name, thiz);
 
 	return thiz;
 }
@@ -184,40 +175,7 @@ EAPI Ender_Namespace * ender_namespace_new(const char *name, int version)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void ender_namespace_element_new_listener_add(Ender_Namespace *thiz, Ender_New_Callback cb, void *data)
-{
-	Ender_New_Listener *listener;
-
-	listener = calloc(1, sizeof(Ender_New_Listener));
-	listener->callback = cb;
-	listener->data = data;
-	thiz->new_callbacks = eina_list_append(thiz->new_callbacks, listener);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_namespace_element_new_listener_remove(Ender_Namespace *thiz, Ender_New_Callback cb, void *data)
-{
-	Ender_New_Listener *listener;
-	Eina_List *l;
-
-	EINA_LIST_FOREACH(thiz->new_callbacks, l, listener)
-	{
-		if (listener->callback == cb && listener->data == data)
-		{
-			thiz->new_callbacks = eina_list_remove(l, listener);
-			break;
-		}
-	}
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Ender_Element * ender_namespace_element_new(Ender_Namespace *thiz, const char *name)
+EAPI Ender_Element * ender_namespace_object_new(Ender_Namespace *thiz, const char *name)
 {
 	Ender_Descriptor *desc;
 	Ender_Element *element;
@@ -279,7 +237,7 @@ EAPI Eina_Bool ender_namespace_list_with_name(const char *name,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Namespace * ender_namespace_find(const char *name, int version)
+EAPI Ender_Namespace * ender_namespace_find(const char *name)
 {
 	Eina_List *namespaces;
 	Eina_List *tmp;
@@ -364,14 +322,3 @@ EAPI const char * ender_namespace_name_get(Ender_Namespace *thiz)
 	if (!thiz) return NULL;
 	return thiz->name;
 }
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI int ender_namespace_version_get(Ender_Namespace *thiz)
-{
-	if (!thiz) return 0;
-	return thiz->version;
-}
-

@@ -20,6 +20,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                      The exernal element interface                         *
+ *----------------------------------------------------------------------------*/
 static Egueb_Dom_String * _ender_element_state_tag_name_get(
 		Egueb_Dom_Node *node, void *data)
 {
@@ -40,6 +43,6 @@ static Egueb_Dom_Element_External_Descriptor _descriptor = {
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_element_state_new(void)
 {
-	return egueb_dom_element_external_new(&_descriptor, NULL);
+	return egueb_dom_element_external_new(&_descriptor);
 }
 

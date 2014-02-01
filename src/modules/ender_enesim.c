@@ -1,0 +1,116 @@
+/* ENDER - Enesim's descriptor library
+ * Copyright (C) 2010 - 2012 Jorge Luis Zapata
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "Ender.h"
+/*============================================================================*
+ *                                  Local                                     *
+ *============================================================================*/
+static Ender_Namespace * _ender_enesim_namespace = NULL;
+static int _ender_enesim_log = -1;
+/*----------------------------------------------------------------------------*
+ *                                 Renderer                                   *
+ *----------------------------------------------------------------------------*/
+static void _ender_enesim_renderer_init(Egueb_Dom_Node *n)
+{
+
+}
+
+static void _ender_enesim_renderer_deinit(Egueb_Dom_Node *n, void *data)
+{
+
+}
+
+/*----------------------------------------------------------------------------*
+ *                                  Shape                                     *
+ *----------------------------------------------------------------------------*/
+static void _ender_enesim_renderer_shape_init(Egueb_Dom_Node *n)
+{
+
+}
+
+static void _ender_enesim_renderer_shape_deinit(Egueb_Dom_Node *n, void *data)
+{
+
+}
+/*----------------------------------------------------------------------------*
+ *                                 Circle                                     *
+ *----------------------------------------------------------------------------*/
+static void * _ender_enesim_renderer_circle_init(Egueb_Dom_Node *n)
+{
+	Egueb_Dom_Node *a;
+
+	a = ender_attr_double_new("x", enesim_renderer_circle_x_get, enesim_renderer_circle_x_set);
+	egueb_dom_element_attribute_add(n, a, NULL);
+
+	a = ender_attr_double_new("y", enesim_renderer_circle_y_get, enesim_renderer_circle_y_set);
+	egueb_dom_element_attribute_add(n, a, NULL);
+}
+
+static void _ender_enesim_renderer_circle_deinit(Egueb_Dom_Node *n, void *data)
+{
+	_ender_enesim_renderer_shape_deinit(n, data);
+}
+
+static Ender_Descriptor _ender_enesim_renderer_circle_descriptor = {
+	/* init 	 = */ _ender_enesim_renderer_circle_init,
+	/* deinit 	 = */ _ender_enesim_renderer_circle_deinit,
+};
+/*----------------------------------------------------------------------------*
+ *                               Module API                                   *
+ *----------------------------------------------------------------------------*/
+#if BUILD_STATIC_MODULE_ENESIM
+Eina_Bool ender_enesim_namespace_init(void)
+#else
+static Eina_Bool ender_enesim_namespace_init(void)
+#endif
+{
+	_ender_enesim_log = eina_log_domain_register("ender_enesim", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
+	if (_ender_enesim_log < 0)
+	{
+		EINA_LOG_ERR("Ender: Can not create enesim log domain.");
+		return EINA_FALSE;
+	}
+	_ender_enesim_namespace = ender_namespace_register("enesim");
+	ender_namespace_instance_register(_ender_enesim_namespace, &_ender_enesim_renderer_circle_descriptor);
+	if (!_ender_enesim_namespace)
+		return EINA_FALSE;
+	return EINA_TRUE;
+}
+
+#if BUILD_STATIC_MODULE_ENESIM
+void ender_enesim_namespace_shutdown(void)
+#else
+static void ender_enesim_namespace_shutdown(void)
+#endif
+{
+	ender_namespace_unregister(_ender_enesim_namespace);
+	_ender_enesim_namespace = NULL;
+
+	eina_log_domain_unregister(_ender_enesim_log);
+	_ender_enesim_log = -1;
+}
+
+#if !BUILD_STATIC_MODULE_ENESIM
+EINA_MODULE_INIT(ender_enesim_namespace_init);
+EINA_MODULE_SHUTDOWN(ender_enesim_namespace_shutdown);
+#endif
+

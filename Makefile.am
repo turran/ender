@@ -66,6 +66,7 @@ $(SED) \
 -e 's,@datarootdir\@,$(datarootdir),g' \
 -e 's,@pkgdatadir\@,$(pkgdatadir),g' \
 -e 's,@requirements_ender_pc\@,$(requirements_ender_pc),g' \
+-e 's,@requirements_private_ender_pc\@,$(requirements_private_ender_pc),g' \
 < $< > $@ || rm $@
 
 pc_verbose = $(pc_verbose_@AM_V@)

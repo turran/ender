@@ -59,10 +59,18 @@ int main(int argc, char *argv[])
 	instance = ender_document_instance_new(doc, argv[2], &err);
 	if (!instance)
 	{
-		printf("Instance %s not found (%s)\n", argv[2],
+		printf("Instance '%s' not found (%s)\n", argv[2],
 				err ? eina_error_msg_get(err): "unknown");
 		goto failed_instance;
 	}
+	if (!ender_element_instance_state_set(instance, argv[3], &err))
+	{
+		printf("State '%s' setting failed (%s)\n", argv[3],
+				err ? eina_error_msg_get(err): "unknown");
+		goto failed_state;
+	}
+failed_state:	
+	egueb_dom_node_unref(instance);
 
 failed_instance:
 	if (doc)

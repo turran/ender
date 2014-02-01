@@ -60,15 +60,24 @@ EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
 
 EAPI Egueb_Dom_Node * ender_element_ender_new(void);
 EAPI Egueb_Dom_Node * ender_element_state_new(void);
+EAPI Egueb_Dom_Node * ender_element_scene_new(void);
 EAPI Egueb_Dom_Node * ender_element_states_new(void);
 EAPI Egueb_Dom_Node * ender_element_object_new(void);
+
+EAPI void * ender_element_instance_object_get(Egueb_Dom_Node *n);
+EAPI Eina_Bool ender_element_instance_state_set(Egueb_Dom_Node *n,
+		const char *state, Eina_Error *err);
 
 /* Shared strings */
 EAPI extern Egueb_Dom_String *ENDER_ELEMENT_ENDER;
 EAPI extern Egueb_Dom_String *ENDER_ELEMENT_INSTANCE;
 EAPI extern Egueb_Dom_String *ENDER_ELEMENT_OBJECT;
+EAPI extern Egueb_Dom_String *ENDER_ELEMENT_SCENE;
 EAPI extern Egueb_Dom_String *ENDER_ELEMENT_STATES;
 EAPI extern Egueb_Dom_String *ENDER_ELEMENT_STATE;
+
+#include "ender_attr_int.h"
+#include "ender_attr_double.h"
 
 #if 0
 /**

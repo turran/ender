@@ -20,6 +20,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                      The exernal element interface                         *
+ *----------------------------------------------------------------------------*/
 static Egueb_Dom_String * _ender_element_object_tag_name_get(
 		Egueb_Dom_Node *node, void *data)
 {
@@ -58,6 +61,9 @@ Eina_Bool ender_element_is_object(Egueb_Dom_Node *n)
 	Egueb_Dom_String *name;
 	Eina_Bool ret = EINA_FALSE;
 
+	if (egueb_dom_node_type_get(n) != EGUEB_DOM_NODE_TYPE_ELEMENT_NODE)
+		return ret;
+
 	name = egueb_dom_element_name_get(n);
 	if (name == ENDER_ELEMENT_OBJECT)
 		ret = EINA_TRUE;
@@ -69,5 +75,5 @@ Eina_Bool ender_element_is_object(Egueb_Dom_Node *n)
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_element_object_new(void)
 {
-	return egueb_dom_element_external_new(&_descriptor, NULL);
+	return egueb_dom_element_external_new(&_descriptor);
 }

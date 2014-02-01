@@ -25,6 +25,9 @@ typedef struct _Ender_Element_Ender
 	Egueb_Dom_Node *n;
 } Ender_Element_Ender;
 
+/*----------------------------------------------------------------------------*
+ *                      The exernal element interface                         *
+ *----------------------------------------------------------------------------*/
 static Egueb_Dom_String * _ender_element_ender_tag_name_get(
 		Egueb_Dom_Node *node, void *data)
 {
@@ -41,7 +44,7 @@ static Eina_Bool _ender_element_ender_child_appendable(Egueb_Dom_Node *n,
 		return ret;
 
 	name = egueb_dom_element_name_get(child);
-	if (name == ENDER_ELEMENT_OBJECT)
+	if (name == ENDER_ELEMENT_SCENE)
 		ret = EINA_TRUE;
 	egueb_dom_string_unref(name);
 
@@ -63,5 +66,5 @@ static Egueb_Dom_Element_External_Descriptor _descriptor = {
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_element_ender_new(void)
 {
-	return egueb_dom_element_external_new(&_descriptor, NULL);
+	return egueb_dom_element_external_new(&_descriptor);
 }

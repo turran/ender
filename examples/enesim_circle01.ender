@@ -1,7 +1,22 @@
-<ender namespace="enesim">
-	<object name="circle" id="circle01">
-	<states>
-		<state name="default">
-		</state>
-	</states>
+<ender>
+  <scene>
+    <object ns="enesim" name="checker" id="checker01">
+      <states>
+        <state name="default">
+          <set attributeName="w" to="10"/>
+          <set attributeName="h" to="10"/>
+        </state>
+      </states>
+    </object>
+
+    <object ns="enesim" name="circle" id="circle01">
+      <states>
+        <state name="default">
+          <set attributeName="radius" to="100"/>
+          <set attributeName="fill_renderer" to="#checker01"/>
+        </state>
+      </states>
+    </object>
+
+  </scene>
 </ender>

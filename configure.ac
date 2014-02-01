@@ -74,9 +74,11 @@ LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
-requirements_ender_pc="egueb-dom egueb-smil"
+requirements_ender_pc="egueb-dom"
+requirements_private_ender_pc="egueb-smil"
 AC_SUBST([requirements_ender_pc])
-PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc}])
+AC_SUBST([requirements_private_ender_pc])
+PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc} ${requirements_private_ender_pc}])
 
 ### Checks for library functions
 

@@ -9,6 +9,7 @@ pkgdatadir=@pkgdatadir@
 Name: Ender
 Version: @VERSION@
 Description: Ender
-Requires.private: @requirements_ender_pc@
+Requires.private: @requirements_private_ender_pc@
+Requires: @requirements_ender_pc@
 Libs: -L${libdir} -lender
 Cflags: -I${pkgincludedir}

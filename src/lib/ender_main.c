@@ -32,6 +32,7 @@ int ender_log_dom = -1;
 Egueb_Dom_String *ENDER_ELEMENT_ENDER;
 Egueb_Dom_String *ENDER_ELEMENT_INSTANCE;
 Egueb_Dom_String *ENDER_ELEMENT_OBJECT;
+Egueb_Dom_String *ENDER_ELEMENT_SCENE;
 Egueb_Dom_String *ENDER_ELEMENT_STATES;
 Egueb_Dom_String *ENDER_ELEMENT_STATE;
 
@@ -46,6 +47,7 @@ EAPI void ender_init(void)
  		ENDER_ELEMENT_ENDER = egueb_dom_string_new_with_static_string("ender");
  		ENDER_ELEMENT_INSTANCE = egueb_dom_string_new_with_static_string("instance");
  		ENDER_ELEMENT_OBJECT = egueb_dom_string_new_with_static_string("object");
+ 		ENDER_ELEMENT_SCENE = egueb_dom_string_new_with_static_string("scene");
  		ENDER_ELEMENT_STATES = egueb_dom_string_new_with_static_string("states");
  		ENDER_ELEMENT_STATE = egueb_dom_string_new_with_static_string("state");
 		ender_log_dom = eina_log_domain_register("ender", NULL);
@@ -63,6 +65,7 @@ EAPI void ender_shutdown(void)
 		egueb_dom_string_unref(ENDER_ELEMENT_ENDER);
 		egueb_dom_string_unref(ENDER_ELEMENT_INSTANCE);
 		egueb_dom_string_unref(ENDER_ELEMENT_OBJECT);
+		egueb_dom_string_unref(ENDER_ELEMENT_SCENE);
 		egueb_dom_string_unref(ENDER_ELEMENT_STATES);
 		egueb_dom_string_unref(ENDER_ELEMENT_STATE);
 		egueb_dom_shutdown();

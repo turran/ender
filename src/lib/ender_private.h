@@ -22,6 +22,8 @@
 #include "config.h"
 #endif
 
+#include <Egueb_Smil.h>
+
 /* core */
 #define ERR(...) EINA_LOG_DOM_ERR(ender_log_dom, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(ender_log_dom, __VA_ARGS__)
@@ -29,7 +31,8 @@
 #define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
 extern int ender_log_dom;
 
-Egueb_Dom_Node * ender_element_instance_new(Egueb_Dom_Node *rel);
+Egueb_Dom_Node * ender_element_instance_new(void);
+void ender_element_instance_relative_set(Egueb_Dom_Node *n, Egueb_Dom_Node *rel);
 
 #if 0
 struct _Ender_Container
