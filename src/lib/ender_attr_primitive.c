@@ -59,7 +59,7 @@ static Eina_Bool _ender_attr_primitive_value_get(Egueb_Dom_Node *n, void *data,
 	o = ender_element_instance_object_get(owner);
 	thiz->get(o, thiz->tmp_primitive);
 	value->data.ptr = thiz->tmp_primitive;
-	value->data.owned = EINA_FALSE;
+	value->owned = EINA_FALSE;
 	egueb_dom_node_unref(owner);
 
 	return EINA_TRUE;

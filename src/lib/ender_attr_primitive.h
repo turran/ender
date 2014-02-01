@@ -18,8 +18,8 @@
 #ifndef ENDER_ATTR_PRIMITIVE_H_
 #define ENDER_ATTR_PRIMITIVE_H_
 
-typedef void (*Ender_Attr_Primitive_Set)(void *o, int i);
-typedef int (*Ender_Attr_Primitive_Get)(void *o);
+typedef void (*Ender_Attr_Primitive_Set)(void *o, void *p);
+typedef void (*Ender_Attr_Primitive_Get)(void *o, void *p);
 
 EAPI Egueb_Dom_Node * ender_attr_primitive_new(Egueb_Dom_String *name,
 		Ender_Attr_Primitive_Get get, Ender_Attr_Primitive_Set set,
