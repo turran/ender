@@ -38,6 +38,7 @@ src_lib_libender_la_SOURCES = \
 src/lib/ender_document.c \
 src/lib/ender_attr_int.c \
 src/lib/ender_attr_double.c \
+src/lib/ender_attr_primitive.c \
 src/lib/ender_element_ender.c \
 src/lib/ender_element_instance.c \
 src/lib/ender_element_object.c \
