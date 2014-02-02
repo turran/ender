@@ -32,6 +32,10 @@ include src/lib/Makefile.mk
 
 include src/bin/Makefile.mk
 
+### Modules
+
+include src/modules/Makefile.mk
+
 ### Tests
 
 #include src/tests/Makefile.mk

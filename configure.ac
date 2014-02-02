@@ -80,6 +80,10 @@ AC_SUBST([requirements_ender_pc])
 AC_SUBST([requirements_private_ender_pc])
 PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc} ${requirements_private_ender_pc}])
 
+
+## Modules support
+ENS_MODULE([Enesim], [static], [yes])
+
 ### Checks for library functions
 
 EFL_CHECK_DLOPEN
@@ -109,6 +113,7 @@ echo "Ender........................................: yes"
 echo "  Serialization:"
 echo "  Eet........................................: ${have_eet}"
 echo "  TPL........................................: no"
+echo "  Enesim module:.............................: ${build_module_enesim}"
 echo
 echo "Compilation............: make (or gmake)"
 echo "  CPPFLAGS.............: $CPPFLAGS"

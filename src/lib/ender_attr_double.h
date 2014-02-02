@@ -18,10 +18,13 @@
 #ifndef ENDER_ATTR_DOUBLE_H_
 #define ENDER_ATTR_DOUBLE_H_
 
+#define ENDER_ATTR_DOUBLE_SET(f) ((Ender_Attr_Double_Set)(f))
+#define ENDER_ATTR_DOUBLE_GET(f) ((Ender_Attr_Double_Get)(f))
+
 typedef void (*Ender_Attr_Double_Set)(void *o, double i);
 typedef double (*Ender_Attr_Double_Get)(void *o);
 
-EAPI Egueb_Dom_Node * ender_attr_double_new(Egueb_Dom_String *name,
+EAPI Egueb_Dom_Node * ender_attr_double_new(const char *name,
 		Ender_Attr_Double_Get get, Ender_Attr_Double_Set set);
 
 #endif

@@ -45,7 +45,8 @@ src/lib/ender_element_object.c \
 src/lib/ender_element_scene.c \
 src/lib/ender_element_states.c \
 src/lib/ender_element_state.c \
-src/lib/ender_main.c
+src/lib/ender_main.c \
+src/lib/ender_namespace.c
 
 if HAVE_WIN32
 src_lib_libender_la_SOURCES += \
@@ -57,6 +58,7 @@ src_lib_libender_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib/tpl \
 -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
+-DPACKAGE_LIB_DIR=\"$(pkglibdir)\" \
 -DENDER_BUILD \
 @ENDER_CFLAGS@
 

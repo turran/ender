@@ -23,39 +23,19 @@
 struct _Ender_Namespace
 {
 	char *name;
-	int version;
-	Eina_Bool initialized;
-	Ender_Namespace_Initialize initialize;
-	void *initialize_data;
 	Eina_Hash *descriptors;
-	Eina_List *new_callbacks;
 };
 
-typedef struct _Ender_New_Listener
-{
-	Ender_New_Callback callback;
-	void *data;
-} Ender_New_Listener;
-
-/* on this hash we store the list of namespaces, we use a list because we need
- * to support multiple versions for the same namespace name. The list is ordered
- * from the minimum version to the latest version
- */
 static Eina_Hash *_namespaces = NULL;
 
 static void _ender_namespace_free(void *data)
 {
-	Eina_List *namespaces = data;
-	Eina_List *ll;
-	Ender_Namespace *thiz;
+	Ender_Namespace *thiz = data;
 
-	EINA_LIST_FOREACH(namespaces, ll, thiz)
-	{
-		if (thiz->name)
-			free(thiz->name);
-		eina_hash_free(thiz->descriptors);
-		free(thiz);
-	}
+	if (thiz->name)
+		free(thiz->name);
+	eina_hash_free(thiz->descriptors);
+	free(thiz);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -70,79 +50,14 @@ void ender_namespace_shutdown(void)
 	eina_hash_free(_namespaces);
 }
 
-void ender_namespace_dump(Ender_Namespace *ns)
+const Ender_Instance_Descriptor * ender_namespace_instance_find(
+		const Ender_Namespace *thiz, const char *name)
 {
-	Eina_Iterator *it;
-	Ender_Descriptor *descriptor;
-
-	it = eina_hash_iterator_data_new(ns->descriptors);
-	printf("namespace \"%s\" {\n", ns->name);
-
-	while (eina_iterator_next(it, (void **)&descriptor))
-	{
-		Ender_Descriptor_Type type;
-
-		type = ender_descriptor_type(descriptor);
-		printf("\t %s \"%s\" {\n", ender_descriptor_type_string_to(type), ender_descriptor_name_get(descriptor));
-		printf("\t};\n");
-	}
-	printf("};\n");
-	eina_iterator_free(it);
+	if (!thiz) return NULL;
+	DBG("Looking for instance '%s' on namespace '%s'", name, thiz->name);
+	return eina_hash_find(thiz->descriptors, name); 
 }
 
-Ender_Element * ender_namespace_element_new_from_descriptor(Ender_Namespace *thiz, Ender_Descriptor *desc)
-{
-	Ender_Element *element;
-	Ender_New_Listener *listener;
-	Eina_List *l;
-
-	/* given tha the initialize usually calls the libname_init on the loader
-	 * we can not share this code with the one from data
-	 */
-	if (!thiz->initialized)
-	{
-		if (thiz->initialize)
-			thiz->initialize(thiz, thiz->initialize_data);
-		thiz->initialized = EINA_TRUE;
-	}
-	element = ender_element_new(desc);
-	/* call the constructor callback */
-	EINA_LIST_FOREACH(thiz->new_callbacks, l, listener)
-	{
-		listener->callback(element, listener->data);
-	}
-	return element;
-}
-
-Ender_Element * ender_namespace_element_new_from_descriptor_and_data(
-		Ender_Namespace *thiz, Ender_Descriptor *desc, void *data)
-{
-	Ender_Element *element;
-	Ender_New_Listener *listener;
-	Eina_List *l;
-
-	if (!thiz->initialized)
-	{
-		if (thiz->initialize)
-			thiz->initialize(thiz, thiz->initialize_data);
-		thiz->initialized = EINA_TRUE;
-	}
-	element = ender_element_new_from_data(desc, data);
-	/* call the constructor callback */
-	EINA_LIST_FOREACH(thiz->new_callbacks, l, listener)
-	{
-		listener->callback(element, listener->data);
-	}
-}
-
-/* FIXME maybe in the future we want this event to be added and also exported?
- * this initialize cb is only used on the loader to actually call libname_init()
- */
-void ender_namespace_initialize_cb_set(Ender_Namespace *thiz, Ender_Namespace_Initialize cb, void *data)
-{
-	thiz->initialize = cb;
-	thiz->initialize_data = data;
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -154,16 +69,15 @@ EAPI Ender_Namespace * ender_namespace_register(const char *name)
 {
 	Ender_Namespace *thiz;
 
+	DBG("Registering namespace '%s'", name);
 	if (!name) return NULL;
 
-	thiz = eina_hash_find(name);
+	thiz = eina_hash_find(_namespaces, name);
 	if (thiz) return thiz;
 
-	/* if not append it */
 	thiz = calloc(1, sizeof(Ender_Namespace));
 	thiz->name = strdup(name);
-	thiz->descriptors = eina_hash_string_superfast_new(
-			(Eina_Free_Cb)ender_descriptor_free);
+	thiz->descriptors = eina_hash_string_superfast_new(NULL);
 
 	/* add it */
 	eina_hash_add(_namespaces, name, thiz);
@@ -175,16 +89,46 @@ EAPI Ender_Namespace * ender_namespace_register(const char *name)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Ender_Element * ender_namespace_object_new(Ender_Namespace *thiz, const char *name)
+EAPI void ender_namespace_unregister(Ender_Namespace *thiz)
 {
-	Ender_Descriptor *desc;
-	Ender_Element *element;
-
-	desc = ender_namespace_descriptor_find(thiz, name);
-	if (!desc) return NULL;
-	return ender_namespace_element_new_from_descriptor(thiz, desc);
+	if (!thiz) return;
+	DBG("Unregistering namespace '%s'", thiz->name);
+	eina_hash_del(_namespaces, thiz->name, thiz);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI const Ender_Namespace * ender_namespace_find(const char *name)
+{
+	DBG("Looking for namespace '%s'", name);
+	if (!name) return NULL;
+	return eina_hash_find(_namespaces, name);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool ender_namespace_instance_register(Ender_Namespace *thiz,
+		const Ender_Instance_Descriptor *descriptor, const char *name)
+{
+	Ender_Instance_Descriptor *d;
+
+	if (!thiz) return EINA_FALSE;
+	if (!descriptor) return EINA_FALSE;
+	if (!name) return EINA_FALSE;
+
+	DBG("Registering instance '%s' on namespace '%s'", name, thiz->name);
+	d = eina_hash_find(thiz->descriptors, name);
+	if (d) return EINA_FALSE;
+
+	eina_hash_add(thiz->descriptors, name, descriptor);
+	return EINA_TRUE;
+}
+
+#if 0
 /**
  * To be documented
  * FIXME: To be fixed
@@ -231,28 +175,6 @@ EAPI Eina_Bool ender_namespace_list_with_name(const char *name,
 			break;
 	}
 	return EINA_TRUE;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Ender_Namespace * ender_namespace_find(const char *name)
-{
-	Eina_List *namespaces;
-	Eina_List *tmp;
-	Ender_Namespace *thiz;
-
-	if (!name) return NULL;
-
-	namespaces = eina_hash_find(_namespaces, name);
-	EINA_LIST_FOREACH(namespaces, tmp, thiz)
-	{
-		/* TODO we might need in the future to not be too restrictive? */
-		if (thiz->version == version)
-			return thiz;
-	}
-	return NULL;
 }
 
 /**
@@ -322,3 +244,4 @@ EAPI const char * ender_namespace_name_get(Ender_Namespace *thiz)
 	if (!thiz) return NULL;
 	return thiz->name;
 }
+#endif

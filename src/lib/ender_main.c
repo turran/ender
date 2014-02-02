@@ -22,6 +22,7 @@
  *                                  Local                                     *
  *============================================================================*/
 static int _init = 0;
+static Eina_Array *_modules = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -51,6 +52,14 @@ EAPI void ender_init(void)
  		ENDER_ELEMENT_STATES = egueb_dom_string_new_with_static_string("states");
  		ENDER_ELEMENT_STATE = egueb_dom_string_new_with_static_string("state");
 		ender_log_dom = eina_log_domain_register("ender", NULL);
+		ender_namespace_init();
+		/* the modules */
+		_modules = eina_module_list_get(_modules, PACKAGE_LIB_DIR"/ender/", 1, NULL, NULL);
+		eina_module_list_load(_modules);
+		/* the static modules */
+#if BUILD_STATIC_MODULE_ENESIM
+		ender_enesim_init();
+#endif
 	}
 }
 
@@ -61,6 +70,14 @@ EAPI void ender_shutdown(void)
 {
 	if (_init == 1)
 	{
+		/* unload every module */
+		eina_module_list_free(_modules);
+		eina_array_free(_modules);
+		/* unload every static module */
+#if BUILD_STATIC_MODULE_ENESIM
+		ender_enesim_shutdown();
+#endif
+		ender_namespace_shutdown();
 		eina_log_domain_unregister(ender_log_dom);
 		egueb_dom_string_unref(ENDER_ELEMENT_ENDER);
 		egueb_dom_string_unref(ENDER_ELEMENT_INSTANCE);

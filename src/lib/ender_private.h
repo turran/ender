@@ -34,6 +34,8 @@ extern int ender_log_dom;
 Egueb_Dom_Node * ender_element_instance_new(void);
 void ender_element_instance_relative_set(Egueb_Dom_Node *n, Egueb_Dom_Node *rel);
 
+#include "ender_namespace_private.h"
+
 #if 0
 struct _Ender_Container
 {

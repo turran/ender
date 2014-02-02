@@ -15,16 +15,14 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENDER_ATTR_INT_H_
-#define ENDER_ATTR_INT_H_
+#ifndef ENDER_NAMESPACE_H_
+#define ENDER_NAMESPACE_H_
 
-#define ENDER_ATTR_INT_SET(f) ((Ender_Attr_Int_Set)(f))
-#define ENDER_ATTR_INT_GET(f) ((Ender_Attr_Int_Get)(f))
+typedef struct _Ender_Namespace Ender_Namespace;
 
-typedef void (*Ender_Attr_Int_Set)(void *o, int i);
-typedef int (*Ender_Attr_Int_Get)(void *o);
-
-EAPI Egueb_Dom_Node * ender_attr_int_new(const char *name,
-		Ender_Attr_Int_Get get, Ender_Attr_Int_Set set);
+EAPI Ender_Namespace * ender_namespace_register(const char *name);
+EAPI void ender_namespace_unregister(Ender_Namespace *thiz);
+EAPI Eina_Bool ender_namespace_instance_register(Ender_Namespace *thiz, const Ender_Instance_Descriptor *descriptor, const char *name);
+EAPI const Ender_Namespace * ender_namespace_find(const char *name);
 
 #endif

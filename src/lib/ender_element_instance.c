@@ -22,6 +22,7 @@
  *============================================================================*/
 typedef struct _Ender_Element_Instance {
 	Egueb_Dom_Node *rel;
+	const Ender_Instance_Descriptor *descriptor;
 	void *object;
 } Ender_Element_Instance;
 
@@ -74,7 +75,6 @@ static void * _ender_element_instance_init(Egueb_Dom_Node *node)
 {
 	Ender_Element_Instance *thiz;
 
-	/* TODO create the object */
 	thiz = calloc(1, sizeof(Ender_Element_Instance));
 
 	return thiz;
@@ -84,16 +84,64 @@ static void _ender_element_instance_deinit(Egueb_Dom_Node *node,
 		void *data)
 {
 	Ender_Element_Instance *thiz = data;
+	/* remove the object */
+	if (thiz->object)
+	{
+		if (thiz->descriptor && thiz->descriptor->deinit)
+			thiz->descriptor->deinit(node, thiz->object);
+		thiz->object = NULL;
+	}
 	egueb_dom_node_unref(thiz->rel);
-	/* TODO remove the object */
+	free(thiz);
 }
 
 static Eina_Bool _ender_element_instance_process(Egueb_Dom_Node *node,
 		void *data)
 {
+	Ender_Element_Instance *thiz = data;
 	Egueb_Dom_Node *child;
 
 	printf("processing\n");
+	/* create the object */
+	if (!thiz->object)
+	{
+		const Ender_Namespace *ns;
+		const Ender_Instance_Descriptor *d;
+		Egueb_Dom_String *nss;
+		Egueb_Dom_String *nsa;
+		Egueb_Dom_String *ds;
+		Egueb_Dom_String *da;
+
+		nss = egueb_dom_string_new_with_static_string("ns");
+		nsa = egueb_dom_element_attribute_get(thiz->rel, nss);
+		egueb_dom_string_unref(nss);
+
+		ns = ender_namespace_find(egueb_dom_string_string_get(nsa));
+		egueb_dom_string_unref(nsa);
+		if (!ns)
+		{
+			return EINA_FALSE;
+		}
+
+		ds = egueb_dom_string_new_with_static_string("name");
+		da = egueb_dom_element_attribute_get(thiz->rel, ds);
+		egueb_dom_string_unref(ds);
+
+		d = ender_namespace_instance_find(ns, egueb_dom_string_string_get(da));
+		egueb_dom_string_unref(da);
+		if (!d)
+		{
+			return EINA_FALSE;
+		}
+
+		if (!d->init)
+		{
+			return EINA_FALSE;
+		}
+		thiz->descriptor = d;
+		thiz->object = thiz->descriptor->init(node);
+	}
+
 	/* iterate over the children and process there too */
 	child = egueb_dom_node_child_first_get(node);
 	while (child)
@@ -196,6 +244,8 @@ EAPI Eina_Bool ender_element_instance_state_set(Egueb_Dom_Node *n, const char *s
 		/* TODO instead of getting the string, get the list of strings directly (for the alias) */
 		name = egueb_dom_string_new_with_static_string("name");
 		state_name = egueb_dom_element_attribute_get(state, name);
+		egueb_dom_string_unref(name);
+
 		if (egueb_dom_string_is_valid(state_name) && !strcmp(s,
 				egueb_dom_string_string_get(state_name)))
 		{

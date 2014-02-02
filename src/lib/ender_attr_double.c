@@ -78,7 +78,7 @@ static Eina_Bool _ender_attr_double_value_set(Egueb_Dom_Node *n, void *data,
 static const Egueb_Dom_Value_Descriptor * _ender_attr_double_value_descriptor_get(
 		Egueb_Dom_Node *n, void *data)
 {
-	return egueb_dom_value_int_descriptor_get();
+	return egueb_dom_value_double_descriptor_get();
 }
 
 static Egueb_Dom_Attr_External_Descriptor _descriptor = {
@@ -94,14 +94,16 @@ static Egueb_Dom_Attr_External_Descriptor _descriptor = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Egueb_Dom_Node * ender_attr_double_new(Egueb_Dom_String *name,
+EAPI Egueb_Dom_Node * ender_attr_double_new(const char *name,
 		Ender_Attr_Double_Get get, Ender_Attr_Double_Set set)
 {
 	Ender_Attr_Double *thiz;
+	Egueb_Dom_String *s;
 	Egueb_Dom_Node *n;
 
 	n = egueb_dom_attr_external_new(&_descriptor);
-	egueb_dom_attr_init(n, name, EINA_TRUE, EINA_TRUE,
+	s = egueb_dom_string_new_with_static_string(name);
+	egueb_dom_attr_init(n, s, EINA_TRUE, EINA_TRUE,
 			EINA_TRUE);
 	thiz = egueb_dom_attr_external_data_get(n);
 	thiz->set = set;
