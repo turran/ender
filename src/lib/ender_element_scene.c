@@ -30,7 +30,7 @@ static Egueb_Dom_String * _ender_element_scene_tag_name_get(
 }
 
 static Eina_Bool _ender_element_scene_child_appendable(Egueb_Dom_Node *n,
-		Egueb_Dom_Node *child)
+		void *data, Egueb_Dom_Node *child)
 {
 	Egueb_Dom_String *name;
 	Eina_Bool ret = EINA_FALSE;

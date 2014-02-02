@@ -95,6 +95,21 @@ static void _ender_element_instance_deinit(Egueb_Dom_Node *node,
 	free(thiz);
 }
 
+static Eina_Bool _ender_element_instance_child_appendable(Egueb_Dom_Node *node,
+		void *data, Egueb_Dom_Node *child)
+{
+	Ender_Element_Instance *thiz = data;
+
+	/* every smil object is appendable */
+	if ((egueb_dom_node_type_get(child) == EGUEB_DOM_NODE_TYPE_ELEMENT_NODE)
+			&&egueb_smil_is_animation(child))
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->descriptor->child_appendable)
+		return thiz->descriptor->child_appendable(node, thiz->object, child);
+}
+
 static Eina_Bool _ender_element_instance_process(Egueb_Dom_Node *node,
 		void *data)
 {
@@ -170,7 +185,7 @@ static Egueb_Dom_Element_External_Descriptor _descriptor = {
 	/* init 		= */ _ender_element_instance_init,
 	/* deinit 		= */ _ender_element_instance_deinit,
 	/* tag_name_get		= */ _ender_element_instance_tag_name_get,
-	/* child_appendable 	= */ NULL,
+	/* child_appendable 	= */ _ender_element_instance_child_appendable,
 	/* process 		= */ _ender_element_instance_process,
 };
 /*============================================================================*

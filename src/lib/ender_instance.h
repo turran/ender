@@ -32,7 +32,7 @@ typedef struct _Ender_Instance_Descriptor {
 	Ender_Instance_Init init;
 	Ender_Instance_Deinit deinit;
 	Ender_Instance_Process process;
-	Ender_Instance_Child_Appendable child_appenable;
+	Ender_Instance_Child_Appendable child_appendable;
 	Ender_Instance_Child_Added child_added;
 	Ender_Instance_Child_Removed child_removed;
 } Ender_Instance_Descriptor;
