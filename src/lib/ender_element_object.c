@@ -64,7 +64,7 @@ Eina_Bool ender_element_is_object(Egueb_Dom_Node *n)
 	if (egueb_dom_node_type_get(n) != EGUEB_DOM_NODE_TYPE_ELEMENT_NODE)
 		return ret;
 
-	name = egueb_dom_element_name_get(n);
+	name = egueb_dom_element_tag_name_get(n);
 	if (name == ENDER_ELEMENT_OBJECT)
 		ret = EINA_TRUE;
 	egueb_dom_string_unref(name);
