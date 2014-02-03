@@ -1,0 +1,3 @@
+Ender is a library written in C that let's you map any library's
+object/properties concept into DOM element's node with attributes.
+
