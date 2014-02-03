@@ -69,6 +69,14 @@ int main(int argc, char *argv[])
 				err ? eina_error_msg_get(err): "unknown");
 		goto failed_state;
 	}
+	/* TODO still think how the animation interface should be:
+	 * 1. one etch per instance?
+	 * 2. one etch per scene?
+	 * 3. one etch per doc?
+	 */
+	//ender_document_tick(doc);
+	egueb_dom_document_process(doc);
+
 failed_state:	
 	egueb_dom_node_unref(instance);
 

@@ -178,13 +178,13 @@ EAPI Egueb_Dom_Node * ender_document_new(void)
 	return egueb_dom_document_external_new(&_descriptor);
 }
 
-#if 0
-/* Add the animation API */
 EAPI void ender_document_tick(Egueb_Dom_Node *n)
 {
+	Ender_Document *thiz;
 
+	thiz = egueb_dom_document_external_data_get(n);
+	etch_timer_tick(thiz->etch);
 }
-#endif
 
 EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
 		const char *id, Eina_Error *err)
