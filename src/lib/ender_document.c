@@ -142,14 +142,8 @@ static Egueb_Dom_Node * _ender_document_element_create(Egueb_Dom_Node *n,
 	return NULL;
 }
 
-static void * _ender_document_init(Egueb_Dom_Node *n)
+static void _ender_document_init(Egueb_Dom_Node *n, void *data)
 {
-	Ender_Document *thiz;
-
-	thiz = calloc(1, sizeof(Ender_Document));
-	thiz->etch = etch_new();
-
-	return thiz;
 }
 
 static void _ender_document_deinit(Egueb_Dom_Node *n, void *data)
@@ -175,7 +169,12 @@ static Egueb_Dom_Document_External_Descriptor _descriptor = {
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_document_new(void)
 {
-	return egueb_dom_document_external_new(&_descriptor);
+	Ender_Document *thiz;
+
+	thiz = calloc(1, sizeof(Ender_Document));
+	thiz->etch = etch_new();
+
+	return egueb_dom_document_external_new(&_descriptor, thiz);
 }
 
 EAPI void ender_document_tick(Egueb_Dom_Node *n)
@@ -199,10 +198,17 @@ EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
 	if (!rel) return NULL;
 
 	if (!ender_element_is_object(rel))
+	{
+		egueb_dom_node_unref(rel);
 		return NULL;
+	}
 
 	ret = egueb_dom_document_element_create(n, ENDER_ELEMENT_INSTANCE, err);
-	if (!ret) return NULL;
+	if (!ret)
+	{
+		egueb_dom_node_unref(rel);
+		return NULL;
+	}
 
 	ender_element_instance_relative_set(ret, rel);
 	/* register some events */

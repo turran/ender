@@ -43,6 +43,6 @@ static Egueb_Dom_Element_External_Descriptor _descriptor = {
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_element_state_new(void)
 {
-	return egueb_dom_element_external_new(&_descriptor);
+	return egueb_dom_element_external_new(&_descriptor, NULL);
 }
 

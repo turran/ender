@@ -71,17 +71,11 @@ static Egueb_Dom_String * _ender_element_instance_tag_name_get(
 	return egueb_dom_string_ref(ENDER_ELEMENT_INSTANCE);
 }
 
-static void * _ender_element_instance_init(Egueb_Dom_Node *node)
+static void _ender_element_instance_init(Egueb_Dom_Node *node, void *data)
 {
-	Ender_Element_Instance *thiz;
-
-	thiz = calloc(1, sizeof(Ender_Element_Instance));
-
-	return thiz;
 }
 
-static void _ender_element_instance_deinit(Egueb_Dom_Node *node,
-		void *data)
+static void _ender_element_instance_deinit(Egueb_Dom_Node *node, void *data)
 {
 	Ender_Element_Instance *thiz = data;
 	/* remove the object */
@@ -193,9 +187,11 @@ static Egueb_Dom_Element_External_Descriptor _descriptor = {
  *============================================================================*/
 Egueb_Dom_Node * ender_element_instance_new(void)
 {
+	Ender_Element_Instance *thiz;
 	Egueb_Dom_Node *n;
 
-	n = egueb_dom_element_external_new(&_descriptor);
+	thiz = calloc(1, sizeof(Ender_Element_Instance));
+	n = egueb_dom_element_external_new(&_descriptor, thiz);
 	return n;
 }
 

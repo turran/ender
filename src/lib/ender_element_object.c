@@ -75,5 +75,5 @@ Eina_Bool ender_element_is_object(Egueb_Dom_Node *n)
  *============================================================================*/
 EAPI Egueb_Dom_Node * ender_element_object_new(void)
 {
-	return egueb_dom_element_external_new(&_descriptor);
+	return egueb_dom_element_external_new(&_descriptor, NULL);
 }
