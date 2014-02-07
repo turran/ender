@@ -3,7 +3,12 @@ lib_LTLIBRARIES += src/lib/libender.la
 
 installed_ender_headersdir = $(pkgincludedir)-$(VMAJ)
 dist_installed_ender_headers_DATA = \
-src/lib/Ender.h
+src/lib/Ender.h \
+src/lib/ender_attr_double.h \
+src/lib/ender_attr_int.h \
+src/lib/ender_attr_primitive.h \
+src/lib/ender_instance.h \
+src/lib/ender_namespace.h
 
 #src_lib_libender_la_YFLAGS = -d -p ender_
 #src_lib_libender_la_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
