@@ -158,8 +158,6 @@ static Egueb_Dom_Document_External_Descriptor _descriptor = {
 	/* init 		= */ _ender_document_init,
 	/* deinit 		= */ _ender_document_deinit,
 	/* element_create	= */ _ender_document_element_create,
-	/* process 		= */ NULL,
-	/* needs process 	= */ NULL,
 };
 /*============================================================================*
  *                                 Global                                     *
