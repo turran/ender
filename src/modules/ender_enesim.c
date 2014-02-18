@@ -49,9 +49,9 @@ static void _ender_enesim_renderer_shape_init(Egueb_Dom_Node *n)
 /*----------------------------------------------------------------------------*
  *                                 Circle                                     *
  *----------------------------------------------------------------------------*/
-static void * _ender_enesim_renderer_circle_init(Egueb_Dom_Node *n)
+static void _ender_enesim_renderer_circle_populate(Egueb_Dom_Node *n, void *data)
 {
-	Enesim_Renderer *r;
+	Enesim_Renderer *r = data;
 	Egueb_Dom_Node *a;
 
 	/* the properties */
@@ -69,20 +69,12 @@ static void * _ender_enesim_renderer_circle_init(Egueb_Dom_Node *n)
 			ENDER_ATTR_DOUBLE_GET(enesim_renderer_circle_radius_get),
 			ENDER_ATTR_DOUBLE_SET(enesim_renderer_circle_radius_set));
 	egueb_dom_element_attribute_add(n, a, NULL);
-
-	/* the object */
-	r = enesim_renderer_circle_new();
-	return r;
-}
-
-static void _ender_enesim_renderer_circle_deinit(Egueb_Dom_Node *n, void *data)
-{
-	enesim_renderer_unref(data);
 }
 
 static Ender_Instance_Descriptor _ender_enesim_renderer_circle_descriptor = {
-	/* init 	 	= */ _ender_enesim_renderer_circle_init,
-	/* deinit 	 	= */ _ender_enesim_renderer_circle_deinit,
+	/* ctor 	 	= */ ENDER_INSTANCE_DESCRIPTOR_CTOR(enesim_renderer_circle_new),
+	/* dtor 	 	= */ ENDER_INSTANCE_DESCRIPTOR_DTOR(enesim_renderer_unref),
+	/* populate	 	= */ _ender_enesim_renderer_circle_populate,
 	/* process	 	= */ NULL,
 	/* child_appendable	= */ NULL,
 	/* child_added		= */ NULL,

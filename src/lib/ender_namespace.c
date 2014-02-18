@@ -77,7 +77,7 @@ EAPI Ender_Namespace * ender_namespace_register(const char *name)
 
 	thiz = calloc(1, sizeof(Ender_Namespace));
 	thiz->name = strdup(name);
-	thiz->descriptors = eina_hash_string_superfast_new(NULL);
+	thiz->descriptors = eina_hash_string_superfast_new(EINA_FREE_CB(free));
 
 	/* add it */
 	eina_hash_add(_namespaces, name, thiz);
@@ -124,7 +124,10 @@ EAPI Eina_Bool ender_namespace_instance_register(Ender_Namespace *thiz,
 	d = eina_hash_find(thiz->descriptors, name);
 	if (d) return EINA_FALSE;
 
-	eina_hash_add(thiz->descriptors, name, descriptor);
+	d = calloc(1, sizeof(Ender_Instance_Descriptor));
+	*d = *descriptor;
+
+	eina_hash_add(thiz->descriptors, name, d);
 	return EINA_TRUE;
 }
 

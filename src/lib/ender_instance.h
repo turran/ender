@@ -18,23 +18,33 @@
 #ifndef ENDER_INSTANCE_H_
 #define ENDER_INSTANCE_H_
 
-typedef void * (*Ender_Instance_Init)(Egueb_Dom_Node *n);
-typedef void (*Ender_Instance_Deinit)(Egueb_Dom_Node *n, void *thiz);
-typedef Eina_Bool (*Ender_Instance_Process)(Egueb_Dom_Node *n, void *thiz);
-typedef Eina_Bool (*Ender_Instance_Child_Appendable)(Egueb_Dom_Node *n,
+#define ENDER_INSTANCE_DESCRIPTOR_CTOR(f) (Ender_Instance_Descriptor_Ctor)(f)
+#define ENDER_INSTANCE_DESCRIPTOR_DTOR(f) (Ender_Instance_Descriptor_Dtor)(f)
+#define ENDER_INSTANCE_DESCRIPTOR_PROCESS(f) (Ender_Instance_Descriptor_Process)(f)
+#define ENDER_INSTANCE_DESCRIPTOR_POPULATE(f) (Ender_Instance_Descriptor_Populate)(f)
+#define ENDER_INSTANCE_DESCRIPTOR_CHILD_APPENDABLE(f) (Ender_Instance_Descriptor_Child_Appendable)(f)
+#define ENDER_INSTANCE_DESCRIPTOR_CHILD_ADDED(f) (Ender_Instance_Descriptor_Child_Added)(f)
+#define ENDER_INSTANCE_DESCRIPTOR_CHILD_REMOVED(f) (Ender_Instance_Descriptor_Child_Removed)(f)
+
+typedef void * (*Ender_Instance_Descriptor_Ctor)(void);
+typedef void (*Ender_Instance_Descriptor_Dtor)(void *thiz);
+typedef void (*Ender_Instance_Descriptor_Populate)(Egueb_Dom_Node *n, void *thiz);
+typedef Eina_Bool (*Ender_Instance_Descriptor_Process)(Egueb_Dom_Node *n, void *thiz);
+typedef Eina_Bool (*Ender_Instance_Descriptor_Child_Appendable)(Egueb_Dom_Node *n,
 		void *thiz, Egueb_Dom_Node *child);
-typedef void (*Ender_Instance_Child_Added)(Egueb_Dom_Node *n, void *thiz,
+typedef void (*Ender_Instance_Descriptor_Child_Added)(Egueb_Dom_Node *n, void *thiz,
 		Egueb_Dom_Node *child);
-typedef void (*Ender_Instance_Child_Removed)(Egueb_Dom_Node *n, void *thiz,
+typedef void (*Ender_Instance_Descriptor_Child_Removed)(Egueb_Dom_Node *n, void *thiz,
 		Egueb_Dom_Node *child);
 
 typedef struct _Ender_Instance_Descriptor {
-	Ender_Instance_Init init;
-	Ender_Instance_Deinit deinit;
-	Ender_Instance_Process process;
-	Ender_Instance_Child_Appendable child_appendable;
-	Ender_Instance_Child_Added child_added;
-	Ender_Instance_Child_Removed child_removed;
+	Ender_Instance_Descriptor_Ctor ctor;
+	Ender_Instance_Descriptor_Dtor dtor;
+	Ender_Instance_Descriptor_Populate populate;
+	Ender_Instance_Descriptor_Process process;
+	Ender_Instance_Descriptor_Child_Appendable child_appendable;
+	Ender_Instance_Descriptor_Child_Added child_added;
+	Ender_Instance_Descriptor_Child_Removed child_removed;
 } Ender_Instance_Descriptor;
 
 #endif

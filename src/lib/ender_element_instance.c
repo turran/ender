@@ -26,6 +26,54 @@ typedef struct _Ender_Element_Instance {
 	void *object;
 } Ender_Element_Instance;
 
+static Eina_Bool _ender_element_instance_create_object(Egueb_Dom_Node *n)
+{
+	Ender_Element_Instance *thiz;
+	const Ender_Namespace *ns;
+	const Ender_Instance_Descriptor *d;
+	Egueb_Dom_String *nss;
+	Egueb_Dom_String *nsa;
+	Egueb_Dom_String *ds;
+	Egueb_Dom_String *da;
+
+	thiz = egueb_dom_element_external_data_get(n);
+	if (thiz->object) return EINA_TRUE;
+
+	nss = egueb_dom_string_new_with_static_string("ns");
+	nsa = egueb_dom_element_attribute_get(thiz->rel, nss);
+	egueb_dom_string_unref(nss);
+
+	ns = ender_namespace_find(egueb_dom_string_string_get(nsa));
+	egueb_dom_string_unref(nsa);
+	if (!ns)
+	{
+		return EINA_FALSE;
+	}
+
+	ds = egueb_dom_string_new_with_static_string("name");
+	da = egueb_dom_element_attribute_get(thiz->rel, ds);
+	egueb_dom_string_unref(ds);
+
+	d = ender_namespace_instance_find(ns, egueb_dom_string_string_get(da));
+	egueb_dom_string_unref(da);
+	if (!d)
+	{
+		return EINA_FALSE;
+	}
+
+	if (!d->ctor)
+	{
+		return EINA_FALSE;
+	}
+	thiz->descriptor = d;
+	thiz->object = thiz->descriptor->ctor();
+	if (d->populate)
+	{
+		thiz->descriptor->populate(n, thiz->object);
+	}
+	return EINA_TRUE;
+}
+
 static Eina_Bool _ender_element_instance_state_set(Egueb_Dom_Node *n,
 		Egueb_Dom_Node *state, Eina_Error *err)
 {
@@ -81,8 +129,8 @@ static void _ender_element_instance_deinit(Egueb_Dom_Node *node, void *data)
 	/* remove the object */
 	if (thiz->object)
 	{
-		if (thiz->descriptor && thiz->descriptor->deinit)
-			thiz->descriptor->deinit(node, thiz->object);
+		if (thiz->descriptor && thiz->descriptor->dtor)
+			thiz->descriptor->dtor(thiz->object);
 		thiz->object = NULL;
 	}
 	egueb_dom_node_unref(thiz->rel);
@@ -112,44 +160,8 @@ static Eina_Bool _ender_element_instance_process(Egueb_Dom_Node *node,
 
 	printf("processing\n");
 	/* create the object */
-	if (!thiz->object)
-	{
-		const Ender_Namespace *ns;
-		const Ender_Instance_Descriptor *d;
-		Egueb_Dom_String *nss;
-		Egueb_Dom_String *nsa;
-		Egueb_Dom_String *ds;
-		Egueb_Dom_String *da;
-
-		nss = egueb_dom_string_new_with_static_string("ns");
-		nsa = egueb_dom_element_attribute_get(thiz->rel, nss);
-		egueb_dom_string_unref(nss);
-
-		ns = ender_namespace_find(egueb_dom_string_string_get(nsa));
-		egueb_dom_string_unref(nsa);
-		if (!ns)
-		{
-			return EINA_FALSE;
-		}
-
-		ds = egueb_dom_string_new_with_static_string("name");
-		da = egueb_dom_element_attribute_get(thiz->rel, ds);
-		egueb_dom_string_unref(ds);
-
-		d = ender_namespace_instance_find(ns, egueb_dom_string_string_get(da));
-		egueb_dom_string_unref(da);
-		if (!d)
-		{
-			return EINA_FALSE;
-		}
-
-		if (!d->init)
-		{
-			return EINA_FALSE;
-		}
-		thiz->descriptor = d;
-		thiz->object = thiz->descriptor->init(node);
-	}
+	if (!thiz->object && !_ender_element_instance_create_object(node))
+		return EINA_FALSE;
 
 	/* iterate over the children and process there too */
 	child = egueb_dom_node_child_first_get(node);
@@ -210,6 +222,8 @@ EAPI void * ender_element_instance_object_get(Egueb_Dom_Node *n)
 	Ender_Element_Instance *thiz;
 
 	thiz = egueb_dom_element_external_data_get(n);
+	if (!thiz->object)
+		_ender_element_instance_create_object(n);
 	return thiz->object;
 }
 
