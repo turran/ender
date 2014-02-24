@@ -78,6 +78,7 @@ EAPI extern Egueb_Dom_String *ENDER_ELEMENT_STATE;
 
 #include "ender_attr_int.h"
 #include "ender_attr_double.h"
+#include "ender_attr_enesim_color.h"
 #include "ender_attr_primitive.h"
 #include "ender_instance.h"
 #include "ender_namespace.h"

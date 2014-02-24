@@ -20,73 +20,79 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Ender_Attr_Color
+typedef struct _Ender_Attr_Enesim_Color
 {
-	Ender_Attr_Color_Set set;
-	Ender_Attr_Color_Get get;
-} Ender_Attr_Color;
+	Ender_Attr_Enesim_Color_Set set;
+	Ender_Attr_Enesim_Color_Get get;
+} Ender_Attr_Enesim_Color;
 /*----------------------------------------------------------------------------*
  *                        The exernal attr interface                           *
  *----------------------------------------------------------------------------*/
-static void * _ender_attr_color_init(Egueb_Dom_Node *n)
+static void * _ender_attr_enesim_color_init(Egueb_Dom_Node *n)
 {
-	Ender_Attr_Color *thiz;
+	Ender_Attr_Enesim_Color *thiz;
 
-	thiz = calloc(1, sizeof(Ender_Attr_Color));
+	thiz = calloc(1, sizeof(Ender_Attr_Enesim_Color));
 	return thiz;
 }
 
-static void _ender_attr_color_deinit(Egueb_Dom_Node *n, void *data)
+static void _ender_attr_enesim_color_deinit(Egueb_Dom_Node *n, void *data)
 {
 	free(data);
 }
 
-static Eina_Bool _ender_attr_color_value_get(Egueb_Dom_Node *n, void *data,
+static Eina_Bool _ender_attr_enesim_color_value_get(Egueb_Dom_Node *n, void *data,
 		Egueb_Dom_Attr_Type type, Egueb_Dom_Value *value)
 {
-	Ender_Attr_Color *thiz = data;
+	Ender_Attr_Enesim_Color *thiz = data;
 	Egueb_Dom_Node *owner;
+	Enesim_Color c;
 	void *o;
 
 	owner = egueb_dom_attr_owner_get(n);
 	if (!owner) return EINA_FALSE;
 
 	o = ender_element_instance_object_get(owner);
-	value->data.i32 = thiz->get(o);
+	c = thiz->get(o);
+	/* convert it to argb */
+	value->data.i32 = c;
 	egueb_dom_node_unref(owner);
 
 	return EINA_TRUE;
 }
 
-static Eina_Bool _ender_attr_color_value_set(Egueb_Dom_Node *n, void *data,
+static Eina_Bool _ender_attr_enesim_color_value_set(Egueb_Dom_Node *n, void *data,
 		Egueb_Dom_Attr_Type type, Egueb_Dom_Value *value)
 {
-	Ender_Attr_Color *thiz = data;
+	Ender_Attr_Enesim_Color *thiz = data;
 	Egueb_Dom_Node *owner;
+	Enesim_Color c;
 	void *o;
 
 	owner = egueb_dom_attr_owner_get(n);
 	if (!owner) return EINA_FALSE;
 
 	o = ender_element_instance_object_get(owner);
-	thiz->set(o, value->data.i32);
+	/* convert it from argb */
+	c = value->data.i32;
+	thiz->set(o, c);
 	egueb_dom_node_unref(owner);
 
 	return EINA_TRUE;
 }
 
-static const Egueb_Dom_Value_Descriptor * _ender_attr_color_value_descriptor_get(
+static const Egueb_Dom_Value_Descriptor * _ender_attr_enesim_color_value_descriptor_get(
 		Egueb_Dom_Node *n, void *data)
 {
 	return egueb_dom_value_color_descriptor_get();
 }
 
 static Egueb_Dom_Attr_External_Descriptor _descriptor = {
-	/* init 		= */ _ender_attr_color_init,
-	/* deinit 		= */ _ender_attr_color_deinit,
-	/* value_descriptor_get	= */ _ender_attr_color_value_descriptor_get,
-	/* value_get 		= */ _ender_attr_color_value_get,
-	/* value_set	 	= */ _ender_attr_color_value_set,
+	/* init 		= */ _ender_attr_enesim_color_init,
+	/* deinit 		= */ _ender_attr_enesim_color_deinit,
+	/* value_descriptor_get	= */ _ender_attr_enesim_color_value_descriptor_get,
+	/* value_get 		= */ _ender_attr_enesim_color_value_get,
+	/* value_set	 	= */ _ender_attr_enesim_color_value_set,
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -94,10 +100,10 @@ static Egueb_Dom_Attr_External_Descriptor _descriptor = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Egueb_Dom_Node * ender_attr_color_new(const char *name,
-		Ender_Attr_Color_Get get, Ender_Attr_Color_Set set)
+EAPI Egueb_Dom_Node * ender_attr_enesim_color_new(const char *name,
+		Ender_Attr_Enesim_Color_Get get, Ender_Attr_Enesim_Color_Set set)
 {
-	Ender_Attr_Color *thiz;
+	Ender_Attr_Enesim_Color *thiz;
 	Egueb_Dom_String *s;
 	Egueb_Dom_Node *n;
 

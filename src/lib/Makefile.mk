@@ -5,6 +5,7 @@ installed_ender_headersdir = $(pkgincludedir)-$(VMAJ)
 dist_installed_ender_headers_DATA = \
 src/lib/Ender.h \
 src/lib/ender_attr_double.h \
+src/lib/ender_attr_enesim_color.h \
 src/lib/ender_attr_int.h \
 src/lib/ender_attr_primitive.h \
 src/lib/ender_instance.h \
@@ -43,6 +44,7 @@ src_lib_libender_la_SOURCES = \
 src/lib/ender_document.c \
 src/lib/ender_attr_int.c \
 src/lib/ender_attr_double.c \
+src/lib/ender_attr_enesim_color.c \
 src/lib/ender_attr_primitive.c \
 src/lib/ender_element_ender.c \
 src/lib/ender_element_instance.c \
