@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
 	/* create the document */
 	doc = ender_document_new();
-	egueb_dom_parser_parse(stream, doc);
+	egueb_dom_parser_parse(stream, &doc);
 	enesim_stream_unref(stream);
 
 	instance = ender_document_instance_new(doc, argv[2], &err);
