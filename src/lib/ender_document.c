@@ -154,10 +154,23 @@ static void _ender_document_deinit(Egueb_Dom_Node *n, void *data)
 	free(thiz);
 }
 
+static Eina_Bool _ender_document_child_appendable(Egueb_Dom_Node *n,
+		void *data, Egueb_Dom_Node *child)
+{
+	Egueb_Dom_String *name;
+	Eina_Bool ret;
+
+	name = egueb_dom_node_name_get(child);
+	ret = egueb_dom_string_is_equal(name, ENDER_ELEMENT_ENDER);
+	egueb_dom_string_unref(name);
+	return ret;
+}
+
 static Egueb_Dom_Document_External_Descriptor _descriptor = {
 	/* init 		= */ _ender_document_init,
 	/* deinit 		= */ _ender_document_deinit,
 	/* element_create	= */ _ender_document_element_create,
+	/* child_appendable 	= */ _ender_document_child_appendable,
 };
 /*============================================================================*
  *                                 Global                                     *
