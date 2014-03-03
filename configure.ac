@@ -74,7 +74,7 @@ LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
-requirements_ender_pc="egueb-dom"
+requirements_ender_pc="egueb-dom egueb-css"
 requirements_private_ender_pc="egueb-smil"
 AC_SUBST([requirements_ender_pc])
 AC_SUBST([requirements_private_ender_pc])

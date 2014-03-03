@@ -19,6 +19,7 @@
 #define _ENDER_H
 
 #include <Eina.h>
+#include <Egueb_Css.h>
 #include <Egueb_Dom.h>
 
 #ifdef EAPI
@@ -79,6 +80,7 @@ EAPI extern Egueb_Dom_String *ENDER_ELEMENT_STATE;
 #include "ender_attr_int.h"
 #include "ender_attr_double.h"
 #include "ender_attr_enesim_color.h"
+#include "ender_attr_font.h"
 #include "ender_attr_primitive.h"
 #include "ender_instance.h"
 #include "ender_namespace.h"
