@@ -22,80 +22,7 @@
  *============================================================================*/
 typedef struct _Ender_Document
 {
-	Etch *etch;
 } Ender_Document;
-
-static void _ender_document_instance_animation_node_removed_from_document_cb(
-		Egueb_Dom_Event *ev, void *data)
-{
-	Egueb_Dom_Node *target;
-	Egueb_Dom_Node *current;
-
-	target = egueb_dom_event_target_get(ev);
-	current = egueb_dom_event_target_current_get(ev);
-
-	if (target != current)
-		goto no_ourselves;
-	/* remove the etch */
-	printf("smil instance removed from document\n");
-	egueb_smil_animation_etch_set(target, NULL);
-	egueb_dom_element_process(target);
-no_ourselves:
-	egueb_dom_node_unref(target);
-	egueb_dom_node_unref(current);
-}
-
-static void _ender_document_instance_node_inserted_cb(Egueb_Dom_Event *ev,
-		void *data)
-{
-	Ender_Document *thiz;
-	Egueb_Dom_Node *n = data;
-	Egueb_Dom_Node *current;
-	Egueb_Dom_Node *target;
-	Egueb_Dom_Node *rel;
-	Egueb_Dom_Node *child;
-
-	/* check if the parent of the node inserted is the target */
-	rel = egueb_dom_event_mutation_related_get(ev);
-	current = egueb_dom_event_target_current_get(ev);
-
-	if (rel != current)
-		goto done;
-
-	/* check if it is an animation */
-	target = egueb_dom_event_target_get(ev);
-	if (egueb_dom_node_type_get(target) != EGUEB_DOM_NODE_TYPE_ELEMENT_NODE)
-		goto no_smil;
-	if (!egueb_smil_is_animation(target))
-		goto no_smil;
-
-	printf("smil instance node inserted\n");
-	thiz = egueb_dom_document_external_data_get(n);
-	egueb_smil_animation_etch_set(target, thiz->etch);
-	egueb_dom_node_event_listener_add(target,
-				EGUEB_DOM_EVENT_MUTATION_NODE_REMOVED_FROM_DOCUMENT,
-				_ender_document_instance_animation_node_removed_from_document_cb,
-				EINA_TRUE, NULL);
-no_smil:
-	egueb_dom_node_unref(target);
-done:
-	egueb_dom_node_unref(rel);
-	egueb_dom_node_unref(current);
-}
-
-static void _ender_document_instance_node_removed_from_document_cb(Egueb_Dom_Event *ev,
-		void *data)
-{
-	Egueb_Dom_Node *n = data;
-
-	printf("removed from document\n");
-#if 0
-	egueb_dom_node_event_listener_remove(ret,
-			EGUEB_DOM_EVENT_MUTATION_NODE_INSERTED,
-			_ender_document_instance_node_inserted_cb,
-			EINA_TRUE, n);
-#endif
-}
 
 /*----------------------------------------------------------------------------*
  *                     The exernal document interface                         *
@@ -150,7 +77,6 @@ static void _ender_document_deinit(Egueb_Dom_Node *n, void *data)
 {
 	Ender_Document *thiz = data;
 
-	etch_delete(thiz->etch);
 	free(thiz);
 }
 
@@ -183,17 +109,8 @@ EAPI Egueb_Dom_Node * ender_document_new(void)
 	Ender_Document *thiz;
 
 	thiz = calloc(1, sizeof(Ender_Document));
-	thiz->etch = etch_new();
 
 	return egueb_dom_document_external_new(&_descriptor, thiz);
-}
-
-EAPI void ender_document_tick(Egueb_Dom_Node *n)
-{
-	Ender_Document *thiz;
-
-	thiz = egueb_dom_document_external_data_get(n);
-	etch_timer_tick(thiz->etch);
 }
 
 EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
@@ -201,6 +118,7 @@ EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
 {
 	Egueb_Dom_Node *ret;
 	Egueb_Dom_Node *rel;
+	Egueb_Dom_Node *topmost;
 	Egueb_Dom_String *sid;
 	
 	sid = egueb_dom_string_new_with_static_string(id);
@@ -221,18 +139,8 @@ EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
 		return NULL;
 	}
 
+	topmost = egueb_dom_document_element_get(n);
+	egueb_dom_node_child_append(topmost, ret, NULL);
 	ender_element_instance_relative_set(ret, rel);
-	/* register some events */
-	if (ret)
-	{
-		egueb_dom_node_event_listener_add(ret,
-				EGUEB_DOM_EVENT_MUTATION_NODE_INSERTED,
-				_ender_document_instance_node_inserted_cb,
-				EINA_TRUE, n);
-		egueb_dom_node_event_listener_add(ret,
-				EGUEB_DOM_EVENT_MUTATION_NODE_REMOVED_FROM_DOCUMENT,
-				_ender_document_instance_node_removed_from_document_cb,
-				EINA_TRUE, n);
-	}
 	return ret;
 }

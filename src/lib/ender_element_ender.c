@@ -46,6 +46,8 @@ static Eina_Bool _ender_element_ender_child_appendable(Egueb_Dom_Node *n,
 	name = egueb_dom_element_name_get(child);
 	if (name == ENDER_ELEMENT_SCENE)
 		ret = EINA_TRUE;
+	else if (name == ENDER_ELEMENT_INSTANCE)
+		ret = EINA_TRUE;
 	egueb_dom_string_unref(name);
 
 	return ret;
