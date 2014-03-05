@@ -47,6 +47,7 @@ static Eina_Bool _ender_element_instance_create_object(Egueb_Dom_Node *n)
 	egueb_dom_string_unref(nsa);
 	if (!ns)
 	{
+		ERR("No namespace found");
 		return EINA_FALSE;
 	}
 
@@ -58,11 +59,13 @@ static Eina_Bool _ender_element_instance_create_object(Egueb_Dom_Node *n)
 	egueb_dom_string_unref(da);
 	if (!d)
 	{
+		ERR("No instance found");
 		return EINA_FALSE;
 	}
 
 	if (!d->ctor)
 	{
+		ERR("No contructor defined");
 		return EINA_FALSE;
 	}
 	thiz->descriptor = d;
@@ -71,6 +74,7 @@ static Eina_Bool _ender_element_instance_create_object(Egueb_Dom_Node *n)
 	{
 		thiz->descriptor->populate(n, thiz->object);
 	}
+	DBG("Object created correctly");
 	return EINA_TRUE;
 }
 
