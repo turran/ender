@@ -140,7 +140,9 @@ EAPI Egueb_Dom_Node * ender_document_instance_new(Egueb_Dom_Node *n,
 	}
 
 	topmost = egueb_dom_document_element_get(n);
-	egueb_dom_node_child_append(topmost, ret, NULL);
+	egueb_dom_node_child_append(topmost, egueb_dom_node_ref(ret), NULL);
 	ender_element_instance_relative_set(ret, rel);
+	egueb_dom_node_unref(topmost);
+
 	return ret;
 }
