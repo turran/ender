@@ -162,7 +162,6 @@ static Eina_Bool _ender_element_instance_process(Egueb_Dom_Node *node,
 	Ender_Element_Instance *thiz = data;
 	Egueb_Dom_Node *child;
 
-	printf("processing\n");
 	/* create the object */
 	if (!thiz->object && !_ender_element_instance_create_object(node))
 		return EINA_FALSE;
@@ -174,15 +173,6 @@ static Eina_Bool _ender_element_instance_process(Egueb_Dom_Node *node,
 		Egueb_Dom_Node *next;
 		if (egueb_dom_node_type_get(child) != EGUEB_DOM_NODE_TYPE_ELEMENT_NODE)
 			goto next;
-		/* in case of a smil element, set the etch there */
-		if (egueb_smil_is_animation(child))
-		{
-#if 0
-			Etch *etch;
-			egueb_smil_animation_etch_set(child, etch);
-#endif
-		}
-
 		egueb_dom_element_process(child);
 next:
 		next = egueb_dom_node_sibling_next_get(child);
