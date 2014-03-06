@@ -238,18 +238,31 @@ EAPI Eina_Bool ender_element_instance_state_set(Egueb_Dom_Node *n, const char *s
 	Egueb_Dom_Node *states;
 	Egueb_Dom_Node *state;
 	Eina_Bool ret = EINA_FALSE;
+	Eina_Bool found = EINA_FALSE;
 
-	printf("setting state %s\n", s);
-
+	DBG("Setting state '%s'", s);
 	thiz = egueb_dom_element_external_data_get(n);
-	if (!thiz) return ret;
+	if (!thiz)
+	{
+		if (err) *err = EGUEB_DOM_ERROR_INVALID_ACCESS;
+		return ret;
+	}
 
-	if (!thiz->rel) return ret;
+	if (!thiz->rel)
+	{
+		if (err) *err = EGUEB_DOM_ERROR_INVALID_ACCESS;
+		return ret;
+	}
 
 	/* TODO remove every current child */
 
 	states = egueb_dom_node_child_first_get(thiz->rel);
-	if (!states) return ret;
+	if (!states)
+	{
+		if (err) *err = EGUEB_DOM_ERROR_NOT_FOUND;
+		DBG("No states found");
+		return ret;
+	}
 
 	/* look for the state child that has the name 'state' */
 	state = egueb_dom_node_child_first_get(states);
@@ -278,6 +291,7 @@ EAPI Eina_Bool ender_element_instance_state_set(Egueb_Dom_Node *n, const char *s
 		if (egueb_dom_string_is_valid(state_name) && !strcmp(s,
 				egueb_dom_string_string_get(state_name)))
 		{
+			found = EINA_TRUE;
 			ret = _ender_element_instance_state_set(n, state, err);
 			egueb_dom_node_unref(state);
 			goto done;
@@ -288,6 +302,11 @@ next:
 		state = next;
 	}
 done:
+	if (!found)
+	{
+		if (err) *err = EGUEB_DOM_ERROR_NOT_FOUND;
+		DBG("State '%s' not found", s);
+	}
 	egueb_dom_node_unref(states);
 	return ret;
 }
