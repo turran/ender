@@ -84,7 +84,7 @@ static Eina_Bool _ender_attr_enesim_color_value_set(Egueb_Dom_Node *n, void *dat
 static const Egueb_Dom_Value_Descriptor * _ender_attr_enesim_color_value_descriptor_get(
 		Egueb_Dom_Node *n, void *data)
 {
-	return egueb_dom_value_color_descriptor_get();
+	return egueb_css_color_descriptor_get();
 }
 
 static Egueb_Dom_Attr_External_Descriptor _descriptor = {
