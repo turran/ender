@@ -17,21 +17,12 @@ ltconfig \
 ltmain.sh \
 missing mkinstalldirs \
 stamp-h.in \
-ender.pc \
-escen.pc
+ender.pc
 
 lib_LTLIBRARIES =
 check_PROGRAMS =
 EXTRA_DIST =
 CLEAN_LOCAL = ender.pc
-
-if HAVE_ESCEN
-CLEAN_LOCAL += escen.pc
-
-include escen/lib/Makefile.mk
-#include escen/tests/Makefile.mk
-
-endif
 
 ### Library
 
@@ -39,11 +30,11 @@ include src/lib/Makefile.mk
 
 ### Binary
 
-include src/bin/Makefile.mk
+#include src/bin/Makefile.mk
 
 ### Tests
 
-include src/tests/Makefile.mk
+#include src/tests/Makefile.mk
 
 ### Data
 
@@ -59,7 +50,6 @@ COPYING \
 README \
 doc/Doxyfile.in \
 ender.pc.in \
-escen.pc.in \
 m4/efl_dlfcn.m4 \
 m4/ens_doxygen.m4
 
@@ -76,8 +66,6 @@ $(SED) \
 -e 's,@datarootdir\@,$(datarootdir),g' \
 -e 's,@pkgdatadir\@,$(pkgdatadir),g' \
 -e 's,@requirements_ender_pc\@,$(requirements_ender_pc),g' \
--e 's,@requirements_deps_escen_pc\@,$(requirements_deps_escen_pc),g' \
--e 's,@requirements_escen_libs\@,$(requirements_escen_libs),g' \
 < $< > $@ || rm $@
 
 pc_verbose = $(pc_verbose_@AM_V@)
@@ -88,18 +76,8 @@ ender.pc: $(top_srcdir)/ender.pc.in Makefile
 	@rm -f $@
 	$(pc_verbose)$(sed_process)
 
-if HAVE_ESCEN
-escen.pc: $(top_srcdir)/escen.pc.in Makefile
-	@rm -f $@
-	$(pc_verbose)$(sed_process)
-endif
-
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ender.pc
-
-if HAVE_ESCEN
-pkgconfig_DATA += escen.pc
-endif
 
 clean-local: doc-clean
 	-rm -rf $(CLEAN_LOCAL)

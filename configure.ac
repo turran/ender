@@ -84,35 +84,13 @@ LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
+requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0 enesim >= 0.0.21"
 if test "x${have_win32}" = "xyes" ; then
    requirements_ender_pc="${requirements_ender_pc} evil >= 1.7.0"
 fi
 
-requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0"
-
-PKG_CHECK_EXISTS([eet >= 1.7.0],
-   [
-    have_eet="yes"
-    AC_DEFINE(BUILD_SERIALIZER_EET, 1, [Build support for EET serializer])
-    requirements_ender_pc="${requirements_ender_pc} eet >= 1.3"
-   ],
-   [have_eet="no"])
-
-AM_CONDITIONAL([BUILD_SERIALIZER_EET], [test "x${have_eet}" = "xyes"])
-
-AC_SUBST([requirements_ender_pc])
-
 PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc}])
-
-requirements_escen_pc="etch >= 0.0.6 enesim >= 0.0.16 eina >= 1.7.0"
-requirements_deps_escen_pc="ender >= $VERSION ${requirements_escen_pc}"
-AC_SUBST([requirements_deps_escen_pc])
-
-PKG_CHECK_MODULES([ESCEN], [${requirements_escen_pc}],
-   [have_escen="yes"],
-   [have_escen="no"])
-#AM_CONDITIONAL([HAVE_ESCEN], [test "x${have_escen}" = "xyes"])
-AM_CONDITIONAL([HAVE_ESCEN], [test "x${want_escen}" = "xyes"])
+AC_SUBST([requirements_ender_pc])
 
 # Scripting
 ## Neko
@@ -169,10 +147,7 @@ echo
 echo "Configuration Options Summary:"
 echo "Ender........................................: yes"
 echo "  Serialization:"
-echo "  Eet........................................: ${have_eet}"
 echo "  TPL........................................: no"
-echo
-echo "Escen........................................: ${have_escen}"
 echo
 echo "Compilation............: make (or gmake)"
 echo "  CPPFLAGS.............: $CPPFLAGS"

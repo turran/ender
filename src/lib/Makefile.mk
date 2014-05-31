@@ -3,42 +3,18 @@ lib_LTLIBRARIES += src/lib/libender.la
 
 installed_ender_headersdir = $(pkgincludedir)-$(VMAJ)
 dist_installed_ender_headers_DATA = \
-src/lib/Ender.h
+src/lib/ender_item.h \
+src/lib/ender_main.h
 
 src_lib_libender_la_YFLAGS = -d -p ender_
 src_lib_libender_la_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
 
 src_lib_libender_la_SOURCES = \
-src/lib/eina_ordered_hash.c \
-src/lib/ender_container.c \
-src/lib/ender_constraint.c \
-src/lib/ender_descriptor.c \
-src/lib/ender_element.c \
-src/lib/ender_function.c \
-src/lib/ender_grammar.y \
-src/lib/ender_lexer.l \
-src/lib/ender_loader.c \
-src/lib/ender_marshaller.c \
+src/lib/ender_item.c \
+src/lib/ender_item_private.h \
 src/lib/ender_main.c \
-src/lib/ender_misc.c \
-src/lib/ender_namespace.c \
-src/lib/ender_object.c \
-src/lib/ender_parser.c \
-src/lib/ender_property.c \
-src/lib/ender_serializer.c \
-src/lib/ender_serializer_eet.c \
-src/lib/ender_struct.c \
-src/lib/ender_union.c \
-src/lib/ender_value.c \
-src/lib/ender_private.h \
-src/lib/tpl/tpl.c \
-src/lib/tpl/tpl.h
-
-if HAVE_WIN32
-src_lib_libender_la_SOURCES += \
-src/lib/tpl/mmap.c \
-src/lib/tpl/mman.h
-endif
+src/lib/ender_main_private.h \
+src/lib/ender_private.h
 
 src_lib_libender_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \

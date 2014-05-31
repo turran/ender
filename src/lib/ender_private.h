@@ -22,13 +22,9 @@
 #include "config.h"
 #endif
 
-/* core */
-#define ERR(...) EINA_LOG_DOM_ERR(ender_log_dom, __VA_ARGS__)
-#define WRN(...) EINA_LOG_DOM_WARN(ender_log_dom, __VA_ARGS__)
-#define INF(...) EINA_LOG_DOM_INFO(ender_log_dom, __VA_ARGS__)
-#define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
-extern int ender_log_dom;
+#include <Eina.h>
 
+#if 0
 struct _Ender_Container
 {
 	Ender_Value_Type type;
@@ -271,5 +267,6 @@ void ender_parser_add_native(Ender_Parser *thiz, const char *name,
 void ender_parser_add_property(Ender_Parser *thiz, Ender_Parser_Property *p);
 void ender_parser_add_function(Ender_Parser *thiz, Ender_Parser_Function *f);
 void ender_parser_container_free(Ender_Parser_Container *c);
+#endif
 
 #endif

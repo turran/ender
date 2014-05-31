@@ -1,5 +1,5 @@
 /* ENDER - Enesim's descriptor library
- * Copyright (C) 2010 Jorge Luis Zapata
+ * Copyright (C) 2010 - 2012 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,52 +18,20 @@
 #include "ender_private.h"
 
 #include "ender_main.h"
+#include "ender_item.h"
+
+#include "ender_main_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static int _init = 0;
-static Eina_Bool _enable_parse = EINA_TRUE;
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-int ender_log_dom = -1;
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * Initialize the ender library
- */
-EAPI void ender_init(void)
+Ender_Item * ender_item_list_content_get(Ender_Item *i)
 {
-	if (!_init++)
-	{
-		eina_init();
-		ender_log_dom = eina_log_domain_register("ender", NULL);
-	}
+	Ender_Item_List *thiz = i;
+	return thiz->content;
 }
-
-/**
- * Shutdown the ender library
- */
-EAPI void ender_shutdown(void)
-{
-	if (_init == 1)
-	{
-		eina_log_domain_unregister(ender_log_dom);
-		eina_shutdown();
-	}
-	_init--;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *micro)
-{
-	if (major) *major = VERSION_MAJOR;
-	if (minor) *minor = VERSION_MINOR;
-	if (micro) *micro = VERSION_MICRO;
-}
-

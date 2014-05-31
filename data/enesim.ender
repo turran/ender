@@ -1,3 +1,21 @@
+<?xml version="1.0"?>
+<lib>
+  <include name="eina" version="1.0"/>
+  <namespace name="Enesim" version="1.0">
+    <struct name="Matrix">
+      <method name="identity">
+        <return name="void" type="void"/>
+      </method>
+      <method name="scale">
+        <return name="void" type="void"/>
+        <arg name="sx" type="double"/>
+        <arg name="sy" type="double"/>
+      </method>
+    </struct>
+    <class name="Renderer">
+    </class>
+  </namespace>
+</lib>
 namespace "enesim" : 0 {
 
 	struct "matrix" {
