@@ -15,119 +15,145 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Ender.h"
 #include "ender_private.h"
+
+#include "ender_main.h"
+#include "ender_item.h"
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-struct _Ender_Parser {
-	const char *file;
-	Ender_Parser_Descriptor *descriptor;
-	void *data;
+
+typedef enum _Ender_Library_Case {
+	ENDER_LIBRARY_CASE_CAMEL, /* backColor */
+	ENDER_LIBRARY_CASE_PASCAL, /* BackColor */
+	ENDER_LIBRARY_CASE_UNDERSCORE, /* back_color */
+} Ender_Library_Case;
+
+typedef enum _Ender_Library_Notation {
+	ENDER_LIBRARY_NOTATION_LATIN, /* foo_back_color_get */
+} Ender_Library_Notation;
+
+typedef Eina_Bool (*Ender_Parser_Tag_Attrs_Set_Cb)(Ender_Item *i, const char *key,
+		const char *value);
+typedef void (*Ender_Parser_Tag_Done_Cb)(Ender_Item *i);
+
+typedef struct _Ender_Parser_Tag
+{
+	const char *name;
+	Ender_Parser_Tag_Attrs_Set_Cb attrs_set_cb;
+	Ender_Parser_Tag_Done_Cb done_cb;
+} Ender_Parser_Tag;
+
+static Ender_Parser_Tag _tags[] = {
+	{ "lib", NULL, NULL },
+	{ "type", NULL, NULL },
 };
+
+typedef struct _Ender_Parser_Context
+{
+	Ender_Item *i;
+	Ender_Parser_Tag *tag;
+} Ender_Parser_Context;
+
+typedef struct _Ender_Parser
+{
+	Eina_Array *context;
+	Ender_Library_Case lcase;
+	Ender_Library_Notation lnotation;
+	Enesim_Stream *s;
+} Ender_Parser;
+
+#if 0
+static Eina_Bool _egueb_dom_parser_eina_tag_attributes_set_cb(void *data, const char *key,
+		const char *value)
+{
+}
+
+static void _egueb_dom_parser_eina_tag_attribute_set(Egueb_Dom_Parser_Eina *thiz,
+		Egueb_Dom_Node *node, const char *attributes, unsigned int length)
+{
+	const char *attrs = NULL;
+	int attr_length = 0;
+	attrs = eina_simple_xml_tag_attributes_find(content, length);
+	eina_simple_xml_attributes_parse(attributes, length, _egueb_dom_parser_eina_tag_attributes_set_cb, &data);
+}
+#endif
+
+/*----------------------------------------------------------------------------*
+ *                      Eina's simple XML interface                           *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_parse_cb(void *data, Eina_Simple_XML_Type type,
+		const char *content, unsigned int offset,
+		unsigned int length)
+{
+	Ender_Parser *thiz = data;
+
+	switch (type)
+	{
+		case EINA_SIMPLE_XML_OPEN:
+		printf("open %.*s\n", length, content);
+		//_egueb_dom_parser_eina_xml_open(thiz, content, length);
+		break;
+
+		case EINA_SIMPLE_XML_OPEN_EMPTY:
+		//_egueb_dom_parser_eina_xml_open(thiz, content, length);
+		//_egueb_dom_parser_eina_xml_close(thiz, content, length);
+		break;
+
+		case EINA_SIMPLE_XML_CLOSE:
+		//_egueb_dom_parser_eina_xml_close(thiz, content, length);
+		break;
+
+		case EINA_SIMPLE_XML_DATA:
+		//_egueb_dom_parser_eina_tag_text_set(thiz, content, length);
+		break;
+
+		case EINA_SIMPLE_XML_CDATA:
+		//_egueb_dom_parser_eina_tag_cdata_set(thiz, content, length);
+		break;
+
+		case EINA_SIMPLE_XML_DOCTYPE_CHILD:
+		case EINA_SIMPLE_XML_IGNORED:
+		case EINA_SIMPLE_XML_COMMENT:
+		case EINA_SIMPLE_XML_DOCTYPE:
+		break;
+
+		default:
+		break;
+	}
+	return EINA_TRUE;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void ender_parser_add_using(Ender_Parser *thiz, Eina_List *using)
-{
-	Eina_List *l;
-	char *str;
 
-	if (!thiz->descriptor->add_using)
-		return;
-	EINA_LIST_FOREACH (using, l, str)
-	{
-		thiz->descriptor->add_using(thiz->data, str);
-	}
-}
-
-void ender_parser_add_namespace(Ender_Parser *thiz, const char *name,
-		int version)
-{
-	if (thiz->descriptor->add_namespace)
-		thiz->descriptor->add_namespace(thiz->data, name, version);
-}
-
-void ender_parser_add_native(Ender_Parser *thiz, const char *name,
-		const char *alias, Ender_Descriptor_Type type, const char *parent)
-{
-	if (thiz->descriptor->add_native)
-		thiz->descriptor->add_native(thiz->data, name, alias, type, parent);
-}
-
-void ender_parser_add_property(Ender_Parser *thiz, Ender_Parser_Property *p)
-{
-	if (thiz->descriptor->add_property)
-		thiz->descriptor->add_property(thiz->data, p);
-}
-
-void ender_parser_add_function(Ender_Parser *thiz, Ender_Parser_Function *f)
-{
-	if (thiz->descriptor->add_function)
-		thiz->descriptor->add_function(thiz->data, f);
-}
-
-void ender_parser_container_free(Ender_Parser_Container *c)
-{
-	Ender_Parser_Container *s;
-	EINA_LIST_FREE(c->subcontainers, s)
-		ender_parser_container_free(s);
-	if (c->defined)
-		free(c->defined);
-	free(c);
-}
-
-void ender_parser_error(Ender_Parser *thiz, const char *str, int line,
-	int col)
-{
-	ERR("Parsing error at %s %d: %d %s", thiz->file, line, col, str);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Eina_Bool ender_parser_parse(const char *file,
-		Ender_Parser_Descriptor *descriptor, void *data)
+EAPI Eina_Bool ender_parser_parse(Enesim_Stream *s)
 {
-	Ender_Parser thiz;
-	void *scanner;
-	FILE *f;
-	int ret;
+	Ender_Parser *thiz;
+	Eina_Bool ret = EINA_FALSE;
+	void *content;
+	size_t len = 0;
 
-	f = fopen(file, "r");
-	if (!f) return EINA_FALSE;
+	if (!s) return EINA_FALSE;
 
-	thiz.descriptor = descriptor;
-	thiz.file = file;
-	thiz.data = data;
+	thiz = calloc(1, sizeof(Ender_Parser));
+	thiz->context = eina_array_new(1);
+	thiz->s = s;
 
-	ender_lex_init(&scanner);
-	ender_set_in(f, scanner);
-	ret = ender_parse(scanner, &thiz);
+	content = enesim_stream_mmap(thiz->s, &len);
+	if (!content) goto no_mmap;
 
-	ender_lex_destroy(scanner);
-	fclose(f);
+	eina_simple_xml_parse(content, len, EINA_TRUE, _ender_parser_parse_cb, thiz);
+	enesim_stream_munmap(thiz->s, content);
+	ret = EINA_TRUE;
+no_mmap:
+	eina_array_free(thiz->context);
+	enesim_stream_unref(thiz->s);
+	free(thiz);
 
-	return !ret;
+	return ret;
 }
-
-#if 0
-/**
- *
- */
-EAPI const char * ender_parser_namepsace_reduce(const char *ns)
-{
-
-}
-
-/**
- *
- */
-EAPI const char * ender_parser_locate_file(const char *name)
-{
-
-}
-#endif

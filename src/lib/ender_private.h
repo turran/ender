@@ -23,6 +23,7 @@
 #endif
 
 #include <Eina.h>
+#include <Enesim.h>
 
 #if 0
 struct _Ender_Container

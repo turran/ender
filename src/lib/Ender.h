@@ -19,6 +19,7 @@
 #define _ENDER_H
 
 #include <Eina.h>
+#include <Enesim.h>
 
 #ifdef EAPI
 # undef EAPI
@@ -62,6 +63,7 @@ extern "C" {
 
 #include "ender_main.h"
 #include "ender_item.h"
+#include "ender_parser.h"
 
 /**
  * @}

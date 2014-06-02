@@ -24,55 +24,7 @@
  * @{
  */
 
-typedef struct _Ender_Parser_Definition
-{
-	const char *name;
-	const char *alias;
-} Ender_Parser_Definition;
-
-typedef struct _Ender_Parser_Container
-{
-	Ender_Value_Type type;
-	Eina_List *subcontainers;
-	char *defined;
-} Ender_Parser_Container;
-
-typedef struct _Ender_Parser_Property
-{
-	Ender_Parser_Definition def;
-	Ender_Parser_Container *container;
-	Eina_Bool rel;
-} Ender_Parser_Property;
-
-typedef struct _Ender_Parser_Function
-{
-	Ender_Parser_Definition def;
-	Ender_Parser_Container *ret;
-	Eina_List *args;
-} Ender_Parser_Function;
-
-/* FIXME this functions will be evolving until all of them
- * are similar to the add_property
- */
-typedef void (*Ender_Parser_Add_Using)(void *data, const char *name);
-typedef void (*Ender_Parser_Add_Namespace)(void *data, const char *name,
-		int version);
-typedef void (*Ender_Parser_Add_Native)(void *data, const char *name,
-		const char *alias, Ender_Descriptor_Type type, const char *parent);
-typedef void (*Ender_Parser_Add_Property)(void *data, Ender_Parser_Property *p);
-typedef void (*Ender_Parser_Add_Function)(void *data, Ender_Parser_Function *f);
-
-typedef struct _Ender_Parser_Descriptor
-{
-	Ender_Parser_Add_Using add_using;
-	Ender_Parser_Add_Namespace add_namespace;
-	Ender_Parser_Add_Native add_native;
-	Ender_Parser_Add_Property add_property;
-	Ender_Parser_Add_Function add_function;
-} Ender_Parser_Descriptor;
-
-EAPI Eina_Bool ender_parser_parse(const char *file, Ender_Parser_Descriptor *descriptor, void *data);
-
+EAPI Eina_Bool ender_parser_parse(Enesim_Stream *s);
 
 /**
  * @}
