@@ -30,7 +30,7 @@ include src/lib/Makefile.mk
 
 ### Binary
 
-#include src/bin/Makefile.mk
+include src/bin/Makefile.mk
 
 ### Tests
 
