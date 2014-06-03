@@ -39,10 +39,12 @@ int main(int argc, char **argv)
 		goto no_file;
 	}
 
+	ender_init();
 	s = enesim_stream_file_new(argv[1], "r");
 	if (!s) goto no_file;
 
 	ender_parser_parse(s);
+	ender_shutdown();
 no_file:
 	return 0;
 }

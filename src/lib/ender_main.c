@@ -18,6 +18,10 @@
 #include "ender_private.h"
 
 #include "ender_main.h"
+#include "ender_lib.h"
+
+#include "ender_main_private.h"
+#include "ender_lib_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -40,6 +44,7 @@ EAPI void ender_init(void)
 	{
 		eina_init();
 		ender_log_dom = eina_log_domain_register("ender", NULL);
+		ender_lib_init();
 	}
 }
 
@@ -50,6 +55,7 @@ EAPI void ender_shutdown(void)
 {
 	if (_init == 1)
 	{
+		ender_lib_shutdown();
 		eina_log_domain_unregister(ender_log_dom);
 		eina_shutdown();
 	}

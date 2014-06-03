@@ -21,26 +21,24 @@
 #include "ender_item.h"
 
 #include "ender_main_private.h"
+#include "ender_item_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-struct _Ender_Item {
-	Ender_Item *api;
-	Ender_Item_Type type;
-	char *name;
-	int ref;
-};
-
-static void _ender_item_free(Ender_Item *thiz)
-{
-
-}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 void ender_item_name_set(Ender_Item *thiz, const char *name)
 {
-
+	if (thiz->name)
+	{
+		free(thiz->name);
+		thiz->name = NULL;
+	}
+	if (name)
+	{
+		thiz->name = strdup(name);
+	}
 }
 /*============================================================================*
  *                                   API                                      *
@@ -55,7 +53,6 @@ EAPI Ender_Item * ender_item_ref(Ender_Item *thiz)
 	if (!thiz) return thiz;
 	thiz->ref++;
 	return thiz;
-
 }
 
 /**
@@ -68,6 +65,7 @@ EAPI void ender_item_unref(Ender_Item *thiz)
 	thiz->ref--;
 	if (!thiz->ref)
 	{
+		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(thiz));
 	}
 }
 

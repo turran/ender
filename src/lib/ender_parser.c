@@ -19,7 +19,9 @@
 
 #include "ender_main.h"
 #include "ender_item.h"
+#include "ender_lib.h"
 
+#include "ender_lib_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -34,52 +36,154 @@ typedef enum _Ender_Library_Notation {
 	ENDER_LIBRARY_NOTATION_LATIN, /* foo_back_color_get */
 } Ender_Library_Notation;
 
-typedef Eina_Bool (*Ender_Parser_Tag_Attrs_Set_Cb)(Ender_Item *i, const char *key,
+typedef struct _Ender_Parser_Context Ender_Parser_Context;
+
+typedef Eina_Bool (*Ender_Parser_Tag_Ctor_Cb)(Ender_Parser_Context *c);
+typedef Eina_Bool (*Ender_Parser_Tag_Attrs_Set_Cb)(Ender_Parser_Context *c, const char *key,
 		const char *value);
-typedef void (*Ender_Parser_Tag_Done_Cb)(Ender_Item *i);
+typedef void (*Ender_Parser_Tag_Dtor_Cb)(Ender_Parser_Context *c);
 
 typedef struct _Ender_Parser_Tag
 {
 	const char *name;
+	Ender_Parser_Tag_Ctor_Cb ctor_cb;
+	Ender_Parser_Tag_Dtor_Cb dtor_cb;
 	Ender_Parser_Tag_Attrs_Set_Cb attrs_set_cb;
-	Ender_Parser_Tag_Done_Cb done_cb;
 } Ender_Parser_Tag;
-
-static Ender_Parser_Tag _tags[] = {
-	{ "lib", NULL, NULL },
-	{ "type", NULL, NULL },
-};
-
-typedef struct _Ender_Parser_Context
-{
-	Ender_Item *i;
-	Ender_Parser_Tag *tag;
-} Ender_Parser_Context;
 
 typedef struct _Ender_Parser
 {
 	Eina_Array *context;
+	Ender_Lib *lib;
 	Ender_Library_Case lcase;
 	Ender_Library_Notation lnotation;
 	Enesim_Stream *s;
 } Ender_Parser;
 
-#if 0
-static Eina_Bool _egueb_dom_parser_eina_tag_attributes_set_cb(void *data, const char *key,
+struct _Ender_Parser_Context {
+	Ender_Parser *parser;
+	Ender_Parser_Tag *tag;
+	Ender_Item *i;
+};
+
+/*----------------------------------------------------------------------------*
+ *                                 lib tag                                    *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_lib_ctor(Ender_Parser_Context *c)
+{
+	if (c->parser->lib)
+		return EINA_FALSE;
+
+	c->parser->lib = ender_lib_new();
+	return EINA_TRUE;
+}
+
+static Eina_Bool _ender_parser_lib_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (!strcmp(key, "case"))
+	{
+		if (!strcmp(value, "underscore"))
+			c->parser->lcase = ENDER_LIBRARY_CASE_UNDERSCORE;
+		else if (!strcmp(value, "camel"))
+			c->parser->lcase = ENDER_LIBRARY_CASE_CAMEL;
+		else if (!strcmp(value, "pascal"))
+			c->parser->lcase = ENDER_LIBRARY_CASE_PASCAL;
+	}
+	else if (!strcmp(key, "name"))
+	{
+		ender_lib_name_set(c->parser->lib, value);
+	}
+	else if (!strcmp(key, "version"))
+	{
+		int version = atoi(value);
+		ender_lib_version_set(c->parser->lib, version);
+	}
+	return EINA_TRUE;
+}
+
+static Ender_Parser_Tag _tags[] = {
+	{ "lib", _ender_parser_lib_ctor, NULL, _ender_parser_lib_attrs_set },
+	{ "type", NULL, NULL, NULL },
+	{ "include", NULL, NULL, NULL },
+	{ "namespace", NULL, NULL, NULL },
+	{ "struct", NULL, NULL, NULL },
+	{ "method", NULL, NULL, NULL },
+	{ "class", NULL, NULL, NULL },
+};
+
+static Ender_Parser_Tag * _ender_parser_get_tag(const char *name)
+{
+	Ender_Parser_Tag *ret = NULL;
+	int i;
+
+	for (i = 0; i < sizeof(_tags) / sizeof(Ender_Parser_Tag); i++)
+	{
+		Ender_Parser_Tag *t = &_tags[i];
+		if (!strncmp(name, t->name, strlen(t->name)))
+		{
+			ret = t;
+			break;
+		}
+	}
+	return ret;
+}
+
+static Eina_Bool _ender_parser_attrs_set_cb(void *data, const char *key,
 		const char *value)
 {
+	Ender_Parser_Context *c = data;
+
+	if (!c->tag) return EINA_FALSE;
+	if (c->tag->attrs_set_cb)
+	{
+		printf("%s=%s\n", key, value);
+		return c->tag->attrs_set_cb(c, key, value); 
+	}
+	return EINA_FALSE;
 }
 
-static void _egueb_dom_parser_eina_tag_attribute_set(Egueb_Dom_Parser_Eina *thiz,
-		Egueb_Dom_Node *node, const char *attributes, unsigned int length)
+/*----------------------------------------------------------------------------*
+ *                         context related functions                          *
+ *----------------------------------------------------------------------------*/
+static Ender_Parser_Context * _ender_parser_tag_new(Ender_Parser *thiz,
+		const char *content, unsigned int length)
 {
+	Ender_Parser_Context *c;
 	const char *attrs = NULL;
 	int attr_length = 0;
-	attrs = eina_simple_xml_tag_attributes_find(content, length);
-	eina_simple_xml_attributes_parse(attributes, length, _egueb_dom_parser_eina_tag_attributes_set_cb, &data);
-}
-#endif
 
+	/* TODO check if we already have a context, if so, check if it can create a new child */
+	c = calloc(1, sizeof(Ender_Parser_Context));
+	c->tag = _ender_parser_get_tag(content);
+	c->parser = thiz;
+
+	/* TODO call the creator */
+	if (c->tag)
+	{
+		if (c->tag->ctor_cb)
+			c->tag->ctor_cb(c);
+		attrs = eina_simple_xml_tag_attributes_find(content, length);
+		eina_simple_xml_attributes_parse(attrs, length, _ender_parser_attrs_set_cb, c);
+	}
+
+	return c;
+}
+
+static void _ender_parser_context_free(Ender_Parser_Context *c)
+{
+	if (c)
+	{
+		if (c->tag)
+		{
+			if (c->tag->dtor_cb)
+				c->tag->dtor_cb(c);
+		}
+		if (c->i)
+			ender_item_unref(c->i);
+		free(c);
+	}
+}
 /*----------------------------------------------------------------------------*
  *                      Eina's simple XML interface                           *
  *----------------------------------------------------------------------------*/
@@ -88,37 +192,31 @@ static Eina_Bool _ender_parser_parse_cb(void *data, Eina_Simple_XML_Type type,
 		unsigned int length)
 {
 	Ender_Parser *thiz = data;
+	Ender_Parser_Context *c;
 
 	switch (type)
 	{
 		case EINA_SIMPLE_XML_OPEN:
-		printf("open %.*s\n", length, content);
-		//_egueb_dom_parser_eina_xml_open(thiz, content, length);
+		c = _ender_parser_tag_new(thiz, content, length);
+		eina_array_push(thiz->context, c);
 		break;
 
 		case EINA_SIMPLE_XML_OPEN_EMPTY:
-		//_egueb_dom_parser_eina_xml_open(thiz, content, length);
-		//_egueb_dom_parser_eina_xml_close(thiz, content, length);
+		c = _ender_parser_tag_new(thiz, content, length);
+		_ender_parser_context_free(c);
 		break;
 
 		case EINA_SIMPLE_XML_CLOSE:
-		//_egueb_dom_parser_eina_xml_close(thiz, content, length);
+		c = eina_array_pop(thiz->context);
+		_ender_parser_context_free(c);
 		break;
 
 		case EINA_SIMPLE_XML_DATA:
-		//_egueb_dom_parser_eina_tag_text_set(thiz, content, length);
-		break;
-
 		case EINA_SIMPLE_XML_CDATA:
-		//_egueb_dom_parser_eina_tag_cdata_set(thiz, content, length);
-		break;
-
 		case EINA_SIMPLE_XML_DOCTYPE_CHILD:
 		case EINA_SIMPLE_XML_IGNORED:
 		case EINA_SIMPLE_XML_COMMENT:
 		case EINA_SIMPLE_XML_DOCTYPE:
-		break;
-
 		default:
 		break;
 	}
@@ -127,7 +225,6 @@ static Eina_Bool _ender_parser_parse_cb(void *data, Eina_Simple_XML_Type type,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

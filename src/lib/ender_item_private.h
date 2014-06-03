@@ -19,7 +19,24 @@
 #ifndef _ENDER_ITEM_PRIVATE_H_
 #define _ENDER_ITEM_PRIVATE_H_
 
+Enesim_Object_Descriptor * ender_item_descriptor_get(void);
+#define ENDER_ITEM_DESCRIPTOR ender_item_descriptor_get()
+#define ENDER_ITEM_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, Ender_Item_Class, ENDER_ITEM_DESCRIPTOR)
+#define ENDER_ITEM_CLASS_GET(o) ENDER_ITEM_CLASS(ENESIM_OBJECT_INSTANCE_CLASS(o))
+#define ENDER_ITEM(o) ENESIM_OBJECT_INSTANCE_CHECK(o, Ender_Item, ENDER_ITEM_DESCRIPTOR)
 
+typedef struct _Ender_Item
+{
+	Enesim_Object_Instance base;
+	Ender_Item *api;
+	Ender_Item_Type type;
+	char *name;
+	int ref;
+} Ender_Item;
+
+typedef struct _Ender_Item_Class
+{
+	Enesim_Object_Class base;
+} Ender_Item_Class;
 
 #endif
-

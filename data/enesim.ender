@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<lib file="enesim" version="1.0" case="underscore">
-  <include name="eina" version="1.0"/>
+<lib name="enesim" version="1" case="underscore">
+  <include name="eina" version="1"/>
   <namespace name="enesim">
     <struct name="enesim.matrix">
       <method name="identity">
