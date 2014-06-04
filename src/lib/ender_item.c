@@ -25,6 +25,32 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Ender_Item,
+		Ender_Item_Class, ender_item);
+
+static void _ender_item_class_init(void *k)
+{
+}
+
+static void _ender_item_instance_init(void *o)
+{
+}
+
+static void _ender_item_instance_deinit(void *o)
+{
+	Ender_Item *thiz;
+
+	thiz = ENDER_ITEM(o);
+	if (thiz->parent)
+	{
+		CRI("Removing last reference with a parent");
+	}
+	if (thiz->name)
+		free(thiz->name);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -39,6 +65,16 @@ void ender_item_name_set(Ender_Item *thiz, const char *name)
 	{
 		thiz->name = strdup(name);
 	}
+}
+
+void ender_item_parent_set(Ender_Item *thiz, Ender_Item *parent)
+{
+	if (thiz->parent)
+	{
+		CRI("Item already has a parent");
+		return;
+	}
+	thiz->parent = parent;
 }
 /*============================================================================*
  *                                   API                                      *
@@ -77,4 +113,9 @@ EAPI const char * ender_item_name_get(Ender_Item *thiz)
 EAPI Ender_Item_Type ender_item_type_get(Ender_Item *thiz)
 {
 	return thiz->type;
+}
+
+EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz)
+{
+	return ender_item_ref(thiz->parent);
 }

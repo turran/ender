@@ -1,5 +1,7 @@
 
-bin_PROGRAMS = src/bin/ender_loader
+bin_PROGRAMS = \
+src/bin/ender_inspect \
+src/bin/ender_loader
 #src/bin/ender_generator
 #src/bin/ender_generator
 

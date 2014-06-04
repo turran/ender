@@ -21,9 +21,12 @@
 
 typedef struct _Ender_Lib Ender_Lib;
 
+EAPI const Ender_Lib * ender_lib_find(const char *name);
+
 EAPI int ender_lib_version_get(const Ender_Lib *thiz);
 EAPI const char * ender_lib_name_get(const Ender_Lib *thiz);
 EAPI Eina_List * ender_lib_dependencies_get(const Ender_Lib *thiz);
-EAPI const Ender_Lib * ender_lib_find(const char *name);
+EAPI Ender_Item * ender_lib_item_find(const Ender_Lib *thiz, const char *name);
+EAPI Eina_List * ender_lib_item_list(const Ender_Lib *thiz, Ender_Item_Type type);
 
 #endif

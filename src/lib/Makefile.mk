@@ -14,6 +14,8 @@ src_lib_libender_la_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
 src_lib_libender_la_SOURCES = \
 src/lib/ender_item.c \
 src/lib/ender_item_private.h \
+src/lib/ender_item_basic.c \
+src/lib/ender_item_struct.c \
 src/lib/ender_lib.c \
 src/lib/ender_main.c \
 src/lib/ender_main_private.h \

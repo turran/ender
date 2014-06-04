@@ -1,7 +1,6 @@
 
 descriptionsdir = $(pkgdatadir)
 descriptions_DATA = \
-data/enesim.ender \
-data/etex.ender
+data/enesim.ender
 
 EXTRA_DIST += $(descriptions_DATA)

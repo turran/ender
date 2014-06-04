@@ -16,14 +16,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_MAIN_PRIVATE_H_
-#define _ENDER_MAIN_PRIVATE_H_
+#ifndef _ENDER_ITEM_STRUCT_PRIVATE_H_
+#define _ENDER_ITEM_STRUCT_PRIVATE_H_
 
-#define ERR(...) EINA_LOG_DOM_ERR(ender_log_dom, __VA_ARGS__)
-#define WRN(...) EINA_LOG_DOM_WARN(ender_log_dom, __VA_ARGS__)
-#define INF(...) EINA_LOG_DOM_INFO(ender_log_dom, __VA_ARGS__)
-#define DBG(...) EINA_LOG_DOM_DBG(ender_log_dom, __VA_ARGS__)
-#define CRI(...) EINA_LOG_DOM_CRIT(ender_log_dom, __VA_ARGS__)
-extern int ender_log_dom;
+#include "ender_item_private.h"
+
+Ender_Item * ender_item_struct_new(void);
+void ender_item_struct_field_add(Ender_Item *i, Ender_Item *f);
 
 #endif

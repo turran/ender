@@ -21,7 +21,9 @@
 #include "ender_item.h"
 #include "ender_lib.h"
 
+#include "ender_main_private.h"
 #include "ender_lib_private.h"
+#include "ender_item_struct_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -64,8 +66,106 @@ struct _Ender_Parser_Context {
 	Ender_Parser *parser;
 	Ender_Parser_Tag *tag;
 	Ender_Item *i;
+	void *prv;
 };
 
+typedef struct _Ender_Parser_Field {
+	char *type;
+	char *name;
+} Ender_Parser_Field;
+
+/*----------------------------------------------------------------------------*
+ *                            common item attrs                               *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_item_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (!strcmp(key, "name"))
+	{
+		ender_item_name_set(c->i, value);
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static void _ender_parser_item_dtor(Ender_Parser_Context *c)
+{
+	ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+}
+
+/*----------------------------------------------------------------------------*
+ *                                struct tag                                  *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_struct_ctor(Ender_Parser_Context *c)
+{
+	c->i = ender_item_struct_new();
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_struct_dtor(Ender_Parser_Context *c)
+{
+	_ender_parser_item_dtor(c);
+}
+
+static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                                field tag                                  *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_field_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Field *f;
+
+	f = calloc(1, sizeof(Ender_Parser_Field));
+	c->prv = f;
+	return EINA_TRUE;
+}
+
+static void _ender_parser_field_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Field *f = c->prv;
+	Ender_Item *i;
+
+	/* create the item based on the type */
+	i = ender_lib_item_find(c->parser->lib, f->type);
+	/* TODO check if it is a basic type, if so, we can create a new
+	 * property based on it
+	 */
+	ender_item_unref(i);
+
+	if (f->name)
+		free(f->name);
+	if (f->type)
+		free(f->type);
+	free(f);
+	c->prv = NULL;
+}
+
+static Eina_Bool _ender_parser_field_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	Ender_Parser_Field *f = c->prv;
+
+	if (!strcmp(key, "name"))
+	{
+		f->name = strdup(value);
+	}
+	else if (!strcmp(key, "type"))
+	{
+		f->type = strdup(value);
+	}
+
+	return EINA_TRUE;
+}
 /*----------------------------------------------------------------------------*
  *                                 lib tag                                    *
  *----------------------------------------------------------------------------*/
@@ -74,8 +174,14 @@ static Eina_Bool _ender_parser_lib_ctor(Ender_Parser_Context *c)
 	if (c->parser->lib)
 		return EINA_FALSE;
 
+	DBG("New lib created");
 	c->parser->lib = ender_lib_new();
 	return EINA_TRUE;
+}
+
+static void _ender_parser_lib_dtor(Ender_Parser_Context *c)
+{
+	ender_lib_register(c->parser->lib);
 }
 
 static Eina_Bool _ender_parser_lib_attrs_set(Ender_Parser_Context *c,
@@ -103,11 +209,12 @@ static Eina_Bool _ender_parser_lib_attrs_set(Ender_Parser_Context *c,
 }
 
 static Ender_Parser_Tag _tags[] = {
-	{ "lib", _ender_parser_lib_ctor, NULL, _ender_parser_lib_attrs_set },
+	{ "lib", _ender_parser_lib_ctor, _ender_parser_lib_dtor, _ender_parser_lib_attrs_set },
 	{ "type", NULL, NULL, NULL },
 	{ "include", NULL, NULL, NULL },
 	{ "namespace", NULL, NULL, NULL },
-	{ "struct", NULL, NULL, NULL },
+	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
+	{ "field", _ender_parser_field_ctor, _ender_parser_field_dtor, _ender_parser_field_attrs_set },
 	{ "method", NULL, NULL, NULL },
 	{ "class", NULL, NULL, NULL },
 };
@@ -137,7 +244,6 @@ static Eina_Bool _ender_parser_attrs_set_cb(void *data, const char *key,
 	if (!c->tag) return EINA_FALSE;
 	if (c->tag->attrs_set_cb)
 	{
-		printf("%s=%s\n", key, value);
 		return c->tag->attrs_set_cb(c, key, value); 
 	}
 	return EINA_FALSE;

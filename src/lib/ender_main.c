@@ -18,6 +18,7 @@
 #include "ender_private.h"
 
 #include "ender_main.h"
+#include "ender_item.h"
 #include "ender_lib.h"
 
 #include "ender_main_private.h"

@@ -15,11 +15,32 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Ender.h"
 #include "ender_private.h"
+
+#include "ender_main.h"
+#include "ender_item.h"
+
+#include "ender_main_private.h"
+#include "ender_item_struct_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENDER_ITEM_STRUCT(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
+		Ender_Item_Struct, ender_item_struct_descriptor_get())
+
+typedef struct _Ender_Item_Struct
+{
+	Ender_Item base;
+	Eina_List *fields;
+	size_t size;
+} Ender_Item_Struct;
+
+typedef struct _Ender_Item_Struct_Class
+{
+	Ender_Item_Class base;
+} Ender_Item_Struct_Class;
+
+#if 0
 typedef struct _Ender_Struct_Property
 {
 	size_t offset;
@@ -298,59 +319,74 @@ static size_t _ender_struct_size_get(Ender_Descriptor *d)
 	}
 	return size;
 }
+#endif
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
+		Ender_Item_Struct, Ender_Item_Struct_Class,
+		ender_item_struct);
+
+static void _ender_item_struct_class_init(void *k)
+{
+}
+
+static void _ender_item_struct_instance_init(void *o)
+{
+	Ender_Item *i;
+
+	i = ENDER_ITEM(o);
+	i->type = ENDER_ITEM_TYPE_STRUCT;
+}
+
+static void _ender_item_struct_instance_deinit(void *o)
+{
+	Ender_Item_Struct *thiz;
+	Ender_Item *f;
+	Eina_List *l;
+
+	thiz = ENDER_ITEM_STRUCT(o);
+	EINA_LIST_FOREACH(thiz->fields, l, f)
+	{
+		ender_item_unref(f);
+	}
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Descriptor_Backend ender_struct_backend = {
-	/* .validate 		= */ _ender_struct_validate,
-	/* .creator 		= */ _ender_struct_creator,
-	/* .destructor 		= */ _ender_struct_destructor,
-	/* .property_add 	= */ _ender_struct_property_add,
-	/* .size_get 		= */ _ender_struct_size_get,
-};
-
-void ender_struct_init(void)
+Ender_Item * ender_item_struct_new(void)
 {
-	int i;
+	Ender_Item *i;
 
-	/* initialize to some sane values */
-	for (i = 0; i < ENDER_PROPERTY_TYPES; i++)
-	{
-		_setters[i] = _ender_dummy_set;
-		_getters[i] = _ender_dummy_get;
-	}
-	/* setters */
-	_setters[ENDER_BOOL] = _ender_uint32_set;
-	_setters[ENDER_UINT32] = _ender_uint32_set;
-	_setters[ENDER_INT32] = _ender_int32_set;
-	_setters[ENDER_UINT64] = _ender_int64_set;
-	_setters[ENDER_INT64] = _ender_int64_set;
-	_setters[ENDER_DOUBLE] = _ender_double_set;
-	_setters[ENDER_ARGB] = _ender_uint32_set;
-	_setters[ENDER_COLOR] = _ender_uint32_set;
-	_setters[ENDER_STRING] = _ender_pointer_set;
-	_setters[ENDER_OBJECT] = _ender_object_set;
-	_setters[ENDER_ENDER] = _ender_object_set;
-	_setters[ENDER_LIST] = _ender_pointer_set;
-	_setters[ENDER_STRUCT] = _ender_pointer_set;
-	_setters[ENDER_UNION] = _ender_pointer_set;
-	/* getters */
-	_getters[ENDER_BOOL] = _ender_uint32_get;
-	_getters[ENDER_UINT32] = _ender_uint32_get;
-	_getters[ENDER_INT32] = _ender_int32_get;
-	_getters[ENDER_UINT64] = _ender_int64_get;
-	_getters[ENDER_INT64] = _ender_int64_get;
-	_getters[ENDER_DOUBLE] = _ender_double_get;
-	_getters[ENDER_ARGB] = _ender_uint32_get;
-	_getters[ENDER_COLOR] = _ender_uint32_get;
-	_getters[ENDER_STRING] = _ender_object_get;
-	_getters[ENDER_OBJECT] = _ender_object_get;
-	_getters[ENDER_ENDER] = _ender_object_get;
-	_getters[ENDER_LIST] = _ender_object_get;
-	_getters[ENDER_STRUCT] = _ender_pointer_get;
-	_getters[ENDER_UNION] = _ender_pointer_get;
+	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_struct);
+	return i;
 }
+
+void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
+{
+	Ender_Item_Struct *thiz;
+	Ender_Item_Type type;
+
+	type = ender_item_type_get(p);
+	if (type != ENDER_ITEM_TYPE_PROPERTY)
+	{
+		ender_item_unref(p);
+		return;
+	}
+		
+	thiz = ENDER_ITEM_STRUCT(i);
+	thiz->fields = eina_list_append(thiz->fields, p);
+	ender_item_parent_set(p, i);
+	/* TODO check the type of the property and increment our own size */
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI size_t ender_item_struct_size_get(Ender_Item *i)
+{
+	Ender_Item_Struct *thiz;
 
+	thiz = ENDER_ITEM_STRUCT(i);
+	return thiz->size;
+}

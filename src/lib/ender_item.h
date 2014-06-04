@@ -23,11 +23,16 @@ typedef struct _Ender_Item Ender_Item;
 
 typedef enum _Ender_Item_Type {
 	ENDER_ITEM_TYPE_INVALID,
+	ENDER_ITEM_TYPE_BASIC,
+	ENDER_ITEM_TYPE_PROPERTY,
+	ENDER_ITEM_TYPE_OBJECT,
+	ENDER_ITEM_TYPE_STRUCT,
 } Ender_Item_Type;
 
 EAPI Ender_Item * ender_item_ref(Ender_Item *thiz);
 EAPI void ender_item_unref(Ender_Item *thiz);
 EAPI const char * ender_item_name_get(Ender_Item *thiz);
 EAPI Ender_Item_Type ender_item_type_get(Ender_Item *thiz);
+EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz);
 
 #endif

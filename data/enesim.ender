@@ -3,6 +3,15 @@
   <include name="eina" version="1"/>
   <namespace name="enesim">
     <struct name="enesim.matrix">
+      <field name="xx" type="double"/>
+      <field name="xy" type="double"/>
+      <field name="xz" type="double"/>
+      <field name="yx" type="double"/>
+      <field name="yy" type="double"/>
+      <field name="yz" type="double"/>
+      <field name="zx" type="double"/>
+      <field name="zy" type="double"/>
+      <field name="zz" type="double"/>
       <method name="identity">
         <return name="void" type="void"/>
       </method>
@@ -13,6 +22,7 @@
       </method>
     </struct>
     <struct name="enesim.rectangle">
+    </struct>
     <class name="enesim.renderer">
     </class>
     <class name="enesim.renderer.rectangle">

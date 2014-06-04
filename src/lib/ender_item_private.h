@@ -28,7 +28,7 @@ Enesim_Object_Descriptor * ender_item_descriptor_get(void);
 typedef struct _Ender_Item
 {
 	Enesim_Object_Instance base;
-	Ender_Item *api;
+	Ender_Item *parent;
 	Ender_Item_Type type;
 	char *name;
 	int ref;
@@ -38,5 +38,8 @@ typedef struct _Ender_Item_Class
 {
 	Enesim_Object_Class base;
 } Ender_Item_Class;
+
+void ender_item_name_set(Ender_Item *thiz, const char *name);
+void ender_item_parent_set(Ender_Item *thiz, Ender_Item *parent);
 
 #endif
