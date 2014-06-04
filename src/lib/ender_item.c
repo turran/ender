@@ -37,6 +37,10 @@ static void _ender_item_class_init(void *k)
 
 static void _ender_item_instance_init(void *o)
 {
+	Ender_Item *thiz;
+
+	thiz = ENDER_ITEM(o);
+	thiz->ref = 1;
 }
 
 static void _ender_item_instance_deinit(void *o)
