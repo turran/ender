@@ -18,7 +18,10 @@
 #include "ender_private.h"
 
 #include "ender_main.h"
+#include "ender_value.h"
 #include "ender_item.h"
+#include "ender_item_struct.h"
+#include "ender_item_attr.h"
 
 #include "ender_main_private.h"
 #include "ender_item_struct_private.h"
@@ -366,6 +369,9 @@ void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
 {
 	Ender_Item_Struct *thiz;
 	Ender_Item_Type type;
+	Ender_Item *attr_type;
+	size_t size = 0;
+	ssize_t align = 0;
 
 	type = ender_item_type_get(p);
 	if (type != ENDER_ITEM_TYPE_ATTR)
@@ -375,9 +381,27 @@ void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
 	}
 		
 	thiz = ENDER_ITEM_STRUCT(i);
+	attr_type = ender_item_attr_type_get(p);
+	type = ender_item_type_get(attr_type);
+	switch (type)
+	{
+		case ENDER_ITEM_TYPE_BASIC:
+		size = ender_value_type_size_get(ender_item_basic_value_type_get(attr_type));
+		align = ender_value_type_alignment_get(ender_item_basic_value_type_get(attr_type));
+		break;
+
+		default:
+		CRI("Unsupported attr type '%d'", type);
+		break;
+	}
+
+	/* add the padding */
+	thiz->size = (thiz->size + align - 1) & ~(align - 1);
+	/* add the size */
+	thiz->size += size;
+
 	thiz->fields = eina_list_append(thiz->fields, p);
 	ender_item_parent_set(p, i);
-	/* TODO check the type of the property and increment our own size */
 }
 
 /*============================================================================*

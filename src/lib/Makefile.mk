@@ -32,7 +32,9 @@ src/lib/ender_lib.c \
 src/lib/ender_main.c \
 src/lib/ender_main_private.h \
 src/lib/ender_parser.c \
-src/lib/ender_private.h
+src/lib/ender_private.h \
+src/lib/ender_value.c \
+src/lib/ender_value_private.h
 
 src_lib_libender_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
