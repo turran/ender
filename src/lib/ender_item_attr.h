@@ -16,25 +16,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_ITEM_H_
-#define _ENDER_ITEM_H_
+#ifndef _ENDER_ITEM_ATTR_H_
+#define _ENDER_ITEM_ATTR_H_
 
-typedef struct _Ender_Item Ender_Item;
-
-typedef enum _Ender_Item_Type {
-	ENDER_ITEM_TYPE_INVALID,
-	ENDER_ITEM_TYPE_BASIC,
-	ENDER_ITEM_TYPE_FUNCTION,
-	ENDER_ITEM_TYPE_ATTR,
-	ENDER_ITEM_TYPE_ARG,
-	ENDER_ITEM_TYPE_OBJECT,
-	ENDER_ITEM_TYPE_STRUCT,
-} Ender_Item_Type;
-
-EAPI Ender_Item * ender_item_ref(Ender_Item *thiz);
-EAPI void ender_item_unref(Ender_Item *thiz);
-EAPI const char * ender_item_name_get(Ender_Item *thiz);
-EAPI Ender_Item_Type ender_item_type_get(Ender_Item *thiz);
-EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz);
+EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i);
+EAPI Ender_Item * ender_item_attr_setter_get(Ender_Item *i);
+EAPI Ender_Item * ender_item_attr_getter_get(Ender_Item *i);
+EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i);
+EAPI Eina_Bool ender_item_attr_value_get_get(Ender_Item *i, Ender_Value *v, Eina_Error *err);
+EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, Ender_Value *v, Eina_Error *err);
 
 #endif
+

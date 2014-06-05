@@ -268,7 +268,6 @@ EAPI Eina_List * ender_lib_item_list(const Ender_Lib *thiz, Ender_Item_Type type
 	it = eina_hash_iterator_data_new(thiz->items);
 	EINA_ITERATOR_FOREACH(it, i)
 	{
-		printf("%p type = %d\n", i, ender_item_type_get(i));
 		if (ender_item_type_get(i) == type)
 			ret = eina_list_append(ret, ender_item_ref(i));
 	}

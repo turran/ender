@@ -1,5 +1,5 @@
 /* ENDER - Enesim's descriptor library
- * Copyright (C) 2010 Jorge Luis Zapata
+ * Copyright (C) 2010 - 2012 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,24 +16,25 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_MARSHALLER_H
-#define _ENDER_MARSHALLER_H
+#ifndef _ENDER_ITEM_FUNCTION_H
+#define _ENDER_ITEM_FUNCTION_H
 
 /**
  * @defgroup Ender_Function_Group Function
  * @{
  */
 
-#define ENDER_FUNCTION(f) ((Ender_Accessor)(f))
+typedef enum _Ender_Item_Function_Flags
+{
+	ENDER_ITEM_FUNCTION_FLAG_THROWS,	
+} Ender_Item_Function_Flags;
 
-typedef struct _Ender_Function Ender_Function;
-
-EAPI int ender_function_args_count(Ender_Function *thiz);
-EAPI const Eina_List * ender_function_args_get(Ender_Function *thiz);
-EAPI Ender_Container * ender_function_ret_get(Ender_Function *thiz);
-EAPI const char * ender_function_name_get(Ender_Function *thiz);
+EAPI Eina_List * ender_item_function_args_get(Ender_Item *i);
+EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i);
+Eina_Bool ender_item_function_call(Ender_Item *i,
+		Ender_Value **in_args, Ender_Value **out_args);
 
 /**
  * @}
  */
-
+#endif

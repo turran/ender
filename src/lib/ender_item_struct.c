@@ -368,7 +368,7 @@ void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
 	Ender_Item_Type type;
 
 	type = ender_item_type_get(p);
-	if (type != ENDER_ITEM_TYPE_PROPERTY)
+	if (type != ENDER_ITEM_TYPE_ATTR)
 	{
 		ender_item_unref(p);
 		return;
@@ -389,4 +389,19 @@ EAPI size_t ender_item_struct_size_get(Ender_Item *i)
 
 	thiz = ENDER_ITEM_STRUCT(i);
 	return thiz->size;
+}
+
+EAPI Eina_List * ender_item_struct_fields_get(Ender_Item *i)
+{
+	Ender_Item_Struct *thiz;
+	Ender_Item *f;
+	Eina_List *ret = NULL;
+	Eina_List *l;
+
+	thiz = ENDER_ITEM_STRUCT(i);
+	EINA_LIST_FOREACH(thiz->fields, l, f)
+	{
+		ret = eina_list_append(ret, ender_item_ref(f));
+	}
+	return ret;
 }

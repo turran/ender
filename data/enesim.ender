@@ -1,31 +1,33 @@
 <?xml version="1.0"?>
 <lib name="enesim" version="1" case="underscore">
   <include name="eina" version="1"/>
-  <namespace name="enesim">
-    <struct name="enesim.matrix">
-      <field name="xx" type="double"/>
-      <field name="xy" type="double"/>
-      <field name="xz" type="double"/>
-      <field name="yx" type="double"/>
-      <field name="yy" type="double"/>
-      <field name="yz" type="double"/>
-      <field name="zx" type="double"/>
-      <field name="zy" type="double"/>
-      <field name="zz" type="double"/>
-      <method name="identity">
-        <return name="void" type="void"/>
-      </method>
-      <method name="scale">
-        <return name="void" type="void"/>
-        <arg name="sx" type="double"/>
-        <arg name="sy" type="double"/>
-      </method>
-    </struct>
-    <struct name="enesim.rectangle">
-    </struct>
-    <class name="enesim.renderer">
-    </class>
-    <class name="enesim.renderer.rectangle">
-    </class>
-  </namespace>
+  <struct name="enesim.matrix">
+    <field name="xx" type="double"/>
+    <field name="xy" type="double"/>
+    <field name="xz" type="double"/>
+    <field name="yx" type="double"/>
+    <field name="yy" type="double"/>
+    <field name="yz" type="double"/>
+    <field name="zx" type="double"/>
+    <field name="zy" type="double"/>
+    <field name="zz" type="double"/>
+    <method name="identity">
+      <return name="void" type="void"/>
+    </method>
+    <method name="scale">
+      <return name="void" type="void"/>
+      <arg name="sx" type="double"/>
+      <arg name="sy" type="double"/>
+    </method>
+  </struct>
+  <struct name="enesim.rectangle">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="w" type="double"/>
+    <field name="h" type="double"/>
+  </struct>
+  <class name="enesim.renderer">
+  </class>
+  <class name="enesim.renderer.rectangle">
+  </class>
 </lib>

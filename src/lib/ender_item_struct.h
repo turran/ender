@@ -20,6 +20,7 @@
 #define _ENDER_ITEM_STRUCT_H_
 
 EAPI size_t ender_item_struct_size_get(Ender_Item *i);
+EAPI Eina_List * ender_item_struct_fields_get(Ender_Item *i);
 
 #endif
 

@@ -18,12 +18,17 @@
 #include "ender_private.h"
 
 #include "ender_main.h"
+#include "ender_value.h"
 #include "ender_item.h"
+#include "ender_item_struct.h"
+#include "ender_item_attr.h"
 #include "ender_lib.h"
 
 #include "ender_main_private.h"
 #include "ender_lib_private.h"
+#include "ender_item_attr_private.h"
 #include "ender_item_struct_private.h"
+#include "ender_item_function_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -71,8 +76,21 @@ struct _Ender_Parser_Context {
 
 typedef struct _Ender_Parser_Field {
 	char *type;
-	char *name;
 } Ender_Parser_Field;
+
+
+static Ender_Parser_Context * _ender_parser_parent_context_get(Ender_Parser *thiz)
+{
+	Ender_Parser_Context *c = NULL;;
+	int count;
+
+	count = eina_array_count(thiz->context);
+	if (count)
+	{
+		c = eina_array_data_get(thiz->context, count - 1);
+	}
+	return c;
+}
 
 /*----------------------------------------------------------------------------*
  *                            common item attrs                               *
@@ -124,29 +142,63 @@ static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
 static Eina_Bool _ender_parser_field_ctor(Ender_Parser_Context *c)
 {
 	Ender_Parser_Field *f;
+	Ender_Parser_Context *parent;
+
+	/* a field can only be child of a struct */
+	parent = _ender_parser_parent_context_get(c->parser);
+	if ((!parent) || (!parent->i) || (ender_item_type_get(parent->i) != ENDER_ITEM_TYPE_STRUCT))
+	{
+		ERR("A field must be a child of a struct");
+		return EINA_FALSE;
+	}
 
 	f = calloc(1, sizeof(Ender_Parser_Field));
 	c->prv = f;
+	c->i = ender_item_attr_new();
+
 	return EINA_TRUE;
 }
 
 static void _ender_parser_field_dtor(Ender_Parser_Context *c)
 {
-	Ender_Parser_Field *f = c->prv;
+	Ender_Parser_Context *parent;
+	Ender_Parser_Field *field = c->prv;
 	Ender_Item *i;
+	Ender_Item_Type type;
+	Ender_Item *f;
 
-	/* create the item based on the type */
-	i = ender_lib_item_find(c->parser->lib, f->type);
-	/* TODO check if it is a basic type, if so, we can create a new
-	 * property based on it
-	 */
+	/* set the type */
+	i = ender_lib_item_find(c->parser->lib, field->type);
+	if (!i)
+	{
+		ERR("Can not find type '%s'", field->type);
+		goto done;
+	}
+	ender_item_attr_type_set(c->i, ender_item_ref(i));
+	type = ender_item_type_get(i);
+	/* set the getter, setter */
+	f = ender_item_function_new();
+	switch (type)
+	{
+		case ENDER_ITEM_TYPE_BASIC:
+		/* TODO check if it is a basic type, if so, we can create a new
+		 * property based on it
+		 */
+		ERR("Basic type");
+		break;
+		default:
+		break;
+	}
+	ender_item_unref(f);
+
+	/* add the field */
+	parent = _ender_parser_parent_context_get(c->parser);
+	ender_item_struct_field_add(parent->i, ender_item_ref(c->i));
 	ender_item_unref(i);
-
-	if (f->name)
-		free(f->name);
-	if (f->type)
-		free(f->type);
-	free(f);
+done:
+	if (field->type)
+		free(field->type);
+	free(field);
 	c->prv = NULL;
 }
 
@@ -155,10 +207,8 @@ static Eina_Bool _ender_parser_field_attrs_set(Ender_Parser_Context *c,
 {
 	Ender_Parser_Field *f = c->prv;
 
-	if (!strcmp(key, "name"))
-	{
-		f->name = strdup(value);
-	}
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
 	else if (!strcmp(key, "type"))
 	{
 		f->type = strdup(value);
