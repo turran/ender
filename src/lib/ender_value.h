@@ -30,6 +30,7 @@ typedef union _Ender_Value
 	uint32_t u32;
 	int64_t i64;
 	uint64_t u64;
+	double d;
 	void *ptr;
 } Ender_Value;
 
