@@ -11,11 +11,8 @@
     <field name="zx" type="double"/>
     <field name="zy" type="double"/>
     <field name="zz" type="double"/>
-    <method name="identity">
-      <return name="void" type="void"/>
-    </method>
+    <method name="identity"/>
     <method name="scale">
-      <return name="void" type="void"/>
       <arg name="sx" type="double"/>
       <arg name="sy" type="double"/>
     </method>
