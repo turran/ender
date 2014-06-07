@@ -21,6 +21,7 @@
 
 EAPI size_t ender_item_struct_size_get(Ender_Item *i);
 EAPI Eina_List * ender_item_struct_fields_get(Ender_Item *i);
+EAPI Eina_List * ender_item_struct_functions_get(Ender_Item *i);
 
 #endif
 

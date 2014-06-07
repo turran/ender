@@ -36,6 +36,7 @@ typedef struct _Ender_Item_Struct
 {
 	Ender_Item base;
 	Eina_List *fields;
+	Eina_List *functions;
 	size_t size;
 } Ender_Item_Struct;
 
@@ -525,6 +526,23 @@ Eina_Bool ender_item_struct_field_value_set(void *o, Ender_Item *field,
 	ender_item_unref(type);
 	return ret;
 }
+
+void ender_item_struct_function_add(Ender_Item *i, Ender_Item *f)
+{
+	Ender_Item_Struct *thiz;
+	Ender_Item_Type type;
+
+	type = ender_item_type_get(f);
+	if (type != ENDER_ITEM_TYPE_FUNCTION)
+	{
+		ender_item_unref(f);
+		return;
+	}
+		
+	thiz = ENDER_ITEM_STRUCT(i);
+	thiz->functions = eina_list_append(thiz->functions, f);
+	ender_item_parent_set(f, i);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -550,3 +568,19 @@ EAPI Eina_List * ender_item_struct_fields_get(Ender_Item *i)
 	}
 	return ret;
 }
+
+EAPI Eina_List * ender_item_struct_functions_get(Ender_Item *i)
+{
+	Ender_Item_Struct *thiz;
+	Ender_Item *f;
+	Eina_List *ret = NULL;
+	Eina_List *l;
+
+	thiz = ENDER_ITEM_STRUCT(i);
+	EINA_LIST_FOREACH(thiz->functions, l, f)
+	{
+		ret = eina_list_append(ret, ender_item_ref(f));
+	}
+	return ret;
+}
+
