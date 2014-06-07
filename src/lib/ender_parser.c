@@ -78,7 +78,13 @@ typedef struct _Ender_Parser_Field {
 	char *type;
 } Ender_Parser_Field;
 
+typedef struct _Ender_Parser_Function {
+	char *symname;
+} Ender_Parser_Function;
 
+/*----------------------------------------------------------------------------*
+ *                                 helpers                                    *
+ *----------------------------------------------------------------------------*/
 static Ender_Parser_Context * _ender_parser_parent_context_get(Ender_Parser *thiz)
 {
 	Ender_Parser_Context *c = NULL;;
@@ -90,6 +96,47 @@ static Ender_Parser_Context * _ender_parser_parent_context_get(Ender_Parser *thi
 		c = eina_array_data_get(thiz->context, count - 1);
 	}
 	return c;
+}
+
+static char * _ender_parser_symname_generate(Ender_Parser *thiz, Ender_Item *i)
+{
+	Ender_Item *parent;
+	char *ret;
+
+	parent = ender_item_parent_get(i);
+	if (parent)
+	{
+		char *parent_name;
+		int count;
+
+		parent_name = _ender_parser_symname_generate(thiz, parent);
+		ender_item_unref(parent);
+		count = asprintf(&ret, "%s.%s", parent_name, ender_item_name_get(i));
+		free(parent_name);
+		if (count < 0)
+			return NULL;
+	}
+	else
+	{
+		if (asprintf(&ret, "%s", ender_item_name_get(i)) < 0)
+			return NULL;
+	}
+	return ret;
+}
+
+/* TODO handle the library case */
+static char * _ender_parser_symname_get(Ender_Parser *thiz, Ender_Item *i)
+{
+	char *ret;
+	char *c;
+
+	ret = _ender_parser_symname_generate(thiz, i);
+	for (c = ret; *c != '\0'; c++)
+	{
+		if (*c == '.')
+			*c = '_';
+	}
+	return ret;
 }
 
 /*----------------------------------------------------------------------------*
@@ -137,6 +184,65 @@ static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
+ *                                method tag                                  *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *f;
+	Ender_Parser_Context *parent;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	if ((!parent) || (!parent->i) ||
+			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_STRUCT))
+	{
+		ERR("A method must be a child of a struct or object");
+		return EINA_FALSE;
+	}
+	/* our private context */
+	f = calloc(1, sizeof(Ender_Parser_Field));
+	c->prv = f;
+	c->i = ender_item_function_new();
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_method_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *f = c->prv;
+	Ender_Parser_Context *parent;
+
+	/* add the function */
+	parent = _ender_parser_parent_context_get(c->parser);
+	switch (ender_item_type_get(parent->i))
+	{
+		case ENDER_ITEM_TYPE_STRUCT:
+		ender_item_struct_function_add(parent->i, ender_item_ref(c->i));
+		break;
+
+	}
+	/* set the symbol name */
+	_ender_parser_item_dtor(c);
+	if (!f->symname)
+		f->symname = _ender_parser_symname_get(c->parser, c->i);
+	ender_item_function_symname_set(c->i, f->symname);
+	
+	/* free our private context */
+	if (f->symname)
+		free(f->symname);
+	free(f);
+	c->prv = NULL;
+}
+
+static Eina_Bool _ender_parser_method_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	Ender_Parser_Function *f = c->prv;
+
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
+	return EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
  *                                field tag                                  *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_field_ctor(Ender_Parser_Context *c)
@@ -152,6 +258,7 @@ static Eina_Bool _ender_parser_field_ctor(Ender_Parser_Context *c)
 		return EINA_FALSE;
 	}
 
+	/* our private context */
 	f = calloc(1, sizeof(Ender_Parser_Field));
 	c->prv = f;
 	c->i = ender_item_attr_new();
@@ -165,7 +272,6 @@ static void _ender_parser_field_dtor(Ender_Parser_Context *c)
 	Ender_Parser_Field *field = c->prv;
 	Ender_Item *i;
 	Ender_Item_Type type;
-	Ender_Item *f;
 
 	/* set the type */
 	i = ender_lib_item_find(c->parser->lib, field->type);
@@ -175,27 +281,13 @@ static void _ender_parser_field_dtor(Ender_Parser_Context *c)
 		goto done;
 	}
 	ender_item_attr_type_set(c->i, ender_item_ref(i));
-	type = ender_item_type_get(i);
-	/* set the getter, setter */
-	f = ender_item_function_new();
-	switch (type)
-	{
-		case ENDER_ITEM_TYPE_BASIC:
-		/* TODO check if it is a basic type, if so, we can create a new
-		 * property based on it
-		 */
-		ERR("Basic type");
-		break;
-		default:
-		break;
-	}
-	ender_item_unref(f);
 
 	/* add the field */
 	parent = _ender_parser_parent_context_get(c->parser);
 	ender_item_struct_field_add(parent->i, ender_item_ref(c->i));
 	ender_item_unref(i);
 done:
+	/* free our private context */
 	if (field->type)
 		free(field->type);
 	free(field);
@@ -212,6 +304,10 @@ static Eina_Bool _ender_parser_field_attrs_set(Ender_Parser_Context *c,
 	else if (!strcmp(key, "type"))
 	{
 		f->type = strdup(value);
+	}
+	else
+	{
+		return EINA_FALSE;
 	}
 
 	return EINA_TRUE;
@@ -265,7 +361,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "namespace", NULL, NULL, NULL },
 	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
 	{ "field", _ender_parser_field_ctor, _ender_parser_field_dtor, _ender_parser_field_attrs_set },
-	{ "method", NULL, NULL, NULL },
+	{ "method", _ender_parser_method_ctor, _ender_parser_method_dtor, _ender_parser_method_attrs_set },
 	{ "class", NULL, NULL, NULL },
 };
 

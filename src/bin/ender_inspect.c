@@ -56,22 +56,46 @@ static const char * value_type_dump(Ender_Value_Type vtype)
 	}
 }
 
-static void attr_dump(Ender_Item *i)
+static const char * item_type_dump(Ender_Item *i)
 {
-	Ender_Item *type;
-
-	type = ender_item_attr_type_get(i);
-	printf("  %s: ", ender_item_name_get(i));
-	switch (ender_item_type_get(type))
+	switch (ender_item_type_get(i))
 	{
 		case ENDER_ITEM_TYPE_BASIC:
-		printf("%s\n", value_type_dump(ender_item_basic_value_type_get(type)));
+		return value_type_dump(ender_item_basic_value_type_get(i));
 		break;
 
 		default:
 		break;
 	}
+
+}
+
+static void attr_dump(Ender_Item *i, int indent)
+{
+	Ender_Item *type;
+
+	type = ender_item_attr_type_get(i);
+	printf("%*c%s: %s\n", indent, ' ', ender_item_name_get(i), item_type_dump(type));
 	ender_item_unref(type);
+}
+
+static void function_dump(Ender_Item *i, int indent)
+{
+	Ender_Item *ret;
+
+	printf("%*c", indent, ' ');
+	ret = ender_item_function_ret_get(i);
+	if (ret)
+	{
+		printf("%s ", item_type_dump(ret));
+	}
+	else
+	{
+		printf("void ");
+	}
+	printf("%s (", ender_item_name_get(i));
+	/* TODO args */
+	printf(")\n");
 }
 
 static void lib_dump(const Ender_Lib *l)
@@ -85,13 +109,20 @@ static void lib_dump(const Ender_Lib *l)
 	EINA_LIST_FREE(items, i)
 	{
 		Ender_Item *f;
-		Eina_List *fields;
+		Eina_List *items;
 
-		printf(" %s\n", ender_item_name_get(i));
-		fields = ender_item_struct_fields_get(i);
-		EINA_LIST_FREE(fields, f)
+		printf("  %s\n", ender_item_name_get(i));
+		items = ender_item_struct_fields_get(i);
+		EINA_LIST_FREE(items, f)
 		{
-			attr_dump(f);
+			attr_dump(f, 4);
+			ender_item_unref(f);
+		}
+		printf("    Functions:\n");
+		items = ender_item_struct_functions_get(i);
+		EINA_LIST_FREE(items, f)
+		{
+			function_dump(f, 8);
 			ender_item_unref(f);
 		}
 		ender_item_unref(i);
