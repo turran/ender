@@ -25,4 +25,3 @@ EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v,
 EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
 
 #endif
-

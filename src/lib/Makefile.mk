@@ -7,6 +7,7 @@ src/lib/Ender.h \
 src/lib/ender_item.h \
 src/lib/ender_item_struct.h \
 src/lib/ender_item_basic.h \
+src/lib/ender_item_arg.h \
 src/lib/ender_item_attr.h \
 src/lib/ender_item_function.h \
 src/lib/ender_lib.h \
@@ -20,6 +21,8 @@ src_lib_libender_la_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
 src_lib_libender_la_SOURCES = \
 src/lib/ender_item.c \
 src/lib/ender_item_private.h \
+src/lib/ender_item_arg.c \
+src/lib/ender_item_arg_private.h \
 src/lib/ender_item_attr.c \
 src/lib/ender_item_attr_private.h \
 src/lib/ender_item_basic.c \

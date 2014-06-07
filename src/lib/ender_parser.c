@@ -22,6 +22,7 @@
 #include "ender_item.h"
 #include "ender_item_struct.h"
 #include "ender_item_attr.h"
+#include "ender_item_function.h"
 #include "ender_lib.h"
 
 #include "ender_main_private.h"
@@ -173,14 +174,20 @@ static Eina_Bool _ender_parser_struct_ctor(Ender_Parser_Context *c)
 
 static void _ender_parser_struct_dtor(Ender_Parser_Context *c)
 {
-	_ender_parser_item_dtor(c);
 }
 
 static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
-	if (_ender_parser_item_attrs_set(c, key, value))
-		return EINA_TRUE;
+	if (!strcmp(key, "name"))
+	{
+		ender_item_name_set(c->i, value);
+		ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
@@ -203,13 +210,8 @@ static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 	c->prv = f;
 	c->i = ender_item_function_new();
 
-	return EINA_TRUE;
-}
-
-static void _ender_parser_method_dtor(Ender_Parser_Context *c)
-{
-	Ender_Parser_Function *f = c->prv;
-	Ender_Parser_Context *parent;
+	/* set it as method */
+	ender_item_function_flags_set(c->i, ENDER_ITEM_FUNCTION_FLAG_IS_METHOD);
 
 	/* add the function */
 	parent = _ender_parser_parent_context_get(c->parser);
@@ -218,8 +220,16 @@ static void _ender_parser_method_dtor(Ender_Parser_Context *c)
 		case ENDER_ITEM_TYPE_STRUCT:
 		ender_item_struct_function_add(parent->i, ender_item_ref(c->i));
 		break;
-
 	}
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_method_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *f = c->prv;
+	Ender_Parser_Context *parent;
+
 	/* set the symbol name */
 	_ender_parser_item_dtor(c);
 	if (!f->symname)

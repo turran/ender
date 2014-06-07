@@ -69,6 +69,7 @@ extern "C" {
 #include "ender_item_struct.h"
 #include "ender_item_attr.h"
 #include "ender_item_function.h"
+#include "ender_item_arg.h"
 #include "ender_parser.h"
 
 /**

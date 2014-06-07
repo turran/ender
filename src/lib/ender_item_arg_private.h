@@ -16,28 +16,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_ITEM_FUNCTION_H
-#define _ENDER_ITEM_FUNCTION_H
+#ifndef _ENDER_ITEM_ARG_PRIVATE_H_
+#define _ENDER_ITEM_ARG_PRIVATE_H_
 
-/**
- * @defgroup Ender_Function_Group Function
- * @{
- */
+#include "ender_item_private.h"
 
-typedef enum _Ender_Item_Function_Flags
-{
-	ENDER_ITEM_FUNCTION_FLAG_IS_METHOD = (1 << 0),
-	ENDER_ITEM_FUNCTION_FLAG_THROWS    = (1 << 1),
-} Ender_Item_Function_Flags;
+Ender_Item * ender_item_arg_new(void);
+void ender_item_arg_type_set(Ender_Item *i, Ender_Item *t);
+void ender_item_arg_transfer_set(Ender_Item *i, Ender_Transfer_Type transfer);
 
-EAPI Eina_List * ender_item_function_args_get(Ender_Item *i);
-EAPI int ender_item_function_args_count(Ender_Item *i);
-EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i);
-Eina_Bool ender_item_function_call(Ender_Item *i,
-		Ender_Value **in_args, Ender_Value **out_args);
-EAPI int ender_item_function_flags_get(Ender_Item *i);
-
-/**
- * @}
- */
 #endif
