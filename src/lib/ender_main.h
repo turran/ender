@@ -27,6 +27,14 @@ EAPI void ender_init(void);
 EAPI void ender_shutdown(void);
 EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *micro);
 
+typedef enum _Ender_Transfer_Type
+{
+	ENDER_TRANSFER_TYPE_FULL,
+	ENDER_TRANSFER_TYPE_NONE,
+	ENDER_TRANSFER_TYPE_CONTAINER,
+	ENDER_TRANSFER_TYPE_CONTENT,
+} Ender_Transfer_Type;
+
 /**
  * @}
  */
