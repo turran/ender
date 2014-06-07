@@ -20,11 +20,9 @@
 #define _ENDER_ITEM_ATTR_H_
 
 EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i);
-EAPI Ender_Item * ender_item_attr_setter_get(Ender_Item *i);
-EAPI Ender_Item * ender_item_attr_getter_get(Ender_Item *i);
 EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i);
-EAPI Eina_Bool ender_item_attr_value_get_get(Ender_Item *i, Ender_Value *v, Eina_Error *err);
-EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, Ender_Value *v, Eina_Error *err);
+EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
+EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
 
 #endif
 

@@ -24,6 +24,7 @@
 
 #include "ender_main_private.h"
 #include "ender_item_attr_private.h"
+#include "ender_item_struct_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -140,37 +141,59 @@ EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
 	return thiz->offset;
 }
 
-EAPI Ender_Item * ender_item_attr_setter_get(Ender_Item *i)
+EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
 {
 	Ender_Item_Attr *thiz;
+	Ender_Item *parent;
+	Eina_Bool ret = EINA_FALSE;
 
 	thiz = ENDER_ITEM_ATTR(i);
-	return ender_item_ref(thiz->setter);
+	parent = ender_item_parent_get(i);
+	if (!parent)
+	{
+		ERR("Attr without parent");
+		goto done;
+	}
+	switch (ender_item_type_get(parent))
+	{
+		case ENDER_ITEM_TYPE_STRUCT:
+		ret = ender_item_struct_field_value_get(o, i, v, err);
+		break;
+
+		default:
+		ERR("Unsupported parent type");
+		break;
+	}
+	ender_item_unref(parent);
+done:
+	return ret;
 }
 
-EAPI Ender_Item * ender_item_attr_getter_get(Ender_Item *i)
+EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
 {
 	Ender_Item_Attr *thiz;
+	Ender_Item *parent;
+	Eina_Bool ret = EINA_FALSE;
 
 	thiz = ENDER_ITEM_ATTR(i);
-	return ender_item_ref(thiz->getter);
-}
+	parent = ender_item_parent_get(i);
+	if (!parent)
+	{
+		ERR("Attr without parent");
+		goto done;
+	}
+	switch (ender_item_type_get(parent))
+	{
+		case ENDER_ITEM_TYPE_STRUCT:
+		ret = ender_item_struct_field_value_set(o, i, v, err);
+		break;
 
-EAPI Eina_Bool ender_item_attr_value_get_get(Ender_Item *i, Ender_Value *v, Eina_Error *err)
-{
-	Ender_Item_Attr *thiz;
-
-	thiz = ENDER_ITEM_ATTR(i);
-	/* for structs we need to pass the offset */
-	return EINA_TRUE;
-}
-
-EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, Ender_Value *v, Eina_Error *err)
-{
-	Ender_Item_Attr *thiz;
-
-	thiz = ENDER_ITEM_ATTR(i);
-	/* for structs we need to pass the offset */
-	return EINA_TRUE;
+		default:
+		ERR("Unsupported parent type");
+		break;
+	}
+	ender_item_unref(parent);
+done:
+	return ret;
 }
 

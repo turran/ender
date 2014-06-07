@@ -24,4 +24,9 @@
 Ender_Item * ender_item_struct_new(void);
 void ender_item_struct_field_add(Ender_Item *i, Ender_Item *f);
 
+Eina_Bool ender_item_struct_field_value_set(void *o, Ender_Item *field,
+		Ender_Value *v, Eina_Error *err);
+Eina_Bool ender_item_struct_field_value_get(void *o, Ender_Item *field,
+		Ender_Value *v, Eina_Error *err);
+
 #endif

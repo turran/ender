@@ -24,6 +24,7 @@
 #include "ender_item_attr.h"
 
 #include "ender_main_private.h"
+#include "ender_item_attr_private.h"
 #include "ender_item_struct_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -397,6 +398,7 @@ void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
 
 	/* add the padding */
 	thiz->size = (thiz->size + align - 1) & ~(align - 1);
+	ender_item_attr_offset_set(p, thiz->size);
 	/* add the size */
 	thiz->size += size;
 
@@ -404,6 +406,125 @@ void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
 	ender_item_parent_set(p, i);
 }
 
+Eina_Bool ender_item_struct_field_value_get(void *o, Ender_Item *field,
+		Ender_Value *v, Eina_Error *err)
+{
+	Ender_Item *type;
+	Eina_Bool ret = EINA_FALSE;
+	char *oa;
+
+	oa = ((char *)o) + ender_item_attr_offset_get(field);
+	/* when getting a value, it is always transfered with a ref, i.e full */
+	type = ender_item_attr_type_get(field);
+	switch (ender_item_type_get(type))
+	{
+		case ENDER_ITEM_TYPE_BASIC:
+		{
+			switch (ender_item_basic_value_type_get(type))
+			{
+				case ENDER_VALUE_TYPE_BOOL:
+				v->b = *((Eina_Bool *)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_UINT32:
+				v->u32 = *((uint32_t *)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_INT32:
+				v->i32 = *((int32_t *)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_UINT64:
+				v->u64 = *((uint64_t *)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_INT64:
+				v->i64 = *((int64_t *)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_DOUBLE:
+				v->d = *((double *)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_STRING:
+				v->ptr = *((char **)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_POINTER:
+				v->ptr = *((void **)oa);
+				break;
+			}
+			ret = EINA_TRUE;
+		}
+		break;
+
+		default:
+		ERR("Unsupported type");
+		break;
+	}
+	ender_item_unref(type);
+	return ret;
+}
+
+Eina_Bool ender_item_struct_field_value_set(void *o, Ender_Item *field,
+		Ender_Value *v, Eina_Error *err)
+{
+	Ender_Item *type;
+	Eina_Bool ret = EINA_FALSE;
+	char *oa;
+
+	oa = ((char *)o) + ender_item_attr_offset_get(field);
+	/* when getting a value, it is always transfered with a ref, i.e full */
+	type = ender_item_attr_type_get(field);
+	switch (ender_item_type_get(type))
+	{
+		case ENDER_ITEM_TYPE_BASIC:
+		{
+			switch (ender_item_basic_value_type_get(type))
+			{
+				case ENDER_VALUE_TYPE_BOOL:
+				*((Eina_Bool *)oa) = v->b;
+				break;
+
+				case ENDER_VALUE_TYPE_UINT32:
+				*((uint32_t *)oa) = v->u32;
+				break;
+
+				case ENDER_VALUE_TYPE_INT32:
+				*((int32_t *)oa) = v->i32;
+				break;
+
+				case ENDER_VALUE_TYPE_UINT64:
+				*((uint64_t *)oa) = v->u64;
+				break;
+
+				case ENDER_VALUE_TYPE_INT64:
+				*((int64_t *)oa) = v->i64;
+				break;
+
+				case ENDER_VALUE_TYPE_DOUBLE:
+				*((double *)oa) = v->d;
+				break;
+
+				case ENDER_VALUE_TYPE_STRING:
+				*((char **)oa) = v->ptr;
+				break;
+
+				case ENDER_VALUE_TYPE_POINTER:
+				*((void **)oa) = v->ptr;
+				break;
+			}
+			ret = EINA_TRUE;
+		}
+		break;
+
+		default:
+		ERR("Unsupported type");
+		break;
+	}
+	ender_item_unref(type);
+	return ret;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
