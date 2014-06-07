@@ -169,9 +169,10 @@ EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 	return ender_item_ref(thiz->ret);
 }
 
-Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value **in_args,
-		Ender_Value **out_args)
+Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args)
 {
+	printf("calling function %s\n", ender_item_name_get(i));
+	/* TODO use FFI for this case  :)*/
 	return EINA_FALSE;
 }
 
