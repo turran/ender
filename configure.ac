@@ -84,41 +84,13 @@ LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
-requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0 enesim >= 0.0.21"
+requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0 enesim >= 0.0.21 libffi"
 if test "x${have_win32}" = "xyes" ; then
    requirements_ender_pc="${requirements_ender_pc} evil >= 1.7.0"
 fi
 
 PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc}])
 AC_SUBST([requirements_ender_pc])
-
-# Scripting
-## Neko
-have_neko="no"
-NEKO_LIBS=""
-AC_CHECK_LIB([neko],
-   [neko_val_callEx],
-   [have_neko="yes"],
-   [have_neko="no"])
-
-if test "x${have_neko}" = "xyes" ; then
-   AC_CHECK_HEADERS([neko.h neko_vm.h],
-      [have_neko="yes"],
-      [have_neko="no"])
-fi
-
-if test "x${have_neko}" = "xyes" ; then
-  AC_CHECK_PROG([have_neko_bin], [nekoc], [yes], [no])
-fi
-
-if test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes" ; then
-   requirements_escen_libs=-lneko
-   AC_DEFINE([BUILD_SCRIPT_NEKO], [1], [Build support for NekoVM scripts])
-fi
-
-AM_CONDITIONAL([BUILD_SCRIPT_NEKO], [test "x${have_neko}" = "xyes" && test "x${have_neko_bin}" = "xyes"])
-AC_SUBST([requirements_escen_libs])
-
 
 ### Checks for library functions
 
@@ -145,9 +117,6 @@ echo "------------------------------------------------------------------------"
 echo
 echo
 echo "Configuration Options Summary:"
-echo "Ender........................................: yes"
-echo "  Serialization:"
-echo "  TPL........................................: no"
 echo
 echo "Compilation............: make (or gmake)"
 echo "  CPPFLAGS.............: $CPPFLAGS"
