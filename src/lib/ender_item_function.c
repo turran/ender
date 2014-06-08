@@ -21,9 +21,12 @@
 #include "ender_value.h"
 #include "ender_item.h"
 #include "ender_item_function.h"
+#include "ender_item_arg.h"
 
 #include "ender_main_private.h"
+#include "ender_item_private.h"
 #include "ender_item_function_private.h"
+#include "ender_item_arg_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -37,12 +40,68 @@ typedef struct _Ender_Item_Function
 	Eina_List *args;
 	char *symname;
 	int flags;
+	void *sym;
 } Ender_Item_Function;
 
 typedef struct _Ender_Item_Function_Class
 {
 	Ender_Item_Class base;
 } Ender_Item_Function_Class;
+
+static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
+{
+	Ender_Item_Type type;
+
+	type = ender_item_type_get(i);
+	switch (type)
+	{
+		case ENDER_ITEM_TYPE_BASIC:
+		{
+			switch (ender_item_basic_value_type_get(i))
+			{
+				case ENDER_VALUE_TYPE_BOOL:
+				return &ffi_type_uint8;
+				break;
+
+				case ENDER_VALUE_TYPE_UINT32:
+				return &ffi_type_uint32;
+				break;
+
+				case ENDER_VALUE_TYPE_INT32:
+				return &ffi_type_sint32;
+				break;
+
+				case ENDER_VALUE_TYPE_UINT64:
+				return &ffi_type_uint64;
+				break;
+
+				case ENDER_VALUE_TYPE_INT64:
+				return &ffi_type_sint64;
+				break;
+
+				case ENDER_VALUE_TYPE_DOUBLE:
+				return &ffi_type_double;
+				break;
+
+				case ENDER_VALUE_TYPE_STRING:
+				case ENDER_VALUE_TYPE_POINTER:
+				return &ffi_type_pointer;
+				break;
+			}
+		}
+		break;
+
+		case ENDER_ITEM_TYPE_STRUCT:
+		case ENDER_ITEM_TYPE_FUNCTION:
+		return &ffi_type_pointer;
+		break;
+
+		default:
+		ERR("Unsupported item type '%d'", type);
+		return &ffi_type_pointer;
+		break;
+	}
+}
 
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -104,6 +163,7 @@ void ender_item_function_arg_add(Ender_Item *i, Ender_Item *arg)
 	type = ender_item_type_get(arg);
 	if (type != ENDER_ITEM_TYPE_ARG)
 	{
+		CRI("Unsupported type '%d'", type);
 		ender_item_unref(arg);
 		return;
 	}
@@ -130,9 +190,6 @@ EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 	Eina_List *l;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
-	/* prepend the parent */
-	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
-		ret = eina_list_append(ret, ender_item_parent_get(i));
 	EINA_LIST_FOREACH(thiz->args, l, i)
 	{
 		ret = eina_list_append(ret, ender_item_ref(i));
@@ -146,11 +203,7 @@ EAPI int ender_item_function_args_count(Ender_Item *i)
 	int ret;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
-	ret = eina_list_count(thiz->args);
-	/* for methods we pass the object as the first argument */
-	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
-		ret++;
-	return ret;
+	return eina_list_count(thiz->args);
 }
 
 EAPI int ender_item_function_flags_get(Ender_Item *i)
@@ -171,8 +224,68 @@ EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 
 Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args)
 {
+	Ender_Item_Function *thiz;
+	Ender_Item *a;
+	Eina_List *l;
+	ffi_type **ffi_args;
+	ffi_status status;
+	ffi_cif cif;
+	void **ffi_values;
+	int ffi_arg = 0;
+	int arg = 0;
+	int nargs;
+	int j;
+
+	thiz = ENDER_ITEM_FUNCTION(i);
+
+	/* load the symbol */
+	if (!thiz->sym)
+		thiz->sym = ender_item_sym_get(i, thiz->symname);
+	if (!thiz->sym)
+	{
+		CRI("Impossible to load the symbol '%s'", thiz->symname);
+		return EINA_FALSE;
+	}
+
+	/* passed the args as ffi args */
+	nargs = eina_list_count(thiz->args);
+	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
+		nargs++;
+
+	ffi_args = calloc(nargs, sizeof(ffi_type *));
+	ffi_values = calloc(nargs, sizeof(void *));
+
+	/* fill in the args */
+	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
+	{
+		ffi_args[ffi_arg] = &ffi_type_pointer;
+		ffi_values[ffi_arg] = &args[arg];
+		arg++;
+		ffi_arg++;
+	}
+
+	EINA_LIST_FOREACH(thiz->args, l, a)
+	{
+		Ender_Item *type;
+
+		type = ender_item_arg_type_get(a);
+		ffi_args[ffi_arg] = _ender_item_function_arg_ffi_to(type);
+		ffi_values[ffi_arg] = &args[arg];
+		arg++;
+		ffi_arg++;
+		ender_item_unref(type);
+	}
+
+	/* TODO fix the return value */
+	if ((status = ffi_prep_cif(&cif, FFI_DEFAULT_ABI, nargs, &ffi_type_void,
+			ffi_args)) != FFI_OK)
+	{
+		/* TODO handle the ffi_status */
+		ERR("FFI error");
+	}
+
 	printf("calling function %s\n", ender_item_name_get(i));
-	/* TODO use FFI for this case  :)*/
-	return EINA_FALSE;
+	ffi_call(&cif, FFI_FN(thiz->sym), NULL, ffi_values);
+	return EINA_TRUE;
 }
 

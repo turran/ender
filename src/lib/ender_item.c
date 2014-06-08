@@ -19,9 +19,11 @@
 
 #include "ender_main.h"
 #include "ender_item.h"
+#include "ender_lib.h"
 
 #include "ender_main_private.h"
 #include "ender_item_private.h"
+#include "ender_lib_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -79,6 +81,21 @@ void ender_item_parent_set(Ender_Item *thiz, Ender_Item *parent)
 		return;
 	}
 	thiz->parent = parent;
+}
+
+void * ender_item_sym_get(Ender_Item *thiz, const char *name)
+{
+	if (!thiz->lib)
+	{
+		if (!thiz->parent)
+			return NULL;
+		return ender_item_sym_get(thiz->parent, name);
+	}
+	else
+	{
+		return ender_lib_sym_get(thiz->lib, name);
+	}
+
 }
 /*============================================================================*
  *                                   API                                      *

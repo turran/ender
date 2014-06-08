@@ -24,6 +24,8 @@
 
 #include <Eina.h>
 #include <Enesim.h>
+#include <ffi.h>
+#include <dlfcn.h>
 
 #if 0
 struct _Ender_Container

@@ -19,6 +19,8 @@
 #ifndef _ENDER_ITEM_PRIVATE_H_
 #define _ENDER_ITEM_PRIVATE_H_
 
+#include "ender_lib.h"
+
 Enesim_Object_Descriptor * ender_item_descriptor_get(void);
 #define ENDER_ITEM_DESCRIPTOR ender_item_descriptor_get()
 #define ENDER_ITEM_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, Ender_Item_Class, ENDER_ITEM_DESCRIPTOR)
@@ -28,6 +30,7 @@ Enesim_Object_Descriptor * ender_item_descriptor_get(void);
 typedef struct _Ender_Item
 {
 	Enesim_Object_Instance base;
+	Ender_Lib *lib;
 	Ender_Item *parent;
 	Ender_Item_Type type;
 	char *name;
@@ -41,5 +44,6 @@ typedef struct _Ender_Item_Class
 
 void ender_item_name_set(Ender_Item *thiz, const char *name);
 void ender_item_parent_set(Ender_Item *thiz, Ender_Item *parent);
+void * ender_item_sym_get(Ender_Item *thiz, const char *name);
 
 #endif

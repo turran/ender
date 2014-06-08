@@ -23,6 +23,7 @@
 #include "ender_item_struct.h"
 #include "ender_item_attr.h"
 #include "ender_item_function.h"
+#include "ender_item_arg.h"
 #include "ender_lib.h"
 
 #include "ender_main_private.h"
@@ -30,6 +31,7 @@
 #include "ender_item_attr_private.h"
 #include "ender_item_struct_private.h"
 #include "ender_item_function_private.h"
+#include "ender_item_arg_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -156,12 +158,6 @@ static Eina_Bool _ender_parser_item_attrs_set(Ender_Parser_Context *c,
 	}
 	return EINA_TRUE;
 }
-
-static void _ender_parser_item_dtor(Ender_Parser_Context *c)
-{
-	ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
-}
-
 /*----------------------------------------------------------------------------*
  *                                struct tag                                  *
  *----------------------------------------------------------------------------*/
@@ -183,6 +179,74 @@ static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
 	{
 		ender_item_name_set(c->i, value);
 		ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                                arg tag                                  *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_arg_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *f;
+	Ender_Parser_Context *parent;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	if ((!parent) || (!parent->i) ||
+			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_FUNCTION))
+	{
+		ERR("An arg must be a child of a function");
+		return EINA_FALSE;
+	}
+	c->i = ender_item_arg_new();
+	/* add the arg to the function */
+	parent = _ender_parser_parent_context_get(c->parser);
+	ender_item_function_arg_add(parent->i, ender_item_ref(c->i));
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_arg_dtor(Ender_Parser_Context *c)
+{
+}
+
+static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	Ender_Parser_Function *f = c->prv;
+
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
+	else if (!strcmp(key, "direction"))
+	{
+		Ender_Item_Arg_Direction dir = ENDER_ITEM_ARG_DIRECTION_IN;
+
+		if (!strcmp(value, "in"))
+			dir = ENDER_ITEM_ARG_DIRECTION_IN;
+		else if (!strcmp(value, "out"))
+			dir = ENDER_ITEM_ARG_DIRECTION_OUT;
+		else if (!strcmp(value, "inout"))
+			dir = ENDER_ITEM_ARG_DIRECTION_IN_OUT;
+		else
+		{
+			WRN("Unknown direciton '%s'", value);
+		}
+		ender_item_arg_direction_set(c->i, dir); 
+	}
+	else if (!strcmp(key, "type"))
+	{
+		Ender_Item *type;
+
+		type = ender_lib_item_find(c->parser->lib, value);
+		if (!type)
+		{
+			ERR("Can not find type '%s'", value);
+			return EINA_FALSE;
+		}
+		ender_item_arg_type_set(c->i, ender_item_ref(type));
 	}
 	else
 	{
@@ -229,9 +293,16 @@ static void _ender_parser_method_dtor(Ender_Parser_Context *c)
 {
 	Ender_Parser_Function *f = c->prv;
 	Ender_Parser_Context *parent;
+	Ender_Item *p;
+
+	/* in case there is no parent, register the function, otherwise
+	 * the function will be included on the parent (struct, object, whaveter)
+	  */
+	p = ender_item_parent_get(c->i);
+	if (!p) ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+	ender_item_unref(p);
 
 	/* set the symbol name */
-	_ender_parser_item_dtor(c);
 	if (!f->symname)
 		f->symname = _ender_parser_symname_get(c->parser, c->i);
 	ender_item_function_symname_set(c->i, f->symname);
@@ -372,6 +443,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
 	{ "field", _ender_parser_field_ctor, _ender_parser_field_dtor, _ender_parser_field_attrs_set },
 	{ "method", _ender_parser_method_ctor, _ender_parser_method_dtor, _ender_parser_method_attrs_set },
+	{ "arg", _ender_parser_arg_ctor, _ender_parser_arg_dtor, _ender_parser_arg_attrs_set },
 	{ "class", NULL, NULL, NULL },
 };
 

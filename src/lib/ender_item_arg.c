@@ -35,6 +35,7 @@ typedef struct _Ender_Item_Arg
 	Ender_Item base;
 	Ender_Item *type;
 	Ender_Transfer_Type transfer;
+	Ender_Item_Arg_Direction direction;
 } Ender_Item_Arg;
 
 typedef struct _Ender_Item_Arg_Class
@@ -97,6 +98,13 @@ void ender_item_arg_transfer_set(Ender_Item *i, Ender_Transfer_Type transfer)
 	thiz->transfer = transfer;
 }
 
+void ender_item_arg_direction_set(Ender_Item *i, Ender_Item_Arg_Direction direction)
+{
+	Ender_Item_Arg *thiz;
+
+	thiz = ENDER_ITEM_ARG(i);
+	thiz->direction = direction;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -114,4 +122,12 @@ EAPI Ender_Transfer_Type ender_item_arg_transfer_get(Ender_Item *i)
 
 	thiz = ENDER_ITEM_ARG(i);
 	return thiz->transfer;
+}
+
+EAPI Ender_Item_Arg_Direction ender_item_arg_direction_get(Ender_Item *i)
+{
+	Ender_Item_Arg *thiz;
+
+	thiz = ENDER_ITEM_ARG(i);
+	return thiz->direction;
 }

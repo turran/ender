@@ -24,6 +24,7 @@
 
 #include "ender_main_private.h"
 #include "ender_lib_private.h"
+#include "ender_item_private.h"
 #include "ender_item_basic_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -35,6 +36,7 @@ struct _Ender_Lib
 	int version;
 	char *name;
 	char *file;
+	void *dl;
 };
 
 static Eina_Hash *_libraries = NULL;
@@ -194,7 +196,28 @@ void ender_lib_item_add(Ender_Lib *thiz, Ender_Item *i)
 	if (!name) return;
 
 	DBG("Adding item %p '%s' %d on '%s' lib", i, name, ender_item_type_get(i), thiz->name);
+	i->lib = thiz;
 	eina_hash_add(thiz->items, name, i);
+}
+
+void ender_lib_load(Ender_Lib *thiz)
+{
+	if (thiz->dl)
+		return;
+
+	DBG("Loading lib '%s'", thiz->file);
+	thiz->dl = dlopen(thiz->file, RTLD_LAZY);
+	if (!thiz->dl)
+	{
+		CRI("Impossible to load the library '%s'", thiz->file);
+	}
+}
+
+void * ender_lib_sym_get(Ender_Lib *thiz, const char *name)
+{
+	ender_lib_load(thiz);
+	DBG("Loading sym '%s' from lib '%s'", name, thiz->name);
+	return dlsym(thiz->dl, name);
 }
 /*============================================================================*
  *                                   API                                      *

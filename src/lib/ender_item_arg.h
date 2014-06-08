@@ -19,7 +19,15 @@
 #ifndef _ENDER_ITEM_ARG_H_
 #define _ENDER_ITEM_ARG_H_
 
+typedef enum _Ender_Item_Arg_Direction
+{
+	ENDER_ITEM_ARG_DIRECTION_IN,
+	ENDER_ITEM_ARG_DIRECTION_OUT,
+	ENDER_ITEM_ARG_DIRECTION_IN_OUT,
+} Ender_Item_Arg_Direction;
+
 EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i);
+EAPI Ender_Item_Arg_Direction ender_item_arg_direction_get(Ender_Item *i);
 EAPI Ender_Transfer_Type ender_item_arg_transfer_get(Ender_Item *i);
 
 #endif

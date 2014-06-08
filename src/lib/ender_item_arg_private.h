@@ -24,5 +24,6 @@
 Ender_Item * ender_item_arg_new(void);
 void ender_item_arg_type_set(Ender_Item *i, Ender_Item *t);
 void ender_item_arg_transfer_set(Ender_Item *i, Ender_Transfer_Type transfer);
+void ender_item_arg_direction_set(Ender_Item *i, Ender_Item_Arg_Direction direction);
 
 #endif
