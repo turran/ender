@@ -23,11 +23,11 @@
     <field name="w" type="double"/>
     <field name="h" type="double"/>
   </struct>
-  <class name="enesim.renderer">
+  <object name="enesim.renderer">
     <ref/>
     <unref/>
-  </class>
-  <class name="enesim.renderer.rectangle" inherits="enesim.renderer">
+  </object>
+  <object name="enesim.renderer.rectangle" inherits="enesim.renderer">
     <ctor/>
-  </class>
+  </object>
 </lib>

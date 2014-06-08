@@ -140,3 +140,31 @@ EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz)
 {
 	return ender_item_ref(thiz->parent);
 }
+
+EAPI const char * ender_item_type_name_get(Ender_Item_Type type)
+{
+	switch (type)
+	{
+		case ENDER_ITEM_TYPE_BASIC:
+		return "basic";
+
+		case ENDER_ITEM_TYPE_FUNCTION:
+		return "function";
+
+		case ENDER_ITEM_TYPE_ATTR:
+		return "attr";
+
+		case ENDER_ITEM_TYPE_ARG:
+		return "arg";
+
+		case ENDER_ITEM_TYPE_OBJECT:
+		return "object";
+
+		case ENDER_ITEM_TYPE_STRUCT:
+		return "struct";
+
+		case ENDER_ITEM_TYPE_INVALID:
+		default:
+		return "invalid";
+	}
+}

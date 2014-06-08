@@ -24,6 +24,7 @@
 #include "ender_item_attr.h"
 #include "ender_item_function.h"
 #include "ender_item_arg.h"
+#include "ender_item_object.h"
 #include "ender_lib.h"
 
 #include "ender_main_private.h"
@@ -32,6 +33,7 @@
 #include "ender_item_struct_private.h"
 #include "ender_item_function_private.h"
 #include "ender_item_arg_private.h"
+#include "ender_item_object_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -68,6 +70,7 @@ typedef struct _Ender_Parser
 	Ender_Library_Case lcase;
 	Ender_Library_Notation lnotation;
 	Enesim_Stream *s;
+	Eina_Bool failed;
 } Ender_Parser;
 
 struct _Ender_Parser_Context {
@@ -127,7 +130,7 @@ static char * _ender_parser_symname_generate(Ender_Parser *thiz, Ender_Item *i)
 	return ret;
 }
 
-/* TODO handle the library case */
+/* TODO handle the library case type */
 static char * _ender_parser_symname_get(Ender_Parser *thiz, Ender_Item *i)
 {
 	char *ret;
@@ -187,7 +190,35 @@ static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
- *                                arg tag                                  *
+ *                                object tag                                  *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_object_ctor(Ender_Parser_Context *c)
+{
+	c->i = ender_item_object_new();
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_object_dtor(Ender_Parser_Context *c)
+{
+}
+
+static Eina_Bool _ender_parser_object_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (!strcmp(key, "name"))
+	{
+		ender_item_name_set(c->i, value);
+		ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                                arg tag                                     *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_arg_ctor(Ender_Parser_Context *c)
 {
@@ -439,7 +470,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "lib", _ender_parser_lib_ctor, _ender_parser_lib_dtor, _ender_parser_lib_attrs_set },
 	{ "type", NULL, NULL, NULL },
 	{ "include", NULL, NULL, NULL },
-	{ "namespace", NULL, NULL, NULL },
+	{ "object", _ender_parser_object_ctor, _ender_parser_object_dtor, _ender_parser_object_attrs_set },
 	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
 	{ "field", _ender_parser_field_ctor, _ender_parser_field_dtor, _ender_parser_field_attrs_set },
 	{ "method", _ender_parser_method_ctor, _ender_parser_method_dtor, _ender_parser_method_attrs_set },
@@ -487,31 +518,56 @@ static Ender_Parser_Context * _ender_parser_tag_new(Ender_Parser *thiz,
 	const char *attrs = NULL;
 	int attr_length = 0;
 
-	/* TODO check if we already have a context, if so, check if it can create a new child */
 	c = calloc(1, sizeof(Ender_Parser_Context));
-	c->tag = _ender_parser_get_tag(content);
 	c->parser = thiz;
 
-	/* TODO call the creator */
+	/* if the parser has failed, keep failing */
+	if (thiz->failed)
+	{
+		thiz->failed++;
+		goto done;
+	}
+
+	c->tag = _ender_parser_get_tag(content);
 	if (c->tag)
 	{
 		if (c->tag->ctor_cb)
-			c->tag->ctor_cb(c);
-		attrs = eina_simple_xml_tag_attributes_find(content, length);
-		eina_simple_xml_attributes_parse(attrs, length, _ender_parser_attrs_set_cb, c);
+		{
+			if (c->tag->ctor_cb(c))
+			{
+				attrs = eina_simple_xml_tag_attributes_find(content, length);
+				eina_simple_xml_attributes_parse(attrs, length, _ender_parser_attrs_set_cb, c);
+			}
+			else
+			{
+				ERR("The parsing of tag '%s' has failed", c->tag->name);
+				thiz->failed++;
+			}
+		}
 	}
 
+done:		
 	return c;
 }
 
 static void _ender_parser_context_free(Ender_Parser_Context *c)
 {
+	Ender_Parser *thiz;
+
+	thiz = c->parser;
 	if (c)
 	{
 		if (c->tag)
 		{
-			if (c->tag->dtor_cb)
-				c->tag->dtor_cb(c);
+			if (thiz->failed)
+			{
+				thiz->failed--;
+			}
+			else
+			{
+				if (c->tag->dtor_cb)
+					c->tag->dtor_cb(c);
+			}
 		}
 		if (c->i)
 			ender_item_unref(c->i);

@@ -7,6 +7,7 @@ src/lib/Ender.h \
 src/lib/ender_item.h \
 src/lib/ender_item_struct.h \
 src/lib/ender_item_basic.h \
+src/lib/ender_item_object.h \
 src/lib/ender_item_arg.h \
 src/lib/ender_item_attr.h \
 src/lib/ender_item_function.h \
@@ -27,6 +28,8 @@ src/lib/ender_item_attr.c \
 src/lib/ender_item_attr_private.h \
 src/lib/ender_item_basic.c \
 src/lib/ender_item_basic_private.h \
+src/lib/ender_item_object.c \
+src/lib/ender_item_object_private.h \
 src/lib/ender_item_struct.c \
 src/lib/ender_item_struct_private.h \
 src/lib/ender_item_function.c \
