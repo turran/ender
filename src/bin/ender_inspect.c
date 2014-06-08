@@ -109,18 +109,18 @@ static void lib_dump(const Ender_Lib *l)
 	EINA_LIST_FREE(items, i)
 	{
 		Ender_Item *f;
-		Eina_List *items;
+		Eina_List *subitems;
 
 		printf("  %s\n", ender_item_name_get(i));
-		items = ender_item_struct_fields_get(i);
-		EINA_LIST_FREE(items, f)
+		subitems = ender_item_struct_fields_get(i);
+		EINA_LIST_FREE(subitems, f)
 		{
 			attr_dump(f, 4);
 			ender_item_unref(f);
 		}
 		printf("    Functions:\n");
-		items = ender_item_struct_functions_get(i);
-		EINA_LIST_FREE(items, f)
+		subitems = ender_item_struct_functions_get(i);
+		EINA_LIST_FREE(subitems, f)
 		{
 			function_dump(f, 8);
 			ender_item_unref(f);
@@ -129,12 +129,23 @@ static void lib_dump(const Ender_Lib *l)
 	}
 	/* objects */
 	printf("Objects:\n");
-#if 0
 	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_OBJECT);
 	EINA_LIST_FREE(items, i)
 	{
+		Ender_Item *f;
+		Eina_List *subitems;
+
+		printf("  %s\n", ender_item_name_get(i));
+
+		printf("    Functions:\n");
+		subitems = ender_item_object_functions_get(i);
+		EINA_LIST_FREE(subitems, f)
+		{
+			function_dump(f, 8);
+			ender_item_unref(f);
+		}
+		ender_item_unref(i);
 	}
-#endif
 }
 
 int main(int argc, char **argv)

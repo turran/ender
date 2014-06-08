@@ -290,7 +290,7 @@ static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 {
-	Ender_Parser_Function *f;
+	Ender_Parser_Function *thiz;
 	Ender_Parser_Context *parent;
 
 	parent = _ender_parser_parent_context_get(c->parser);
@@ -301,8 +301,8 @@ static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 		return EINA_FALSE;
 	}
 	/* our private context */
-	f = calloc(1, sizeof(Ender_Parser_Field));
-	c->prv = f;
+	thiz = calloc(1, sizeof(Ender_Parser_Field));
+	c->prv = thiz;
 	c->i = ender_item_function_new();
 
 	/* set it as method */
@@ -322,7 +322,7 @@ static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 
 static void _ender_parser_method_dtor(Ender_Parser_Context *c)
 {
-	Ender_Parser_Function *f = c->prv;
+	Ender_Parser_Function *thiz = c->prv;
 	Ender_Parser_Context *parent;
 	Ender_Item *p;
 
@@ -334,25 +334,95 @@ static void _ender_parser_method_dtor(Ender_Parser_Context *c)
 	ender_item_unref(p);
 
 	/* set the symbol name */
-	if (!f->symname)
-		f->symname = _ender_parser_symname_get(c->parser, c->i);
-	ender_item_function_symname_set(c->i, f->symname);
+	if (!thiz->symname)
+		thiz->symname = _ender_parser_symname_get(c->parser, c->i);
+	ender_item_function_symname_set(c->i, thiz->symname);
 	
 	/* free our private context */
-	if (f->symname)
-		free(f->symname);
-	free(f);
+	if (thiz->symname)
+		free(thiz->symname);
+	free(thiz);
 	c->prv = NULL;
 }
 
 static Eina_Bool _ender_parser_method_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
-	Ender_Parser_Function *f = c->prv;
+	Ender_Parser_Function *thiz = c->prv;
 
 	if (_ender_parser_item_attrs_set(c, key, value))
 		return EINA_TRUE;
-	return EINA_FALSE;
+	else if (!strcmp(key, "symname"))
+	{
+		thiz->symname = strdup(value);
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                                 ctor tag                                   *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_ctor_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *thiz;
+	Ender_Parser_Context *parent;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	if ((!parent) || (!parent->i) ||
+			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_OBJECT))
+	{
+		ERR("A ctor must be a child of an object");
+		return EINA_FALSE;
+	}
+
+	thiz = calloc(1, sizeof(Ender_Parser_Function));
+	c->i = ender_item_function_new();
+	ender_item_name_set(c->i, "new");
+	c->prv = thiz;
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_ctor_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *thiz;
+	Ender_Parser_Context *parent;
+
+	thiz = c->prv;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	ender_item_object_function_add(parent->i, ender_item_ref(c->i));
+
+	/* set the symbol name */
+	if (!thiz->symname)
+		thiz->symname = _ender_parser_symname_get(c->parser, c->i);
+	ender_item_function_symname_set(c->i, thiz->symname);
+	
+	/* free our private context */
+	if (thiz->symname)
+		free(thiz->symname);
+	free(thiz);
+	c->prv = NULL;
+}
+
+static Eina_Bool _ender_parser_ctor_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	Ender_Parser_Function *thiz;
+
+	thiz = c->prv;
+	if (!strcmp(key, "symname"))
+	{
+		thiz->symname = strdup(value);
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                                field tag                                  *
@@ -474,6 +544,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
 	{ "field", _ender_parser_field_ctor, _ender_parser_field_dtor, _ender_parser_field_attrs_set },
 	{ "method", _ender_parser_method_ctor, _ender_parser_method_dtor, _ender_parser_method_attrs_set },
+	{ "ctor", _ender_parser_ctor_ctor, _ender_parser_ctor_dtor, _ender_parser_ctor_attrs_set },
 	{ "arg", _ender_parser_arg_ctor, _ender_parser_arg_dtor, _ender_parser_arg_attrs_set },
 	{ "class", NULL, NULL, NULL },
 };

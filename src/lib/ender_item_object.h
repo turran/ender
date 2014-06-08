@@ -16,9 +16,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_ITEM_CLASS_H_
-#define _ENDER_ITEM_CLASS_H_
+#ifndef _ENDER_ITEM_OBJECT_H_
+#define _ENDER_ITEM_OBJECT_H_
 
-EAPI Eina_List * ender_item_class_functions_get(Ender_Item *i);
+EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i);
 
 #endif
