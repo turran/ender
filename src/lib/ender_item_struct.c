@@ -75,6 +75,10 @@ static void _ender_item_struct_instance_deinit(void *o)
 	{
 		ender_item_unref(f);
 	}
+	EINA_LIST_FOREACH(thiz->functions, l, f)
+	{
+		ender_item_unref(f);
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
