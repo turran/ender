@@ -28,6 +28,9 @@ typedef enum _Ender_Item_Function_Flags
 {
 	ENDER_ITEM_FUNCTION_FLAG_IS_METHOD = (1 << 0),
 	ENDER_ITEM_FUNCTION_FLAG_THROWS    = (1 << 1),
+	ENDER_ITEM_FUNCTION_FLAG_CTOR      = (1 << 2),
+	ENDER_ITEM_FUNCTION_FLAG_REF       = (1 << 3),
+	ENDER_ITEM_FUNCTION_FLAG_UNREF     = (1 << 4),
 } Ender_Item_Function_Flags;
 
 EAPI Eina_List * ender_item_function_args_get(Ender_Item *i);

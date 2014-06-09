@@ -22,6 +22,7 @@
 #include "ender_item.h"
 #include "ender_item_object.h"
 #include "ender_item_attr.h"
+#include "ender_item_function.h"
 
 #include "ender_main_private.h"
 #include "ender_item_attr_private.h"
@@ -35,6 +36,9 @@
 typedef struct _Ender_Item_Object
 {
 	Ender_Item base;
+	Ender_Item *inherit;
+	Ender_Item *ref;
+	Ender_Item *unref;
 	Eina_List *functions;
 } Ender_Item_Object;
 
@@ -42,6 +46,13 @@ typedef struct _Ender_Item_Object_Object
 {
 	Ender_Item_Object base;
 } Ender_Item_Object_Object;
+
+static void _ender_item_object_function_add(Ender_Item_Object *thiz,
+		Ender_Item *f)
+{
+	thiz->functions = eina_list_append(thiz->functions, f);
+	ender_item_parent_set(f, ENDER_ITEM(thiz));
+}
 
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -85,10 +96,21 @@ Ender_Item * ender_item_object_new(void)
 	return i;
 }
 
+void ender_item_object_inherit_set(Ender_Item *i, Ender_Item *in)
+{
+	Ender_Item_Object *thiz;
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	if (thiz->inherit)
+		ender_item_unref(thiz->inherit);
+	thiz->inherit = in;
+}
+
 void ender_item_object_function_add(Ender_Item *i, Ender_Item *f)
 {
 	Ender_Item_Object *thiz;
 	Ender_Item_Type type;
+	int flags;
 
 	type = ender_item_type_get(f);
 	if (type != ENDER_ITEM_TYPE_FUNCTION)
@@ -96,10 +118,22 @@ void ender_item_object_function_add(Ender_Item *i, Ender_Item *f)
 		ender_item_unref(f);
 		return;
 	}
-		
+
+	flags = ender_item_function_flags_get(f);
+	if (flags & ENDER_ITEM_FUNCTION_FLAG_UNREF)
+	{
+		if (!thiz->unref)
+			thiz->unref = ender_item_ref(f);
+	}
+
+	if (flags & ENDER_ITEM_FUNCTION_FLAG_REF)
+	{
+		if (!thiz->ref)
+			thiz->ref = ender_item_ref(f);
+	}
+
 	thiz = ENDER_ITEM_OBJECT(i);
-	thiz->functions = eina_list_append(thiz->functions, f);
-	ender_item_parent_set(f, i);
+	_ender_item_object_function_add(thiz, f);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -117,4 +151,55 @@ EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i)
 		ret = eina_list_append(ret, ender_item_ref(f));
 	}
 	return ret;
+}
+
+EAPI Eina_List * ender_item_object_ctor_get(Ender_Item *i)
+{
+	Ender_Item_Object *thiz;
+	Ender_Item *f;
+	Eina_List *l;
+	Eina_List *ret = NULL;
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	EINA_LIST_FOREACH(thiz->functions, l, f)
+	{
+		int flags;
+
+		flags = ender_item_function_flags_get(f);
+		if (flags & ENDER_ITEM_FUNCTION_FLAG_CTOR)
+			ret = eina_list_append(ret, ender_item_ref(f));
+	}
+	return ret;
+}
+
+EAPI Eina_Bool ender_item_object_ref(Ender_Item *i, void *o)
+{
+	Ender_Item_Object *thiz;
+	Ender_Value args[2];
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	if (!thiz->ref)
+	{
+		if (!thiz->inherit)
+			return EINA_FALSE;
+		return ender_item_object_ref(thiz->inherit, o);
+	}
+	args[0].ptr = o;
+	return ender_item_function_call(i, args);
+}
+
+EAPI Eina_Bool ender_item_object_unref(Ender_Item *i, void *o)
+{
+	Ender_Item_Object *thiz;
+	Ender_Value args[1];
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	if (!thiz->unref)
+	{
+		if (!thiz->inherit)
+			return EINA_FALSE;
+		return ender_item_object_ref(thiz->inherit, o);
+	}
+	args[0].ptr = o;
+	return ender_item_function_call(i, args);
 }

@@ -222,7 +222,7 @@ EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 	return ender_item_ref(thiz->ret);
 }
 
-Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args)
+EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args)
 {
 	Ender_Item_Function *thiz;
 	Ender_Item *a;
