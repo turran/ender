@@ -189,9 +189,79 @@ static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
 	}
 	return EINA_TRUE;
 }
+
+/*----------------------------------------------------------------------------*
+ *                               function tag                                 *
+ *----------------------------------------------------------------------------*/
+static void _ender_parser_function_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *thiz;
+
+	thiz = calloc(1, sizeof(Ender_Parser_Function));
+	c->i = ender_item_function_new();
+	c->prv = thiz;
+}
+
+static void _ender_parser_function_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Function *thiz;
+
+	thiz = c->prv;
+	/* set the symbol name */
+	if (!thiz->symname)
+		thiz->symname = _ender_parser_symname_get(c->parser, c->i);
+	ender_item_function_symname_set(c->i, thiz->symname);
+
+	/* free our private context */
+	if (thiz->symname)
+		free(thiz->symname);
+	free(thiz);
+	c->prv = NULL;
+}
+
+static Eina_Bool _ender_parser_function_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	Ender_Parser_Function *thiz;
+
+	thiz = c->prv;
+	if (!strcmp(key, "symname"))
+	{
+		thiz->symname = strdup(value);
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
 /*----------------------------------------------------------------------------*
  *                                object tag                                  *
  *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_object_function_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Context *parent;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	if ((!parent) || (!parent->i) ||
+			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_OBJECT))
+	{
+		ERR("A ctor must be a child of an object");
+		return EINA_FALSE;
+	}
+	_ender_parser_function_ctor(c);
+	return EINA_TRUE;
+}
+
+static void _ender_parser_object_function_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Context *parent;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	ender_item_object_function_add(parent->i, ender_item_ref(c->i));
+	_ender_parser_function_dtor(c);
+}
+
 static Eina_Bool _ender_parser_object_ctor(Ender_Parser_Context *c)
 {
 	c->i = ender_item_object_new();
@@ -352,10 +422,8 @@ static Eina_Bool _ender_parser_method_attrs_set(Ender_Parser_Context *c,
 
 	if (_ender_parser_item_attrs_set(c, key, value))
 		return EINA_TRUE;
-	else if (!strcmp(key, "symname"))
-	{
-		thiz->symname = strdup(value);
-	}
+	else if (_ender_parser_function_attrs_set(c, key, value))
+		return EINA_TRUE;
 	else
 	{
 		return EINA_FALSE;
@@ -367,57 +435,25 @@ static Eina_Bool _ender_parser_method_attrs_set(Ender_Parser_Context *c,
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_ctor_ctor(Ender_Parser_Context *c)
 {
-	Ender_Parser_Function *thiz;
-	Ender_Parser_Context *parent;
-
-	parent = _ender_parser_parent_context_get(c->parser);
-	if ((!parent) || (!parent->i) ||
-			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_OBJECT))
-	{
-		ERR("A ctor must be a child of an object");
+	if (!_ender_parser_object_function_ctor(c))
 		return EINA_FALSE;
-	}
 
-	thiz = calloc(1, sizeof(Ender_Parser_Function));
-	c->i = ender_item_function_new();
+	ender_item_function_flags_set(c->i, ENDER_ITEM_FUNCTION_FLAG_CTOR);
 	ender_item_name_set(c->i, "new");
-	c->prv = thiz;
 
 	return EINA_TRUE;
 }
 
 static void _ender_parser_ctor_dtor(Ender_Parser_Context *c)
 {
-	Ender_Parser_Function *thiz;
-	Ender_Parser_Context *parent;
-
-	thiz = c->prv;
-
-	parent = _ender_parser_parent_context_get(c->parser);
-	ender_item_object_function_add(parent->i, ender_item_ref(c->i));
-
-	/* set the symbol name */
-	if (!thiz->symname)
-		thiz->symname = _ender_parser_symname_get(c->parser, c->i);
-	ender_item_function_symname_set(c->i, thiz->symname);
-	
-	/* free our private context */
-	if (thiz->symname)
-		free(thiz->symname);
-	free(thiz);
-	c->prv = NULL;
+	_ender_parser_object_function_dtor(c);
 }
 
 static Eina_Bool _ender_parser_ctor_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
-	Ender_Parser_Function *thiz;
-
-	thiz = c->prv;
-	if (!strcmp(key, "symname"))
-	{
-		thiz->symname = strdup(value);
-	}
+	if (_ender_parser_function_attrs_set(c, key, value))
+		return EINA_TRUE;
 	else
 	{
 		return EINA_FALSE;
@@ -425,7 +461,7 @@ static Eina_Bool _ender_parser_ctor_attrs_set(Ender_Parser_Context *c,
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
- *                                field tag                                  *
+ *                                 field tag                                  *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_field_ctor(Ender_Parser_Context *c)
 {
