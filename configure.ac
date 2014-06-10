@@ -56,6 +56,7 @@ AM_CONDITIONAL([HAVE_WIN32], [test "x${have_win32}" = "xyes"])
 
 AC_PROG_CC
 AM_PROG_CC_C_O
+ENS_CHECK_COMPILER_FLAGS([ENDER], [-Wall])
 
 # pkg-config
 PKG_PROG_PKG_CONFIG
@@ -89,8 +90,12 @@ if test "x${have_win32}" = "xyes" ; then
    requirements_ender_pc="${requirements_ender_pc} evil >= 1.7.0"
 fi
 
-PKG_CHECK_MODULES([ENDER], [${requirements_ender_pc}])
+PKG_CHECK_MODULES([REQUIREMENTS], [${requirements_ender_pc}])
 AC_SUBST([requirements_ender_pc])
+
+ENDER_CFLAGS="${ENDER_CFLAGS} ${REQUIREMENTS_CFLAGS}"
+ENDER_LIBS="${REQUIREMENTS_LIBS}"
+AC_SUBST(ENDER_LIBS)
 
 ### Checks for library functions
 
