@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
 <lib name="enesim" version="1" case="underscore">
   <include name="eina" version="1"/>
+  <function name="enesim.init"/>
+  <function name="enesim.deinit"/>
+  <enum name="enesim.format">
+    <value name="none"/>
+    <value name="argb8888"/>
+    <value name="a8"/>
+  </enum>
+  <enum name="enesim.rop">
+    <value name="blend"/>
+    <value name="fill"/>
+  </enum>
   <struct name="enesim.matrix">
     <field name="xx" type="double"/>
     <field name="xy" type="double"/>
@@ -23,11 +34,40 @@
     <field name="w" type="double"/>
     <field name="h" type="double"/>
   </struct>
-  <object name="enesim.renderer">
+  <object name="enesim.surface">
+    <ctor>
+      <arg name="f" type="enesim.format"/>
+      <arg name="w" type="int32"/>
+      <arg name="h" type="int32"/>
+    </ctor>
     <ref/>
     <unref/>
   </object>
-  <object name="enesim.renderer.rectangle" inherits="enesim.renderer">
+  <object name="enesim.log">
+  </object>
+  <object name="enesim.renderer">
+    <ref/>
+    <unref/>
+    <method name="draw">
+      <arg name="s" type="enesim.surface"/>
+      <arg name="rop" type="enesim.rop"/>
+      <arg name="clip" type="enesim.rectangle"/>
+      <arg name="x" type="int32"/>
+      <arg name="y" type="int32"/>
+      <arg name="log" type="enesim.log" direction="out"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.shape" inherits="enesim.renderer"/>
+  <object name="enesim.renderer.line" inherits="enesim.renderer.shape">
+    <ctor/>
+  </object>
+  <object name="enesim.renderer.ellipse" inherits="enesim.renderer.shape">
+    <ctor/>
+  </object>
+  <object name="enesim.renderer.circle" inherits="enesim.renderer.shape">
+    <ctor/>
+  </object>
+  <object name="enesim.renderer.rectangle" inherits="enesim.renderer.shape">
     <ctor/>
   </object>
 </lib>
