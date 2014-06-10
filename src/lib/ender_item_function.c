@@ -190,6 +190,9 @@ EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 	Eina_List *l;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
+	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
+		ret = eina_list_append(ret, ender_item_parent_get(i));
+
 	EINA_LIST_FOREACH(thiz->args, l, i)
 	{
 		ret = eina_list_append(ret, ender_item_ref(i));
@@ -203,7 +206,10 @@ EAPI int ender_item_function_args_count(Ender_Item *i)
 	int ret;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
-	return eina_list_count(thiz->args);
+	ret = eina_list_count(thiz->args);
+	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
+		ret++;
+	return ret;
 }
 
 EAPI int ender_item_function_flags_get(Ender_Item *i)
@@ -219,7 +225,10 @@ EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 	Ender_Item_Function *thiz;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
-	return ender_item_ref(thiz->ret);
+	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_CTOR)
+		return ender_item_parent_get(i);
+	else
+		return ender_item_ref(thiz->ret);
 }
 
 EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args)
