@@ -135,9 +135,6 @@ static void lib_dump(const Ender_Lib *l)
 	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_ENUM);
 	EINA_LIST_FREE(items, i)
 	{
-		Ender_Item *f;
-		Eina_List *subitems;
-
 		printf("  %s\n", ender_item_name_get(i));
 		/* TODO values */
 		/* TODO functions */

@@ -18,6 +18,10 @@
 #ifndef _ENDER_PRIVATE_H
 #define _ENDER_PRIVATE_H
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

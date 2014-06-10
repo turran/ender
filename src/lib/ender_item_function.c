@@ -21,6 +21,7 @@
 #include "ender_value.h"
 #include "ender_item.h"
 #include "ender_item_function.h"
+#include "ender_item_basic.h"
 #include "ender_item_arg.h"
 
 #include "ender_main_private.h"
@@ -58,7 +59,10 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 	{
 		case ENDER_ITEM_TYPE_BASIC:
 		{
-			switch (ender_item_basic_value_type_get(i))
+			Ender_Value_Type vt;
+
+			vt = ender_item_basic_value_type_get(i);
+			switch (vt)
 			{
 				case ENDER_VALUE_TYPE_BOOL:
 				return &ffi_type_uint8;
@@ -88,6 +92,11 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 				case ENDER_VALUE_TYPE_POINTER:
 				return &ffi_type_pointer;
 				break;
+
+				default:
+				ERR("Unsupported item type '%d'", vt);
+				return &ffi_type_pointer;
+				break;
 			}
 		}
 		break;
@@ -107,6 +116,7 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 		return &ffi_type_pointer;
 		break;
 	}
+	
 }
 
 /*----------------------------------------------------------------------------*
@@ -158,6 +168,11 @@ void ender_item_function_symname_set(Ender_Item *i, const char *symname)
 	Ender_Item_Function *thiz;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
+	if (thiz->symname)
+	{
+		WRN("Symname already set");
+		return;
+	}
 	thiz->symname = strdup(symname);
 }
 
@@ -287,7 +302,6 @@ EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args, Ender_
 	int ffi_arg = 0;
 	int arg = 0;
 	int nargs;
-	int j;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
 
@@ -300,7 +314,7 @@ EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args, Ender_
 		return EINA_FALSE;
 	}
 
-	/* passed the args as ffi args */
+	/* pass the args as ffi args */
 	nargs = eina_list_count(thiz->args);
 	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
 		nargs++;

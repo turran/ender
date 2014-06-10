@@ -16,11 +16,18 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_ITEM_OBJECT_H_
-#define _ENDER_ITEM_OBJECT_H_
+#ifndef _ENDER_ITEM_CONSTANT_H
+#define _ENDER_ITEM_CONSTANT_H
 
-EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i);
-EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i);
-EAPI Eina_List * ender_item_object_ctor_get(Ender_Item *i);
+/**
+ * @defgroup Ender_Constant_Group Constant
+ * @{
+ */
 
+EAPI Ender_Item * ender_item_constant_type_get(Ender_Item *i);
+EAPI void ender_item_constant_value_get(Ender_Item *i, Ender_Value *v);
+
+/**
+ * @}
+ */
 #endif

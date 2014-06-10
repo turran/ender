@@ -20,71 +20,99 @@
 #include "ender_main.h"
 #include "ender_value.h"
 #include "ender_item.h"
-#include "ender_item_arg.h"
+#include "ender_item_constant.h"
 
 #include "ender_main_private.h"
-#include "ender_item_arg_private.h"
+#include "ender_item_constant_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENDER_ITEM_ARG(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
-		Ender_Item_Arg, ender_item_arg_descriptor_get())
+#define ENDER_ITEM_CONSTANT(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
+		Ender_Item_Constant, ender_item_constant_descriptor_get())
 
-typedef struct _Ender_Item_Arg
+typedef struct _Ender_Item_Constant
 {
 	Ender_Item base;
 	Ender_Item *type;
-	Ender_Transfer_Type transfer;
-	Ender_Item_Arg_Direction direction;
-} Ender_Item_Arg;
+	Ender_Value value;
+	char *symname;
+	void *sym;
+} Ender_Item_Constant;
 
-typedef struct _Ender_Item_Arg_Class
+typedef struct _Ender_Item_Constant_Class
 {
 	Ender_Item_Class base;
-} Ender_Item_Arg_Class;
+} Ender_Item_Constant_Class;
 
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
 ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
-		Ender_Item_Arg, Ender_Item_Arg_Class,
-		ender_item_arg);
+		Ender_Item_Constant, Ender_Item_Constant_Class,
+		ender_item_constant);
 
-static void _ender_item_arg_class_init(void *k)
+static void _ender_item_constant_class_init(void *k)
 {
 }
 
-static void _ender_item_arg_instance_init(void *o)
+static void _ender_item_constant_instance_init(void *o)
 {
 	Ender_Item *i;
 
 	i = ENDER_ITEM(o);
-	i->type = ENDER_ITEM_TYPE_ARG;
+	i->type = ENDER_ITEM_TYPE_CONSTANT;
 }
 
-static void _ender_item_arg_instance_deinit(void *o)
+static void _ender_item_constant_instance_deinit(void *o)
 {
-	Ender_Item_Arg *thiz;
+	Ender_Item_Constant *thiz;
 
-	thiz = ENDER_ITEM_ARG(o);
+	thiz = ENDER_ITEM_CONSTANT(o);
 	ender_item_unref(thiz->type);
 }
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Ender_Item * ender_item_arg_new(void)
+Ender_Item * ender_item_constant_new(void)
 {
 	Ender_Item *i;
 
-	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_arg);
+	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_constant);
 	return i;
 }
 
-void ender_item_arg_type_set(Ender_Item *i, Ender_Item *t)
+void ender_item_constant_symname_set(Ender_Item *i, const char *symname)
 {
-	Ender_Item_Arg *thiz;
+	Ender_Item_Constant *thiz;
 
-	thiz = ENDER_ITEM_ARG(i);
+	thiz = ENDER_ITEM_CONSTANT(i);
+	if (thiz->symname)
+	{
+		WRN("Symname already set");
+		return;
+	}
+	thiz->symname = strdup(symname);
+}
+
+void ender_item_constant_value_set(Ender_Item *i, Ender_Value *value)
+{
+	Ender_Item_Constant *thiz;
+	Ender_Item_Type type;
+
+	thiz = ENDER_ITEM_CONSTANT(i);
+	if (!value)
+	{
+		WRN("No value to set");
+		return;
+	}
+	thiz->value = *value;
+}
+
+void ender_item_constant_type_set(Ender_Item *i, Ender_Item *t)
+{
+	Ender_Item_Constant *thiz;
+
+	thiz = ENDER_ITEM_CONSTANT(i);
 	if (thiz->type)
 	{
 		WRN("Type already set");
@@ -93,45 +121,28 @@ void ender_item_arg_type_set(Ender_Item *i, Ender_Item *t)
 	}
 	thiz->type = t;
 }
-
-void ender_item_arg_transfer_set(Ender_Item *i, Ender_Transfer_Type transfer)
-{
-	Ender_Item_Arg *thiz;
-
-	thiz = ENDER_ITEM_ARG(i);
-	thiz->transfer = transfer;
-}
-
-void ender_item_arg_direction_set(Ender_Item *i, Ender_Item_Arg_Direction direction)
-{
-	Ender_Item_Arg *thiz;
-
-	thiz = ENDER_ITEM_ARG(i);
-	thiz->direction = direction;
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i)
+EAPI Ender_Item * ender_item_constant_type_get(Ender_Item *i)
 {
-	Ender_Item_Arg *thiz;
+	Ender_Item_Constant *thiz;
 
-	thiz = ENDER_ITEM_ARG(i);
+	thiz = ENDER_ITEM_CONSTANT(i);
 	return ender_item_ref(thiz->type);
 }
 
-EAPI Ender_Transfer_Type ender_item_arg_transfer_get(Ender_Item *i)
+EAPI void ender_item_constant_value_get(Ender_Item *i, Ender_Value *v)
 {
-	Ender_Item_Arg *thiz;
+	Ender_Item_Constant *thiz;
 
-	thiz = ENDER_ITEM_ARG(i);
-	return thiz->transfer;
-}
-
-EAPI Ender_Item_Arg_Direction ender_item_arg_direction_get(Ender_Item *i)
-{
-	Ender_Item_Arg *thiz;
-
-	thiz = ENDER_ITEM_ARG(i);
-	return thiz->direction;
+	thiz = ENDER_ITEM_CONSTANT(i);
+	/* in case the constant is a symbol, load it */
+	if (thiz->symname && !thiz->sym)
+	{
+		thiz->sym = ender_item_sym_get(i, thiz->symname);
+		/* convert the symbol to a value */
+		WRN("Get the real value");
+	}
+	*v = thiz->value;
 }

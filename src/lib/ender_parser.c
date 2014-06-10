@@ -25,6 +25,8 @@
 #include "ender_item_function.h"
 #include "ender_item_arg.h"
 #include "ender_item_object.h"
+#include "ender_item_constant.h"
+#include "ender_item_enum.h"
 #include "ender_lib.h"
 
 #include "ender_main_private.h"
@@ -35,6 +37,7 @@
 #include "ender_item_arg_private.h"
 #include "ender_item_object_private.h"
 #include "ender_item_enum_private.h"
+#include "ender_item_constant_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -88,6 +91,10 @@ typedef struct _Ender_Parser_Field {
 typedef struct _Ender_Parser_Function {
 	char *symname;
 } Ender_Parser_Function;
+
+typedef struct _Ender_Parser_Value {
+	char *value;
+} Ender_Parser_Value;
 
 /*----------------------------------------------------------------------------*
  *                                 helpers                                    *
@@ -540,6 +547,96 @@ static Eina_Bool _ender_parser_ctor_attrs_set(Ender_Parser_Context *c,
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
+ *                                 value tag                                  *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_value_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Value *thiz;
+	Ender_Parser_Context *parent;
+	Ender_Item *i32;
+
+	/* a value can only be child of the main lib */
+	parent = _ender_parser_parent_context_get(c->parser);
+	if (!parent)
+		return EINA_FALSE;
+	if (parent->i)
+	{
+		Ender_Item_Type type = ender_item_type_get(parent->i);
+		if (type != ENDER_ITEM_TYPE_ENUM)
+			return EINA_FALSE;
+	}
+
+	c->i = ender_item_constant_new();
+	c->prv = calloc(1, sizeof(Ender_Parser_Value));
+
+	/* for enum values the type is always an int32 */
+	i32 = ender_lib_item_find(c->parser->lib, "int32");
+	ender_item_constant_type_set(c->i, i32);
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_value_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Value *thiz;
+	Ender_Parser_Context *parent;
+	
+	parent = _ender_parser_parent_context_get(c->parser);
+	thiz = c->prv;
+	if (thiz->value)
+	{
+		/* TODO parse the value */
+		WRN("TODO");
+		free(thiz->value);
+	}
+	else
+	{
+		Ender_Item *i;
+		Ender_Value v;
+		Eina_List *values;
+
+		/* pick the last value and autoincrement it */
+		values = ender_item_enum_values_get(parent->i);
+		if (values)
+		{
+			Eina_List *last;
+
+			last = eina_list_last(values);
+			ender_item_constant_value_get(last->data, &v);
+			/* auto increment the value */
+			v.i32++;
+		}
+		else
+		{
+			v.i32 = 0;
+		}
+		ender_item_constant_value_set(c->i, &v);
+		EINA_LIST_FREE(values, i)
+			ender_item_unref(i);
+	}
+	ender_item_enum_value_add(parent->i, ender_item_ref(c->i));
+	free(thiz);
+}
+
+static Eina_Bool _ender_parser_value_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	Ender_Parser_Value *thiz;
+	
+	thiz = c->prv;
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
+	else if (!strcmp(key, "value"))
+	{
+		thiz->value = strdup(value);
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
  *                                 enum tag                                  *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_enum_ctor(Ender_Parser_Context *c)
@@ -697,6 +794,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "object", _ender_parser_object_ctor, _ender_parser_object_dtor, _ender_parser_object_attrs_set },
 	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
 	{ "enum", _ender_parser_enum_ctor, _ender_parser_enum_dtor, _ender_parser_enum_attrs_set },
+	{ "value", _ender_parser_value_ctor, _ender_parser_value_dtor, _ender_parser_value_attrs_set },
 	{ "field", _ender_parser_field_ctor, _ender_parser_field_dtor, _ender_parser_field_attrs_set },
 	{ "method", _ender_parser_method_ctor, _ender_parser_method_dtor, _ender_parser_method_attrs_set },
 	{ "function", _ender_parser_function_ctor, _ender_parser_function_dtor, _ender_parser_function_attrs_set },

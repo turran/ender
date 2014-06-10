@@ -21,6 +21,7 @@
 #include "ender_item.h"
 #include "ender_lib.h"
 #include "ender_value.h"
+#include "ender_parser.h"
 
 #include "ender_main_private.h"
 #include "ender_lib_private.h"
@@ -166,7 +167,8 @@ void ender_lib_name_set(Ender_Lib *thiz, const char *name)
 		return;
 	}
 	thiz->name = strdup(name);
-	asprintf(&thiz->file, "lib%s.so", name);
+	if (asprintf(&thiz->file, "lib%s.so", name) < 0)
+		return;
 }
 
 void ender_lib_dependency_add(Ender_Lib *thiz, const Ender_Lib *dep)

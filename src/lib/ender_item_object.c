@@ -112,6 +112,7 @@ void ender_item_object_function_add(Ender_Item *i, Ender_Item *f)
 	Ender_Item_Type type;
 	int flags;
 
+	thiz = ENDER_ITEM_OBJECT(i);
 	type = ender_item_type_get(f);
 	if (type != ENDER_ITEM_TYPE_FUNCTION)
 	{
@@ -132,12 +133,19 @@ void ender_item_object_function_add(Ender_Item *i, Ender_Item *f)
 			thiz->ref = ender_item_ref(f);
 	}
 
-	thiz = ENDER_ITEM_OBJECT(i);
 	_ender_item_object_function_add(thiz, f);
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i)
+{
+	Ender_Item_Object *thiz;
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	return ender_item_ref(thiz->inherit);
+}
+
 EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;

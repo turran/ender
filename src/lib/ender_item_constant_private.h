@@ -16,11 +16,16 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_ITEM_OBJECT_H_
-#define _ENDER_ITEM_OBJECT_H_
+#ifndef _ENDER_ITEM_CONSTANT_PRIVATE_H_
+#define _ENDER_ITEM_CONSTANT_PRIVATE_H_
 
-EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i);
-EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i);
-EAPI Eina_List * ender_item_object_ctor_get(Ender_Item *i);
+#include "ender_item_private.h"
+
+Ender_Item * ender_item_constant_new(void);
+void ender_item_constant_symname_set(Ender_Item *i, const char *symname);
+void ender_item_constant_value_set(Ender_Item *i, Ender_Value *value);
+void ender_item_constant_type_set(Ender_Item *i, Ender_Item *t);
+
 
 #endif
+

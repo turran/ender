@@ -10,6 +10,7 @@ src/lib/ender_item_basic.h \
 src/lib/ender_item_object.h \
 src/lib/ender_item_arg.h \
 src/lib/ender_item_attr.h \
+src/lib/ender_item_constant.h \
 src/lib/ender_item_function.h \
 src/lib/ender_item_enum.h \
 src/lib/ender_lib.h \
@@ -33,6 +34,8 @@ src/lib/ender_item_object.c \
 src/lib/ender_item_object_private.h \
 src/lib/ender_item_struct.c \
 src/lib/ender_item_struct_private.h \
+src/lib/ender_item_constant.c \
+src/lib/ender_item_constant_private.h \
 src/lib/ender_item_function.c \
 src/lib/ender_item_function_private.h \
 src/lib/ender_item_enum.c \
