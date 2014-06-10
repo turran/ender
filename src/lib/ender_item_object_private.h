@@ -22,6 +22,7 @@
 #include "ender_item_private.h"
 
 Ender_Item * ender_item_object_new(void);
+void ender_item_object_inherit_set(Ender_Item *i, Ender_Item *in);
 void ender_item_object_function_add(Ender_Item *i, Ender_Item *f);
 
 #endif

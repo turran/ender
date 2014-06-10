@@ -281,6 +281,20 @@ static Eina_Bool _ender_parser_object_attrs_set(Ender_Parser_Context *c,
 		ender_item_name_set(c->i, value);
 		ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
 	}
+	else if (!strcmp(key, "inherits"))
+	{
+		Ender_Item *inherits;
+
+		inherits = ender_lib_item_find(c->parser->lib, value);
+		if (!inherits)
+		{
+			WRN("Inherit '%s' not found", value);
+		}
+		else
+		{
+			ender_item_object_inherit_set(c->i, inherits);
+		}
+	}
 	else
 	{
 		return EINA_FALSE;
