@@ -48,6 +48,7 @@ typedef struct _Ender_Item_Function_Class
 	Ender_Item_Class base;
 } Ender_Item_Function_Class;
 
+/* TODO handle the direction */
 static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 {
 	Ender_Item_Type type;
@@ -89,6 +90,10 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 				break;
 			}
 		}
+		break;
+
+		case ENDER_ITEM_TYPE_ENUM:
+		return &ffi_type_sint32;
 		break;
 
 		case ENDER_ITEM_TYPE_STRUCT:
