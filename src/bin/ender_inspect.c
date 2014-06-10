@@ -64,7 +64,12 @@ static const char * item_type_dump(Ender_Item *i)
 		return value_type_dump(ender_item_basic_value_type_get(i));
 		break;
 
+		case ENDER_ITEM_TYPE_OBJECT:
+		case ENDER_ITEM_TYPE_STRUCT:
+		return ender_item_name_get(i);
+
 		default:
+		return "unknown";
 		break;
 	}
 
