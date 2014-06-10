@@ -58,6 +58,9 @@ static const char * value_type_dump(Ender_Value_Type vtype)
 
 static const char * item_type_dump(Ender_Item *i)
 {
+	if (!i)
+		return "unknown";
+
 	switch (ender_item_type_get(i))
 	{
 		case ENDER_ITEM_TYPE_BASIC:
@@ -66,6 +69,7 @@ static const char * item_type_dump(Ender_Item *i)
 
 		case ENDER_ITEM_TYPE_OBJECT:
 		case ENDER_ITEM_TYPE_STRUCT:
+		case ENDER_ITEM_TYPE_ENUM:
 		return ender_item_name_get(i);
 
 		default:
@@ -87,19 +91,37 @@ static void attr_dump(Ender_Item *i, int indent)
 static void function_dump(Ender_Item *i, int indent)
 {
 	Ender_Item *ret;
+	Ender_Item *a;
+	Eina_List *args;
+	int count = 0;
 
 	printf("%*c", indent, ' ');
 	ret = ender_item_function_ret_get(i);
 	if (ret)
 	{
-		printf("%s ", item_type_dump(ret));
+		Ender_Item *type;
+
+		type = ender_item_arg_type_get(ret);
+		printf("%s ", item_type_dump(type));
+		ender_item_unref(type);
 	}
 	else
 	{
 		printf("void ");
 	}
 	printf("%s (", ender_item_name_get(i));
-	/* TODO args */
+	args = ender_item_function_args_get(i);
+	EINA_LIST_FREE(args, a)
+	{
+		Ender_Item *type;
+
+		if (count != 0)
+			printf(", ");
+		type = ender_item_arg_type_get(a);
+		printf("%s", item_type_dump(type));
+		ender_item_unref(a);
+		count++;
+	}
 	printf(")\n");
 }
 
@@ -107,6 +129,20 @@ static void lib_dump(const Ender_Lib *l)
 {
 	Ender_Item *i;
 	Eina_List *items;
+
+	/* enums */
+	printf("Enums:\n");
+	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_ENUM);
+	EINA_LIST_FREE(items, i)
+	{
+		Ender_Item *f;
+		Eina_List *subitems;
+
+		printf("  %s\n", ender_item_name_get(i));
+		/* TODO values */
+		/* TODO functions */
+		ender_item_unref(i);
+	}
 
 	/* structs */
 	printf("Structs:\n");
@@ -149,6 +185,14 @@ static void lib_dump(const Ender_Lib *l)
 			function_dump(f, 8);
 			ender_item_unref(f);
 		}
+		ender_item_unref(i);
+	}
+	/* objects */
+	printf("Functions:\n");
+	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_FUNCTION);
+	EINA_LIST_FREE(items, i)
+	{
+		function_dump(i, 4);
 		ender_item_unref(i);
 	}
 }

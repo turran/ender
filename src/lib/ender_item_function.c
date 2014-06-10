@@ -93,6 +93,7 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 
 		case ENDER_ITEM_TYPE_STRUCT:
 		case ENDER_ITEM_TYPE_FUNCTION:
+		case ENDER_ITEM_TYPE_OBJECT:
 		return &ffi_type_pointer;
 		break;
 
@@ -155,10 +156,28 @@ void ender_item_function_symname_set(Ender_Item *i, const char *symname)
 	thiz->symname = strdup(symname);
 }
 
+void ender_item_function_ret_set(Ender_Item *i, Ender_Item *arg)
+{
+	Ender_Item_Function *thiz;
+	Ender_Item_Type type;
+
+	type = ender_item_type_get(arg);
+	if (type != ENDER_ITEM_TYPE_ARG)
+	{
+		CRI("Unsupported type '%d'", type);
+		ender_item_unref(arg);
+		return;
+	}
+	thiz->ret = arg;
+	ender_item_parent_set(arg, i);
+}
+
 void ender_item_function_arg_add(Ender_Item *i, Ender_Item *arg)
 {
 	Ender_Item_Function *thiz;
 	Ender_Item_Type type;
+
+	if (!arg) return;
 
 	type = ender_item_type_get(arg);
 	if (type != ENDER_ITEM_TYPE_ARG)
@@ -191,7 +210,14 @@ EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 
 	thiz = ENDER_ITEM_FUNCTION(i);
 	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
-		ret = eina_list_append(ret, ender_item_parent_get(i));
+	{
+		Ender_Item *arg;
+
+		arg = ender_item_arg_new();
+		ender_item_name_set(arg, "self");
+		ender_item_arg_type_set(arg, ender_item_parent_get(i));
+		ret = eina_list_append(ret, arg);
+	}
 
 	EINA_LIST_FOREACH(thiz->args, l, i)
 	{
@@ -226,17 +252,30 @@ EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 
 	thiz = ENDER_ITEM_FUNCTION(i);
 	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_CTOR)
-		return ender_item_parent_get(i);
+	{
+		Ender_Item *ret;
+
+		/* create our own arg based on the parent type */
+		ret = ender_item_arg_new();
+		ender_item_arg_direction_set(ret, ENDER_ITEM_ARG_DIRECTION_IN);
+		ender_item_arg_transfer_set(ret, ENDER_TRANSFER_TYPE_FULL);
+		ender_item_arg_type_set(ret, ender_item_parent_get(i));
+		return ret;
+	}
 	else
+	{
 		return ender_item_ref(thiz->ret);
+	}
 }
 
-EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args)
+EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args, Ender_Value *retval)
 {
 	Ender_Item_Function *thiz;
 	Ender_Item *a;
+	Ender_Item *i_ret;
 	Eina_List *l;
 	ffi_type **ffi_args;
+	ffi_type *ffi_ret = &ffi_type_void;
 	ffi_status status;
 	ffi_cif cif;
 	void **ffi_values;
@@ -285,16 +324,26 @@ EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args)
 		ender_item_unref(type);
 	}
 
-	/* TODO fix the return value */
-	if ((status = ffi_prep_cif(&cif, FFI_DEFAULT_ABI, nargs, &ffi_type_void,
+	i_ret = ender_item_function_ret_get(i);
+	if (i_ret)
+	{
+		Ender_Item *type;
+
+		type = ender_item_arg_type_get(i_ret);
+		ffi_ret = _ender_item_function_arg_ffi_to(type);
+		ender_item_unref(type);
+		ender_item_unref(i_ret);
+	}
+
+	if ((status = ffi_prep_cif(&cif, FFI_DEFAULT_ABI, nargs, ffi_ret,
 			ffi_args)) != FFI_OK)
 	{
 		/* TODO handle the ffi_status */
 		ERR("FFI error");
 	}
 
-	printf("calling function %s\n", ender_item_name_get(i));
-	ffi_call(&cif, FFI_FN(thiz->sym), NULL, ffi_values);
+	ffi_call(&cif, FFI_FN(thiz->sym), retval, ffi_values);
+
 	return EINA_TRUE;
 }
 

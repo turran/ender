@@ -33,8 +33,6 @@ struct _Ender_Lib
 {
 	Eina_List *deps;
 	Eina_Hash *items;
-	Ender_Item *init;
-	Ender_Item *deinit;
 	int version;
 	char *name;
 	char *file;
@@ -143,7 +141,6 @@ void ender_lib_free(Ender_Lib *thiz)
 	eina_list_free(thiz->deps);
 	free(thiz->name);
 	free(thiz->file);
-	/* TODO handle the deinit */
 	free(thiz);
 }
 
@@ -213,10 +210,6 @@ void ender_lib_load(Ender_Lib *thiz)
 	if (!thiz->dl)
 	{
 		CRI("Impossible to load the library '%s'", thiz->file);
-	}
-	else
-	{
-		/* TODO handle the init */
 	}
 }
 

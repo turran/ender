@@ -29,6 +29,8 @@ typedef enum _Ender_Item_Type {
 	ENDER_ITEM_TYPE_ARG,
 	ENDER_ITEM_TYPE_OBJECT,
 	ENDER_ITEM_TYPE_STRUCT,
+	ENDER_ITEM_TYPE_CONSTANT,
+	ENDER_ITEM_TYPE_ENUM,
 } Ender_Item_Type;
 
 EAPI Ender_Item * ender_item_ref(Ender_Item *thiz);

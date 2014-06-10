@@ -37,7 +37,7 @@ EAPI Eina_List * ender_item_function_args_get(Ender_Item *i);
 EAPI int ender_item_function_args_count(Ender_Item *i);
 EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i);
 Eina_Bool ender_item_function_call(Ender_Item *i,
-		Ender_Value *args);
+		Ender_Value *args, Ender_Value *retval);
 EAPI int ender_item_function_flags_get(Ender_Item *i);
 
 /**

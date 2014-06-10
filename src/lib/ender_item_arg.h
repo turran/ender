@@ -19,6 +19,14 @@
 #ifndef _ENDER_ITEM_ARG_H_
 #define _ENDER_ITEM_ARG_H_
 
+typedef enum _Ender_Transfer_Type
+{
+	ENDER_TRANSFER_TYPE_FULL,
+	ENDER_TRANSFER_TYPE_NONE,
+	ENDER_TRANSFER_TYPE_CONTAINER,
+	ENDER_TRANSFER_TYPE_CONTENT,
+} Ender_Transfer_Type;
+
 typedef enum _Ender_Item_Arg_Direction
 {
 	ENDER_ITEM_ARG_DIRECTION_IN,
