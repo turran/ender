@@ -11,7 +11,8 @@
   <xsl:template match="/">
     <lib name="foo" version="fooversion" case="fooscore">
       <xsl:apply-templates select="doxygenindex/compound[@kind='struct']"/>
-      <xsl:apply-templates select="doxygenindex/compound/member[@kind='enum']"/>
+      <xsl:apply-templates select="doxygenindex/compound[@kind='file']/member[@kind='enum']"/>
+      <xsl:apply-templates select="doxygenindex/compound[@kind='file']/member[@kind='typedef']"/>
     </lib>
   </xsl:template>
 
@@ -22,9 +23,15 @@
     </struct>
   </xsl:template>
 
-  <xsl:template match="compound/member[@kind='enum']">
+  <xsl:template match="compound[@kind='file']/member[@kind='enum']">
     <xsl:variable name="name" select="translate(translate(name/text(), '_', '.'), $uppercase, $lowercase)"/>
     <enum name="{$name}">
     </enum>
+  </xsl:template>
+
+  <xsl:template match="compound[@kind='file']/member[@kind='typedef']">
+    <xsl:variable name="name" select="translate(translate(name/text(), '_', '.'), $uppercase, $lowercase)"/>
+    <object name="{$name}">
+    </object>
   </xsl:template>
 </xsl:stylesheet>
