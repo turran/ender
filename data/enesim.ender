@@ -7,10 +7,23 @@
     <value name="none"/>
     <value name="argb8888"/>
     <value name="a8"/>
+    <value name="formats"/>
   </enum>
   <enum name="enesim.rop">
     <value name="blend"/>
     <value name="fill"/>
+  </enum>
+  <enum name="enesim.buffer.format">
+    <value name="rgb565"/>
+    <value name="argb8888"/>
+    <value name="argb8888_pre"/>
+    <value name="xrgb8888"/>
+    <value name="rgb888"/>
+    <value name="bgr888"/>
+    <value name="a8"/>
+    <value name="gray"/>
+    <value name="cmyk"/>
+    <value name="cmyk_adobe"/>
   </enum>
   <struct name="enesim.matrix">
     <field name="xx" type="double"/>
@@ -34,11 +47,20 @@
     <field name="w" type="double"/>
     <field name="h" type="double"/>
   </struct>
+  <object name="enesim.buffer">
+    <ctor>
+      <arg name="f" type="enesim.buffer.format"/>
+      <arg name="w" type="uint32"/>
+      <arg name="h" type="uint32"/>
+    </ctor>
+    <ref/>
+    <unref/>
+  </object>
   <object name="enesim.surface">
     <ctor>
       <arg name="f" type="enesim.format"/>
-      <arg name="w" type="int32"/>
-      <arg name="h" type="int32"/>
+      <arg name="w" type="uint32"/>
+      <arg name="h" type="uint32"/>
     </ctor>
     <ref/>
     <unref/>
@@ -69,5 +91,16 @@
   </object>
   <object name="enesim.renderer.rectangle" inherits="enesim.renderer.shape">
     <ctor/>
+  </object>
+  <object name="enesim.image">
+    <function name="info_get">
+    </function>
+  </object>
+  <object name="enesim.image.file">
+    <function name="save">
+      <arg name="file" type="string"/>
+      <arg name="b" type="enesim.buffer"/>
+      <arg name="options" type="string"/>
+    </function>
   </object>
 </lib>

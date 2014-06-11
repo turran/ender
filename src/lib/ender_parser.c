@@ -253,14 +253,21 @@ static Eina_Bool _ender_parser_function_ctor(Ender_Parser_Context *c)
 	parent = _ender_parser_parent_context_get(c->parser);
 	/* the lib case */
 	if (!parent)
+	{
+		ERR("A function must have a parent");
 		return EINA_FALSE;
+	}
 	if (parent->i)
 	{
 		Ender_Item_Type type = ender_item_type_get(parent->i);
-		if (type != ENDER_ITEM_TYPE_STRUCT || type != ENDER_ITEM_TYPE_OBJECT)
+		if (type != ENDER_ITEM_TYPE_STRUCT && type != ENDER_ITEM_TYPE_OBJECT)
+		{
+			ERR("The parent must be of type struct or object");
 			return EINA_FALSE;
+		}
 	}
 	_ender_parser_common_function_ctor(c);
+
 	return EINA_TRUE;
 }
 
@@ -269,12 +276,32 @@ static void _ender_parser_function_dtor(Ender_Parser_Context *c)
 	Ender_Parser_Context *parent;
 
 	parent = _ender_parser_parent_context_get(c->parser);
-	_ender_parser_common_function_dtor(c);
-	/* topmost */
-	if (!parent->i)
+	/* add the function, we wait for the dtor because we need
+	 * the name parsed
+	 */
+	if (parent->i)
+	{
+		switch (ender_item_type_get(parent->i))
+		{
+			case ENDER_ITEM_TYPE_STRUCT:
+			ender_item_struct_function_add(parent->i, ender_item_ref(c->i));
+			break;
+
+			case ENDER_ITEM_TYPE_OBJECT:
+			ender_item_object_function_add(parent->i, ender_item_ref(c->i));
+			break;
+
+			default:
+			ERR("Unsupported parent type");
+			break;
+		}
+	}
+	else
 	{
 		ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
 	}
+
+	_ender_parser_common_function_dtor(c);
 }
 
 static Eina_Bool _ender_parser_function_attrs_set(Ender_Parser_Context *c,
@@ -357,7 +384,6 @@ static Eina_Bool _ender_parser_object_attrs_set(Ender_Parser_Context *c,
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_arg_ctor(Ender_Parser_Context *c)
 {
-	Ender_Parser_Function *f;
 	Ender_Parser_Context *parent;
 
 	parent = _ender_parser_parent_context_get(c->parser);
@@ -382,8 +408,6 @@ static void _ender_parser_arg_dtor(Ender_Parser_Context *c)
 static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
-	Ender_Parser_Function *f = c->prv;
-
 	if (_ender_parser_item_attrs_set(c, key, value))
 		return EINA_TRUE;
 	else if (!strcmp(key, "direction"))
@@ -457,7 +481,6 @@ static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 	ender_item_function_flags_set(c->i, ENDER_ITEM_FUNCTION_FLAG_IS_METHOD);
 
 	/* add the function */
-	parent = _ender_parser_parent_context_get(c->parser);
 	switch (ender_item_type_get(parent->i))
 	{
 		case ENDER_ITEM_TYPE_STRUCT:
@@ -479,7 +502,6 @@ static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 static void _ender_parser_method_dtor(Ender_Parser_Context *c)
 {
 	Ender_Parser_Function *thiz = c->prv;
-	Ender_Parser_Context *parent;
 	Ender_Item *p;
 
 	/* in case there is no parent, register the function, otherwise
@@ -504,8 +526,6 @@ static void _ender_parser_method_dtor(Ender_Parser_Context *c)
 static Eina_Bool _ender_parser_method_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
-	Ender_Parser_Function *thiz = c->prv;
-
 	if (_ender_parser_item_attrs_set(c, key, value))
 		return EINA_TRUE;
 	else if (_ender_parser_common_function_attrs_set(c, key, value))
@@ -566,8 +586,11 @@ static Eina_Bool _ender_parser_value_ctor(Ender_Parser_Context *c)
 			return EINA_FALSE;
 	}
 
+	/* our own private data */
+	thiz = calloc(1, sizeof(Ender_Parser_Value));
+
 	c->i = ender_item_constant_new();
-	c->prv = calloc(1, sizeof(Ender_Parser_Value));
+	c->prv = thiz;
 
 	/* for enum values the type is always an int32 */
 	i32 = ender_lib_item_find(c->parser->lib, "int32");
@@ -641,7 +664,6 @@ static Eina_Bool _ender_parser_value_attrs_set(Ender_Parser_Context *c,
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_enum_ctor(Ender_Parser_Context *c)
 {
-	Ender_Parser_Field *f;
 	Ender_Parser_Context *parent;
 
 	/* a enum can only be child of the main lib */
@@ -704,7 +726,6 @@ static void _ender_parser_field_dtor(Ender_Parser_Context *c)
 	Ender_Parser_Context *parent;
 	Ender_Parser_Field *field = c->prv;
 	Ender_Item *i;
-	Ender_Item_Type type;
 
 	/* set the type */
 	i = ender_lib_item_find(c->parser->lib, field->type);
@@ -841,7 +862,6 @@ static Ender_Parser_Context * _ender_parser_tag_new(Ender_Parser *thiz,
 {
 	Ender_Parser_Context *c;
 	const char *attrs = NULL;
-	int attr_length = 0;
 
 	c = calloc(1, sizeof(Ender_Parser_Context));
 	c->parser = thiz;
