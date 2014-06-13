@@ -22,8 +22,10 @@
 #include "ender_item.h"
 #include "ender_item_struct.h"
 #include "ender_item_attr.h"
+#include "ender_item_basic.h"
 
 #include "ender_main_private.h"
+#include "ender_value_private.h"
 #include "ender_item_attr_private.h"
 #include "ender_item_struct_private.h"
 /*============================================================================*
