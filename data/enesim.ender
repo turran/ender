@@ -1,30 +1,43 @@
-<?xml version="1.0"?>
-<lib name="enesim" version="1" case="underscore">
-  <include name="eina" version="1"/>
-  <function name="enesim.init"/>
-  <function name="enesim.deinit"/>
-  <enum name="enesim.format">
-    <value name="none"/>
-    <value name="argb8888"/>
-    <value name="a8"/>
-    <value name="formats"/>
-  </enum>
-  <enum name="enesim.rop">
-    <value name="blend"/>
-    <value name="fill"/>
-  </enum>
-  <enum name="enesim.buffer.format">
-    <value name="rgb565"/>
-    <value name="argb8888"/>
-    <value name="argb8888_pre"/>
-    <value name="xrgb8888"/>
-    <value name="rgb888"/>
-    <value name="bgr888"/>
-    <value name="a8"/>
-    <value name="gray"/>
-    <value name="cmyk"/>
-    <value name="cmyk_adobe"/>
-  </enum>
+<?xml version="1.0" standalone="yes"?>
+<lib name="enesim" version="0" case="underscore">
+  <struct name="enesim.buffer.24bpp">
+    <field name="plane0" type="uint8.t *"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.buffer.32bpp">
+    <field name="plane0" type="uint32.t *"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.buffer.a8">
+    <field name="plane0" type="uint8.t *"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.buffer.opengl.data">
+    <field name="fbo" type="gluint"/>
+    <field name="textures" type="gluint *"/>
+    <field name="num_textures" type="uint32"/>
+  </struct>
+  <struct name="enesim.buffer.rgb565">
+    <field name="plane0" type="uint16.t *"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.image.finder.descriptor">
+    <field name="version" type="int32"/>
+    <field name="data_from" type="enesim.image.finder.data.from.cb"/>
+    <field name="extension_from" type="enesim.image.finder.extension.from.cb"/>
+  </struct>
+  <struct name="enesim.image.provider.descriptor">
+    <field name="version" type="int32"/>
+    <field name="name" type="const char *"/>
+    <field name="options_parse" type="enesim.image.provider.options.parse.cb"/>
+    <field name="options_free" type="enesim.image.provider.options.free.cb"/>
+    <field name="loadable" type="enesim.image.provider.loadable.cb"/>
+    <field name="saveable" type="enesim.image.provider.saveable.cb"/>
+    <field name="info_get" type="enesim.image.provider.info.get.cb"/>
+    <field name="formats_get" type="enesim.image.provider.formats.get.cb"/>
+    <field name="load" type="enesim.image.provider.load.cb"/>
+    <field name="save" type="enesim.image.provider.save.cb"/>
+  </struct>
   <struct name="enesim.matrix">
     <field name="xx" type="double"/>
     <field name="xy" type="double"/>
@@ -35,11 +48,81 @@
     <field name="zx" type="double"/>
     <field name="zy" type="double"/>
     <field name="zz" type="double"/>
-    <method name="identity"/>
-    <method name="scale">
-      <arg name="sx" type="double" direction="in"/>
-      <arg name="sy" type="double" direction="in"/>
-    </method>
+  </struct>
+  <struct name="enesim.matrix.f16p16">
+    <field name="xx" type="eina.f16p16"/>
+    <field name="xy" type="eina.f16p16"/>
+    <field name="xz" type="eina.f16p16"/>
+    <field name="yx" type="eina.f16p16"/>
+    <field name="yy" type="eina.f16p16"/>
+    <field name="yz" type="eina.f16p16"/>
+    <field name="zx" type="eina.f16p16"/>
+    <field name="zy" type="eina.f16p16"/>
+    <field name="zz" type="eina.f16p16"/>
+  </struct>
+  <struct name="enesim.object.class">
+    <field name="descriptor" type="enesim.object.descriptor *"/>
+  </struct>
+  <struct name="enesim.object.instance">
+    <field name="klass" type="enesim.object.class"/>
+  </struct>
+  <struct name="enesim.path.command">
+    <field name="type" type="enesim.path.command.type"/>
+    <field name="definition" type="enesim.path.command.definition"/>
+  </struct>
+  <struct name="enesim.path.command.arc.to">
+    <field name="rx" type="double"/>
+    <field name="ry" type="double"/>
+    <field name="angle" type="double"/>
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="large" type="bool"/>
+    <field name="sweep" type="bool"/>
+  </struct>
+  <struct name="enesim.path.command.close">
+    <field name="close" type="bool"/>
+  </struct>
+  <struct name="enesim.path.command.cubic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="ctrl_x0" type="double"/>
+    <field name="ctrl_y0" type="double"/>
+    <field name="ctrl_x1" type="double"/>
+    <field name="ctrl_y1" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.line.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.move.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.quadratic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="ctrl_x" type="double"/>
+    <field name="ctrl_y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.scubic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="ctrl_x" type="double"/>
+    <field name="ctrl_y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.squadratic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+  </struct>
+  <struct name="enesim.quad">
+    <field name="x0" type="double"/>
+    <field name="y0" type="double"/>
+    <field name="x1" type="double"/>
+    <field name="y1" type="double"/>
+    <field name="x2" type="double"/>
+    <field name="y2" type="double"/>
+    <field name="x3" type="double"/>
+    <field name="y3" type="double"/>
   </struct>
   <struct name="enesim.rectangle">
     <field name="x" type="double"/>
@@ -47,60 +130,855 @@
     <field name="w" type="double"/>
     <field name="h" type="double"/>
   </struct>
+  <struct name="enesim.renderer.figure.polygon">
+    <field name="vertices" type="eina.list *"/>
+  </struct>
+  <struct name="enesim.renderer.figure.vertex">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+  </struct>
+  <struct name="enesim.renderer.gradient.stop">
+    <field name="argb" type="enesim.argb"/>
+    <field name="pos" type="double"/>
+  </struct>
+  <struct name="enesim.renderer.path.enesim">
+    <field name="parent" type="enesim.renderer.path.abstract"/>
+    <field name="bifigure" type="enesim.renderer"/>
+  </struct>
+  <struct name="enesim.renderer.path.enesim.class">
+    <field name="parent" type="enesim.renderer.path.abstract.class"/>
+  </struct>
+  <struct name="enesim.renderer.shape.stroke.dash">
+    <field name="length" type="double"/>
+    <field name="gap" type="double"/>
+  </struct>
+  <enum name="enesim.buffer.format">
+    <value name="rgb565"/>
+    <value name="argb8888"/>
+    <value name="argb8888.pre"/>
+    <value name="xrgb8888"/>
+    <value name="rgb888"/>
+    <value name="bgr888"/>
+    <value name="a8"/>
+    <value name="gray"/>
+    <value name="cmyk"/>
+    <value name="cmyk.adobe"/>
+    <value name="enesim.buffer.formats"/>
+  </enum>
+  <enum name="enesim.format">
+    <value name="none"/>
+    <value name="argb8888"/>
+    <value name="a8"/>
+    <value name="enesim.formats"/>
+  </enum>
+  <enum name="enesim.angle">
+    <value name="0"/>
+    <value name="90"/>
+    <value name="180"/>
+    <value name="270"/>
+    <value name="enesim.angles"/>
+  </enum>
+  <enum name="enesim.rop">
+    <value name="blend"/>
+    <value name="fill"/>
+    <value name="enesim.rops"/>
+  </enum>
+  <enum name="enesim.quality">
+    <value name="best"/>
+    <value name="good"/>
+    <value name="fast"/>
+    <value name="enesim.qualities"/>
+  </enum>
+  <enum name="enesim.priority">
+    <value name="none"/>
+    <value name="marginal"/>
+    <value name="secondary"/>
+    <value name="primary"/>
+  </enum>
+  <enum name="enesim.channel">
+    <value name="red"/>
+    <value name="green"/>
+    <value name="blue"/>
+    <value name="alpha"/>
+    <value name="enesim.channels"/>
+  </enum>
+  <enum name="enesim.alpha.hint">
+    <value name="normal"/>
+    <value name="sparse"/>
+    <value name="opaque"/>
+    <value name="enesim.alpha.hints"/>
+  </enum>
+  <enum name="enesim.repeat.mode">
+    <value name="restrict"/>
+    <value name="pad"/>
+    <value name="reflect"/>
+    <value name="repeat"/>
+    <value name="enesim.repeat.modes"/>
+  </enum>
+  <enum name="enesim.backend">
+    <value name="invalid"/>
+    <value name="software"/>
+    <value name="opencl"/>
+    <value name="opengl"/>
+    <value name="enesim.backends"/>
+  </enum>
+  <enum name="enesim.matrix.type">
+    <value name="enesim.matrix.identity"/>
+    <value name="enesim.matrix.affine"/>
+    <value name="enesim.matrix.projective"/>
+    <value name="enesim.matrix.types"/>
+  </enum>
+  <enum name="enesim.path.command.type">
+    <value name="enesim.path.command.move.to"/>
+    <value name="enesim.path.command.line.to"/>
+    <value name="enesim.path.command.quadratic.to"/>
+    <value name="enesim.path.command.squadratic.to"/>
+    <value name="enesim.path.command.cubic.to"/>
+    <value name="enesim.path.command.scubic.to"/>
+    <value name="enesim.path.command.arc.to"/>
+    <value name="enesim.path.command.close"/>
+    <value name="enesim.path.command.types"/>
+  </enum>
+  <enum name="enesim.renderer.feature">
+    <value name="translate"/>
+    <value name="affine"/>
+    <value name="projective"/>
+    <value name="a8"/>
+    <value name="argb8888"/>
+    <value name="quality"/>
+    <value name="backend.software"/>
+    <value name="backend.opengl"/>
+  </enum>
+  <enum name="enesim.text.direction">
+    <value name="ltr"/>
+    <value name="rtl"/>
+  </enum>
+  <enum name="enesim.blur.channel">
+    <value name="color"/>
+    <value name="alpha"/>
+    <value name="enesim.blur.channels"/>
+  </enum>
+  <enum name="enesim.renderer.shape.feature">
+    <value name="fill.renderer"/>
+    <value name="stroke.renderer"/>
+    <value name="stroke.location"/>
+    <value name="stroke.dash"/>
+  </enum>
+  <enum name="enesim.renderer.shape.draw.mode">
+    <value name="fill"/>
+    <value name="stroke"/>
+  </enum>
+  <enum name="enesim.renderer.shape.stroke.location">
+    <value name="inside"/>
+    <value name="outside"/>
+    <value name="center"/>
+  </enum>
+  <enum name="enesim.renderer.shape.stroke.cap">
+    <value name="butt"/>
+    <value name="round"/>
+    <value name="square"/>
+    <value name="enesim.renderer.shape.stroke.caps"/>
+  </enum>
+  <enum name="enesim.renderer.shape.stroke.join">
+    <value name="miter"/>
+    <value name="round"/>
+    <value name="bevel"/>
+    <value name="enesim.renderer.shape.stroke.joins"/>
+  </enum>
+  <enum name="enesim.renderer.shape.fill.rule">
+    <value name="non.zero"/>
+    <value name="even.odd"/>
+    <value name="enesim.renderer.shape.fill.rules"/>
+  </enum>
   <object name="enesim.buffer">
-    <ctor>
+    <method name="new">
       <arg name="f" type="enesim.buffer.format"/>
-      <arg name="w" type="uint32"/>
-      <arg name="h" type="uint32"/>
-    </ctor>
-    <ref/>
-    <unref/>
-  </object>
-  <object name="enesim.surface">
-    <ctor>
-      <arg name="f" type="enesim.format"/>
-      <arg name="w" type="uint32"/>
-      <arg name="h" type="uint32"/>
-    </ctor>
-    <ref/>
-    <unref/>
-  </object>
-  <object name="enesim.log">
-  </object>
-  <object name="enesim.renderer">
-    <ref/>
-    <unref/>
-    <method name="draw">
-      <arg name="s" type="enesim.surface"/>
-      <arg name="rop" type="enesim.rop"/>
-      <arg name="clip" type="enesim.rectangle"/>
-      <arg name="x" type="int32"/>
-      <arg name="y" type="int32"/>
-      <arg name="log" type="enesim.log" direction="out"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+    </method>
+    <method name="new.data.from">
+      <arg name="f" type="enesim.buffer.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+      <arg name="copy" type="eina.bool"/>
+      <arg name="data" type="enesim.buffer.sw.data *"/>
+      <arg name="free_func" type="enesim.buffer.free"/>
+      <arg name="free_func_data" type="void *"/>
+    </method>
+    <method name="new.pool.from">
+      <arg name="f" type="enesim.buffer.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+      <arg name="p" type="enesim.pool *"/>
+    </method>
+    <method name="new.pool.and.data.from">
+      <arg name="f" type="enesim.buffer.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+      <arg name="p" type="enesim.pool *"/>
+      <arg name="copy" type="eina.bool"/>
+      <arg name="data" type="enesim.buffer.sw.data *"/>
+      <arg name="free_func" type="enesim.buffer.free"/>
+      <arg name="free_func_data" type="void *"/>
+    </method>
+    <method name="ref">
+      <arg name="b" type="enesim.buffer *"/>
+    </method>
+    <method name="unref">
+      <arg name="b" type="enesim.buffer *"/>
+    </method>
+    <method name="size.get">
+      <arg name="b" type="const enesim.buffer *"/>
+      <arg name="w" type="int *"/>
+      <arg name="h" type="int *"/>
+    </method>
+    <method name="format.get">
+      <arg name="b" type="const enesim.buffer *"/>
+    </method>
+    <method name="backend.get">
+      <arg name="b" type="const enesim.buffer *"/>
+    </method>
+    <method name="pool.get">
+      <arg name="b" type="enesim.buffer *"/>
+    </method>
+    <method name="private.set">
+      <arg name="b" type="enesim.buffer *"/>
+      <arg name="data" type="void *"/>
+    </method>
+    <method name="private.get">
+      <arg name="b" type="enesim.buffer *"/>
+    </method>
+    <method name="data.get">
+      <arg name="b" type="const enesim.buffer *"/>
+      <arg name="data" type="enesim.buffer.sw.data *"/>
+    </method>
+    <method name="format.size.get">
+      <arg name="fmt" type="enesim.buffer.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+    </method>
+    <method name="format.rgb.components.from">
+      <arg name="fmt" type="enesim.buffer.format *"/>
+      <arg name="depth" type="int"/>
+      <arg name="aoffset" type="uint8.t"/>
+      <arg name="alen" type="uint8.t"/>
+      <arg name="roffset" type="uint8.t"/>
+      <arg name="rlen" type="uint8.t"/>
+      <arg name="goffset" type="uint8.t"/>
+      <arg name="glen" type="uint8.t"/>
+      <arg name="boffset" type="uint8.t"/>
+      <arg name="blen" type="uint8.t"/>
+      <arg name="premul" type="eina.bool"/>
+    </method>
+    <method name="format.rgb.components.to">
+      <arg name="fmt" type="enesim.buffer.format"/>
+      <arg name="aoffset" type="uint8.t *"/>
+      <arg name="alen" type="uint8.t *"/>
+      <arg name="roffset" type="uint8.t *"/>
+      <arg name="rlen" type="uint8.t *"/>
+      <arg name="goffset" type="uint8.t *"/>
+      <arg name="glen" type="uint8.t *"/>
+      <arg name="boffset" type="uint8.t *"/>
+      <arg name="blen" type="uint8.t *"/>
+      <arg name="premul" type="eina.bool *"/>
+    </method>
+    <method name="format.rgb.depth.get">
+      <arg name="fmt" type="enesim.buffer.format"/>
+    </method>
+    <method name="lock">
+      <arg name="b" type="enesim.buffer *"/>
+      <arg name="write" type="eina.bool"/>
+    </method>
+    <method name="unlock">
+      <arg name="b" type="enesim.buffer *"/>
     </method>
   </object>
-  <object name="enesim.renderer.shape" inherits="enesim.renderer"/>
-  <object name="enesim.renderer.line" inherits="enesim.renderer.shape">
-    <ctor/>
+  <unknown type=""/>
+  <unknown type=""/>
+  <unknown type=""/>
+  <unknown type=""/>
+  <unknown type=""/>
+  <unknown type=""/>
+  <unknown type="void(*"/>
+  <unknown type="uint32_t"/>
+  <unknown type="uint32_t"/>
+  <unknown type="uint8_t"/>
+  <object name="enesim.image.context">
+    <method name="new"/>
+    <method name="free">
+      <arg name="thiz" type="enesim.image.context *"/>
+    </method>
+    <method name="load.async">
+      <arg name="thiz" type="enesim.image.context *"/>
+      <arg name="data" type="enesim.stream *"/>
+      <arg name="mime" type="const char *"/>
+      <arg name="b" type="enesim.buffer *"/>
+      <arg name="mpool" type="enesim.pool *"/>
+      <arg name="cb" type="enesim.image.callback"/>
+      <arg name="user_data" type="void *"/>
+      <arg name="options" type="const char *"/>
+    </method>
+    <method name="save.async">
+      <arg name="thiz" type="enesim.image.context *"/>
+      <arg name="data" type="enesim.stream *"/>
+      <arg name="mime" type="const char *"/>
+      <arg name="b" type="enesim.buffer *"/>
+      <arg name="cb" type="enesim.image.callback"/>
+      <arg name="user_data" type="void *"/>
+      <arg name="options" type="const char *"/>
+    </method>
+    <method name="dispatch">
+      <arg name="thiz" type="enesim.image.context *"/>
+    </method>
   </object>
-  <object name="enesim.renderer.ellipse" inherits="enesim.renderer.shape">
-    <ctor/>
+  <unknown type="void(*"/>
+  <object name="enesim.image.provider">
+    <method name="register">
+      <arg name="pd" type="enesim.image.provider.descriptor *"/>
+      <arg name="priority" type="enesim.priority"/>
+      <arg name="mime" type="const char *"/>
+    </method>
+    <method name="unregister">
+      <arg name="pd" type="enesim.image.provider.descriptor *"/>
+      <arg name="mime" type="const char *"/>
+    </method>
+    <method name="priority.set">
+      <arg name="p" type="enesim.image.provider *"/>
+      <arg name="priority" type="enesim.priority"/>
+    </method>
+    <method name="info.get">
+      <arg name="thiz" type="enesim.image.provider *"/>
+      <arg name="data" type="enesim.stream *"/>
+      <arg name="w" type="int *"/>
+      <arg name="h" type="int *"/>
+      <arg name="sfmt" type="enesim.buffer.format *"/>
+      <arg name="options" type="const char *"/>
+      <arg name="err" type="eina.error *"/>
+    </method>
+    <method name="load">
+      <arg name="thiz" type="enesim.image.provider *"/>
+      <arg name="data" type="enesim.stream *"/>
+      <arg name="b" type="enesim.buffer **"/>
+      <arg name="mpool" type="enesim.pool *"/>
+      <arg name="options" type="const char *"/>
+      <arg name="err" type="eina.error *"/>
+    </method>
+    <method name="save">
+      <arg name="thiz" type="enesim.image.provider *"/>
+      <arg name="data" type="enesim.stream *"/>
+      <arg name="b" type="enesim.buffer *"/>
+      <arg name="options" type="const char *"/>
+      <arg name="err" type="eina.error *"/>
+    </method>
   </object>
-  <object name="enesim.renderer.circle" inherits="enesim.renderer.shape">
-    <ctor/>
+  <unknown type="void *(*"/>
+  <unknown type="void(*"/>
+  <unknown type="Eina_Bool(*"/>
+  <unknown type="Eina_Bool(*"/>
+  <unknown type="Eina_Bool(*"/>
+  <unknown type="int(*"/>
+  <unknown type="Eina_Bool(*"/>
+  <unknown type="Eina_Bool(*"/>
+  <unknown type="const char *(*"/>
+  <unknown type="const char *(*"/>
+  <unknown type="void(*"/>
+  <object name="enesim.log">
+    <method name="add">
+      <arg name="log" type="enesim.log *"/>
+      <arg name="string" type="const char *"/>
+    </method>
+    <method name="add.parametric">
+      <arg name="log" type="enesim.log *"/>
+      <arg name="file" type="const char *"/>
+      <arg name="function" type="const char *"/>
+      <arg name="line" type="int"/>
+      <arg name="fmt" type="char *"/>
+      <arg name="args" type="va.list"/>
+    </method>
+    <method name="delete">
+      <arg name="log" type="enesim.log *"/>
+    </method>
+    <method name="dump">
+      <arg name="log" type="const enesim.log *"/>
+    </method>
   </object>
-  <object name="enesim.renderer.rectangle" inherits="enesim.renderer.shape">
-    <ctor/>
+  <object name="enesim.path">
+    <method name="new"/>
+    <method name="ref">
+      <arg name="thiz" type="enesim.path *"/>
+    </method>
+    <method name="unref">
+      <arg name="thiz" type="enesim.path *"/>
+    </method>
+    <method name="command.clear">
+      <arg name="thiz" type="enesim.path *"/>
+    </method>
+    <method name="command.add">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="cmd" type="enesim.path.command *"/>
+    </method>
+    <method name="move.to">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="line.to">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="squadratic.to">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="quadratic.to">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="ctrl_x" type="double"/>
+      <arg name="ctrl_y" type="double"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="cubic.to">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="ctrl_x0" type="double"/>
+      <arg name="ctrl_y0" type="double"/>
+      <arg name="ctrl_x" type="double"/>
+      <arg name="ctrl_y" type="double"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="scubic.to">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="ctrl_x" type="double"/>
+      <arg name="ctrl_y" type="double"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="arc.to">
+      <arg name="thiz" type="enesim.path *"/>
+      <arg name="rx" type="double"/>
+      <arg name="ry" type="double"/>
+      <arg name="angle" type="double"/>
+      <arg name="large" type="unsigned char"/>
+      <arg name="sweep" type="unsigned char"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="close">
+      <arg name="thiz" type="enesim.path *"/>
+    </method>
   </object>
-  <object name="enesim.image">
-    <function name="info_get">
-    </function>
+  <object name="enesim.pool">
+    <method name="default.get"/>
+    <method name="default.set">
+      <arg name="thiz" type="enesim.pool *"/>
+    </method>
+    <method name="ref">
+      <arg name="thiz" type="enesim.pool *"/>
+    </method>
+    <method name="unref">
+      <arg name="thiz" type="enesim.pool *"/>
+    </method>
+    <method name="eina.new">
+      <arg name="mp" type="eina.mempool *"/>
+    </method>
   </object>
-  <object name="enesim.image.file">
-    <function name="save">
-      <arg name="file" type="string"/>
-      <arg name="b" type="enesim.buffer"/>
-      <arg name="options" type="string"/>
-    </function>
+  <object name="enesim.renderer">
+    <method name="private.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="name" type="const char *"/>
+      <arg name="data" type="void *"/>
+    </method>
+    <method name="private.get">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="name" type="const char *"/>
+    </method>
+    <method name="ref">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="unref">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="ref.count">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="lock">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="unlock">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="name.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="name" type="const char *"/>
+    </method>
+    <method name="name.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="transformation.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="m" type="const enesim.matrix *"/>
+    </method>
+    <method name="transformation.get">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="m" type="enesim.matrix *"/>
+    </method>
+    <method name="transformation.type.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="origin.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="origin.get">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="x" type="double *"/>
+      <arg name="y" type="double *"/>
+    </method>
+    <method name="x.origin.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="x" type="double"/>
+    </method>
+    <method name="x.origin.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="y.origin.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="y.origin.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="visibility.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="visibility" type="eina.bool"/>
+    </method>
+    <method name="visibility.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="color.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="color" type="enesim.color"/>
+    </method>
+    <method name="color.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="mask.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="mask" type="enesim.renderer *"/>
+    </method>
+    <method name="mask.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="quality.set">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="quality" type="enesim.quality"/>
+    </method>
+    <method name="quality.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="is.supported">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="s" type="enesim.surface *"/>
+    </method>
+    <method name="bounds.get">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="rect" type="enesim.rectangle *"/>
+    </method>
+    <method name="bounds.get.extended">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="prev" type="enesim.rectangle *"/>
+      <arg name="curr" type="enesim.rectangle *"/>
+    </method>
+    <method name="destination.bounds.get">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="rect" type="eina.rectangle *"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+    </method>
+    <method name="destination.bounds.get.extended">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="prev" type="eina.rectangle *"/>
+      <arg name="curr" type="eina.rectangle *"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+    </method>
+    <method name="features.get">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="is.inside">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="x" type="double"/>
+      <arg name="y" type="double"/>
+    </method>
+    <method name="has.changed">
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="damages.get">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="cb" type="enesim.renderer.damage.cb"/>
+      <arg name="data" type="void *"/>
+    </method>
+    <method name="draw">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="s" type="enesim.surface *"/>
+      <arg name="rop" type="enesim.rop"/>
+      <arg name="clip" type="eina.rectangle *"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="log" type="enesim.log **"/>
+    </method>
+    <method name="draw.list">
+      <arg name="r" type="enesim.renderer *"/>
+      <arg name="s" type="enesim.surface *"/>
+      <arg name="rop" type="enesim.rop"/>
+      <arg name="clips" type="eina.list *"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="log" type="enesim.log **"/>
+    </method>
+    <method name="default.quality.set">
+      <arg name="quality" type="enesim.quality"/>
+    </method>
   </object>
+  <unknown type="Eina_Bool(*"/>
+  <object name="enesim.stream">
+    <method name="ref">
+      <arg name="thiz" type="enesim.stream *"/>
+    </method>
+    <method name="unref">
+      <arg name="thiz" type="enesim.stream *"/>
+    </method>
+    <method name="read">
+      <arg name="thiz" type="enesim.stream *"/>
+      <arg name="buffer" type="void *"/>
+      <arg name="len" type="size.t"/>
+    </method>
+    <method name="write">
+      <arg name="thiz" type="enesim.stream *"/>
+      <arg name="buffer" type="void *"/>
+      <arg name="len" type="size.t"/>
+    </method>
+    <method name="length">
+      <arg name="thiz" type="enesim.stream *"/>
+    </method>
+    <method name="mmap">
+      <arg name="thiz" type="enesim.stream *"/>
+      <arg name="size" type="size.t *"/>
+    </method>
+    <method name="munmap">
+      <arg name="thiz" type="enesim.stream *"/>
+      <arg name="ptr" type="void *"/>
+    </method>
+    <method name="reset">
+      <arg name="thiz" type="enesim.stream *"/>
+    </method>
+    <method name="uri.get">
+      <arg name="thiz" type="enesim.stream *"/>
+    </method>
+    <method name="file.new">
+      <arg name="file" type="const char *"/>
+      <arg name="mode" type="const char *"/>
+    </method>
+    <method name="buffer.new">
+      <arg name="buffer" type="void *"/>
+      <arg name="len" type="size.t"/>
+    </method>
+    <method name="base64.new">
+      <arg name="d" type="enesim.stream *"/>
+    </method>
+  </object>
+  <object name="enesim.surface">
+    <method name="new">
+      <arg name="f" type="enesim.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+    </method>
+    <method name="new.data.from">
+      <arg name="f" type="enesim.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+      <arg name="copy" type="eina.bool"/>
+      <arg name="data" type="void *"/>
+      <arg name="stride" type="size.t"/>
+      <arg name="free_func" type="enesim.buffer.free"/>
+      <arg name="free_func_data" type="void *"/>
+    </method>
+    <method name="new.pool.from">
+      <arg name="f" type="enesim.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+      <arg name="p" type="enesim.pool *"/>
+    </method>
+    <method name="new.pool.and.data.from">
+      <arg name="fmt" type="enesim.format"/>
+      <arg name="w" type="uint32.t"/>
+      <arg name="h" type="uint32.t"/>
+      <arg name="p" type="enesim.pool *"/>
+      <arg name="copy" type="eina.bool"/>
+      <arg name="data" type="void *"/>
+      <arg name="stride" type="size.t"/>
+      <arg name="free_func" type="enesim.buffer.free"/>
+      <arg name="free_func_data" type="void *"/>
+    </method>
+    <method name="new.buffer.from">
+      <arg name="buffer" type="enesim.buffer *"/>
+    </method>
+    <method name="ref">
+      <arg name="s" type="enesim.surface *"/>
+    </method>
+    <method name="unref">
+      <arg name="s" type="enesim.surface *"/>
+    </method>
+    <method name="buffer.get">
+      <arg name="s" type="enesim.surface *"/>
+    </method>
+    <method name="size.get">
+      <arg name="s" type="const enesim.surface *"/>
+      <arg name="w" type="int *"/>
+      <arg name="h" type="int *"/>
+    </method>
+    <method name="format.get">
+      <arg name="s" type="const enesim.surface *"/>
+    </method>
+    <method name="backend.get">
+      <arg name="s" type="const enesim.surface *"/>
+    </method>
+    <method name="pool.get">
+      <arg name="s" type="enesim.surface *"/>
+    </method>
+    <method name="private.set">
+      <arg name="s" type="enesim.surface *"/>
+      <arg name="data" type="void *"/>
+    </method>
+    <method name="private.get">
+      <arg name="s" type="enesim.surface *"/>
+    </method>
+    <method name="data.get">
+      <arg name="s" type="enesim.surface *"/>
+      <arg name="data" type="void **"/>
+      <arg name="stride" type="size.t *"/>
+    </method>
+    <method name="lock">
+      <arg name="s" type="enesim.surface *"/>
+      <arg name="write" type="eina.bool"/>
+    </method>
+    <method name="unlock">
+      <arg name="s" type="enesim.surface *"/>
+    </method>
+  </object>
+  <object name="enesim.text.engine">
+    <method name="default.get"/>
+    <method name="freetype.get"/>
+    <method name="ref">
+      <arg name="thiz" type="enesim.text.engine *"/>
+    </method>
+    <method name="unref">
+      <arg name="thiz" type="enesim.text.engine *"/>
+    </method>
+  </object>
+  <object name="enesim.text.font">
+    <method name="new.description.from">
+      <arg name="e" type="enesim.text.engine *"/>
+      <arg name="description" type="const char *"/>
+      <arg name="size" type="int"/>
+    </method>
+    <method name="new.file.from">
+      <arg name="e" type="enesim.text.engine *"/>
+      <arg name="file" type="const char *"/>
+      <arg name="index" type="int"/>
+      <arg name="size" type="int"/>
+    </method>
+    <method name="ref">
+      <arg name="thiz" type="enesim.text.font *"/>
+    </method>
+    <method name="unref">
+      <arg name="thiz" type="enesim.text.font *"/>
+    </method>
+    <method name="max.ascent.get">
+      <arg name="thiz" type="enesim.text.font *"/>
+    </method>
+    <method name="max.descent.get">
+      <arg name="thiz" type="enesim.text.font *"/>
+    </method>
+  </object>
+  <object name="enesim.text.buffer">
+    <method name="ref">
+      <arg name="thiz" type="enesim.text.buffer *"/>
+    </method>
+    <method name="unref">
+      <arg name="thiz" type="enesim.text.buffer *"/>
+    </method>
+    <method name="string.set">
+      <arg name="thiz" type="enesim.text.buffer *"/>
+      <arg name="string" type="const char *"/>
+      <arg name="length" type="int"/>
+    </method>
+    <method name="string.get">
+      <arg name="thiz" type="enesim.text.buffer *"/>
+    </method>
+    <method name="string.insert">
+      <arg name="thiz" type="enesim.text.buffer *"/>
+      <arg name="string" type="const char *"/>
+      <arg name="length" type="int"/>
+      <arg name="offset" type="ssize.t"/>
+    </method>
+    <method name="string.delete">
+      <arg name="thiz" type="enesim.text.buffer *"/>
+      <arg name="length" type="int"/>
+      <arg name="offset" type="ssize.t"/>
+    </method>
+    <method name="string.length">
+      <arg name="thiz" type="enesim.text.buffer *"/>
+    </method>
+  </object>
+  <unknown type="void(*"/>
+  <unknown type="void(*"/>
+  <unknown type="void(*"/>
+  <object name="enesim.object.descriptor">
+    <method name="new">
+      <arg name="parent" type="enesim.object.descriptor *"/>
+      <arg name="class_size" type="size.t"/>
+      <arg name="class_init" type="enesim.object.descriptor.class.init"/>
+      <arg name="instance_size" type="size.t"/>
+      <arg name="instance_init" type="enesim.object.descriptor.instance.init"/>
+      <arg name="instance_deinit" type="enesim.object.descriptor.instance.deinit"/>
+      <arg name="name" type="const char *"/>
+    </method>
+    <method name="instance.new">
+      <arg name="thiz" type="enesim.object.descriptor *"/>
+      <arg name="k" type="void *"/>
+    </method>
+    <method name="get"/>
+    <method name="name.get">
+      <arg name="thiz" type="enesim.object.descriptor *"/>
+    </method>
+    <method name="private.get">
+      <arg name="thiz" type="enesim.object.descriptor *"/>
+    </method>
+    <method name="private.set">
+      <arg name="thiz" type="enesim.object.descriptor *"/>
+      <arg name="prv" type="void *"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.compound.layer">
+    <method name="new"/>
+    <method name="renderer.set">
+      <arg name="l" type="enesim.renderer.compound.layer *"/>
+      <arg name="r" type="enesim.renderer *"/>
+    </method>
+    <method name="rop.set">
+      <arg name="l" type="enesim.renderer.compound.layer *"/>
+      <arg name="rop" type="enesim.rop"/>
+    </method>
+    <method name="ref">
+      <arg name="l" type="enesim.renderer.compound.layer *"/>
+    </method>
+    <method name="unref">
+      <arg name="l" type="enesim.renderer.compound.layer *"/>
+    </method>
+  </object>
+  <unknown type="Eina_Bool(*"/>
 </lib>
