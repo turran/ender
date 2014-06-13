@@ -33,12 +33,6 @@
   <!-- main entry point -->
   <xsl:template match="/">
     <lib name="{$lib}" version="{$version}" case="{$case}">
-      <!-- structs and their functions -->
-      <xsl:apply-templates select="doxygenindex/compound[@kind='struct']"/>
-      <!-- enums and their functions -->
-      <xsl:apply-templates select="doxygenindex/compound[@kind='group']/member[@kind='enum']"/>
-      <!-- object and their functions -->
-      <xsl:apply-templates select="doxygenindex/compound[@kind='group']/member[@kind='typedef']"/>
       <xsl:apply-templates select="doxygenindex/compound[@kind='group']"/>
     </lib>
   </xsl:template>
@@ -102,19 +96,19 @@
   </xsl:template>
 
   <!-- struct handling -->
-  <xsl:template match="compound[@kind='struct']">
+  <xsl:template match="compounddef[@kind='struct']">
     <!-- The name of the struct must be all lower case, replace the '_' by '.', etc -->
-    <xsl:variable name="name" select="translate(translate(name/text(), '_', '.'), $uppercase, $lowercase)"/>
+    <xsl:variable name="name" select="translate(translate(compoundname/text(), '_', '.'), $uppercase, $lowercase)"/>
     <struct name="{$name}">
-      <xsl:apply-templates select="member"/>
+      <xsl:apply-templates select=".//memberdef[@kind='variable']"/>
     </struct>
   </xsl:template>
 
   <!-- field handling -->
-  <xsl:template match="member[@kind='variable']">
+  <xsl:template match="memberdef[@kind='variable']">
      <xsl:variable name="name" select="name/text()"/>
     <xsl:variable name="id" select="@refid"/>
-    <xsl:variable name="fieldtype" select="document(concat(../@refid, '.xml'), ../@refid)//memberdef[@id=$id]/type//text()"/>
+    <xsl:variable name="fieldtype" select="type//text()"/>
     <xsl:variable name="type">
       <xsl:call-template name="type-to-ender">
         <xsl:with-param name="text" select="$fieldtype"/>
@@ -124,7 +118,7 @@
   </xsl:template>
 
   <!-- enums handling -->
-  <xsl:template match="member[@kind='enum']">
+  <xsl:template match="memberdef[@kind='enum']">
     <xsl:variable name="name">
       <xsl:call-template name="type-to-ender">
         <xsl:with-param name="text" select="name/text()"/>
@@ -133,7 +127,7 @@
     <xsl:variable name="id" select="@refid"/>
     <enum name="{$name}">
       <!-- pick every enumvalue and pass the parent name to temove it from the generated names -->
-      <xsl:apply-templates select="document(concat(../@refid, '.xml'), ../@refid)//memberdef[@id=$id]/enumvalue">
+      <xsl:apply-templates select="enumvalue">
         <xsl:with-param name="pname" select="translate(name/text(), $uppercase, $lowercase)"/>
       </xsl:apply-templates>
     </enum>
@@ -210,7 +204,7 @@
   </xsl:template>
 
   <!-- method handling -->
-  <xsl:template match="member[@kind='function']">
+  <xsl:template match="memberdef[@kind='function']">
     <xsl:param name="pname"/>
     <xsl:param name="ptype"/>
     <xsl:variable name="id" select="@refid"/>
@@ -223,7 +217,7 @@
       </xsl:call-template>
     </xsl:variable>
     <!-- decide to define a method, ctor or property -->
-    <xsl:variable name="first_param" select="document(concat(../@refid, '.xml'), ../@refid)//memberdef[@id=$id]//param[1]"/>
+    <xsl:variable name="first_param" select=".//param[1]"/>
     <xsl:variable name="first_param_type">
       <xsl:call-template name="type-to-ender">
         <xsl:with-param name="text" select="string($first_param/type)"/>
@@ -233,25 +227,25 @@
       <xsl:when test="contains($first_param_type, $ptype)">
         <method name="{$name}">
           <!-- get the args -->
-          <xsl:apply-templates select="document(concat(../@refid, '.xml'), ../@refid)//memberdef[@id=$id]//param[position() > 1]"/>
+          <xsl:apply-templates select=".//param[position() > 1]"/>
         </method>
       </xsl:when>
       <xsl:when test="contains($name, 'new')">
         <ctor>
           <!-- get the args -->
-          <xsl:apply-templates select="document(concat(../@refid, '.xml'), ../@refid)//memberdef[@id=$id]//param"/>
+          <xsl:apply-templates select=".//param"/>
         </ctor>
       </xsl:when>
       <xsl:otherwise>
         <function name="{$name}">
           <!-- get the args -->
-          <xsl:apply-templates select="document(concat(../@refid, '.xml'), ../@refid)//memberdef[@id=$id]//param"/>
+          <xsl:apply-templates select=".//param"/>
         </function>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="member[@kind='typedef']">
+  <xsl:template match="memberdef[@kind='typedef']">
     <!-- typedefs can be or either functions, new types or objects. object must be a typedef of an struct -->
     <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
     <xsl:variable name="name">
@@ -259,14 +253,13 @@
         <xsl:with-param name="text" select="name/text()"/>
       </xsl:call-template>
     </xsl:variable>
-    <!-- document() with two arguments: the first the path/node set, the second the node set to take the base uri from -->
     <xsl:variable name="id" select="@refid"/>
-    <xsl:variable name="type" select="document(concat(../@refid, '.xml'), ../@refid)//memberdef[@id=$id]/type/text()"/>
+    <xsl:variable name="type" select="type/text()"/>
     <xsl:choose>
       <xsl:when test="contains($type, 'struct _')">
         <object name="{$name}">
           <!-- get every function that belongs to this group -->
-          <xsl:apply-templates select="../descendant::member[@kind='function']">
+          <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
             <xsl:with-param name="pname" select="$lower_name"/>
             <xsl:with-param name="ptype" select="$name"/>
           </xsl:apply-templates>
@@ -278,9 +271,15 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Process innerclasses -->
+  <xsl:template match="innerclass">
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef[@kind='struct']"/>
+  </xsl:template>
+
   <!-- Process a group -->
   <xsl:template match="doxygen/compounddef[@kind='group']">
-    <xsl:variable name="ender-name">
+    <xsl:variable name="lower_name" select="translate(compoundname/text(), $uppercase, $lowercase)"/>
+    <xsl:variable name="name">
       <xsl:call-template name="type-to-ender">
         <xsl:with-param name="text" select="compoundname/text()"/>
       </xsl:call-template>
@@ -290,15 +289,26 @@
     <xsl:variable name="is-struct" select="contains(.//memberdef[@kind='typedef']/type/text(), 'struct')"/>
     <xsl:choose>
       <xsl:when test="not($is-enum or $is-struct)">
-        <object name="{$ender-name}">
-        <!-- now the methods -->
+        <xsl:apply-templates select=".//memberdef[@kind='enum']"/>
+        <object name="{$name}">
+          <!-- now the methods -->
+          <xsl:apply-templates select=".//memberdef[@kind='function']">
+            <xsl:with-param name="pname" select="$lower_name"/>
+            <xsl:with-param name="ptype" select="$name"/>
+          </xsl:apply-templates>
         </object>
       </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="./innerclass"/>
+        <xsl:apply-templates select=".//memberdef[@kind='enum']"/>
+        <xsl:apply-templates select=".//memberdef[@kind='typedef']"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <!-- Process every group -->
   <xsl:template match="doxygenindex/compound[@kind='group']">
+    <!-- document() with two arguments: the first the path/node set, the second the node set to take the base uri from -->
     <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
   </xsl:template>
 </xsl:stylesheet>
