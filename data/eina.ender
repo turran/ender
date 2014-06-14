@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone="yes"?>
+<lib name="eina" version="1" case="underscore">
+  <def name="eina.f16p16" type="int32"/>
+  <struct name="eina.rectangle">
+    <field name="x" type="int32"/>
+    <field name="y" type="int32"/>
+    <field name="w" type="int32"/>
+    <field name="h" type="int32"/>
+  </struct>
+</lib>
