@@ -30,6 +30,19 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- get the return type of a function that is a ctor, usefull to know if a
+       function is a method or not
+  -->
+  <xsl:template name="ctor-return-type">
+    <xsl:param name="ctor"/>
+    <xsl:variable name="rtype">
+      <xsl:call-template name="type-to-ender">
+        <xsl:with-param name="text" select="string($ctor/type)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$rtype"/>
+  </xsl:template>
+
   <!-- main entry point -->
   <xsl:template match="/">
     <lib name="{$lib}" version="{$version}" case="{$case}">
@@ -40,68 +53,73 @@
   <!-- convert a type to ender -->
   <xsl:template name="type-to-ender">
     <xsl:param name="text"/>
+    <!-- remove the EAPI thing -->
+    <xsl:variable name="replaced">
+      <xsl:call-template name="string-replace-all">
+        <xsl:with-param name="text" select="$text"/>
+        <xsl:with-param name="replace" select="'EAPI'"/>
+        <xsl:with-param name="by" select="''"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="name" select="normalize-space($replaced)"/>
     <xsl:choose>
-      <xsl:when test="$text = 'char *'">
+      <xsl:when test="$name = 'char *'">
         <xsl:value-of select="'string'"/>
       </xsl:when>
       <!-- int8 variants -->
-      <xsl:when test="$text = 'int8_t'">
+      <xsl:when test="$name = 'int8_t'">
         <xsl:value-of select="'int8'"/>
       </xsl:when>
       <!-- int32 variants -->
-      <xsl:when test="$text = 'int'">
+      <xsl:when test="$name = 'int'">
         <xsl:value-of select="'int32'"/>
       </xsl:when>
-      <xsl:when test="$text = 'int32_t'">
+      <xsl:when test="$name = 'int32_t'">
         <xsl:value-of select="'int32'"/>
       </xsl:when>
       <!-- int64 variants -->
-      <xsl:when test="$text = 'long'">
+      <xsl:when test="$name = 'long'">
         <xsl:value-of select="'int64'"/>
       </xsl:when>
-      <xsl:when test="$text = 'long int'">
+      <xsl:when test="$name = 'long int'">
         <xsl:value-of select="'int64'"/>
       </xsl:when>
       <!-- uint8 variants -->
-      <xsl:when test="$text = 'uint8_t'">
+      <xsl:when test="$name = 'uint8_t'">
         <xsl:value-of select="'uint8'"/>
       </xsl:when>
       <!-- uint8 variants -->
-      <xsl:when test="$text = 'uint16_t'">
+      <xsl:when test="$name = 'uint16_t'">
         <xsl:value-of select="'uint16'"/>
       </xsl:when>
       <!-- uint32 variants -->
-      <xsl:when test="$text = 'unsigned int'">
+      <xsl:when test="$name = 'unsigned int'">
         <xsl:value-of select="'uint32'"/>
       </xsl:when>
-      <xsl:when test="$text = 'uint32_t'">
+      <xsl:when test="$name = 'uint32_t'">
         <xsl:value-of select="'uint32'"/>
       </xsl:when>
       <!-- uint64 variants -->
-      <xsl:when test="$text = 'unsigned long'">
+      <xsl:when test="$name = 'unsigned long'">
         <xsl:value-of select="'uint64'"/>
       </xsl:when>
-      <xsl:when test="$text = 'Eina_Bool'">
+      <xsl:when test="$name = 'Eina_Bool'">
         <xsl:value-of select="'bool'"/>
       </xsl:when>
       <!-- pointer variants -->
-      <xsl:when test="$text = 'void *'">
+      <xsl:when test="$name = 'void *'">
         <xsl:value-of select="'pointer'"/>
       </xsl:when>
       <xsl:otherwise>
         <!-- make it lowercase, change the '_' to '.' and remove any * indirection -->
-        <xsl:value-of select="normalize-space(translate(translate(translate($text, '_', '.'), $uppercase, $lowercase), '*', ''))"/>
+        <xsl:value-of select="normalize-space(translate(translate(translate($name, '_', '.'), $uppercase, $lowercase), '*', ''))"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <!-- struct handling -->
   <xsl:template match="compounddef[@kind='struct']">
-    <!-- The name of the struct must be all lower case, replace the '_' by '.', etc -->
-    <xsl:variable name="name" select="translate(translate(compoundname/text(), '_', '.'), $uppercase, $lowercase)"/>
-    <struct name="{$name}">
-      <xsl:apply-templates select=".//memberdef[@kind='variable']"/>
-    </struct>
+    <xsl:apply-templates select=".//memberdef[@kind='variable']"/>
   </xsl:template>
 
   <!-- field handling -->
@@ -130,6 +148,9 @@
       <xsl:apply-templates select="enumvalue">
         <xsl:with-param name="pname" select="translate(name/text(), $uppercase, $lowercase)"/>
       </xsl:apply-templates>
+      <!-- get all the functions related -->
+<!--      <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
+      </xsl:apply-templates>-->
     </enum>
   </xsl:template>
 
@@ -193,7 +214,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="normalize-space(substring(string($no-space-type), 1,string-length(string($no-space-type)) - 1))"/>
+            <xsl:with-param name="text" select="normalize-space(substring(string($no-space-type), 1, string-length(string($no-space-type)) - 1))"/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
@@ -224,17 +245,23 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="contains($first_param_type, $ptype)">
-        <method name="{$name}">
-          <!-- get the args -->
-          <xsl:apply-templates select=".//param[position() > 1]"/>
-        </method>
-      </xsl:when>
       <xsl:when test="contains($name, 'new')">
         <ctor>
           <!-- get the args -->
           <xsl:apply-templates select=".//param"/>
         </ctor>
+      </xsl:when>
+      <xsl:when test="contains($name, 'unref')">
+        <unref/>
+      </xsl:when>
+      <xsl:when test="contains($name, 'ref')">
+        <ref/>
+      </xsl:when>
+      <xsl:when test="contains($first_param_type, $ptype)">
+        <method name="{$name}">
+          <!-- get the args -->
+          <xsl:apply-templates select=".//param[position() > 1]"/>
+        </method>
       </xsl:when>
       <xsl:otherwise>
         <function name="{$name}">
@@ -246,6 +273,12 @@
   </xsl:template>
 
   <xsl:template match="memberdef[@kind='typedef']">
+    <!-- check if the definition has an inherits tag -->
+    <xsl:variable name="itype">
+      <xsl:call-template name="type-to-ender">
+        <xsl:with-param name="text" select=".//inherits/@from"/>
+      </xsl:call-template>
+    </xsl:variable>
     <!-- typedefs can be or either functions, new types or objects. object must be a typedef of an struct -->
     <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
     <xsl:variable name="name">
@@ -257,13 +290,22 @@
     <xsl:variable name="type" select="type/text()"/>
     <xsl:choose>
       <xsl:when test="contains($type, 'struct _')">
-        <object name="{$name}">
+        <!-- decide to use the inherit or not -->
+        <xsl:element name="object">
+          <xsl:attribute name="name">
+            <xsl:value-of select="$name"/>
+          </xsl:attribute>
+          <xsl:if test="string($itype)">
+            <xsl:attribute name="inherits">
+              <xsl:value-of select="$itype"/>
+            </xsl:attribute>
+          </xsl:if>
           <!-- get every function that belongs to this group -->
           <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
             <xsl:with-param name="pname" select="$lower_name"/>
             <xsl:with-param name="ptype" select="$name"/>
           </xsl:apply-templates>
-        </object>
+        </xsl:element>
       </xsl:when>
       <xsl:otherwise>
         <unknown type="{$type}"/>
@@ -271,13 +313,35 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Process innerclasses -->
+  <!-- Process innerclasses, i.e structs -->
   <xsl:template match="innerclass">
-    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef[@kind='struct']"/>
+    <!-- The name of the struct must be all lower case, replace the '_' by '.', etc -->
+    <!--<xsl:variable name="name" select="translate(translate(compoundname/text(), '_', '.'), $uppercase, $lowercase)"/>-->
+    <xsl:variable name="lower_name" select="translate(text(), $uppercase, $lowercase)"/>
+    <xsl:variable name="name">
+      <xsl:call-template name="type-to-ender">
+        <xsl:with-param name="text" select="text()"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <struct name="{$name}">
+      <!-- the fields -->
+      <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef[@kind='struct']"/>
+      <!-- the functions -->
+      <xsl:apply-templates select="..//memberdef[@kind='function']">
+        <xsl:with-param name="pname" select="$lower_name"/>
+        <xsl:with-param name="ptype" select="$name"/>
+      </xsl:apply-templates>
+    </struct>
   </xsl:template>
 
   <!-- Process a group -->
   <xsl:template match="doxygen/compounddef[@kind='group']">
+    <!-- check if the definition has an inherits tag -->
+    <xsl:variable name="itype">
+      <xsl:call-template name="type-to-ender">
+        <xsl:with-param name="text" select=".//inherits/@from"/>
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:variable name="lower_name" select="translate(compoundname/text(), $uppercase, $lowercase)"/>
     <xsl:variable name="name">
       <xsl:call-template name="type-to-ender">
@@ -285,18 +349,44 @@
       </xsl:call-template>
     </xsl:variable>
     <!-- check that we have a valid struct/enum -->
-    <xsl:variable name="is-enum" select="contains(.//memberdef[@kind='typedef']/type/text(), 'enum')"/>
-    <xsl:variable name="is-struct" select="contains(.//memberdef[@kind='typedef']/type/text(), 'struct')"/>
+    <xsl:variable name="has-enum" select="count(.//memberdef[@kind='enum']) > 0"/>
+    <xsl:variable name="has-struct" select="count(.//innerclass) > 0"/>
     <xsl:choose>
-      <xsl:when test="not($is-enum or $is-struct)">
-        <xsl:apply-templates select=".//memberdef[@kind='enum']"/>
-        <object name="{$name}">
+      <!-- we define an object with the name of the group -->
+      <xsl:when test="not($has-enum or $has-struct)">
+        <!-- get the return type of a constructor in case it has it -->
+        <xsl:variable name="rtype">
+          <xsl:call-template name="ctor-return-type">
+            <xsl:with-param name="ctor" select=".//memberdef[@kind='function'][contains(./name/text(), 'new')][1]"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <!-- choose to use the rtype or the name -->
+        <xsl:variable name="ptype">
+          <xsl:choose>
+            <xsl:when test="string($rtype)">
+              <xsl:value-of select="$rtype"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$name"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <!-- decide to use the inherit or not -->
+        <xsl:element name="object">
+          <xsl:attribute name="name">
+            <xsl:value-of select="$name"/>
+          </xsl:attribute>
+          <xsl:if test="string($itype)">
+            <xsl:attribute name="inherits">
+              <xsl:value-of select="$itype"/>
+            </xsl:attribute>
+          </xsl:if>
           <!-- now the methods -->
           <xsl:apply-templates select=".//memberdef[@kind='function']">
             <xsl:with-param name="pname" select="$lower_name"/>
-            <xsl:with-param name="ptype" select="$name"/>
+            <xsl:with-param name="ptype" select="$ptype"/>
           </xsl:apply-templates>
-        </object>
+        </xsl:element>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="./innerclass"/>
