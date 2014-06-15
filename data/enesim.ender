@@ -66,15 +66,13 @@
     <value name="opengl"/>
     <value name="enesim_backends"/>
   </enum>
-  <object name="enesim.main">
-    <function name="enesim_init"/>
-    <function name="enesim_shutdown"/>
-    <function name="enesim_version_get">
-      <arg name="major" type="uint32" direction="out" transfer="full"/>
-      <arg name="minor" type="uint32" direction="out" transfer="full"/>
-      <arg name="micro" type="unsigned int" direction="in" transfer="full"/>
-    </function>
-  </object>
+  <function name="init"/>
+  <function name="shutdown"/>
+  <function name="version_get">
+    <arg name="major" type="uint32" direction="out" transfer="full"/>
+    <arg name="minor" type="uint32" direction="out" transfer="full"/>
+    <arg name="micro" type="unsigned int" direction="in" transfer="full"/>
+  </function>
   <enum name="enesim.format">
     <value name="none"/>
     <value name="argb8888"/>
@@ -1378,7 +1376,7 @@
     <method name="enesim_surface_pattern_source_surface_set">
       <arg name="source" type="enesim.surface" direction="in" transfer="full"/>
     </method>
-    <method name="enesim_surface_pattern_source_surface_get"/>
+    <method name="source_surface_get"/>
     <method name="repeat_mode_set">
       <arg name="mode" type="enesim.repeat.mode" direction="in" transfer="full"/>
     </method>

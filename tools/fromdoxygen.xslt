@@ -67,9 +67,9 @@
   <!-- main entry point -->
   <xsl:template match="/">
     <lib name="{$lib}" version="{$version}" case="{$case}">
-      <!-- We need to get every header, get it and then get every group from such header -->
-      <!--<xsl:apply-templates select="doxygenindex/compound[@kind='group']"/>-->
+      <!-- first get the dependencies -->
       <xsl:apply-templates select=".//depends"/>
+      <!-- We need to get every header, get it and then get every group from such header -->
       <xsl:apply-templates select="doxygen/compounddef/includes[@local='yes']"/>
     </lib>
   </xsl:template>
@@ -370,9 +370,17 @@
       </xsl:call-template>
     </xsl:variable>
     <!-- check that we have a valid struct/enum -->
+    <xsl:variable name="is-main" select="contains($lower_name, 'main')"/>
     <xsl:variable name="has-enum" select="count(.//memberdef[@kind='enum']) > 0"/>
     <xsl:variable name="has-struct" select="count(.//innerclass) > 0"/>
     <xsl:choose>
+      <!-- main library functions -->
+      <xsl:when test="$is-main">
+        <xsl:apply-templates select=".//memberdef[@kind='function']">
+          <xsl:with-param name="pname" select="$lib"/>
+          <xsl:with-param name="ptype" select="'none'"/>
+        </xsl:apply-templates>
+      </xsl:when>
       <!-- we define an object with the name of the group -->
       <xsl:when test="not($has-enum or $has-struct)">
         <!-- get the return type of a constructor in case it has it -->
