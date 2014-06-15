@@ -43,10 +43,34 @@
     <xsl:value-of select="$rtype"/>
   </xsl:template>
 
+  <!-- ingroup ref -->
+  <xsl:template match="ingroup/ref">
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
+  </xsl:template>
+
+  <!-- header file -->
+  <xsl:template match="compounddef[@kind='file']">
+    <xsl:apply-templates select=".//ingroup/ref"/>
+  </xsl:template>
+
+  <!-- header ref -->
+  <xsl:template match="includes[@local='yes']">
+    <!-- get all the groups with the <ingroup> tag -->
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
+  </xsl:template>
+
+  <xsl:template match="depends">
+    <xsl:variable name="name" select="@from"/>
+    <includes name="{$name}"/>
+  </xsl:template>
+
   <!-- main entry point -->
   <xsl:template match="/">
     <lib name="{$lib}" version="{$version}" case="{$case}">
-      <xsl:apply-templates select="doxygenindex/compound[@kind='group']"/>
+      <!-- We need to get every header, get it and then get every group from such header -->
+      <!--<xsl:apply-templates select="doxygenindex/compound[@kind='group']"/>-->
+      <xsl:apply-templates select=".//depends"/>
+      <xsl:apply-templates select="doxygen/compounddef/includes[@local='yes']"/>
     </lib>
   </xsl:template>
 
@@ -148,9 +172,6 @@
       <xsl:apply-templates select="enumvalue">
         <xsl:with-param name="pname" select="translate(name/text(), $uppercase, $lowercase)"/>
       </xsl:apply-templates>
-      <!-- get all the functions related -->
-<!--      <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
-      </xsl:apply-templates>-->
     </enum>
   </xsl:template>
 
