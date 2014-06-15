@@ -206,15 +206,113 @@
     </method>
     <method name="type_get"/>
   </struct>
-  <field name="xx" type="double"/>
-  <field name="xy" type="double"/>
-  <field name="xz" type="double"/>
-  <field name="yx" type="double"/>
-  <field name="yy" type="double"/>
-  <field name="yz" type="double"/>
-  <field name="zx" type="double"/>
-  <field name="zy" type="double"/>
-  <field name="zz" type="double"/>
+  <struct name="enesim.matrix">
+    <field name="xx" type="double"/>
+    <field name="xy" type="double"/>
+    <field name="xz" type="double"/>
+    <field name="yx" type="double"/>
+    <field name="yy" type="double"/>
+    <field name="yz" type="double"/>
+    <field name="zx" type="double"/>
+    <field name="zy" type="double"/>
+    <field name="zz" type="double"/>
+    <method name="type_get"/>
+    <method name="values_set">
+      <arg name="a" type="double" direction="in" transfer="full"/>
+      <arg name="b" type="double" direction="in" transfer="full"/>
+      <arg name="c" type="double" direction="in" transfer="full"/>
+      <arg name="d" type="double" direction="in" transfer="full"/>
+      <arg name="e" type="double" direction="in" transfer="full"/>
+      <arg name="f" type="double" direction="in" transfer="full"/>
+      <arg name="g" type="double" direction="in" transfer="full"/>
+      <arg name="h" type="double" direction="in" transfer="full"/>
+      <arg name="i" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="values_get">
+      <arg name="a" type="double" direction="in" transfer="full"/>
+      <arg name="b" type="double" direction="in" transfer="full"/>
+      <arg name="c" type="double" direction="in" transfer="full"/>
+      <arg name="d" type="double" direction="in" transfer="full"/>
+      <arg name="e" type="double" direction="in" transfer="full"/>
+      <arg name="f" type="double" direction="in" transfer="full"/>
+      <arg name="g" type="double" direction="in" transfer="full"/>
+      <arg name="h" type="double" direction="in" transfer="full"/>
+      <arg name="i" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="fixed_values_get">
+      <arg name="a" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="b" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="c" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="d" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="e" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="f" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="g" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="h" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="i" type="eina.f16p16" direction="in" transfer="full"/>
+    </method>
+    <method name="matrix_f16p16_to">
+      <arg name="fm" type="enesim.matrix.f16p16" direction="in" transfer="full"/>
+    </method>
+    <method name="is_equal">
+      <arg name="m2" type="enesim.matrix" direction="in" transfer="none"/>
+    </method>
+    <method name="compose">
+      <arg name="m2" type="enesim.matrix" direction="in" transfer="none"/>
+      <arg name="dst" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="translate">
+      <arg name="tx" type="double" direction="in" transfer="full"/>
+      <arg name="ty" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="scale">
+      <arg name="sx" type="double" direction="in" transfer="full"/>
+      <arg name="sy" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="rotate">
+      <arg name="rad" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="identity"/>
+    <method name="determinant"/>
+    <method name="divide">
+      <arg name="scalar" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="inverse">
+      <arg name="m2" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="transpose">
+      <arg name="a" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="cofactor">
+      <arg name="a" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="adjoint">
+      <arg name="a" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="point_transform">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+      <arg name="xr" type="double" direction="in" transfer="full"/>
+      <arg name="yr" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="eina_rectangle_transform">
+      <arg name="r" type="eina.rectangle" direction="in" transfer="none"/>
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="rectangle_transform">
+      <arg name="r" type="enesim.rectangle" direction="in" transfer="none"/>
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="quad_quad_map">
+      <arg name="src" type="enesim.quad" direction="in" transfer="none"/>
+      <arg name="dst" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="square_quad_map">
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="quad_square_map">
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+  </struct>
   <struct name="enesim.path.command.move.to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
