@@ -28,6 +28,7 @@
 #include "ender_item_constant.h"
 #include "ender_item_enum.h"
 #include "ender_lib.h"
+#include "ender_parser.h"
 
 #include "ender_main_private.h"
 #include "ender_lib_private.h"
@@ -808,10 +809,45 @@ static Eina_Bool _ender_parser_lib_attrs_set(Ender_Parser_Context *c,
 	return EINA_TRUE;
 }
 
+static Eina_Bool _ender_parser_include_ctor(Ender_Parser_Context *c)
+{
+	return EINA_TRUE;
+}
+
+static Eina_Bool _ender_parser_include_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (!strcmp(key, "name"))
+	{
+		const Ender_Lib *dep;
+		Enesim_Stream *s;
+		char *file = NULL;
+
+		if (asprintf(&file, "%s/%s.ender", PACKAGE_DATA_DIR, value) < 0)
+			return EINA_FALSE;
+
+		s = enesim_stream_file_new(file, "r");
+		DBG("Including %s %p", file, s);
+		ender_parser_parse(s);
+		free(file);
+
+		dep = ender_lib_find(value);
+		if (dep)
+		{
+			ender_lib_dependency_add(c->parser->lib, dep);
+		}
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
 static Ender_Parser_Tag _tags[] = {
 	{ "lib", _ender_parser_lib_ctor, _ender_parser_lib_dtor, _ender_parser_lib_attrs_set },
 	{ "type", NULL, NULL, NULL },
-	{ "include", NULL, NULL, NULL },
+	{ "include", _ender_parser_include_ctor, NULL, _ender_parser_include_attrs_set },
 	{ "object", _ender_parser_object_ctor, _ender_parser_object_dtor, _ender_parser_object_attrs_set },
 	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
 	{ "enum", _ender_parser_enum_ctor, _ender_parser_enum_dtor, _ender_parser_enum_attrs_set },

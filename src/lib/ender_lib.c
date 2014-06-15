@@ -46,8 +46,22 @@ static int _init = 0;
 
 static void _ender_lib_dir_list_cb(const char *name, const char *path, void *data)
 {
+	const Ender_Lib *lib;
 	Enesim_Stream *s;
 	char *file = NULL;
+	char *token;
+	char *fname;
+
+	token = strchr(name, '.');
+	if (!token) return;
+
+	fname = strndup(name, token - name);
+	lib = ender_lib_find(fname);
+	if (lib)
+	{
+		INF("Library '%s' already parsed", fname);
+		return;
+	}
 
 	if (asprintf(&file, "%s/%s", path, name) < 0)
 		return;
@@ -180,8 +194,16 @@ void ender_lib_dependency_add(Ender_Lib *thiz, const Ender_Lib *dep)
 
 void ender_lib_register(Ender_Lib *thiz)
 {
+	Ender_Lib *other;
+
 	if (!thiz) return;
 	if (!thiz->name) return;
+
+	other = eina_hash_find(_libraries, thiz->name);
+	if (other)
+	{
+		WRN("Library '%s' already registered", thiz->name);
+	}
 
 	DBG("Registering lib '%s'", thiz->name);
 	eina_hash_add(_libraries, thiz->name, thiz);
