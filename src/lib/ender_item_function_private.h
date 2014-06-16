@@ -25,6 +25,7 @@ Ender_Item * ender_item_function_new(void);
 void ender_item_function_symname_set(Ender_Item *i, const char *symname);
 void ender_item_function_arg_add(Ender_Item *i, Ender_Item *arg);
 void ender_item_function_flags_set(Ender_Item *i, int flags);
+void ender_item_function_ret_set(Ender_Item *i, Ender_Item *ret);
 
 #endif
 

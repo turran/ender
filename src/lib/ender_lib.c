@@ -91,6 +91,16 @@ void ender_lib_init(void)
 		ender_item_name_set(i, "bool");
 		ender_item_basic_value_type_set(i, ENDER_VALUE_TYPE_BOOL);
 		ender_lib_item_add(_c_lib, i);
+		/* uint8 */
+		i = ender_item_basic_new();
+		ender_item_name_set(i, "uint8");
+		ender_item_basic_value_type_set(i, ENDER_VALUE_TYPE_UINT8);
+		ender_lib_item_add(_c_lib, i);
+		/* int8 */
+		i = ender_item_basic_new();
+		ender_item_name_set(i, "int8");
+		ender_item_basic_value_type_set(i, ENDER_VALUE_TYPE_INT8);
+		ender_lib_item_add(_c_lib, i);
 		/* uint32 */
 		i = ender_item_basic_new();
 		ender_item_name_set(i, "uint32");

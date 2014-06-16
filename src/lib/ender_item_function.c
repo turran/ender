@@ -54,6 +54,12 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 {
 	Ender_Item_Type type;
 
+	if (!i)
+	{
+		WRN("No item found");
+		return &ffi_type_pointer;
+	}
+
 	type = ender_item_type_get(i);
 	switch (type)
 	{
@@ -66,6 +72,14 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 			{
 				case ENDER_VALUE_TYPE_BOOL:
 				return &ffi_type_uint8;
+				break;
+
+				case ENDER_VALUE_TYPE_UINT8:
+				return &ffi_type_uint8;
+				break;
+
+				case ENDER_VALUE_TYPE_INT8:
+				return &ffi_type_sint8;
 				break;
 
 				case ENDER_VALUE_TYPE_UINT32:
@@ -188,6 +202,7 @@ void ender_item_function_ret_set(Ender_Item *i, Ender_Item *arg)
 		ender_item_unref(arg);
 		return;
 	}
+	thiz = ENDER_ITEM_FUNCTION(i);
 	thiz->ret = arg;
 	ender_item_parent_set(arg, i);
 }
@@ -307,7 +322,10 @@ EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args, Ender_
 
 	/* load the symbol */
 	if (!thiz->sym)
+	{
+		DBG("Loading symbol '%s'", thiz->symname);
 		thiz->sym = ender_item_sym_get(i, thiz->symname);
+	}
 	if (!thiz->sym)
 	{
 		CRI("Impossible to load the symbol '%s'", thiz->symname);

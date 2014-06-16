@@ -153,6 +153,22 @@ static char * _ender_parser_symname_get(Ender_Parser *thiz, Ender_Item *i)
 	}
 	return ret;
 }
+/*----------------------------------------------------------------------------*
+ *                            common item attrs                               *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_item_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (!strcmp(key, "name"))
+	{
+		ender_item_name_set(c->i, value);
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
 
 /*----------------------------------------------------------------------------*
  *                           common function attrs                            *
@@ -189,25 +205,11 @@ static Eina_Bool _ender_parser_common_function_attrs_set(Ender_Parser_Context *c
 	Ender_Parser_Function *thiz;
 
 	thiz = c->prv;
-	if (!strcmp(key, "symname"))
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
+	else if (!strcmp(key, "symname"))
 	{
 		thiz->symname = strdup(value);
-	}
-	else
-	{
-		return EINA_FALSE;
-	}
-	return EINA_TRUE;
-}
-/*----------------------------------------------------------------------------*
- *                            common item attrs                               *
- *----------------------------------------------------------------------------*/
-static Eina_Bool _ender_parser_item_attrs_set(Ender_Parser_Context *c,
-		const char *key, const char *value)
-{
-	if (!strcmp(key, "name"))
-	{
-		ender_item_name_set(c->i, value);
 	}
 	else
 	{
@@ -309,8 +311,6 @@ static Eina_Bool _ender_parser_function_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
 	if (_ender_parser_common_function_attrs_set(c, key, value))
-		return EINA_TRUE;
-	if (_ender_parser_item_attrs_set(c, key, value))
 		return EINA_TRUE;
 	return EINA_FALSE;
 }
@@ -446,6 +446,56 @@ static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
+ *                                return tag                                     *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_return_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Context *parent;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	if ((!parent) || (!parent->i) ||
+			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_FUNCTION))
+	{
+		ERR("An return must be a child of a function");
+		return EINA_FALSE;
+	}
+	c->i = ender_item_arg_new();
+	ender_item_arg_flags_set(c->i, ENDER_ITEM_ARG_FLAG_IS_RETURN);
+	/* add the return to the function */
+	parent = _ender_parser_parent_context_get(c->parser);
+	ender_item_function_ret_set(parent->i, ender_item_ref(c->i));
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_return_dtor(Ender_Parser_Context *c)
+{
+}
+
+static Eina_Bool _ender_parser_return_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
+	else if (!strcmp(key, "type"))
+	{
+		Ender_Item *type;
+
+		type = ender_lib_item_find(c->parser->lib, value);
+		if (!type)
+		{
+			ERR("Can not find type '%s'", value);
+			return EINA_FALSE;
+		}
+		ender_item_arg_type_set(c->i, ender_item_ref(type));
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
  *                                method tag                                  *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
@@ -527,9 +577,7 @@ static void _ender_parser_method_dtor(Ender_Parser_Context *c)
 static Eina_Bool _ender_parser_method_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
-	if (_ender_parser_item_attrs_set(c, key, value))
-		return EINA_TRUE;
-	else if (_ender_parser_common_function_attrs_set(c, key, value))
+	if (_ender_parser_common_function_attrs_set(c, key, value))
 		return EINA_TRUE;
 	else
 	{
@@ -546,7 +594,6 @@ static Eina_Bool _ender_parser_ctor_ctor(Ender_Parser_Context *c)
 		return EINA_FALSE;
 
 	ender_item_function_flags_set(c->i, ENDER_ITEM_FUNCTION_FLAG_CTOR);
-	ender_item_name_set(c->i, "new");
 
 	return EINA_TRUE;
 }
@@ -857,6 +904,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "function", _ender_parser_function_ctor, _ender_parser_function_dtor, _ender_parser_function_attrs_set },
 	{ "ctor", _ender_parser_ctor_ctor, _ender_parser_ctor_dtor, _ender_parser_ctor_attrs_set },
 	{ "arg", _ender_parser_arg_ctor, _ender_parser_arg_dtor, _ender_parser_arg_attrs_set },
+	{ "return", _ender_parser_return_ctor, _ender_parser_return_dtor, _ender_parser_return_attrs_set },
 	{ "class", NULL, NULL, NULL },
 };
 

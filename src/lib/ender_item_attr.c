@@ -143,11 +143,9 @@ EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
 
 EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
 {
-	Ender_Item_Attr *thiz;
 	Ender_Item *parent;
 	Eina_Bool ret = EINA_FALSE;
 
-	thiz = ENDER_ITEM_ATTR(i);
 	parent = ender_item_parent_get(i);
 	if (!parent)
 	{
@@ -171,11 +169,9 @@ done:
 
 EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
 {
-	Ender_Item_Attr *thiz;
 	Ender_Item *parent;
 	Eina_Bool ret = EINA_FALSE;
 
-	thiz = ENDER_ITEM_ATTR(i);
 	parent = ender_item_parent_get(i);
 	if (!parent)
 	{

@@ -35,6 +35,12 @@ size_t ender_value_type_size_get(Ender_Value_Type t)
 		case ENDER_VALUE_TYPE_BOOL:
 		return sizeof(Eina_Bool);
 
+		case ENDER_VALUE_TYPE_UINT8:
+		return sizeof(uint8_t);
+
+		case ENDER_VALUE_TYPE_INT8:
+		return sizeof(int8_t);
+
 		case ENDER_VALUE_TYPE_UINT32:
 		return sizeof(uint32_t);
 
@@ -66,6 +72,12 @@ ssize_t ender_value_type_alignment_get(Ender_Value_Type t)
 	{
 		case ENDER_VALUE_TYPE_BOOL:
 		return __alignof__(Eina_Bool);
+
+		case ENDER_VALUE_TYPE_UINT8:
+		return __alignof__(uint8_t);
+
+		case ENDER_VALUE_TYPE_INT8:
+		return __alignof__(int8_t);
 
 		case ENDER_VALUE_TYPE_UINT32:
 		return __alignof__(uint32_t);

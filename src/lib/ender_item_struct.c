@@ -153,6 +153,14 @@ Eina_Bool ender_item_struct_field_value_get(void *o, Ender_Item *field,
 				v->b = *((Eina_Bool *)oa);
 				break;
 
+				case ENDER_VALUE_TYPE_UINT8:
+				v->u8 = *((uint8_t *)oa);
+				break;
+
+				case ENDER_VALUE_TYPE_INT8:
+				v->i8 = *((int8_t *)oa);
+				break;
+
 				case ENDER_VALUE_TYPE_UINT32:
 				v->u32 = *((uint32_t *)oa);
 				break;
@@ -211,6 +219,14 @@ Eina_Bool ender_item_struct_field_value_set(void *o, Ender_Item *field,
 			{
 				case ENDER_VALUE_TYPE_BOOL:
 				*((Eina_Bool *)oa) = v->b;
+				break;
+
+				case ENDER_VALUE_TYPE_UINT8:
+				*((uint8_t *)oa) = v->u8;
+				break;
+
+				case ENDER_VALUE_TYPE_INT8:
+				*((int8_t *)oa) = v->i8;
 				break;
 
 				case ENDER_VALUE_TYPE_UINT32:
