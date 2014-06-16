@@ -190,6 +190,90 @@
     <value name="{$name}"/>
   </xsl:template>
 
+  <!-- remove the const thing -->
+  <xsl:template name="remove-const">
+    <xsl:param name="type"/>
+    <!-- remove any const thing -->
+    <xsl:variable name="no-const-type">
+      <xsl:call-template name="string-replace-all">
+        <xsl:with-param name="text" select="$type"/>
+        <xsl:with-param name="replace" select="'const'"/>
+        <xsl:with-param name="by" select="''"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$no-const-type"/>
+  </xsl:template>
+
+  <!-- get the transfer type based on the const attribute -->
+  <xsl:template name="param-transfer-type">
+    <xsl:param name="type"/>
+    <xsl:variable name="no-const-type">
+      <xsl:call-template name="remove-const">
+        <xsl:with-param name="type" select="$type"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <!-- if they are equal means that no const has been removed and thus a full transfer is done -->
+      <xsl:when test="$no-const-type = $type">
+        <xsl:value-of select="'full'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="'none'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- get the type of an argument/param/return value -->
+  <xsl:template name="param-type">
+    <xsl:param name="direction"/>
+    <xsl:param name="name"/>
+    <!-- in case is an out direction, remove one pointer -->
+    <xsl:variable name="type">
+      <xsl:choose>
+        <xsl:when test="$direction = 'in'">
+          <xsl:call-template name="type-to-ender">
+            <xsl:with-param name="text" select="$name"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="type-to-ender">
+            <xsl:with-param name="text" select="normalize-space(substring(string($name), 1, string-length(string($name)) - 1))"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$type"/>
+  </xsl:template>
+
+  <!-- return value -->
+  <xsl:template match="type">
+    <xsl:variable name="name" select="string(.)"/>
+    <xsl:variable name="direction" select="'in'"/>
+    <!-- handle the transfer -->
+    <xsl:variable name="transfer">
+      <xsl:call-template name="param-transfer-type">
+        <xsl:with-param name="type" select="$name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- keep a no const -->
+    <xsl:variable name="no-const-type">
+      <xsl:call-template name="remove-const">
+        <xsl:with-param name="type" select="$name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="no-space-type" select="normalize-space($no-const-type)"/>
+    <!-- get the type -->
+    <xsl:variable name="type">
+      <xsl:call-template name="param-type">
+        <xsl:with-param name="name" select="$no-space-type"/>
+        <xsl:with-param name="direction" select="$direction"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="not($type = 'void')">
+      <return type="{$type}" transfer="{$transfer}"/>
+    </xsl:if>
+  </xsl:template>
+
   <!-- params -->
   <xsl:template match="param">
     <xsl:variable name="name" select="declname/text()"/>
@@ -204,41 +288,25 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <!-- remove any const thing -->
-    <xsl:variable name="no-const-type">
-      <xsl:call-template name="string-replace-all">
-        <xsl:with-param name="text" select="string(type)"/>
-        <xsl:with-param name="replace" select="'const'"/>
-        <xsl:with-param name="by" select="''"/>
-      </xsl:call-template>
-    </xsl:variable>
     <!-- handle the transfer -->
     <xsl:variable name="transfer">
-      <xsl:choose>
-        <!-- if they are equal means that no const has been removed and thus a full transfer is done -->
-        <xsl:when test="$no-const-type = string(type)">
-          <xsl:value-of select="'full'"/> 
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="'none'"/> 
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="param-transfer-type">
+        <xsl:with-param name="type" select="string(type)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- keep a no const -->
+    <xsl:variable name="no-const-type">
+      <xsl:call-template name="remove-const">
+        <xsl:with-param name="type" select="string(type)"/>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="no-space-type" select="normalize-space($no-const-type)"/>
-    <!-- in case is an out direction, remove one pointer -->
+    <!-- get the type -->
     <xsl:variable name="type">
-      <xsl:choose>
-        <xsl:when test="$direction = 'in'">
-          <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="$no-space-type"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="normalize-space(substring(string($no-space-type), 1, string-length(string($no-space-type)) - 1))"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="param-type">
+        <xsl:with-param name="name" select="$no-space-type"/>
+        <xsl:with-param name="direction" select="$direction"/>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:if test="not($type = 'void')">
       <arg name="{$name}" type="{$type}" direction="{$direction}" transfer="{$transfer}"/>
@@ -266,26 +334,47 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
+      <!-- for top level functions, use the ender name -->
+      <xsl:when test="$pname = 'none'">
+        <xsl:variable name="rname">
+          <xsl:call-template name="type-to-ender">
+            <xsl:with-param name="text" select="string($name)"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <function name="{$rname}">
+          <!-- get the return value -->
+          <xsl:apply-templates select="./type"/>
+          <!-- get the args -->
+          <xsl:apply-templates select=".//param"/>
+        </function>
+      </xsl:when>
+      <!-- ctors -->
       <xsl:when test="contains($name, 'new')">
-        <ctor>
+        <ctor name="{$name}">
           <!-- get the args -->
           <xsl:apply-templates select=".//param"/>
         </ctor>
       </xsl:when>
+      <!-- unref -->
       <xsl:when test="contains($name, 'unref')">
         <unref/>
       </xsl:when>
+      <!-- ref -->
       <xsl:when test="contains($name, 'ref')">
         <ref/>
       </xsl:when>
       <xsl:when test="contains($first_param_type, $ptype)">
         <method name="{$name}">
+          <!-- get the return value -->
+          <xsl:apply-templates select="./type"/>
           <!-- get the args -->
           <xsl:apply-templates select=".//param[position() > 1]"/>
         </method>
       </xsl:when>
       <xsl:otherwise>
         <function name="{$name}">
+          <!-- get the return value -->
+          <xsl:apply-templates select="./type"/>
           <!-- get the args -->
           <xsl:apply-templates select=".//param"/>
         </function>
@@ -377,7 +466,7 @@
       <!-- main library functions -->
       <xsl:when test="$is-main">
         <xsl:apply-templates select=".//memberdef[@kind='function']">
-          <xsl:with-param name="pname" select="$lib"/>
+          <xsl:with-param name="pname" select="'none'"/>
           <xsl:with-param name="ptype" select="'none'"/>
         </xsl:apply-templates>
       </xsl:when>
