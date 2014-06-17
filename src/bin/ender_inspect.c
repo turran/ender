@@ -26,9 +26,14 @@ static const char * value_type_dump(Ender_Value_Type vtype)
 {
 	switch (vtype)
 	{
-
 		case ENDER_VALUE_TYPE_BOOL:
 		return "bool";
+
+		case ENDER_VALUE_TYPE_UINT8:
+		return "uint8";
+
+		case ENDER_VALUE_TYPE_INT8:
+		return "int8";
 
 		case ENDER_VALUE_TYPE_UINT32:
 		return "uint32";
@@ -59,7 +64,7 @@ static const char * value_type_dump(Ender_Value_Type vtype)
 static const char * item_type_dump(Ender_Item *i)
 {
 	if (!i)
-		return "unknown";
+		return "unknown not i";
 
 	switch (ender_item_type_get(i))
 	{
@@ -67,6 +72,7 @@ static const char * item_type_dump(Ender_Item *i)
 		return value_type_dump(ender_item_basic_value_type_get(i));
 		break;
 
+		case ENDER_ITEM_TYPE_DEF:
 		case ENDER_ITEM_TYPE_OBJECT:
 		case ENDER_ITEM_TYPE_STRUCT:
 		case ENDER_ITEM_TYPE_ENUM:
@@ -138,6 +144,25 @@ static void lib_dump(const Ender_Lib *l)
 		printf("  %s\n", ender_item_name_get(i));
 		/* TODO values */
 		/* TODO functions */
+		ender_item_unref(i);
+	}
+
+	/* defs */
+	printf("Defs:\n");
+	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_DEF);
+	EINA_LIST_FREE(items, i)
+	{
+		Ender_Item *f;
+		Eina_List *subitems;
+
+		printf("  %s\n", ender_item_name_get(i));
+		printf("    Functions:\n");
+		subitems = ender_item_def_functions_get(i);
+		EINA_LIST_FREE(subitems, f)
+		{
+			function_dump(f, 8);
+			ender_item_unref(f);
+		}
 		ender_item_unref(i);
 	}
 
