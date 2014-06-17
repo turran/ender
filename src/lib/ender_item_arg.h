@@ -36,7 +36,8 @@ typedef enum _Ender_Item_Arg_Direction
 
 typedef enum _Ender_Item_Arg_Flags
 {
-	ENDER_ITEM_ARG_FLAG_IS_RETURN = (1 << 0),
+	ENDER_ITEM_ARG_FLAG_IS_RETURN  = (1 << 0),
+	ENDER_ITEM_ARG_FLAG_IS_CLOSURE = (1 << 1),
 } Ender_Item_Arg_Flags;
 
 EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i);
