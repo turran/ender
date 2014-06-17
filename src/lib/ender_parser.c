@@ -24,6 +24,7 @@
 #include "ender_item_attr.h"
 #include "ender_item_function.h"
 #include "ender_item_arg.h"
+#include "ender_item_def.h"
 #include "ender_item_object.h"
 #include "ender_item_constant.h"
 #include "ender_item_enum.h"
@@ -36,6 +37,7 @@
 #include "ender_item_struct_private.h"
 #include "ender_item_function_private.h"
 #include "ender_item_arg_private.h"
+#include "ender_item_def_private.h"
 #include "ender_item_object_private.h"
 #include "ender_item_enum_private.h"
 #include "ender_item_constant_private.h"
@@ -218,22 +220,58 @@ static Eina_Bool _ender_parser_common_function_attrs_set(Ender_Parser_Context *c
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
+ *                                def tag                                     *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_def_ctor(Ender_Parser_Context *c)
+{
+	c->i = ender_item_def_new();
+	return EINA_TRUE;
+}
+
+static Eina_Bool _ender_parser_def_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	/* We add the item here instead of the dtor because some child functions
+	 * might want to reference the struct type
+	 */
+	if (!strcmp(key, "name"))
+	{
+		ender_item_name_set(c->i, value);
+		ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+	}
+	else if (!strcmp(key, "type"))
+	{
+		Ender_Item *type;
+
+		type = ender_lib_item_find(c->parser->lib, value);
+		if (!type)
+		{
+			ERR("Can not find type '%s'", value);
+			return EINA_FALSE;
+		}
+		ender_item_def_type_set(c->i, ender_item_ref(type));
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
  *                                struct tag                                  *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_struct_ctor(Ender_Parser_Context *c)
 {
 	c->i = ender_item_struct_new();
-
 	return EINA_TRUE;
-}
-
-static void _ender_parser_struct_dtor(Ender_Parser_Context *c)
-{
 }
 
 static Eina_Bool _ender_parser_struct_attrs_set(Ender_Parser_Context *c,
 		const char *key, const char *value)
 {
+	/* We add the item here instead of the dtor because some child functions
+	 * might want to reference the struct type
+	 */
 	if (!strcmp(key, "name"))
 	{
 		ender_item_name_set(c->i, value);
@@ -263,9 +301,10 @@ static Eina_Bool _ender_parser_function_ctor(Ender_Parser_Context *c)
 	if (parent->i)
 	{
 		Ender_Item_Type type = ender_item_type_get(parent->i);
-		if (type != ENDER_ITEM_TYPE_STRUCT && type != ENDER_ITEM_TYPE_OBJECT)
+		if (type != ENDER_ITEM_TYPE_STRUCT && type != ENDER_ITEM_TYPE_OBJECT
+				&& type != ENDER_ITEM_TYPE_DEF)
 		{
-			ERR("The parent must be of type struct or object");
+			ERR("The parent must be of type struct, object or def");
 			return EINA_FALSE;
 		}
 	}
@@ -292,6 +331,10 @@ static void _ender_parser_function_dtor(Ender_Parser_Context *c)
 
 			case ENDER_ITEM_TYPE_OBJECT:
 			ender_item_object_function_add(parent->i, ender_item_ref(c->i));
+			break;
+
+			case ENDER_ITEM_TYPE_DEF:
+			ender_item_def_function_add(parent->i, ender_item_ref(c->i));
 			break;
 
 			default:
@@ -322,8 +365,17 @@ static Eina_Bool _ender_parser_object_function_ctor(Ender_Parser_Context *c)
 	Ender_Parser_Context *parent;
 
 	parent = _ender_parser_parent_context_get(c->parser);
-	if ((!parent) || (!parent->i) ||
-			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_OBJECT))
+	if (!parent)
+	{
+		ERR("A ctor must have a parent");
+		return EINA_FALSE;
+	}
+	if (!parent->i)
+	{
+		ERR("A ctor must have a parent type");
+		return EINA_FALSE;
+	}
+	if (ender_item_type_get(parent->i) != ENDER_ITEM_TYPE_OBJECT)
 	{
 		ERR("A ctor must be a child of an object");
 		return EINA_FALSE;
@@ -895,8 +947,9 @@ static Ender_Parser_Tag _tags[] = {
 	{ "lib", _ender_parser_lib_ctor, _ender_parser_lib_dtor, _ender_parser_lib_attrs_set },
 	{ "type", NULL, NULL, NULL },
 	{ "include", _ender_parser_include_ctor, NULL, _ender_parser_include_attrs_set },
+	{ "def", _ender_parser_def_ctor, NULL, _ender_parser_def_attrs_set },
 	{ "object", _ender_parser_object_ctor, _ender_parser_object_dtor, _ender_parser_object_attrs_set },
-	{ "struct", _ender_parser_struct_ctor, _ender_parser_struct_dtor, _ender_parser_struct_attrs_set },
+	{ "struct", _ender_parser_struct_ctor, NULL, _ender_parser_struct_attrs_set },
 	{ "enum", _ender_parser_enum_ctor, _ender_parser_enum_dtor, _ender_parser_enum_attrs_set },
 	{ "value", _ender_parser_value_ctor, _ender_parser_value_dtor, _ender_parser_value_attrs_set },
 	{ "field", _ender_parser_field_ctor, _ender_parser_field_dtor, _ender_parser_field_attrs_set },
