@@ -23,6 +23,7 @@
 #include "ender_item_function.h"
 #include "ender_item_basic.h"
 #include "ender_item_arg.h"
+#include "ender_item_def.h"
 
 #include "ender_main_private.h"
 #include "ender_item_private.h"
@@ -117,6 +118,18 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 
 		case ENDER_ITEM_TYPE_ENUM:
 		return &ffi_type_sint32;
+		break;
+
+		case ENDER_ITEM_TYPE_DEF:
+		{
+			Ender_Item *other;
+			ffi_type *ret;
+
+			other = ender_item_def_type_get(i);
+			ret = _ender_item_function_arg_ffi_to(other);
+			ender_item_unref(other);
+			return ret;
+		}
 		break;
 
 		case ENDER_ITEM_TYPE_STRUCT:
