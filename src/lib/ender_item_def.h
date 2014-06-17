@@ -16,29 +16,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ENDER_ITEM_H_
-#define _ENDER_ITEM_H_
+#ifndef _ENDER_ITEM_DEF_H_
+#define _ENDER_ITEM_DEF_H_
 
-typedef struct _Ender_Item Ender_Item;
-
-typedef enum _Ender_Item_Type {
-	ENDER_ITEM_TYPE_INVALID,
-	ENDER_ITEM_TYPE_BASIC,
-	ENDER_ITEM_TYPE_FUNCTION,
-	ENDER_ITEM_TYPE_ATTR,
-	ENDER_ITEM_TYPE_ARG,
-	ENDER_ITEM_TYPE_OBJECT,
-	ENDER_ITEM_TYPE_STRUCT,
-	ENDER_ITEM_TYPE_CONSTANT,
-	ENDER_ITEM_TYPE_ENUM,
-	ENDER_ITEM_TYPE_DEF,
-} Ender_Item_Type;
-
-EAPI Ender_Item * ender_item_ref(Ender_Item *thiz);
-EAPI void ender_item_unref(Ender_Item *thiz);
-EAPI const char * ender_item_name_get(Ender_Item *thiz);
-EAPI Ender_Item_Type ender_item_type_get(Ender_Item *thiz);
-EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz);
-EAPI const char * ender_item_type_name_get(Ender_Item_Type type);
+EAPI Ender_Item * ender_item_def_type_get(Ender_Item *i);
+EAPI Eina_List * ender_item_def_functions_get(Ender_Item *i);
 
 #endif

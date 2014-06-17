@@ -169,6 +169,9 @@ EAPI const char * ender_item_type_name_get(Ender_Item_Type type)
 		case ENDER_ITEM_TYPE_CONSTANT:
 		return "constant";
 
+		case ENDER_ITEM_TYPE_DEF:
+		return "def";
+
 		case ENDER_ITEM_TYPE_INVALID:
 		default:
 		return "invalid";

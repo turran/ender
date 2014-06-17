@@ -66,6 +66,7 @@ extern "C" {
 #include "ender_item.h"
 #include "ender_lib.h"
 #include "ender_item_basic.h"
+#include "ender_item_def.h"
 #include "ender_item_struct.h"
 #include "ender_item_attr.h"
 #include "ender_item_object.h"
