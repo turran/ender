@@ -85,42 +85,47 @@
     <value name="a8"/>
     <value name="enesim_formats"/>
   </enum>
-  <object name="enesim.argb">
-    <method name="components_from">
+  <def name="enesim.argb" type="uint32">
+    <function name="components_from">
+      <return type="enesim.argb" transfer="full"/>
       <arg name="a" type="uint8" direction="in" transfer="full"/>
       <arg name="r" type="uint8" direction="in" transfer="full"/>
       <arg name="g" type="uint8" direction="in" transfer="full"/>
       <arg name="b" type="uint8" direction="in" transfer="full"/>
-    </method>
-    <method name="components_to">
+    </function>
+    <function name="components_to">
+      <arg name="argb" type="enesim.arg" direction="out" transfer="full"/>
       <arg name="a" type="uint8" direction="out" transfer="full"/>
       <arg name="r" type="uint8" direction="out" transfer="full"/>
       <arg name="g" type="uint8" direction="out" transfer="full"/>
-      <arg name="b" type="uint8" direction="out" transfer="full"/>
-    </method>
-  </object>
-  <object name="enesim.color">
-    <method name="argb_to">
+      <arg name="b" type="uint8.t" direction="in" transfer="full"/>
+    </function>
+  </def>
+  <def name="enesim.color" type="uint32">
+    <function name="argb_to">
       <return type="enesim.argb" transfer="full"/>
-    </method>
+      <arg name="c" type="enesim.color" direction="in" transfer="full"/>
+    </function>
     <function name="argb_from">
       <return type="enesim.color" transfer="full"/>
       <arg name="argb" type="enesim.argb" direction="in" transfer="full"/>
     </function>
-    <method name="components_from">
+    <function name="components_from">
+      <return type="enesim.color" transfer="full"/>
       <arg name="a" type="uint8" direction="in" transfer="full"/>
       <arg name="r" type="uint8" direction="in" transfer="full"/>
       <arg name="g" type="uint8" direction="in" transfer="full"/>
       <arg name="b" type="uint8" direction="in" transfer="full"/>
-    </method>
-    <method name="components_to">
+    </function>
+    <function name="components_to">
+      <arg name="color" type="enesim.colo" direction="out" transfer="full"/>
       <arg name="a" type="uint8" direction="out" transfer="full"/>
       <arg name="r" type="uint8" direction="out" transfer="full"/>
       <arg name="g" type="uint8" direction="out" transfer="full"/>
-      <arg name="b" type="uint8" direction="out" transfer="full"/>
-    </method>
-  </object>
-  <object name="enesim.alpha"/>
+      <arg name="b" type="uint8.t" direction="in" transfer="full"/>
+    </function>
+  </def>
+  <def name="enesim.alpha" type="uint8"/>
   <struct name="enesim.rectangle">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
@@ -476,12 +481,12 @@
     <value name="cmyk_adobe"/>
     <value name="enesim_buffer_formats"/>
   </enum>
-  <unknown type=""/>
-  <unknown type=""/>
-  <unknown type=""/>
-  <unknown type=""/>
-  <unknown type=""/>
-  <unknown type=""/>
+  <def name="enesim.buffer.argb8888" type=""/>
+  <def name="enesim.buffer.argb8888.pre" type=""/>
+  <def name="enesim.buffer.xrgb8888" type=""/>
+  <def name="enesim.buffer.rgb888" type=""/>
+  <def name="enesim.buffer.bgr888" type=""/>
+  <def name="enesim.buffer.cmyk" type=""/>
   <object name="enesim.buffer">
     <ctor name="new">
       <arg name="f" type="enesim.buffer.format" direction="in" transfer="full"/>
@@ -576,6 +581,7 @@
     </method>
     <method name="unlock"/>
   </object>
+  <callback name="enesim.buffer.free"/>
   <object name="enesim.surface">
     <ctor name="new">
       <arg name="f" type="enesim.format" direction="in" transfer="full"/>
@@ -804,7 +810,7 @@
       <arg name="quality" type="enesim.quality" direction="in" transfer="full"/>
     </function>
   </object>
-  <unknown type="Eina_Bool(*"/>
+  <callback name="enesim.renderer.damage.cb"/>
   <object name="enesim.stream">
     <ref/>
     <unref/>
@@ -844,6 +850,7 @@
       <arg name="d" type="enesim.stream" direction="in" transfer="full"/>
     </ctor>
   </object>
+  <callback name="enesim.image.callback"/>
   <object name="enesim.image">
     <function name="dispatch"/>
     <function name="info_get">
@@ -1042,14 +1049,14 @@
       <arg name="err" type="eina.error" direction="in" transfer="full"/>
     </method>
   </object>
-  <unknown type="void *(*"/>
-  <unknown type="void(*"/>
-  <unknown type="Eina_Bool(*"/>
-  <unknown type="Eina_Bool(*"/>
-  <unknown type="Eina_Bool(*"/>
-  <unknown type="int(*"/>
-  <unknown type="Eina_Bool(*"/>
-  <unknown type="Eina_Bool(*"/>
+  <callback name="enesim.image.provider.options.parse.cb"/>
+  <callback name="enesim.image.provider.options.free.cb"/>
+  <callback name="enesim.image.provider.loadable.cb"/>
+  <callback name="enesim.image.provider.saveable.cb"/>
+  <callback name="enesim.image.provider.info.get.cb"/>
+  <callback name="enesim.image.provider.formats.get.cb"/>
+  <callback name="enesim.image.provider.load.cb"/>
+  <callback name="enesim.image.provider.save.cb"/>
   <struct name="enesim.image.finder.descriptor">
     <field name="version" type="int32"/>
     <field name="data_from" type="enesim.image.finder.data.from.cb"/>
@@ -1059,8 +1066,8 @@
     </method>
     <method name="enesim_image_finder_unregister"/>
   </struct>
-  <unknown type="const char *(*"/>
-  <unknown type="const char *(*"/>
+  <callback name="enesim.image.finder.data.from.cb"/>
+  <callback name="enesim.image.finder.extension.from.cb"/>
   <enum name="enesim.text.direction">
     <value name="ltr"/>
     <value name="rtl"/>
@@ -1261,7 +1268,7 @@
       <arg name="h" type="int32" direction="out" transfer="full"/>
     </method>
   </object>
-  <object name="enesim.renderer.compound.layer" inherits="enesim.renderer">
+  <object name="enesim.renderer.compound.layer">
     <ctor name="new"/>
     <method name="renderer_set">
       <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
@@ -1272,6 +1279,7 @@
     <ref/>
     <unref/>
   </object>
+  <callback name="enesim.renderer.compound.cb"/>
   <object name="enesim.renderer.compound">
     <ctor name="new"/>
     <method name="layer_add">
