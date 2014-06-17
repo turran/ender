@@ -23,6 +23,7 @@
 #include "ender_item_struct.h"
 #include "ender_item_attr.h"
 #include "ender_item_basic.h"
+#include "ender_item_def.h"
 
 #include "ender_main_private.h"
 #include "ender_value_private.h"
@@ -82,6 +83,34 @@ static void _ender_item_struct_instance_deinit(void *o)
 		ender_item_unref(f);
 	}
 }
+
+static Eina_Bool _ender_item_field_size_alignment_get(Ender_Item *i, size_t *sz, ssize_t *al)
+{
+	Ender_Item_Type type;
+	Ender_Item *other;
+	Eina_Bool ret = EINA_FALSE;
+
+	type = ender_item_type_get(i);
+	switch (type)
+	{
+		case ENDER_ITEM_TYPE_BASIC:
+		*sz = ender_value_type_size_get(ender_item_basic_value_type_get(i));
+		*al = ender_value_type_alignment_get(ender_item_basic_value_type_get(i));
+		ret = EINA_TRUE;
+		break;
+
+		case ENDER_ITEM_TYPE_DEF:
+		other = ender_item_def_type_get(i);
+		ret = _ender_item_field_size_alignment_get(other, sz, al);
+		ender_item_unref(other);
+		break;
+
+		default:
+		CRI("Unsupported attr type '%d'", type);
+		break;
+	}
+	return ret;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -110,17 +139,10 @@ void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
 		
 	thiz = ENDER_ITEM_STRUCT(i);
 	attr_type = ender_item_attr_type_get(p);
-	type = ender_item_type_get(attr_type);
-	switch (type)
+	if (!_ender_item_field_size_alignment_get(attr_type, &size, &align))
 	{
-		case ENDER_ITEM_TYPE_BASIC:
-		size = ender_value_type_size_get(ender_item_basic_value_type_get(attr_type));
-		align = ender_value_type_alignment_get(ender_item_basic_value_type_get(attr_type));
-		break;
-
-		default:
-		CRI("Unsupported attr type '%d'", type);
-		break;
+		CRI("Can not add field '%s' on' %s', wrong things might happen",
+			ender_item_name_get(p), ender_item_name_get(i));
 	}
 
 	/* add the padding */
