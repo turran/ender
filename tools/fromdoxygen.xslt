@@ -399,6 +399,7 @@
     <xsl:variable name="id" select="@refid"/>
     <xsl:variable name="type" select="type/text()"/>
     <xsl:choose>
+      <!-- object -->
       <xsl:when test="contains($type, 'struct _')">
         <!-- decide to use the inherit or not -->
         <xsl:element name="object">
@@ -417,8 +418,23 @@
           </xsl:apply-templates>
         </xsl:element>
       </xsl:when>
+      <!-- function pointer -->
+      <xsl:when test="contains($type, '(*')">
+        <callback name="{$name}"/>
+      </xsl:when>
       <xsl:otherwise>
-        <unknown type="{$type}"/>
+        <xsl:variable name="dtype">
+          <xsl:call-template name="type-to-ender">
+            <xsl:with-param name="text" select="$type"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <def name="{$name}" type="{$dtype}">
+          <!-- get every function that belongs to this group -->
+          <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
+            <xsl:with-param name="pname" select="$lower_name"/>
+            <xsl:with-param name="ptype" select="'none'"/>
+          </xsl:apply-templates>
+        </def>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -458,10 +474,11 @@
         <xsl:with-param name="text" select="compoundname/text()"/>
       </xsl:call-template>
     </xsl:variable>
-    <!-- check that we have a valid struct/enum -->
+    <!-- check that we have a valid struct/enum/def -->
     <xsl:variable name="is-main" select="contains($lower_name, 'main')"/>
     <xsl:variable name="has-enum" select="count(.//memberdef[@kind='enum']) > 0"/>
     <xsl:variable name="has-struct" select="count(.//innerclass) > 0"/>
+    <xsl:variable name="has-def" select="count(.//memberdef[@kind='typedef']) > 0"/>
     <xsl:choose>
       <!-- main library functions -->
       <xsl:when test="$is-main">
@@ -471,7 +488,7 @@
         </xsl:apply-templates>
       </xsl:when>
       <!-- we define an object with the name of the group -->
-      <xsl:when test="not($has-enum or $has-struct)">
+      <xsl:when test="not($has-enum or $has-struct or $has-def)">
         <!-- get the return type of a constructor in case it has it -->
         <xsl:variable name="rtype">
           <xsl:call-template name="ctor-return-type">
