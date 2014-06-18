@@ -97,7 +97,6 @@ void ender_item_constant_symname_set(Ender_Item *i, const char *symname)
 void ender_item_constant_value_set(Ender_Item *i, Ender_Value *value)
 {
 	Ender_Item_Constant *thiz;
-	Ender_Item_Type type;
 
 	thiz = ENDER_ITEM_CONSTANT(i);
 	if (!value)
