@@ -276,10 +276,21 @@
 
   <!-- params -->
   <xsl:template match="param">
+    <xsl:param name="skip-first"/>
     <xsl:variable name="name" select="declname/text()"/>
-    <xsl:variable name="pos" select="position()"/>
+    <!-- the position is relative to the node set, not the real document -->
+    <xsl:variable name="pos">
+      <xsl:choose>
+        <xsl:when test="$skip-first">
+          <xsl:value-of select="position() + 1"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="position()"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <!-- handle the direction -->
-    <xsl:variable name="direction-attr" select="../detaileddescription/para/parameterlist/parameteritem[$pos + 1]//parametername/@direction" />
+    <xsl:variable name="direction-attr" select="../detaileddescription/para/parameterlist[@kind='param']/parameteritem[position() = $pos]//parametername/@direction" />
     <xsl:variable name="direction">
       <xsl:choose>
         <xsl:when test="not(string($direction-attr))">in</xsl:when>
@@ -345,14 +356,18 @@
           <!-- get the return value -->
           <xsl:apply-templates select="./type"/>
           <!-- get the args -->
-          <xsl:apply-templates select=".//param"/>
+          <xsl:apply-templates select=".//param">
+            <xsl:with-param name="skip-first" select="false()"/>
+          </xsl:apply-templates>
         </function>
       </xsl:when>
       <!-- ctors -->
       <xsl:when test="contains($name, 'new')">
         <ctor name="{$name}">
           <!-- get the args -->
-          <xsl:apply-templates select=".//param"/>
+          <xsl:apply-templates select=".//param">
+            <xsl:with-param name="skip-first" select="false()"/>
+          </xsl:apply-templates>
         </ctor>
       </xsl:when>
       <!-- unref -->
@@ -368,7 +383,9 @@
           <!-- get the return value -->
           <xsl:apply-templates select="./type"/>
           <!-- get the args -->
-          <xsl:apply-templates select=".//param[position() > 1]"/>
+          <xsl:apply-templates select=".//param[position() > 1]">
+            <xsl:with-param name="skip-first" select="true()"/>
+          </xsl:apply-templates>
         </method>
       </xsl:when>
       <xsl:otherwise>
@@ -376,7 +393,9 @@
           <!-- get the return value -->
           <xsl:apply-templates select="./type"/>
           <!-- get the args -->
-          <xsl:apply-templates select=".//param"/>
+          <xsl:apply-templates select=".//param">
+            <xsl:with-param name="skip-first" select="false()"/>
+          </xsl:apply-templates>
         </function>
       </xsl:otherwise>
     </xsl:choose>
@@ -495,11 +514,14 @@
             <xsl:with-param name="ctor" select=".//memberdef[@kind='function'][contains(./name/text(), 'new')][1]"/>
           </xsl:call-template>
         </xsl:variable>
-        <!-- choose to use the rtype or the name -->
+        <!-- choose to use the rtype, the itype or the name -->
         <xsl:variable name="ptype">
           <xsl:choose>
             <xsl:when test="string($rtype)">
               <xsl:value-of select="$rtype"/>
+            </xsl:when>
+            <xsl:when test="string($itype)">
+              <xsl:value-of select="$itype"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$name"/>
