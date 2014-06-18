@@ -196,9 +196,19 @@ static void lib_dump(const Ender_Lib *l)
 	EINA_LIST_FREE(items, i)
 	{
 		Ender_Item *f;
+		Ender_Item *inherit;
 		Eina_List *subitems;
 
-		printf("  %s\n", ender_item_name_get(i));
+		inherit = ender_item_object_inherit_get(i);
+		if (inherit)
+		{
+			printf("  %s:%s\n", ender_item_name_get(i), ender_item_name_get(inherit));
+			ender_item_unref(inherit);
+		}
+		else
+		{
+			printf("  %s\n", ender_item_name_get(i));
+		}
 
 		printf("    Functions:\n");
 		subitems = ender_item_object_functions_get(i);
