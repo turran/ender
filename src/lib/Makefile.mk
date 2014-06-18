@@ -19,9 +19,6 @@ src/lib/ender_main.h \
 src/lib/ender_parser.h \
 src/lib/ender_value.h
 
-src_lib_libender_la_YFLAGS = -d -p ender_
-src_lib_libender_la_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
-
 src_lib_libender_la_SOURCES = \
 src/lib/ender_item.c \
 src/lib/ender_item_private.h \
@@ -59,7 +56,6 @@ src_lib_libender_la_CPPFLAGS = \
 
 src_lib_libender_la_LIBADD = \
 @ENDER_LIBS@ \
-@LEXLIB@ \
 @EFL_DLOPEN_LIBS@
 
 src_lib_libender_la_LDFLAGS = -no-undefined -version-info @version_info@

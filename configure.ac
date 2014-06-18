@@ -66,18 +66,6 @@ if ! $PKG_CONFIG --atleast-pkgconfig-version 0.22; then
    AC_MSG_ERROR([pkg-config >= 0.22 is required])
 fi
 
-# lex
-
-AM_PROG_LEX
-if test "x$ac_cv_prog_LEX" = "x"; then
-   AC_MSG_ERROR(Cannot find flex)
-fi
-
-AC_PROG_YACC
-if test "x$ac_cv_prog_YACC" = "x"; then
-   AC_MSG_ERROR(Cannot find bison)
-fi
-
 # doxygen program for documentation building
 ENS_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
