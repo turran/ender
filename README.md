@@ -18,6 +18,8 @@ typedef struct _Foo_S1 {
 int foo_s1_has_i(Foo_S1 *thiz);
 ```
 
+And the corresponding XML's Ender file foo.ender:
+
 ```xml
 <?xml version="1.0" standalone="yes"?>
 <lib name="foo" version="0" case="underscore">
@@ -34,7 +36,8 @@ int foo_s1_has_i(Foo_S1 *thiz);
 </lib>
 ```
 
-There are tools for automatic XML generation too based on doxygen documentation.
+For some big libraries, it might be tedious to do the XML file manually, for that, there is an automatic generator from doxygen
+documentation.
 
 Available bindings
 ==================
@@ -42,5 +45,4 @@ There are several projects for creating bindings of ender to specific languages.
 
 FAQ
 ===
-+ Q: Is ender an OO for C?
-  A: No, it is not. It lets you describe a library that uses any OO system for C (GLib, EO, Enesim Object, your own custom, etc)
++ Is ender an OO for C? No, it is not. It lets you describe a library that uses any OO system for C (GLib, EO, Enesim Object, your own custom, etc)
