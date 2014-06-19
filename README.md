@@ -8,16 +8,18 @@ How?
 Ender uses an intermediary XML format to describe your library, lodas it and registers every definition of your library.
 For example, for a C library defined like this:
 
-`/* contents of foo.h */
+```c
+/* contents of foo.h */
 typedef struct _Foo_S1 {
   int i;
   char *s;
 } Foo_S1;
 
 int foo_s1_has_i(Foo_S1 *thiz);
-`
+```
 
-`<?xml version="1.0" standalone="yes"?>
+```xml
+<?xml version="1.0" standalone="yes"?>
 <lib name="foo" version="0" case="underscore">
   <!-- Define the struct -->
   <struct name="foo.s1">
@@ -30,7 +32,7 @@ int foo_s1_has_i(Foo_S1 *thiz);
     </mthod>
   </struct>
 </lib>
-`
+```
 
 There are tools for automatic XML generation too based on doxygen documentation.
 
