@@ -24,6 +24,10 @@ check_PROGRAMS =
 EXTRA_DIST =
 CLEAN_LOCAL = ender.pc
 
+### Documentation
+
+include common/Makefile_doxygen.mk
+
 ### Library
 
 include src/lib/Makefile.mk
@@ -40,15 +44,10 @@ include src/bin/Makefile.mk
 
 include data/Makefile.mk
 
-### Documentation
-
-include doc/Makefile.mk
-
 EXTRA_DIST += \
 AUTHORS \
 COPYING \
 README \
-doc/Doxyfile.in \
 ender.pc.in \
 m4/efl_dlfcn.m4 \
 m4/ens_doxygen.m4

@@ -93,7 +93,7 @@ EFL_CHECK_DLOPEN
 
 AC_CONFIG_FILES([
 Makefile
-doc/Doxyfile
+common/doc/Doxyfile_common
 ])
 
 AC_OUTPUT
