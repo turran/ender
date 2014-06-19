@@ -371,11 +371,11 @@
         </ctor>
       </xsl:when>
       <!-- unref -->
-      <xsl:when test="contains($name, 'unref')">
+      <xsl:when test="$name = 'unref'">
         <unref/>
       </xsl:when>
       <!-- ref -->
-      <xsl:when test="contains($name, 'ref')">
+      <xsl:when test="$name = 'ref'">
         <ref/>
       </xsl:when>
       <xsl:when test="contains($first_param_type, $ptype)">
