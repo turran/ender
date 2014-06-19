@@ -5,7 +5,7 @@ much struggling.
 
 How?
 ====
-Ender uses an intermediary XML format to describe your library, lodas it and registers every definition of your library.
+Ender uses an intermediary XML format to describe your library, loads it and registers every definition of your library.
 For example, for a C library defined like this:
 
 ```c
