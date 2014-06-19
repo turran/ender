@@ -22,18 +22,18 @@
     <value name="90"/>
     <value name="180"/>
     <value name="270"/>
-    <value name="enesim_angles"/>
+    <value name="last"/>
   </enum>
   <enum name="enesim.rop">
     <value name="blend"/>
     <value name="fill"/>
-    <value name="enesim_rops"/>
+    <value name="last"/>
   </enum>
   <enum name="enesim.quality">
     <value name="best"/>
     <value name="good"/>
     <value name="fast"/>
-    <value name="enesim_qualities"/>
+    <value name="last"/>
   </enum>
   <enum name="enesim.priority">
     <value name="none"/>
@@ -46,27 +46,27 @@
     <value name="green"/>
     <value name="blue"/>
     <value name="alpha"/>
-    <value name="enesim_channels"/>
+    <value name="last"/>
   </enum>
   <enum name="enesim.alpha.hint">
     <value name="normal"/>
     <value name="sparse"/>
     <value name="opaque"/>
-    <value name="enesim_alpha_hints"/>
+    <value name="last"/>
   </enum>
   <enum name="enesim.repeat.mode">
     <value name="restrict"/>
     <value name="pad"/>
     <value name="reflect"/>
     <value name="repeat"/>
-    <value name="enesim_repeat_modes"/>
+    <value name="last"/>
   </enum>
   <enum name="enesim.backend">
     <value name="invalid"/>
     <value name="software"/>
     <value name="opencl"/>
     <value name="opengl"/>
-    <value name="enesim_backends"/>
+    <value name="last"/>
   </enum>
   <function name="enesim.init">
     <return type="int32" transfer="full"/>
@@ -83,7 +83,7 @@
     <value name="none"/>
     <value name="argb8888"/>
     <value name="a8"/>
-    <value name="enesim_formats"/>
+    <value name="last"/>
   </enum>
   <def name="enesim.argb" type="uint32">
     <function name="components_from">
@@ -201,10 +201,10 @@
     </method>
   </struct>
   <enum name="enesim.matrix.type">
-    <value name="enesim_matrix_identity"/>
-    <value name="enesim_matrix_affine"/>
-    <value name="enesim_matrix_projective"/>
-    <value name="enesim_matrix_types"/>
+    <value name="identity"/>
+    <value name="affine"/>
+    <value name="projective"/>
+    <value name="last"/>
   </enum>
   <struct name="enesim.matrix.f16p16">
     <field name="xx" type="eina.f16p16"/>
@@ -1546,22 +1546,19 @@
   <struct name="enesim.renderer.gradient.stop">
     <field name="argb" type="enesim.argb"/>
     <field name="pos" type="double"/>
-    <function name="add">
-      <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
-      <arg name="stop" type="enesim.renderer.gradient.stop" direction="in" transfer="full"/>
-    </function>
-    <function name="clear">
-      <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
-    </function>
-    <function name="enesim_renderer_gradient_repeat_mode_set">
-      <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
-      <arg name="mode" type="enesim.repeat.mode" direction="in" transfer="full"/>
-    </function>
-    <function name="enesim_renderer_gradient_repeat_mode_get">
-      <return type="enesim.repeat.mode" transfer="full"/>
-      <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
-    </function>
   </struct>
+  <object name="enesim.renderer.gradient" inherits="enesim.renderer">
+    <method name="stop_add">
+      <arg name="stop" type="enesim.renderer.gradient.stop" direction="in" transfer="full"/>
+    </method>
+    <method name="stop_clear"/>
+    <method name="repeat_mode_set">
+      <arg name="mode" type="enesim.repeat.mode" direction="in" transfer="full"/>
+    </method>
+    <method name="repeat_mode_get">
+      <return type="enesim.repeat.mode" transfer="full"/>
+    </method>
+  </object>
   <object name="enesim.renderer.gradient.linear" inherits="enesim.renderer.gradient">
     <ctor name="new"/>
     <method name="x0_set">
