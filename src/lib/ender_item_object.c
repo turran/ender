@@ -77,13 +77,12 @@ static void _ender_item_object_instance_deinit(void *o)
 {
 	Ender_Item_Object *thiz;
 	Ender_Item *f;
-	Eina_List *l;
 
 	thiz = ENDER_ITEM_OBJECT(o);
-	EINA_LIST_FOREACH(thiz->functions, l, f)
-	{
+	EINA_LIST_FREE(thiz->functions, f)
 		ender_item_unref(f);
-	}
+	if (thiz->inherit)
+		ender_item_unref(thiz->inherit);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -102,7 +101,11 @@ void ender_item_object_inherit_set(Ender_Item *i, Ender_Item *in)
 
 	thiz = ENDER_ITEM_OBJECT(i);
 	if (thiz->inherit)
-		ender_item_unref(thiz->inherit);
+	{
+		WRN("Inherit already set");
+		ender_item_unref(in);
+		return;
+	}
 	thiz->inherit = in;
 }
 
@@ -125,12 +128,24 @@ void ender_item_object_function_add(Ender_Item *i, Ender_Item *f)
 	{
 		if (!thiz->unref)
 			thiz->unref = ender_item_ref(f);
+		else
+		{
+			WRN("Unref function already set");
+			ender_item_unref(f);
+			return;
+		}
 	}
 
 	if (flags & ENDER_ITEM_FUNCTION_FLAG_REF)
 	{
 		if (!thiz->ref)
 			thiz->ref = ender_item_ref(f);
+		else
+		{
+			WRN("Ref function already set");
+			ender_item_unref(f);
+			return;
+		}
 	}
 
 	_ender_item_object_function_add(thiz, f);
