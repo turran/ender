@@ -684,7 +684,9 @@
     </method>
     <ref/>
     <unref/>
-    <ref/>
+    <method name="ref_count">
+      <return type="int32" transfer="full"/>
+    </method>
     <method name="lock"/>
     <method name="unlock"/>
     <method name="name_set">
@@ -1150,13 +1152,8 @@
     </method>
   </object>
   <object name="enesim.renderer.background" inherits="enesim.renderer">
+    <prop name="color"/>
     <ctor name="new"/>
-    <method name="color_set">
-      <arg name="color" type="enesim.color" direction="in" transfer="full"/>
-    </method>
-    <method name="color_get">
-      <return type="enesim.color" transfer="full"/>
-    </method>
   </object>
   <enum name="enesim.blur.channel">
     <value name="color"/>
