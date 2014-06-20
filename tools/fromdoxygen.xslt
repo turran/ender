@@ -8,6 +8,8 @@
   <!-- Our tables to do the lower/upper case -->
   <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
   <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+  <!-- Our property key for Muenchian grouping -->
+  <xsl:key name="prop" match="memberdef[@kind='function'][//prop]" use=".//prop/@name"/>
 
   <!-- function to replace a string http://stackoverflow.com/questions/3067113/xslt-string-replace -->
   <xsl:template name="string-replace-all">
@@ -149,7 +151,6 @@
   <!-- field handling -->
   <xsl:template match="memberdef[@kind='variable']">
      <xsl:variable name="name" select="name/text()"/>
-    <xsl:variable name="id" select="@refid"/>
     <xsl:variable name="fieldtype" select="type//text()"/>
     <xsl:variable name="type">
       <xsl:call-template name="type-to-ender">
@@ -166,7 +167,6 @@
         <xsl:with-param name="text" select="name/text()"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="id" select="@refid"/>
     <enum name="{$name}">
       <!-- pick every enumvalue and pass the parent name to temove it from the generated names -->
       <xsl:apply-templates select="enumvalue">
@@ -324,11 +324,54 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- property handling -->
+  <xsl:template match="memberdef[@kind='function'][.//prop]">
+    <xsl:param name="oname"/>
+    <xsl:param name="otype"/>
+    <xsl:variable name="pname" select=".//prop/@name"/>
+    <!-- get the second arg of the setter, or the second arg/return value of the getter -->
+    <prop name="{$pname}">
+    <!-- look for setters/getters -->
+    <xsl:for-each select="key('prop',.//prop/@name)">
+      <!-- get the function name without the property name -->
+      <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
+      <xsl:variable name="name">
+        <xsl:call-template name="string-replace-all">
+          <xsl:with-param name="text" select="$lower_name"/>
+          <xsl:with-param name="replace" select="concat($oname, concat(concat('_', $pname), '_'))"/>
+          <xsl:with-param name="by" select="''"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$name = 'get'">
+          <getter>
+            <!-- get the return value -->
+            <xsl:apply-templates select="./type"/>
+            <!-- get the args -->
+            <xsl:apply-templates select=".//param[position() > 1]">
+              <xsl:with-param name="skip-first" select="true()"/>
+            </xsl:apply-templates>
+          </getter>
+        </xsl:when>
+        <xsl:when test="$name = 'set'">
+          <setter>
+            <!-- get the return value -->
+            <xsl:apply-templates select="./type"/>
+            <!-- get the args -->
+            <xsl:apply-templates select=".//param[position() > 1]">
+              <xsl:with-param name="skip-first" select="true()"/>
+            </xsl:apply-templates>
+          </setter>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+    </prop>
+  </xsl:template>
+
   <!-- method handling -->
-  <xsl:template match="memberdef[@kind='function']">
+  <xsl:template match="memberdef[@kind='function'][not(.//prop)]">
     <xsl:param name="pname"/>
     <xsl:param name="ptype"/>
-    <xsl:variable name="id" select="@refid"/>
     <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
     <xsl:variable name="name">
       <xsl:call-template name="string-replace-all">
@@ -337,7 +380,7 @@
         <xsl:with-param name="by" select="''"/>
       </xsl:call-template>
     </xsl:variable>
-    <!-- decide to define a method, ctor or property -->
+    <!-- decide to define a method, ctor, ref, unref -->
     <xsl:variable name="first_param" select=".//param[1]"/>
     <xsl:variable name="first_param_type">
       <xsl:call-template name="type-to-ender">
@@ -415,7 +458,6 @@
         <xsl:with-param name="text" select="name/text()"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="id" select="@refid"/>
     <xsl:variable name="type" select="type/text()"/>
     <xsl:choose>
       <!-- object -->
@@ -538,8 +580,13 @@
               <xsl:value-of select="$itype"/>
             </xsl:attribute>
           </xsl:if>
-          <!-- now the methods -->
-          <xsl:apply-templates select=".//memberdef[@kind='function']">
+          <!-- now the properties -->
+          <xsl:apply-templates select=".//memberdef[@kind='function'][.//prop][generate-id(.)=generate-id(key('prop',.//prop/@name)[1])]">
+            <xsl:with-param name="oname" select="$lower_name"/>
+            <xsl:with-param name="otype" select="$ptype"/>
+          </xsl:apply-templates>
+          <!-- now the methods that are not properties -->
+          <xsl:apply-templates select=".//memberdef[@kind='function'][not(.//prop)]">
             <xsl:with-param name="pname" select="$lower_name"/>
             <xsl:with-param name="ptype" select="$ptype"/>
           </xsl:apply-templates>
