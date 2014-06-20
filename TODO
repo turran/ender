@@ -1,17 +1,2 @@
-Ender:
-
-+ Make every call to a function return an Eina_Error, this way we can make every binding
-  handle execeptions easily
-+ Add bindings for ender
-+ Add mutation events per property
-+ Add a serializer
-+ Add ref/unref here too
-+ Add constraints to properties, this way we can define enums and ranges
-+ Make every function that sets user provided data also receive a callback to free it
-
-Escen:
-+ Add an "external" type. So escen instead of creating the element, you'll need to pass it and then escen will animate it
-+ Fix the examples and add more eye-candy ones
-+ Move some of the examples to the test dir to have a simple way to test the different renderer spans functions
-+ We'll need to modify the benchmark to render every ender found
-+ Append T_ to every token to avoid namespace collisions
++ Add the property item for objects
++ Add support for callbacks
