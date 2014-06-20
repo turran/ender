@@ -47,7 +47,7 @@ include data/Makefile.mk
 EXTRA_DIST += \
 AUTHORS \
 COPYING \
-README \
+README.md \
 ender.pc.in \
 m4/efl_dlfcn.m4 \
 m4/ens_doxygen.m4
@@ -78,5 +78,5 @@ ender.pc: $(top_srcdir)/ender.pc.in Makefile
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ender.pc
 
-clean-local: doc-clean
+clean-local: doxygen-clean
 	-rm -rf $(CLEAN_LOCAL)
