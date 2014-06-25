@@ -130,7 +130,35 @@ EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i)
 	Ender_Item_Attr *thiz;
 
 	thiz = ENDER_ITEM_ATTR(i);
-	return ender_item_ref(thiz->type);
+	if (thiz->type)
+	{
+		return ender_item_ref(thiz->type);
+	}
+	/* check if we have a getter/setter and get the type from the
+	 * function types
+	 */
+	else
+	{
+		/* [bool, void] foo_set(object, TYPE, error) */
+		if (thiz->setter)
+		{
+
+		}
+		else if (thiz->getter)
+		{
+			/* [bool, void] foo_get(object, TYPE)
+			 * TYPE foo_get(object, error)
+			 */
+
+			/* bool foo_get(object, TYPE, error) */
+			/* TYPE foo_get(object) */
+		}
+		else
+		{
+			CRI("No type for attr");
+			return NULL;
+		}
+	}
 }
 
 EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
