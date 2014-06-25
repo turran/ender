@@ -274,6 +274,16 @@ EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 	return ret;
 }
 
+EAPI Ender_Item * ender_item_function_args_at(Ender_Item *i, int idx)
+{
+	Ender_Item_Function *thiz;
+	Ender_Item *ret;
+
+	thiz = ENDER_ITEM_FUNCTION(i);
+	ret = eina_list_nth(thiz->args, idx);
+	return ender_item_ref(ret);
+}
+
 EAPI int ender_item_function_args_count(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;

@@ -21,15 +21,30 @@
 #include "ender_value.h"
 #include "ender_item.h"
 #include "ender_item_attr.h"
+#include "ender_item_function.h"
+#include "ender_item_basic.h"
 
 #include "ender_main_private.h"
 #include "ender_item_attr_private.h"
 #include "ender_item_struct_private.h"
+#include "ender_item_object_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 #define ENDER_ITEM_ATTR(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
 		Ender_Item_Attr, ender_item_attr_descriptor_get())
+
+typedef enum _Ender_Item_Attr_Getter_Type
+{
+	/* TYPE foo_get(object) */
+	ENDER_ITEM_ATTR_GETTER_TYPE_RETURN,
+	/* TYPE foo_get(object, error) */
+	ENDER_ITEM_ATTR_GETTER_TYPE_RETURN_THROW,
+	/* [bool, void] foo_get(object, TYPE) */
+	ENDER_ITEM_ATTR_GETTER_TYPE_INOUT,
+	/* bool foo_get(object, TYPE, error) */
+	ENDER_ITEM_ATTR_GETTER_TYPE_INOUT_THROW,
+} Ender_Item_Attr_Getter_Type;
 
 typedef struct _Ender_Item_Attr
 {
@@ -37,6 +52,7 @@ typedef struct _Ender_Item_Attr
 	Ender_Item *type;
 	Ender_Item *setter;
 	Ender_Item *getter;
+	Ender_Item_Attr_Getter_Type getter_type;
 	ssize_t offset;
 } Ender_Item_Attr;
 
@@ -72,6 +88,144 @@ static void _ender_item_attr_instance_deinit(void *o)
 	ender_item_unref(thiz->type);
 	ender_item_unref(thiz->getter);
 	ender_item_unref(thiz->setter);
+}
+
+static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,
+		Ender_Item_Attr_Getter_Type *type)
+{
+	int nargs;
+
+	nargs = ender_item_function_args_count(getter);
+	/* TYPE foo_get(object) */
+	if (nargs == 1)
+	{
+		*type = ENDER_ITEM_ATTR_GETTER_TYPE_RETURN;
+		return EINA_TRUE;
+	}
+	else if (nargs == 2)
+	{
+		Ender_Item *ret;
+		Ender_Item *arg;
+
+		ret = ender_item_function_ret_get(getter);
+		if (!ret)
+		{
+			/* void foo_get(object, TYPE) */
+			*type = ENDER_ITEM_ATTR_GETTER_TYPE_INOUT;
+			return EINA_TRUE;
+		}
+		else
+		{
+			Ender_Item_Type itype;
+
+			ender_item_unref(ret);
+			arg = ender_item_function_args_at(getter, 1);
+			itype = ender_item_type_get(arg);
+			if ((itype == ENDER_ITEM_TYPE_BASIC) &&
+					ender_item_basic_value_type_get(arg) == ENDER_VALUE_TYPE_EXCEPTION)
+			{
+				ender_item_unref(arg);
+	 			/* TYPE foo_get(object, error) */
+				*type = ENDER_ITEM_ATTR_GETTER_TYPE_RETURN_THROW;
+				return EINA_TRUE;
+			}
+			else
+			{
+				ender_item_unref(arg);
+	 			/* bool foo_get(object, TYPE) */
+				*type = ENDER_ITEM_ATTR_GETTER_TYPE_INOUT;
+				return EINA_TRUE;
+			}
+		}
+	}
+	/* bool foo_get(object, TYPE, error) */
+	else if (nargs == 3)
+	{
+		*type = ENDER_ITEM_ATTR_GETTER_TYPE_INOUT_THROW;
+		return EINA_TRUE;
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
+}
+
+static Eina_Bool _ender_item_attr_value_get(Ender_Item *getter,
+		Ender_Item_Attr_Getter_Type type, void *o,
+		Ender_Value *v, Eina_Error *err)
+{
+	Eina_Bool ret = EINA_FALSE;
+
+	switch (type)
+	{
+		case ENDER_ITEM_ATTR_GETTER_TYPE_RETURN:
+		{
+			Ender_Value args[1];
+
+			args[0].ptr = o;
+			ret = ender_item_function_call(getter, args, v);
+		}
+		break;
+
+		case ENDER_ITEM_ATTR_GETTER_TYPE_RETURN_THROW:
+		{
+			Ender_Value args[2];
+
+			args[0].ptr = o;
+			args[1].ptr = err;
+			ret = ender_item_function_call(getter, args, v); 
+		}
+		break;
+
+		case ENDER_ITEM_ATTR_GETTER_TYPE_INOUT:
+		{
+			Ender_Value args[2];
+
+			args[0].ptr = o;
+			args[1] = *v;
+			/* TODO check for the return value */
+			ret = ender_item_function_call(getter, args, NULL); 
+		}
+		break;
+
+		case ENDER_ITEM_ATTR_GETTER_TYPE_INOUT_THROW:
+		{
+			Ender_Value args[3];
+
+			args[0].ptr = o;
+			args[1] = *v;
+			args[2].ptr = err;
+			/* TODO check for the return value */
+			ret = ender_item_function_call(getter, args, NULL); 
+		}
+		break;
+	}
+	return ret;
+}
+
+static Eina_Bool _ender_item_attr_value_set(Ender_Item *setter, void *o,
+		Ender_Value *v, Eina_Error *err)
+{
+	Ender_Value args[3];
+	Ender_Value ret = { 0 };
+	Eina_Bool ok;
+
+	args[0].ptr = o;
+	args[1] = *v;
+	args[2].ptr = err;
+
+	ok = ender_item_function_call(setter, args, &ret);
+	if (ok)
+	{
+		Ender_Item *rarg;
+		rarg = ender_item_function_ret_get(setter);
+		if (rarg)
+		{
+			ok = ret.b;
+		}
+		ender_item_unref(rarg);
+	}
+	return ok;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -110,7 +264,16 @@ void ender_item_attr_getter_set(Ender_Item *i, Ender_Item *f)
 
 	thiz = ENDER_ITEM_ATTR(i);
 	if (thiz->getter)
+	{
 		ender_item_unref(thiz->getter);
+		thiz->getter = NULL;
+	}
+	if (!_ender_item_attr_getter_type_get(f, &thiz->getter_type))
+	{
+		ERR("Wrong type of getter");
+		ender_item_unref(f);
+		return;
+	}
 	thiz->getter = f;
 }
 
@@ -142,16 +305,29 @@ EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i)
 		/* [bool, void] foo_set(object, TYPE, error) */
 		if (thiz->setter)
 		{
+			Ender_Item *arg;
 
+			arg = ender_item_function_args_at(thiz->setter, 1);
+			if (!arg) CRI("No type on arg[1]");
+			return arg;
 		}
 		else if (thiz->getter)
 		{
-			/* [bool, void] foo_get(object, TYPE)
-			 * TYPE foo_get(object, error)
-			 */
+			switch (thiz->getter_type)
+			{
+				case ENDER_ITEM_ATTR_GETTER_TYPE_RETURN:
+				case ENDER_ITEM_ATTR_GETTER_TYPE_RETURN_THROW:
+				return ender_item_function_ret_get(thiz->getter);
+				break;
 
-			/* bool foo_get(object, TYPE, error) */
-			/* TYPE foo_get(object) */
+				case ENDER_ITEM_ATTR_GETTER_TYPE_INOUT:
+				case ENDER_ITEM_ATTR_GETTER_TYPE_INOUT_THROW:
+				return ender_item_function_args_at(thiz->getter, 1);
+				break;
+
+				default:
+				break;
+			}
 		}
 		else
 		{
@@ -159,6 +335,7 @@ EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i)
 			return NULL;
 		}
 	}
+	return NULL;
 }
 
 EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
@@ -171,8 +348,14 @@ EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
 
 EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
 {
+	Ender_Item_Attr *thiz;
 	Ender_Item *parent;
 	Eina_Bool ret = EINA_FALSE;
+
+	thiz = ENDER_ITEM_ATTR(i);
+	if (thiz->setter)
+		return _ender_item_attr_value_get(thiz->getter,
+				thiz->getter_type, o, v, err);
 
 	parent = ender_item_parent_get(i);
 	if (!parent)
@@ -197,8 +380,13 @@ done:
 
 EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
 {
+	Ender_Item_Attr *thiz;
 	Ender_Item *parent;
 	Eina_Bool ret = EINA_FALSE;
+
+	thiz = ENDER_ITEM_ATTR(i);
+	if (thiz->getter)
+		return _ender_item_attr_value_set(thiz->setter, o, v, err);
 
 	parent = ender_item_parent_get(i);
 	if (!parent)

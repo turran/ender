@@ -31,10 +31,11 @@ typedef enum _Ender_Item_Function_Flag
 	ENDER_ITEM_FUNCTION_FLAG_CTOR      = (1 << 2),
 	ENDER_ITEM_FUNCTION_FLAG_REF       = (1 << 3),
 	ENDER_ITEM_FUNCTION_FLAG_UNREF     = (1 << 4),
-	ENDER_ITEM_FUNCTION_FLAG_CALLBACK  = (1 << 2),
+	ENDER_ITEM_FUNCTION_FLAG_CALLBACK  = (1 << 5),
 } Ender_Item_Function_Flag;
 
 EAPI Eina_List * ender_item_function_args_get(Ender_Item *i);
+EAPI Ender_Item * ender_item_function_args_at(Ender_Item *i, int idx);
 EAPI int ender_item_function_args_count(Ender_Item *i);
 EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i);
 Eina_Bool ender_item_function_call(Ender_Item *i,

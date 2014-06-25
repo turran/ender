@@ -22,5 +22,6 @@
 EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i);
 EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i);
 EAPI Eina_List * ender_item_object_ctor_get(Ender_Item *i);
+EAPI Eina_List * ender_item_object_props_get(Ender_Item *i);
 
 #endif

@@ -169,6 +169,7 @@ Eina_Bool ender_item_struct_field_value_get(void *o, Ender_Item *field,
 	{
 		case ENDER_ITEM_TYPE_BASIC:
 		{
+			ret = EINA_TRUE;
 			switch (ender_item_basic_value_type_get(type))
 			{
 				case ENDER_VALUE_TYPE_BOOL:
@@ -210,8 +211,12 @@ Eina_Bool ender_item_struct_field_value_get(void *o, Ender_Item *field,
 				case ENDER_VALUE_TYPE_POINTER:
 				v->ptr = *((void **)oa);
 				break;
+
+				default:
+				ERR("Unsupported value type");
+				ret = EINA_FALSE;
+				break;
 			}
-			ret = EINA_TRUE;
 		}
 		break;
 
@@ -237,6 +242,7 @@ Eina_Bool ender_item_struct_field_value_set(void *o, Ender_Item *field,
 	{
 		case ENDER_ITEM_TYPE_BASIC:
 		{
+			ret = EINA_TRUE;
 			switch (ender_item_basic_value_type_get(type))
 			{
 				case ENDER_VALUE_TYPE_BOOL:
@@ -278,8 +284,12 @@ Eina_Bool ender_item_struct_field_value_set(void *o, Ender_Item *field,
 				case ENDER_VALUE_TYPE_POINTER:
 				*((void **)oa) = v->ptr;
 				break;
+
+				default:
+				ERR("Unsupported value type");
+				ret = EINA_FALSE;
+				break;
 			}
-			ret = EINA_TRUE;
 		}
 		break;
 

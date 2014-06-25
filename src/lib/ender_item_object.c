@@ -40,6 +40,7 @@ typedef struct _Ender_Item_Object
 	Ender_Item *ref;
 	Ender_Item *unref;
 	Eina_List *functions;
+	Eina_List *props;
 } Ender_Item_Object;
 
 typedef struct _Ender_Item_Object_Object
@@ -150,6 +151,21 @@ void ender_item_object_function_add(Ender_Item *i, Ender_Item *f)
 
 	_ender_item_object_function_add(thiz, f);
 }
+
+void ender_item_object_prop_add(Ender_Item *i, Ender_Item *p)
+{
+	Ender_Item_Object *thiz;
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	if (ender_item_type_get(p) != ENDER_ITEM_TYPE_ATTR)
+	{
+		ERR("Type must be an attribute");
+		ender_item_unref(p);
+		return;
+	}
+	thiz->props = eina_list_append(thiz->props, p);
+	ender_item_parent_set(p, i);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -172,6 +188,21 @@ EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i)
 	EINA_LIST_FOREACH(thiz->functions, l, f)
 	{
 		ret = eina_list_append(ret, ender_item_ref(f));
+	}
+	return ret;
+}
+
+EAPI Eina_List * ender_item_object_props_get(Ender_Item *i)
+{
+	Ender_Item_Object *thiz;
+	Ender_Item *p;
+	Eina_List *ret = NULL;
+	Eina_List *l;
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	EINA_LIST_FOREACH(thiz->props, l, p)
+	{
+		ret = eina_list_append(ret, ender_item_ref(p));
 	}
 	return ret;
 }
