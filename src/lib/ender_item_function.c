@@ -280,6 +280,22 @@ EAPI Ender_Item * ender_item_function_args_at(Ender_Item *i, int idx)
 	Ender_Item *ret;
 
 	thiz = ENDER_ITEM_FUNCTION(i);
+	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
+	{
+		if (!idx)
+		{
+			Ender_Item *arg;
+
+			arg = ender_item_arg_new();
+			ender_item_name_set(arg, "self");
+			ender_item_arg_type_set(arg, ender_item_parent_get(i));
+			return arg;
+		}
+		else
+		{
+			idx--;
+		}
+	}
 	ret = eina_list_nth(thiz->args, idx);
 	return ender_item_ref(ret);
 }

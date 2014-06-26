@@ -209,6 +209,12 @@ static void lib_dump(const Ender_Lib *l)
 		{
 			printf("  %s\n", ender_item_name_get(i));
 		}
+		subitems = ender_item_object_props_get(i);
+		EINA_LIST_FREE(subitems, f)
+		{
+			attr_dump(f, 4);
+			ender_item_unref(f);
+		}
 
 		printf("    Functions:\n");
 		subitems = ender_item_object_functions_get(i);

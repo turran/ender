@@ -23,6 +23,7 @@
 #include "ender_item_attr.h"
 #include "ender_item_function.h"
 #include "ender_item_basic.h"
+#include "ender_item_arg.h"
 
 #include "ender_main_private.h"
 #include "ender_item_attr_private.h"
@@ -256,6 +257,7 @@ void ender_item_attr_setter_set(Ender_Item *i, Ender_Item *f)
 	if (thiz->setter)
 		ender_item_unref(thiz->setter);
 	thiz->setter = f;
+	ender_item_parent_set(f, i);
 }
 
 void ender_item_attr_getter_set(Ender_Item *i, Ender_Item *f)
@@ -275,6 +277,7 @@ void ender_item_attr_getter_set(Ender_Item *i, Ender_Item *f)
 		return;
 	}
 	thiz->getter = f;
+	ender_item_parent_set(f, i);
 }
 
 void ender_item_attr_offset_set(Ender_Item *i, ssize_t offset)
@@ -302,14 +305,22 @@ EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i)
 	 */
 	else
 	{
+		Ender_Item *arg = NULL;
+		Ender_Item *ret;
+
 		/* [bool, void] foo_set(object, TYPE, error) */
 		if (thiz->setter)
 		{
-			Ender_Item *arg;
 
 			arg = ender_item_function_args_at(thiz->setter, 1);
-			if (!arg) CRI("No type on arg[1]");
-			return arg;
+			if (!arg)
+			{
+				CRI("No type on setter arg[1]");
+				return NULL;
+			}
+			ret = ender_item_arg_type_get(arg);
+			ender_item_unref(arg);
+			return ret;
 		}
 		else if (thiz->getter)
 		{
@@ -317,17 +328,25 @@ EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i)
 			{
 				case ENDER_ITEM_ATTR_GETTER_TYPE_RETURN:
 				case ENDER_ITEM_ATTR_GETTER_TYPE_RETURN_THROW:
-				return ender_item_function_ret_get(thiz->getter);
+				arg = ender_item_function_ret_get(thiz->getter);
 				break;
 
 				case ENDER_ITEM_ATTR_GETTER_TYPE_INOUT:
 				case ENDER_ITEM_ATTR_GETTER_TYPE_INOUT_THROW:
-				return ender_item_function_args_at(thiz->getter, 1);
+				arg = ender_item_function_args_at(thiz->getter, 1);
 				break;
 
 				default:
 				break;
 			}
+			if (!arg)
+			{
+				CRI("No type on setter arg[1] or ret");
+				return NULL;
+			}
+			ret = ender_item_arg_type_get(arg);
+			ender_item_unref(arg);
+			return ret;
 		}
 		else
 		{
