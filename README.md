@@ -43,6 +43,11 @@ Available bindings
 ==================
 There are several projects for creating bindings of ender to specific languages. Several are still in deveolping tho
 
++ [Neko](http://github.com/turran/ender-neko)
++ [JavaScript (SpiderMonkey)](http://github.com/turran/ender-js-sm)
++ [JavaScript (V8)](http://github.com/turran/ender-js-v8)
++ [Lua](http://github.com/turran/ender-lua)
+
 FAQ
 ===
 + Is ender an OO for C? No, it is not. It lets you describe a library that uses any OO system for C (GLib, EO, Enesim Object, your own custom, etc)
