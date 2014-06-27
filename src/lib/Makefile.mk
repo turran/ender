@@ -17,6 +17,7 @@ src/lib/ender_item_enum.h \
 src/lib/ender_lib.h \
 src/lib/ender_main.h \
 src/lib/ender_parser.h \
+src/lib/ender_utils.h \
 src/lib/ender_value.h
 
 src_lib_libender_la_SOURCES = \
@@ -45,6 +46,7 @@ src/lib/ender_main.c \
 src/lib/ender_main_private.h \
 src/lib/ender_parser.c \
 src/lib/ender_private.h \
+src/lib/ender_utils.c \
 src/lib/ender_value.c \
 src/lib/ender_value_private.h
 
