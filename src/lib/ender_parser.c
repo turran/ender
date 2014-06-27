@@ -45,16 +45,6 @@
  *                                  Local                                     *
  *============================================================================*/
 
-typedef enum _Ender_Library_Case {
-	ENDER_LIBRARY_CASE_CAMEL, /* backColor */
-	ENDER_LIBRARY_CASE_PASCAL, /* BackColor */
-	ENDER_LIBRARY_CASE_UNDERSCORE, /* back_color */
-} Ender_Library_Case;
-
-typedef enum _Ender_Library_Notation {
-	ENDER_LIBRARY_NOTATION_LATIN, /* foo_back_color_get */
-} Ender_Library_Notation;
-
 typedef struct _Ender_Parser_Context Ender_Parser_Context;
 
 typedef Eina_Bool (*Ender_Parser_Tag_Ctor_Cb)(Ender_Parser_Context *c);
@@ -74,8 +64,8 @@ typedef struct _Ender_Parser
 {
 	Eina_Array *context;
 	Ender_Lib *lib;
-	Ender_Library_Case lcase;
-	Ender_Library_Notation lnotation;
+	Ender_Case lcase;
+	Ender_Notation lnotation;
 	Enesim_Stream *s;
 	Eina_Bool failed;
 } Ender_Parser;
@@ -1093,11 +1083,11 @@ static Eina_Bool _ender_parser_lib_attrs_set(Ender_Parser_Context *c,
 	if (!strcmp(key, "case"))
 	{
 		if (!strcmp(value, "underscore"))
-			c->parser->lcase = ENDER_LIBRARY_CASE_UNDERSCORE;
+			c->parser->lcase = ENDER_CASE_UNDERSCORE;
 		else if (!strcmp(value, "camel"))
-			c->parser->lcase = ENDER_LIBRARY_CASE_CAMEL;
+			c->parser->lcase = ENDER_CASE_CAMEL;
 		else if (!strcmp(value, "pascal"))
-			c->parser->lcase = ENDER_LIBRARY_CASE_PASCAL;
+			c->parser->lcase = ENDER_CASE_PASCAL;
 	}
 	else if (!strcmp(key, "name"))
 	{

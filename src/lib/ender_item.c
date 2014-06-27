@@ -177,3 +177,17 @@ EAPI const char * ender_item_type_name_get(Ender_Item_Type type)
 		return "invalid";
 	}
 }
+
+EAPI const Ender_Lib * ender_item_lib_get(Ender_Item *thiz)
+{
+	if (!thiz->lib)
+	{
+		if (!thiz->parent)
+			return NULL;
+		return ender_item_lib_get(thiz);
+	}
+	else
+	{
+		return thiz->lib;
+	}
+}

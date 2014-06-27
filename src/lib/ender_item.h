@@ -19,7 +19,10 @@
 #ifndef _ENDER_ITEM_H_
 #define _ENDER_ITEM_H_
 
-typedef struct _Ender_Item Ender_Item;
+/*
+ * @defgroup Ender_Item_Group Item
+ * @{
+ */
 
 typedef enum _Ender_Item_Type {
 	ENDER_ITEM_TYPE_INVALID,
@@ -40,5 +43,10 @@ EAPI const char * ender_item_name_get(Ender_Item *thiz);
 EAPI Ender_Item_Type ender_item_type_get(Ender_Item *thiz);
 EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz);
 EAPI const char * ender_item_type_name_get(Ender_Item_Type type);
+EAPI const Ender_Lib * ender_item_lib_get(Ender_Item *thiz);
+
+/**
+ * @}
+ */
 
 #endif

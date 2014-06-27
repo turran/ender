@@ -19,7 +19,10 @@
 #ifndef _ENDER_LIB_H_
 #define _ENDER_LIB_H_
 
-typedef struct _Ender_Lib Ender_Lib;
+/*
+ * @defgroup Ender_Lib_Group Lib
+ * @{
+ */
 
 EAPI const Ender_Lib * ender_lib_find(const char *name);
 
@@ -28,5 +31,9 @@ EAPI const char * ender_lib_name_get(const Ender_Lib *thiz);
 EAPI Eina_List * ender_lib_dependencies_get(const Ender_Lib *thiz);
 EAPI Ender_Item * ender_lib_item_find(const Ender_Lib *thiz, const char *name);
 EAPI Eina_List * ender_lib_item_list(const Ender_Lib *thiz, Ender_Item_Type type);
+
+/**
+ * @}
+ */
 
 #endif

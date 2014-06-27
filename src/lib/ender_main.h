@@ -23,6 +23,22 @@
  * @defgroup Ender_Main_Group Main
  * @{
  */
+
+typedef enum _Ender_Case {
+	ENDER_CASE_CAMEL, /* backColor */
+	ENDER_CASE_PASCAL, /* BackColor */
+	ENDER_CASE_UNDERSCORE, /* back_color */
+} Ender_Case;
+
+#define ENDER_CASE_TYPES (ENDER_CASE_UNDERSCORE + 1)
+
+typedef enum _Ender_Notation {
+	ENDER_NOTATION_ENGLISH, /* foo_get_back_color (SVO) */
+	ENDER_NOTATION_LATIN, /* foo_back_color_get (SOV) */
+} Ender_Notation;
+
+#define ENDER_NOTATION_TYPES (ENDER_NOTATION_LATIN + 1)
+
 EAPI void ender_init(void);
 EAPI void ender_shutdown(void);
 EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *micro);
@@ -30,5 +46,8 @@ EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *
 /**
  * @}
  */
+
+typedef struct _Ender_Item Ender_Item;
+typedef struct _Ender_Lib Ender_Lib;
 
 #endif
