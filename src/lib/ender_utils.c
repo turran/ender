@@ -19,17 +19,100 @@
 
 #include "ender_main.h"
 #include "ender_main_private.h"
+
+#include <ctype.h>
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 typedef char * (*Ender_Name_Convert)(const char *s);
 
-static char * _ender_utils_name_convert_case_underscore_latin_camel_english(
+static char * _ender_utils_name_convert_english_latin(char *s)
+{
+	Eina_Bool swap = EINA_FALSE;
+	const char *tmp;
+	char *ret;
+	size_t len;
+
+	/* check for the verb */
+	tmp = strtok(s, "_");
+
+	/* no separator */
+	if (!tmp) return strdup(s);
+
+	if (!strcmp(s, "get"))
+	{
+		swap = EINA_TRUE;
+	}
+	else if (!strcmp(s, "set"))
+	{
+		swap = EINA_TRUE;
+	}
+
+	len = strlen(tmp);
+	if (swap)
+	{
+
+		ret = calloc(strlen(s) + 1, sizeof(char));
+
+		strcpy(ret, tmp + len + 1);
+		len = strlen(ret);
+		ret[len] = '_';
+		strcpy(ret + len + 1, s);
+	}
+	else
+	{
+		s[len] = '_';
+		ret = strdup(s);
+	}
+
+	return ret;
+}
+
+static char * _ender_utils_name_convert_underscore_latin_camel_english(
 		const char *s)
 {
 	return NULL;
 }
 
+static char * _ender_utils_name_convert_camel_english_underscore_latin(
+		const char *s)
+{
+	char *ret;
+	char *dtmp;
+	char *d;
+	const char *stmp;
+	const char *send;
+	size_t len;
+
+	/* the worst case is one a_b_c for aBC, i.e 2*len - 1 + NULL */
+	len = strlen(s);
+	send = s + len;
+
+	d = calloc((len * 2), sizeof(char));
+	dtmp = d;
+	
+	for (stmp = s; stmp < send; stmp++)
+	{
+		if (isupper(*stmp))
+		{
+			*dtmp = '_';
+			dtmp++;
+
+			*dtmp = tolower(*stmp);
+			dtmp++;
+		}
+		else
+		{
+			*dtmp = *stmp;
+			dtmp++;
+		}
+	}
+
+	ret = _ender_utils_name_convert_english_latin(d);
+	free(d);
+
+	return ret;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -48,7 +131,10 @@ EAPI char * ender_utils_name_convert(const char *s, Ender_Case src_case,
 	{
 		_conv[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN]
 				[ENDER_CASE_CAMEL][ENDER_NOTATION_ENGLISH] =
-				_ender_utils_name_convert_case_underscore_latin_camel_english;
+				_ender_utils_name_convert_underscore_latin_camel_english;
+		_conv[ENDER_CASE_CAMEL][ENDER_NOTATION_ENGLISH]
+				[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN] =
+				_ender_utils_name_convert_camel_english_underscore_latin;
 		_init = EINA_TRUE;
 	}
 
