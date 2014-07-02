@@ -292,29 +292,28 @@ EAPI Eina_List * ender_lib_dependencies_get(const Ender_Lib *thiz)
 EAPI Ender_Item * ender_lib_item_find(const Ender_Lib *thiz, const char *name)
 {
 	Ender_Item *i;
+	Ender_Lib *dep;
+	Eina_List *l;
 
 	if (!thiz) return NULL;
 
 	i = eina_hash_find(thiz->items, name);
+	if (i) return ender_item_ref(i);
+
 	/* check on the dependencies */
-	if (!i)
+	EINA_LIST_FOREACH(thiz->deps, l, dep)
 	{
-		Ender_Lib *dep;
-		Eina_List *l;
-
-		EINA_LIST_FOREACH(thiz->deps, l, dep)
-		{
-			i = ender_lib_item_find(dep, name);
-			if (i) break;
-		}
+		i = ender_lib_item_find(dep, name);
+		if (i) return i;
 	}
+
 	/* check on the c lib */
-	if (!i && thiz != _c_lib)
+	if (thiz != _c_lib)
 	{
-		i = ender_lib_item_find(_c_lib, name);
+		return ender_lib_item_find(_c_lib, name);
 	}
 
-	return ender_item_ref(i);
+	return NULL;
 }
 
 EAPI Eina_List * ender_lib_item_list(const Ender_Lib *thiz, Ender_Item_Type type)
