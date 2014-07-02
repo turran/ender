@@ -60,8 +60,10 @@ static void _ender_lib_dir_list_cb(const char *name, const char *path, void *dat
 	if (lib)
 	{
 		INF("Library '%s' already parsed", fname);
+		free(fname);
 		return;
 	}
+	free(fname);
 
 	if (asprintf(&file, "%s/%s", path, name) < 0)
 		return;
