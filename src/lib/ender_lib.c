@@ -163,6 +163,7 @@ Ender_Lib * ender_lib_new(void)
 
 void ender_lib_free(Ender_Lib *thiz)
 {
+	eina_hash_free(thiz->items);
 	eina_list_free(thiz->deps);
 	free(thiz->name);
 	free(thiz->file);
