@@ -242,7 +242,7 @@ static Eina_Bool _ender_parser_def_attrs_set(Ender_Parser_Context *c,
 			ERR("Can not find type '%s'", value);
 			return EINA_FALSE;
 		}
-		ender_item_def_type_set(c->i, ender_item_ref(type));
+		ender_item_def_type_set(c->i, type);
 	}
 	else
 	{
@@ -482,7 +482,7 @@ static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
 			ERR("Can not find type '%s'", value);
 			return EINA_FALSE;
 		}
-		ender_item_arg_type_set(c->i, ender_item_ref(type));
+		ender_item_arg_type_set(c->i, type);
 	}
 	else
 	{
@@ -532,7 +532,7 @@ static Eina_Bool _ender_parser_return_attrs_set(Ender_Parser_Context *c,
 			ERR("Can not find type '%s'", value);
 			return EINA_FALSE;
 		}
-		ender_item_arg_type_set(c->i, ender_item_ref(type));
+		ender_item_arg_type_set(c->i, type);
 	}
 	else
 	{
@@ -954,8 +954,7 @@ static void _ender_parser_prop_dtor(Ender_Parser_Context *c)
 			ERR("Can not find type '%s'", prop->type);
 			goto done;
 		}
-		ender_item_attr_type_set(c->i, ender_item_ref(i));
-		ender_item_unref(i);
+		ender_item_attr_type_set(c->i, i);
 	}
 
 done:
@@ -1027,12 +1026,11 @@ static void _ender_parser_field_dtor(Ender_Parser_Context *c)
 		ERR("Can not find type '%s'", field->type);
 		goto done;
 	}
-	ender_item_attr_type_set(c->i, ender_item_ref(i));
+	ender_item_attr_type_set(c->i, i);
 
 	/* add the field */
 	parent = _ender_parser_parent_context_get(c->parser);
 	ender_item_struct_field_add(parent->i, ender_item_ref(c->i));
-	ender_item_unref(i);
 done:
 	/* free our private context */
 	if (field->type)
