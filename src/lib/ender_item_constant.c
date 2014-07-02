@@ -69,6 +69,8 @@ static void _ender_item_constant_instance_deinit(void *o)
 
 	thiz = ENDER_ITEM_CONSTANT(o);
 	ender_item_unref(thiz->type);
+	if (thiz->symname)
+		free(thiz->symname);
 }
 /*============================================================================*
  *                                 Global                                     *
