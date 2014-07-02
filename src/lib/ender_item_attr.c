@@ -29,6 +29,11 @@
 #include "ender_item_attr_private.h"
 #include "ender_item_struct_private.h"
 #include "ender_item_object_private.h"
+/*
+ * TODO:
+ * Add helper functions to inform about the direction of the getter/setter
+ * Add helper functions to inform about the transfer of the getter/setter
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -75,10 +80,14 @@ static void _ender_item_attr_class_init(void *k)
 
 static void _ender_item_attr_instance_init(void *o)
 {
+	Ender_Item_Attr *thiz;
 	Ender_Item *i;
 
 	i = ENDER_ITEM(o);
 	i->type = ENDER_ITEM_TYPE_ATTR;
+
+	thiz = ENDER_ITEM_ATTR(o);
+	thiz->offset = -1;
 }
 
 static void _ender_item_attr_instance_deinit(void *o)
