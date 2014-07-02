@@ -1110,18 +1110,21 @@ static Eina_Bool _ender_parser_include_attrs_set(Ender_Parser_Context *c,
 	if (!strcmp(key, "name"))
 	{
 		const Ender_Lib *dep;
-		Enesim_Stream *s;
-		char *file = NULL;
-
-		if (asprintf(&file, "%s/%s.ender", PACKAGE_DATA_DIR, value) < 0)
-			return EINA_FALSE;
-
-		s = enesim_stream_file_new(file, "r");
-		DBG("Including %s %p", file, s);
-		ender_parser_parse(s);
-		free(file);
 
 		dep = ender_lib_find(value);
+		if (!dep)
+		{
+			Enesim_Stream *s;
+			char *file = NULL;
+
+			if (asprintf(&file, "%s/%s.ender", PACKAGE_DATA_DIR, value) < 0)
+				return EINA_FALSE;
+
+			s = enesim_stream_file_new(file, "r");
+			DBG("Including %s %p", file, s);
+			ender_parser_parse(s);
+			free(file);
+		}
 		if (dep)
 		{
 			ender_lib_dependency_add(c->parser->lib, dep);
