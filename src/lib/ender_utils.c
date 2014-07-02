@@ -34,34 +34,34 @@ static char * _ender_utils_name_convert_english_latin(char *s)
 	size_t len;
 
 	/* check for the verb */
-	tmp = strtok(s, "_");
+	tmp = strchr(s, '_');
 
 	/* no separator */
 	if (!tmp) return strdup(s);
 
-	if (!strcmp(s, "get"))
+	len = tmp - s;
+	if (!strncmp(s, "get", len))
 	{
 		swap = EINA_TRUE;
 	}
-	else if (!strcmp(s, "set"))
+	else if (!strncmp(s, "set", len))
 	{
 		swap = EINA_TRUE;
 	}
 
-	len = strlen(tmp);
 	if (swap)
 	{
+		size_t llen;
 
 		ret = calloc(strlen(s) + 1, sizeof(char));
 
-		strcpy(ret, tmp + len + 1);
-		len = strlen(ret);
-		ret[len] = '_';
-		strcpy(ret + len + 1, s);
+		strcpy(ret, tmp + 1);
+		llen = strlen(ret);
+		ret[llen] = '_';
+		strncpy(ret + llen + 1, s, len);
 	}
 	else
 	{
-		s[len] = '_';
 		ret = strdup(s);
 	}
 
@@ -142,4 +142,40 @@ EAPI char * ender_utils_name_convert(const char *s, Ender_Case src_case,
 	if (!conv) return NULL;
 
 	return conv(s);
+}
+
+EAPI char * ender_utils_to_lower(const char *str)
+{
+	char *ret;
+	char *tmp;
+	size_t len;
+
+	len = strlen(str);
+	ret = tmp = malloc(len + 1);
+	while (*str)
+	{
+		*tmp = tolower(*str);
+		tmp++;
+		str++;
+	}
+	ret[len] = '\0';
+	return ret;
+}
+
+EAPI char * ender_utils_to_upper(const char *str)
+{
+	char *ret;
+	char *tmp;
+	size_t len;
+
+	len = strlen(str);
+	ret = tmp = malloc(len + 1);
+	while (*str)
+	{
+		*tmp = toupper(*str);
+		tmp++;
+		str++;
+	}
+	ret[len] = '\0';
+	return ret;
 }

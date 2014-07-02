@@ -21,5 +21,7 @@
 
 EAPI char * ender_utils_name_convert(const char *s, Ender_Case src_case,
 		Ender_Notation src_not, Ender_Case dst, Ender_Notation dst_not);
+EAPI char * ender_utils_to_upper(const char *s);
+EAPI char * ender_utils_to_lower(const char *s);
 
 #endif
