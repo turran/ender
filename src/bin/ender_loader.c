@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	if (!s) goto no_file;
 
 	ender_parser_parse(s);
-	ender_shutdown();
 no_file:
+	ender_shutdown();
 	return 0;
 }

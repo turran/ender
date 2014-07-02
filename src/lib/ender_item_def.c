@@ -64,9 +64,15 @@ static void _ender_item_def_instance_init(void *o)
 static void _ender_item_def_instance_deinit(void *o)
 {
 	Ender_Item_Def *thiz;
+	Ender_Item *i;
 
 	thiz = ENDER_ITEM_DEF(o);
 	ender_item_unref(thiz->type);
+	EINA_LIST_FREE(thiz->functions, i)
+	{
+		ender_item_parent_set(i, NULL);
+		ender_item_unref(i);
+	}
 }
 /*============================================================================*
  *                                 Global                                     *

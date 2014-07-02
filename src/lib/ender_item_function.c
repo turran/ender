@@ -171,9 +171,14 @@ static void _ender_item_function_instance_deinit(void *o)
 	Ender_Item *i;
 
 	thiz = ENDER_ITEM_FUNCTION(o);
-	ender_item_unref(thiz->ret);
+	if (thiz->ret)
+	{
+		ender_item_parent_set(thiz->ret, NULL);
+		ender_item_unref(thiz->ret);
+	}
 	EINA_LIST_FREE(thiz->args, i)
 	{
+		ender_item_parent_set(i, NULL);
 		ender_item_unref(i);
 	}
 	if (thiz->symname)

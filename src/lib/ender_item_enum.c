@@ -68,6 +68,7 @@ static void _ender_item_enum_instance_deinit(void *o)
 	thiz = ENDER_ITEM_ENUM(o);
 	EINA_LIST_FREE(thiz->values, c)
 	{
+		ender_item_parent_set(c, NULL);
 		ender_item_unref(c);
 	}
 }

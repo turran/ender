@@ -70,17 +70,18 @@ static void _ender_item_struct_instance_init(void *o)
 static void _ender_item_struct_instance_deinit(void *o)
 {
 	Ender_Item_Struct *thiz;
-	Ender_Item *f;
-	Eina_List *l;
+	Ender_Item *i;
 
 	thiz = ENDER_ITEM_STRUCT(o);
-	EINA_LIST_FOREACH(thiz->fields, l, f)
+	EINA_LIST_FREE(thiz->fields, i)
 	{
-		ender_item_unref(f);
+		ender_item_parent_set(i, NULL);
+		ender_item_unref(i);
 	}
-	EINA_LIST_FOREACH(thiz->functions, l, f)
+	EINA_LIST_FREE(thiz->functions, i)
 	{
-		ender_item_unref(f);
+		ender_item_parent_set(i, NULL);
+		ender_item_unref(i);
 	}
 }
 

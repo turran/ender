@@ -96,8 +96,16 @@ static void _ender_item_attr_instance_deinit(void *o)
 
 	thiz = ENDER_ITEM_ATTR(o);
 	ender_item_unref(thiz->type);
-	ender_item_unref(thiz->getter);
-	ender_item_unref(thiz->setter);
+	if (thiz->getter)
+	{
+		ender_item_parent_set(thiz->getter, NULL);
+		ender_item_unref(thiz->getter);
+	}
+	if (thiz->setter)
+	{
+		ender_item_parent_set(thiz->setter, NULL);
+		ender_item_unref(thiz->setter);
+	}
 }
 
 static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,

@@ -52,7 +52,7 @@ static void _ender_item_instance_deinit(void *o)
 	thiz = ENDER_ITEM(o);
 	if (thiz->parent)
 	{
-		CRI("Removing last reference with a parent");
+		CRI("Removing last reference of '%s' with a parent", thiz->name);
 	}
 	if (thiz->name)
 		free(thiz->name);
@@ -75,7 +75,7 @@ void ender_item_name_set(Ender_Item *thiz, const char *name)
 
 void ender_item_parent_set(Ender_Item *thiz, Ender_Item *parent)
 {
-	if (thiz->parent)
+	if (thiz->parent && parent)
 	{
 		CRI("Item already has a parent");
 		return;

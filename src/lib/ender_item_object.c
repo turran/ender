@@ -77,13 +77,34 @@ static void _ender_item_object_instance_init(void *o)
 static void _ender_item_object_instance_deinit(void *o)
 {
 	Ender_Item_Object *thiz;
-	Ender_Item *f;
+	Ender_Item *i;
 
 	thiz = ENDER_ITEM_OBJECT(o);
-	EINA_LIST_FREE(thiz->functions, f)
-		ender_item_unref(f);
+	EINA_LIST_FREE(thiz->functions, i)
+	{
+		ender_item_parent_set(i, NULL);
+		ender_item_unref(i);
+	}
+	EINA_LIST_FREE(thiz->props, i)
+	{
+		ender_item_parent_set(i, NULL);
+		ender_item_unref(i);
+	}
 	if (thiz->inherit)
+	{
+		ender_item_parent_set(thiz->inherit, NULL);
 		ender_item_unref(thiz->inherit);
+	}
+	if (thiz->ref)
+	{
+		ender_item_parent_set(thiz->ref, NULL);
+		ender_item_unref(thiz->ref);
+	}
+	if (thiz->unref)
+	{
+		ender_item_parent_set(thiz->unref, NULL);
+		ender_item_unref(thiz->unref);
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
