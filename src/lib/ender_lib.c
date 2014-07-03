@@ -226,11 +226,19 @@ void ender_lib_item_add(Ender_Lib *thiz, Ender_Item *i)
 {
 	const char *name;
 
-	if (!thiz) return;
 	if (!i) return;
+	if (!thiz)
+	{
+		ender_item_unref(i);
+		return;
+	}
 
 	name = ender_item_name_get(i);
-	if (!name) return;
+	if (!name)
+	{
+		ender_item_unref(i);
+		return;
+	}
 
 	DBG("Adding item %p '%s' %d on '%s' lib", i, name, ender_item_type_get(i), thiz->name);
 	i->lib = thiz;

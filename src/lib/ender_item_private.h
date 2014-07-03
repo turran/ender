@@ -35,6 +35,7 @@ typedef struct _Ender_Item
 	Ender_Item_Type type;
 	char *name;
 	int ref;
+	int cycle_ref;
 } Ender_Item;
 
 typedef struct _Ender_Item_Class
@@ -45,5 +46,7 @@ typedef struct _Ender_Item_Class
 void ender_item_name_set(Ender_Item *thiz, const char *name);
 void ender_item_parent_set(Ender_Item *thiz, Ender_Item *parent);
 void * ender_item_sym_get(Ender_Item *thiz, const char *name);
+int ender_item_ref_count(Ender_Item *thiz);
+void ender_item_cycle_ref_set(Ender_Item *thiz, int ref);
 
 #endif

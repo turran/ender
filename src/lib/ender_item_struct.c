@@ -145,6 +145,7 @@ void ender_item_struct_field_add(Ender_Item *i, Ender_Item *p)
 		CRI("Can not add field '%s' on' %s', wrong things might happen",
 			ender_item_name_get(p), ender_item_name_get(i));
 	}
+	ender_item_unref(attr_type);
 
 	/* add the padding */
 	thiz->size = (thiz->size + align - 1) & ~(align - 1);

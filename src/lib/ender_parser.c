@@ -1231,11 +1231,11 @@ done:
 
 static void _ender_parser_context_free(Ender_Parser_Context *c)
 {
-	Ender_Parser *thiz;
-
-	thiz = c->parser;
 	if (c)
 	{
+		Ender_Parser *thiz;
+
+		thiz = c->parser;
 		if (c->tag)
 		{
 			if (thiz->failed)
@@ -1249,7 +1249,18 @@ static void _ender_parser_context_free(Ender_Parser_Context *c)
 			}
 		}
 		if (c->i)
+		{
+			int cycle_ref;
+
+			cycle_ref = ender_item_ref_count(c->i);
+			/* in case the ref > 1, the item has been included on the lib */
+			if (cycle_ref > 1)
+			{
+				/* every ref() done between the ctor and the dtor *must* be a cycle ref */
+				ender_item_cycle_ref_set(c->i, cycle_ref - 2);
+			}
 			ender_item_unref(c->i);
+		}
 		free(c);
 	}
 }

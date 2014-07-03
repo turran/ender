@@ -97,6 +97,16 @@ void * ender_item_sym_get(Ender_Item *thiz, const char *name)
 	}
 
 }
+
+void ender_item_cycle_ref_set(Ender_Item *thiz, int ref)
+{
+	thiz->cycle_ref = ref;
+}
+
+int ender_item_ref_count(Ender_Item *thiz)
+{
+	return thiz->ref;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -120,7 +130,7 @@ EAPI void ender_item_unref(Ender_Item *thiz)
 {
 	if (!thiz) return;
 	thiz->ref--;
-	if (!thiz->ref)
+	if (thiz->ref == thiz->cycle_ref)
 	{
 		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(thiz));
 	}
