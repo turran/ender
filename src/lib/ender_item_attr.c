@@ -389,7 +389,7 @@ EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v,
 	Eina_Bool ret = EINA_FALSE;
 
 	thiz = ENDER_ITEM_ATTR(i);
-	if (thiz->setter)
+	if (thiz->getter)
 		return _ender_item_attr_value_get(thiz->getter,
 				thiz->getter_type, o, v, err);
 
