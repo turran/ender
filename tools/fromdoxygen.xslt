@@ -363,6 +363,9 @@
             </xsl:apply-templates>
           </setter>
         </xsl:when>
+        <xsl:otherwise>
+          <accessor name="{$name}" oname="{$oname}" otype="{$otype}"/>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
     </prop>
@@ -473,9 +476,14 @@
             </xsl:attribute>
           </xsl:if>
           <!-- get every function that belongs to this group -->
-          <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
+          <xsl:apply-templates select="/descendant::memberdef[@kind='function'][not(.//prop)]">
             <xsl:with-param name="pname" select="$lower_name"/>
             <xsl:with-param name="ptype" select="$name"/>
+          </xsl:apply-templates>
+          <!-- get every property -->
+          <xsl:apply-templates select="/descendant::memberdef[@kind='function'][.//prop][generate-id(.)=generate-id(key('prop',.//prop/@name)[1])]">
+            <xsl:with-param name="oname" select="$lower_name"/>
+            <xsl:with-param name="otype" select="$name"/>
           </xsl:apply-templates>
         </xsl:element>
       </xsl:when>
