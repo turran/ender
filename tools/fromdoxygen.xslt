@@ -330,7 +330,16 @@
     <xsl:param name="otype"/>
     <xsl:variable name="pname" select=".//prop/@name"/>
     <!-- get the second arg of the setter, or the second arg/return value of the getter -->
-    <prop name="{$pname}">
+    <xsl:element name="prop">
+      <xsl:attribute name="name">
+        <xsl:value-of select="$pname"/>
+      </xsl:attribute>
+    <!-- check if it is a valueof -->
+    <xsl:if test=".//valueof">
+      <xsl:attribute name="value-of">
+        <xsl:value-of select="'true'"/>
+      </xsl:attribute>
+    </xsl:if>
     <!-- look for setters/getters -->
     <xsl:for-each select="key('prop',.//prop/@name)">
       <!-- get the function name without the property name -->
@@ -368,7 +377,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
-    </prop>
+    </xsl:element>
   </xsl:template>
 
   <!-- method handling -->
