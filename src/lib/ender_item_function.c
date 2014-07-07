@@ -40,6 +40,7 @@ typedef struct _Ender_Item_Function
 	Ender_Item base;
 	Ender_Item *ret;
 	Eina_List *args;
+	int throw_position;
 	char *symname;
 	int flags;
 	void *sym;
@@ -228,6 +229,7 @@ void ender_item_function_ret_set(Ender_Item *i, Ender_Item *arg)
 void ender_item_function_arg_add(Ender_Item *i, Ender_Item *arg)
 {
 	Ender_Item_Function *thiz;
+	Ender_Item *arg_type;
 	Ender_Item_Type type;
 
 	if (!arg) return;
@@ -241,6 +243,14 @@ void ender_item_function_arg_add(Ender_Item *i, Ender_Item *arg)
 	}
 
 	thiz = ENDER_ITEM_FUNCTION(i);
+	/* check if the arg is an error, if so, mark it as a throw */
+	arg_type = ender_item_arg_type_get(arg);
+	if (ender_item_is_exception(arg_type))
+	{
+		thiz->throw_position = eina_list_count(thiz->args);
+		thiz->flags |= ENDER_ITEM_FUNCTION_FLAG_THROWS;
+	}
+	ender_item_unref(arg_type);
 	thiz->args = eina_list_append(thiz->args, arg);
 	ender_item_parent_set(arg, i);
 }
@@ -255,6 +265,22 @@ void ender_item_function_flags_set(Ender_Item *i, int flags)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI int ender_item_function_throw_position_get(Ender_Item *i)
+{
+	Ender_Item_Function *thiz;
+
+	thiz = ENDER_ITEM_FUNCTION(i);
+	if (!(thiz->flags & ENDER_ITEM_FUNCTION_FLAG_THROWS))
+		return -1;
+	else
+	{
+		if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
+			return thiz->throw_position + 1;
+		else
+			return thiz->throw_position;
+	}
+}
+
 EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;
