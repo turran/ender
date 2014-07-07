@@ -44,7 +44,6 @@ size_t ender_value_type_size_get(Ender_Value_Type t)
 		case ENDER_VALUE_TYPE_UINT32:
 		return sizeof(uint32_t);
 
-		case ENDER_VALUE_TYPE_EXCEPTION:
 		case ENDER_VALUE_TYPE_INT32:
 		return sizeof(int32_t);
 
@@ -83,7 +82,6 @@ ssize_t ender_value_type_alignment_get(Ender_Value_Type t)
 		case ENDER_VALUE_TYPE_UINT32:
 		return __alignof__(uint32_t);
 
-		case ENDER_VALUE_TYPE_EXCEPTION:
 		case ENDER_VALUE_TYPE_INT32:
 		return __alignof__(int32_t);
 
