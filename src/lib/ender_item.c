@@ -201,3 +201,13 @@ EAPI const Ender_Lib * ender_item_lib_get(Ender_Item *thiz)
 		return thiz->lib;
 	}
 }
+
+EAPI Eina_Bool ender_item_is_exception(Ender_Item *i)
+{
+	if (!i) return EINA_FALSE;
+
+	if (!strcmp(ender_item_name_get(i), "eina.error"))
+		return EINA_TRUE;
+	else
+		return EINA_FALSE;
+}

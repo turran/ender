@@ -44,6 +44,7 @@ EAPI Ender_Item_Type ender_item_type_get(Ender_Item *thiz);
 EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz);
 EAPI const char * ender_item_type_name_get(Ender_Item_Type type);
 EAPI const Ender_Lib * ender_item_lib_get(Ender_Item *thiz);
+EAPI Eina_Bool ender_item_is_exception(Ender_Item *i);
 
 /**
  * @}
