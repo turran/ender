@@ -176,6 +176,7 @@ static Eina_Bool _ender_item_attr_value_get(Ender_Item *getter,
 {
 	Eina_Bool ret = EINA_FALSE;
 
+	DBG("Getting value of getter type %d", type);
 	switch (type)
 	{
 		case ENDER_ITEM_ATTR_GETTER_TYPE_RETURN:
