@@ -134,14 +134,14 @@ static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,
 		}
 		else
 		{
-			Ender_Item_Type itype;
+			Ender_Item *itype;
 
 			ender_item_unref(ret);
 			arg = ender_item_function_args_at(getter, 1);
-			itype = ender_item_type_get(arg);
-			if ((itype == ENDER_ITEM_TYPE_BASIC) &&
-					ender_item_basic_value_type_get(arg) == ENDER_VALUE_TYPE_EXCEPTION)
+			itype = ender_item_arg_type_get(arg);
+			if (ender_item_is_exception(itype))
 			{
+				ender_item_unref(itype);
 				ender_item_unref(arg);
 	 			/* TYPE foo_get(object, error) */
 				*type = ENDER_ITEM_ATTR_GETTER_TYPE_RETURN_THROW;
@@ -149,6 +149,7 @@ static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,
 			}
 			else
 			{
+				ender_item_unref(itype);
 				ender_item_unref(arg);
 	 			/* bool foo_get(object, TYPE) */
 				*type = ENDER_ITEM_ATTR_GETTER_TYPE_INOUT;
