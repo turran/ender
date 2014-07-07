@@ -1989,7 +1989,7 @@
         <return type="double" transfer="full"/>
       </getter>
     </prop>
-    <prop name="x_radius">
+    <prop name="radius_x">
       <setter>
         <arg name="rad" type="double" direction="in" transfer="full"/>
       </setter>
@@ -1997,7 +1997,7 @@
         <return type="double" transfer="full"/>
       </getter>
     </prop>
-    <prop name="y_radius">
+    <prop name="radius_y">
       <setter>
         <arg name="rad" type="double" direction="in" transfer="full"/>
       </setter>
