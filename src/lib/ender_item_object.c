@@ -190,6 +190,43 @@ void ender_item_object_prop_add(Ender_Item *i, Ender_Item *p)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI Eina_Bool ender_item_object_string_to(Ender_Item *i, void *o, char **str,
+		void *xfer, Eina_Error *err)
+{
+	Ender_Item_Object *thiz;
+	Ender_Item *item;
+	Ender_Value val = { 0 };
+	Eina_List *l;
+	Eina_Bool ret = EINA_FALSE;
+	int flags;
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	/* check for attributes that have the value-of flag */
+	EINA_LIST_FOREACH (thiz->props, l, item)
+	{
+		flags = ender_item_attr_flags_get(item);
+		if (flags & ENDER_ITEM_ATTR_FLAG_VALUE_OF)
+		{
+			DBG("Property found '%s'", ender_item_name_get(item));
+			ret = ender_item_attr_value_get(item, o, &val, err);
+			*str = val.ptr;
+			goto done;
+		}
+	}
+	/* check for functions that have the value-of flag */
+	EINA_LIST_FOREACH (thiz->functions, l, item)
+	{
+		flags = ender_item_function_flags_get(item);
+		if (flags & ENDER_ITEM_FUNCTION_FLAG_VALUE_OF)
+		{
+			DBG("Function found '%s'", ender_item_name_get(item));
+			break;
+		}
+	}
+done:
+	return ret;
+}
+
 EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;

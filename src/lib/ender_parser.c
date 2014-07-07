@@ -440,15 +440,17 @@ static Eina_Bool _ender_parser_arg_ctor(Ender_Parser_Context *c)
 		return EINA_FALSE;
 	}
 	c->i = ender_item_arg_new();
-	/* add the arg to the function */
-	parent = _ender_parser_parent_context_get(c->parser);
-	ender_item_function_arg_add(parent->i, ender_item_ref(c->i));
 
 	return EINA_TRUE;
 }
 
 static void _ender_parser_arg_dtor(Ender_Parser_Context *c)
 {
+	Ender_Parser_Context *parent;
+
+	/* add the arg to the function */
+	parent = _ender_parser_parent_context_get(c->parser);
+	ender_item_function_arg_add(parent->i, ender_item_ref(c->i));
 }
 
 static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
@@ -975,6 +977,16 @@ static Eina_Bool _ender_parser_prop_attrs_set(Ender_Parser_Context *c,
 	else if (!strcmp(key, "type"))
 	{
 		f->type = strdup(value);
+	}
+	else if (!strcmp(key, "value-of"))
+	{
+		if (!strcmp(value, "true"))
+		{
+			int flags;
+
+			flags = ender_item_attr_flags_get(c->i);
+			ender_item_attr_flags_set(c->i, flags | ENDER_ITEM_ATTR_FLAG_VALUE_OF);
+		}
 	}
 	else
 	{
