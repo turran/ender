@@ -19,14 +19,6 @@
 #ifndef _ENDER_ITEM_ARG_H_
 #define _ENDER_ITEM_ARG_H_
 
-typedef enum _Ender_Item_Arg_Transfer
-{
-	ENDER_ITEM_ARG_TRANSFER_FULL,
-	ENDER_ITEM_ARG_TRANSFER_NONE,
-	ENDER_ITEM_ARG_TRANSFER_CONTAINER,
-	ENDER_ITEM_ARG_TRANSFER_CONTENT,
-} Ender_Item_Arg_Transfer;
-
 typedef enum _Ender_Item_Arg_Direction
 {
 	ENDER_ITEM_ARG_DIRECTION_IN,
@@ -42,7 +34,7 @@ typedef enum _Ender_Item_Arg_Flag
 
 EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i);
 EAPI Ender_Item_Arg_Direction ender_item_arg_direction_get(Ender_Item *i);
-EAPI Ender_Item_Arg_Transfer ender_item_arg_transfer_get(Ender_Item *i);
+EAPI Ender_Item_Transfer ender_item_arg_transfer_get(Ender_Item *i);
 EAPI int ender_item_arg_flags_get(Ender_Item *i);
 
 #endif

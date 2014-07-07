@@ -20,7 +20,7 @@
 #define _ENDER_ITEM_OBJECT_H_
 
 EAPI Eina_Bool ender_item_object_string_to(Ender_Item *i, void *o, char **str,
-		void *xfer, Eina_Error *err);
+		Ender_Item_Transfer *xfer, Eina_Error *err);
 EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i);
 EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i);
 EAPI Eina_List * ender_item_object_ctor_get(Ender_Item *i);

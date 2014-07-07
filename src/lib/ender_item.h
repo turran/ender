@@ -37,6 +37,14 @@ typedef enum _Ender_Item_Type {
 	ENDER_ITEM_TYPE_DEF,
 } Ender_Item_Type;
 
+typedef enum _Ender_Item_Transfer
+{
+	ENDER_ITEM_TRANSFER_FULL,
+	ENDER_ITEM_TRANSFER_NONE,
+	ENDER_ITEM_TRANSFER_CONTAINER,
+	ENDER_ITEM_TRANSFER_CONTENT,
+} Ender_Item_Transfer;
+
 EAPI Ender_Item * ender_item_ref(Ender_Item *thiz);
 EAPI void ender_item_unref(Ender_Item *thiz);
 EAPI const char * ender_item_name_get(Ender_Item *thiz);

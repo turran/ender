@@ -363,7 +363,7 @@ EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 		/* create our own arg based on the parent type */
 		ret = ender_item_arg_new();
 		ender_item_arg_direction_set(ret, ENDER_ITEM_ARG_DIRECTION_IN);
-		ender_item_arg_transfer_set(ret, ENDER_ITEM_ARG_TRANSFER_FULL);
+		ender_item_arg_transfer_set(ret, ENDER_ITEM_TRANSFER_FULL);
 		ender_item_arg_type_set(ret, ender_item_parent_get(i));
 		return ret;
 	}

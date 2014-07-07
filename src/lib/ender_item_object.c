@@ -191,7 +191,7 @@ void ender_item_object_prop_add(Ender_Item *i, Ender_Item *p)
  *                                   API                                      *
  *============================================================================*/
 EAPI Eina_Bool ender_item_object_string_to(Ender_Item *i, void *o, char **str,
-		void *xfer, Eina_Error *err)
+		Ender_Item_Transfer *xfer, Eina_Error *err)
 {
 	Ender_Item_Object *thiz;
 	Ender_Item *item;
