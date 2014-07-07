@@ -22,6 +22,7 @@
 #include "ender_item_private.h"
 
 Ender_Item * ender_item_attr_new(void);
+void ender_item_attr_flags_set(Ender_Item *i, int flags);
 void ender_item_attr_type_set(Ender_Item *i, Ender_Item *t);
 void ender_item_attr_setter_set(Ender_Item *i, Ender_Item *f);
 void ender_item_attr_getter_set(Ender_Item *i, Ender_Item *f);

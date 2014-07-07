@@ -60,6 +60,7 @@ typedef struct _Ender_Item_Attr
 	Ender_Item *getter;
 	Ender_Item_Attr_Getter_Type getter_type;
 	ssize_t offset;
+	int flags;
 } Ender_Item_Attr;
 
 typedef struct _Ender_Item_Attr_Class
@@ -306,6 +307,14 @@ void ender_item_attr_offset_set(Ender_Item *i, ssize_t offset)
 	thiz->offset = offset;
 }
 
+void ender_item_attr_flags_set(Ender_Item *i, int flags)
+{
+	Ender_Item_Attr *thiz;
+
+	thiz = ENDER_ITEM_ATTR(i);
+	thiz->flags = flags;
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -381,6 +390,14 @@ EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
 
 	thiz = ENDER_ITEM_ATTR(i);
 	return thiz->offset;
+}
+
+EAPI int ender_item_attr_flags_get(Ender_Item *i)
+{
+	Ender_Item_Attr *thiz;
+
+	thiz = ENDER_ITEM_ATTR(i);
+	return thiz->flags;
 }
 
 EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)

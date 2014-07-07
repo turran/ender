@@ -19,9 +19,15 @@
 #ifndef _ENDER_ITEM_ATTR_H_
 #define _ENDER_ITEM_ATTR_H_
 
+typedef enum _Ender_Item_Attr_Flag
+{
+	ENDER_ITEM_ATTR_FLAG_VALUE_OF  = (1 << 0),
+} Ender_Item_Attr_Flag;
+
 EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i);
 EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i);
 EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
 EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
+EAPI int ender_item_attr_flags_get(Ender_Item *i);
 
 #endif
