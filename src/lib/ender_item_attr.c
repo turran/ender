@@ -416,7 +416,7 @@ EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o,
 	thiz = ENDER_ITEM_ATTR(i);
 	if (thiz->getter)
 	{
-		*xfer = thiz->getter_transfer;
+		if (xfer) *xfer = thiz->getter_transfer;
 		return _ender_item_attr_value_get(thiz->getter,
 				thiz->getter_type, o, v, err);
 	}
