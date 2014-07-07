@@ -208,7 +208,7 @@ EAPI Eina_Bool ender_item_object_string_to(Ender_Item *i, void *o, char **str,
 		if (flags & ENDER_ITEM_ATTR_FLAG_VALUE_OF)
 		{
 			DBG("Property found '%s'", ender_item_name_get(item));
-			ret = ender_item_attr_value_get(item, o, &val, err);
+			ret = ender_item_attr_value_get(item, o, xfer, &val, err);
 			*str = val.ptr;
 			goto done;
 		}

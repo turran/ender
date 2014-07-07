@@ -29,11 +29,6 @@
 #include "ender_item_attr_private.h"
 #include "ender_item_struct_private.h"
 #include "ender_item_object_private.h"
-/*
- * TODO:
- * Add helper functions to inform about the direction of the getter/setter
- * Add helper functions to inform about the transfer of the getter/setter
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -59,6 +54,7 @@ typedef struct _Ender_Item_Attr
 	Ender_Item *setter;
 	Ender_Item *getter;
 	Ender_Item_Attr_Getter_Type getter_type;
+	Ender_Item_Transfer getter_transfer;
 	ssize_t offset;
 	int flags;
 } Ender_Item_Attr;
@@ -110,7 +106,8 @@ static void _ender_item_attr_instance_deinit(void *o)
 }
 
 static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,
-		Ender_Item_Attr_Getter_Type *type)
+		Ender_Item_Attr_Getter_Type *type,
+		Ender_Item_Transfer *xfer)
 {
 	int nargs;
 
@@ -118,7 +115,12 @@ static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,
 	/* TYPE foo_get(object) */
 	if (nargs == 1)
 	{
+		Ender_Item *ret;
+
 		*type = ENDER_ITEM_ATTR_GETTER_TYPE_RETURN;
+		ret = ender_item_function_ret_get(getter);
+		*xfer = ender_item_arg_transfer_get(ret);
+		ender_item_unref(ret);
 		return EINA_TRUE;
 	}
 	else if (nargs == 2)
@@ -131,31 +133,33 @@ static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,
 		{
 			/* void foo_get(object, TYPE) */
 			*type = ENDER_ITEM_ATTR_GETTER_TYPE_INOUT;
+			arg = ender_item_function_args_at(getter, 1);
+			*xfer = ender_item_arg_transfer_get(arg);
+			ender_item_unref(arg);
 			return EINA_TRUE;
 		}
 		else
 		{
 			Ender_Item *itype;
 
-			ender_item_unref(ret);
 			arg = ender_item_function_args_at(getter, 1);
 			itype = ender_item_arg_type_get(arg);
 			if (ender_item_is_exception(itype))
 			{
-				ender_item_unref(itype);
-				ender_item_unref(arg);
 	 			/* TYPE foo_get(object, error) */
 				*type = ENDER_ITEM_ATTR_GETTER_TYPE_RETURN_THROW;
-				return EINA_TRUE;
+				*xfer = ender_item_arg_transfer_get(ret);
 			}
 			else
 			{
-				ender_item_unref(itype);
-				ender_item_unref(arg);
 	 			/* bool foo_get(object, TYPE) */
 				*type = ENDER_ITEM_ATTR_GETTER_TYPE_INOUT;
-				return EINA_TRUE;
+				*xfer = ender_item_arg_transfer_get(arg);
 			}
+			ender_item_unref(ret);
+			ender_item_unref(itype);
+			ender_item_unref(arg);
+			return EINA_TRUE;
 		}
 	}
 	/* bool foo_get(object, TYPE, error) */
@@ -290,7 +294,8 @@ void ender_item_attr_getter_set(Ender_Item *i, Ender_Item *f)
 		ender_item_unref(thiz->getter);
 		thiz->getter = NULL;
 	}
-	if (!_ender_item_attr_getter_type_get(f, &thiz->getter_type))
+	if (!_ender_item_attr_getter_type_get(f, &thiz->getter_type,
+			&thiz->getter_transfer))
 	{
 		ERR("Wrong type of getter");
 		ender_item_unref(f);
@@ -401,7 +406,8 @@ EAPI int ender_item_attr_flags_get(Ender_Item *i)
 	return thiz->flags;
 }
 
-EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
+EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o,
+		Ender_Item_Transfer *xfer, Ender_Value *v, Eina_Error *err)
 {
 	Ender_Item_Attr *thiz;
 	Ender_Item *parent;
@@ -409,8 +415,11 @@ EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v,
 
 	thiz = ENDER_ITEM_ATTR(i);
 	if (thiz->getter)
+	{
+		*xfer = thiz->getter_transfer;
 		return _ender_item_attr_value_get(thiz->getter,
 				thiz->getter_type, o, v, err);
+	}
 
 	parent = ender_item_parent_get(i);
 	if (!parent)
@@ -421,6 +430,7 @@ EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v,
 	switch (ender_item_type_get(parent))
 	{
 		case ENDER_ITEM_TYPE_STRUCT:
+		*xfer = ENDER_ITEM_TRANSFER_FULL;
 		ret = ender_item_struct_field_value_get(o, i, v, err);
 		break;
 

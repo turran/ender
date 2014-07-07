@@ -26,7 +26,8 @@ typedef enum _Ender_Item_Attr_Flag
 
 EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i);
 EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i);
-EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
+EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Item_Transfer *xfer,
+		Ender_Value *v, Eina_Error *err);
 EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
 EAPI int ender_item_attr_flags_get(Ender_Item *i);
 
