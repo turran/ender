@@ -450,6 +450,8 @@ EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args, Ender_
 	}
 
 	ffi_call(&cif, FFI_FN(thiz->sym), retval, ffi_values);
+	free(ffi_args);
+	free(ffi_values);
 
 	return EINA_TRUE;
 }
