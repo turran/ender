@@ -49,16 +49,59 @@ static char * _ender_utils_name_convert_english_latin(char *s)
 		swap = EINA_TRUE;
 	}
 
+	/* ok we got a verb */
 	if (swap)
 	{
+		Eina_Bool extra = EINA_FALSE;
+		char *stmp;
 		size_t llen;
 
-		ret = calloc(strlen(s) + 1, sizeof(char));
+		/* check if we have a modifier, like from, by, etc */
+		stmp = strchr(tmp, '_');
+		while (stmp)
+		{
+			char *sstmp;
 
-		strcpy(ret, tmp + 1);
-		llen = strlen(ret);
-		ret[llen] = '_';
-		strncpy(ret + llen + 1, s, len);
+			stmp++;
+			sstmp = strchr(stmp, '_');
+			if (sstmp)
+			{
+				size_t sslen;
+
+				sslen = sstmp - stmp;
+				if (!strncmp(stmp, "by", sslen))
+				{
+					extra = EINA_TRUE;
+					break;
+				}
+				else if (!strncmp(stmp, "from", sslen))
+				{
+					extra = EINA_TRUE;
+					break;
+				}
+			}
+			stmp = sstmp;
+		}
+
+		ret = calloc(strlen(s) + 1, sizeof(char));
+		/* subject_verb_extra */
+		if (extra)
+		{
+			llen = stmp - tmp - 1;
+			strncpy(ret, tmp + 1, llen);
+			strncpy(ret + llen, s, len + 1);
+			strcpy(ret + llen + len + 1, stmp);
+
+		}
+		/* subject_verb */
+		else
+		{
+			/* copy the verb */
+			strcpy(ret, tmp + 1);
+			llen = strlen(ret);
+			ret[llen] = '_';
+			strncpy(ret + llen + 1, s, len);
+		}
 	}
 	else
 	{
