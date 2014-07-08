@@ -52,12 +52,13 @@
 
   <!-- header file -->
   <xsl:template match="compounddef[@kind='file']">
+    <!-- get all the groups with the <ingroup> tag -->
     <xsl:apply-templates select=".//ingroup/ref"/>
   </xsl:template>
 
   <!-- header ref -->
   <xsl:template match="includes[@local='yes']">
-    <!-- get all the groups with the <ingroup> tag -->
+    <!-- get all the header files -->
     <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
   </xsl:template>
 
@@ -264,10 +265,17 @@
     <xsl:variable name="no-space-type" select="normalize-space($no-const-type)"/>
     <!-- get the type -->
     <xsl:variable name="type">
-      <xsl:call-template name="param-type">
-        <xsl:with-param name="name" select="$no-space-type"/>
-        <xsl:with-param name="direction" select="$direction"/>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="../detaileddescription//simplesect[@kind='return']//ender-type">
+          <xsl:value-of select="../detaileddescription//simplesect[@kind='return']//ender-type/@type"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="param-type">
+            <xsl:with-param name="name" select="$no-space-type"/>
+            <xsl:with-param name="direction" select="$direction"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:if test="not($type = 'void')">
       <return type="{$type}" transfer="{$transfer}"/>
