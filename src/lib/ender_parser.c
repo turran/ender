@@ -402,8 +402,19 @@ static Eina_Bool _ender_parser_object_attrs_set(Ender_Parser_Context *c,
 {
 	if (!strcmp(key, "name"))
 	{
-		ender_item_name_set(c->i, value);
-		ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+		Ender_Item *exists;
+
+		exists = ender_lib_item_find(c->parser->lib, value);
+		if (exists)
+		{
+			ender_item_unref(c->i);
+			c->i = exists;
+		}
+		else
+		{
+			ender_item_name_set(c->i, value);
+			ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+		}
 	}
 	else if (!strcmp(key, "inherits"))
 	{
