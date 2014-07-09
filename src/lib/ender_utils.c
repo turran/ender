@@ -128,6 +128,7 @@ static char * _ender_utils_name_convert_underscore_latin_camel_english(
 static char * _ender_utils_name_convert_camel_english_underscore_latin(
 		const char *s)
 {
+	Eina_Bool is_upper = EINA_FALSE;
 	char *ret;
 	char *dtmp;
 	char *d;
@@ -146,16 +147,23 @@ static char * _ender_utils_name_convert_camel_english_underscore_latin(
 	{
 		if (isupper(*stmp))
 		{
-			*dtmp = '_';
-			dtmp++;
+			if (!is_upper)
+			{
+				*dtmp = '_';
+				dtmp++;
+			}
 
 			*dtmp = tolower(*stmp);
 			dtmp++;
+
+			is_upper = EINA_TRUE;
 		}
 		else
 		{
 			*dtmp = *stmp;
 			dtmp++;
+
+			is_upper = EINA_FALSE;
 		}
 	}
 
