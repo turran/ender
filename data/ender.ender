@@ -1,0 +1,8 @@
+<?xml version="1.0" standalone="yes"?>
+<lib name="ender" version="1" case="underscore">
+  <includes name="eina"/>
+  <object name="ender.item">
+    <ref/>
+    <unref/>
+  </object>
+</lib>
