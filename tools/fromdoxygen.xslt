@@ -348,6 +348,12 @@
         <xsl:value-of select="'true'"/>
       </xsl:attribute>
     </xsl:if>
+    <!-- check if it is a downcast -->
+    <xsl:if test=".//ender-prop-downcast">
+      <xsl:attribute name="downcast">
+        <xsl:value-of select="'true'"/>
+      </xsl:attribute>
+    </xsl:if>
     <!-- look for setters/getters -->
     <xsl:for-each select="key('prop',.//prop/@name)">
       <!-- get the function name without the property name -->

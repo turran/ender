@@ -999,6 +999,16 @@ static Eina_Bool _ender_parser_prop_attrs_set(Ender_Parser_Context *c,
 			ender_item_attr_flags_set(c->i, flags | ENDER_ITEM_ATTR_FLAG_VALUE_OF);
 		}
 	}
+	else if (!strcmp(key, "downcast"))
+	{
+		if (!strcmp(value, "true"))
+		{
+			int flags;
+
+			flags = ender_item_attr_flags_get(c->i);
+			ender_item_attr_flags_set(c->i, flags | ENDER_ITEM_ATTR_FLAG_DOWNCAST);
+		}
+	}
 	else
 	{
 		return EINA_FALSE;

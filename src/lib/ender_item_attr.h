@@ -22,6 +22,7 @@
 typedef enum _Ender_Item_Attr_Flag
 {
 	ENDER_ITEM_ATTR_FLAG_VALUE_OF  = (1 << 0),
+	ENDER_ITEM_ATTR_FLAG_DOWNCAST  = (1 << 1),
 } Ender_Item_Attr_Flag;
 
 EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i);

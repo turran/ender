@@ -227,6 +227,33 @@ done:
 	return ret;
 }
 
+EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
+{
+	Ender_Item_Object *thiz;
+	Ender_Item *item;
+	Ender_Item *ret = NULL;
+	Eina_List *l;
+
+	thiz = ENDER_ITEM_OBJECT(i);
+	/* check for attributes that have the value-of flag */
+	EINA_LIST_FOREACH (thiz->props, l, item)
+	{
+		Ender_Value val = { 0 };
+		int flags;
+
+		flags = ender_item_attr_flags_get(item);
+		if (flags & ENDER_ITEM_ATTR_FLAG_DOWNCAST)
+		{
+			DBG("Property found '%s'", ender_item_name_get(item));
+			ender_item_attr_value_get(item, o, NULL, &val, NULL);
+			ret = val.ptr;
+			goto done;
+		}
+	}
+done:
+	return ret;
+}
+
 EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;
