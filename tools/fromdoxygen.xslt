@@ -47,11 +47,22 @@
 
   <!-- ingroup ref -->
   <xsl:template match="ingroup/ref">
-    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef">
+      <xsl:with-param name="only-proto" select="false()"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <!-- for protos -->
+  <xsl:template match="ender-group-proto/ref">
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef">
+      <xsl:with-param name="only-proto" select="true()"/>
+    </xsl:apply-templates>
   </xsl:template>
 
   <!-- header file -->
   <xsl:template match="compounddef[@kind='file']">
+    <!-- first get all the proto -->
+    <xsl:apply-templates select=".//ender-group-proto/ref"/>
     <!-- get all the groups with the <ingroup> tag -->
     <xsl:apply-templates select=".//ingroup/ref"/>
   </xsl:template>
@@ -471,6 +482,7 @@
   </xsl:template>
 
   <xsl:template match="memberdef[@kind='typedef']">
+    <xsl:param name="only-proto"/>
     <!-- check if the definition has an inherits tag -->
     <xsl:variable name="itype">
       <xsl:call-template name="type-to-ender">
@@ -498,16 +510,18 @@
               <xsl:value-of select="$itype"/>
             </xsl:attribute>
           </xsl:if>
-          <!-- get every function that belongs to this group -->
-          <xsl:apply-templates select="/descendant::memberdef[@kind='function'][not(.//prop)]">
-            <xsl:with-param name="pname" select="$lower_name"/>
-            <xsl:with-param name="ptype" select="$name"/>
-          </xsl:apply-templates>
-          <!-- get every property -->
-          <xsl:apply-templates select="/descendant::memberdef[@kind='function'][.//prop][generate-id(.)=generate-id(key('prop',.//prop/@name)[1])]">
-            <xsl:with-param name="oname" select="$lower_name"/>
-            <xsl:with-param name="otype" select="$name"/>
-          </xsl:apply-templates>
+          <xsl:if test="not($only-proto)">
+            <!-- get every function that belongs to this group -->
+            <xsl:apply-templates select="/descendant::memberdef[@kind='function'][not(.//prop)]">
+              <xsl:with-param name="pname" select="$lower_name"/>
+              <xsl:with-param name="ptype" select="$name"/>
+            </xsl:apply-templates>
+            <!-- get every property -->
+            <xsl:apply-templates select="/descendant::memberdef[@kind='function'][.//prop][generate-id(.)=generate-id(key('prop',.//prop/@name)[1])]">
+              <xsl:with-param name="oname" select="$lower_name"/>
+              <xsl:with-param name="otype" select="$name"/>
+            </xsl:apply-templates>
+          </xsl:if>
         </xsl:element>
       </xsl:when>
       <!-- function pointer -->
@@ -521,11 +535,13 @@
           </xsl:call-template>
         </xsl:variable>
         <def name="{$name}" type="{$dtype}">
-          <!-- get every function that belongs to this group -->
-          <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
-            <xsl:with-param name="pname" select="$lower_name"/>
-            <xsl:with-param name="ptype" select="'none'"/>
-          </xsl:apply-templates>
+          <xsl:if test="not($only-proto)">
+            <!-- get every function that belongs to this group -->
+            <xsl:apply-templates select="/descendant::memberdef[@kind='function']">
+              <xsl:with-param name="pname" select="$lower_name"/>
+              <xsl:with-param name="ptype" select="'none'"/>
+            </xsl:apply-templates>
+          </xsl:if>
         </def>
       </xsl:otherwise>
     </xsl:choose>
@@ -554,6 +570,7 @@
 
   <!-- Process a group -->
   <xsl:template match="doxygen/compounddef[@kind='group']">
+    <xsl:param name="only-proto"/>
     <!-- check if the definition has an inherits tag -->
     <xsl:variable name="itype">
       <xsl:call-template name="type-to-ender">
@@ -611,22 +628,26 @@
               <xsl:value-of select="$itype"/>
             </xsl:attribute>
           </xsl:if>
-          <!-- now the properties -->
-          <xsl:apply-templates select=".//memberdef[@kind='function'][.//prop][generate-id(.)=generate-id(key('prop',.//prop/@name)[1])]">
-            <xsl:with-param name="oname" select="$lower_name"/>
-            <xsl:with-param name="otype" select="$ptype"/>
-          </xsl:apply-templates>
-          <!-- now the methods that are not properties -->
-          <xsl:apply-templates select=".//memberdef[@kind='function'][not(.//prop)]">
-            <xsl:with-param name="pname" select="$lower_name"/>
-            <xsl:with-param name="ptype" select="$ptype"/>
-          </xsl:apply-templates>
+          <xsl:if test="not($only-proto)">
+            <!-- now the properties -->
+            <xsl:apply-templates select=".//memberdef[@kind='function'][.//prop][generate-id(.)=generate-id(key('prop',.//prop/@name)[1])]">
+              <xsl:with-param name="oname" select="$lower_name"/>
+              <xsl:with-param name="otype" select="$ptype"/>
+            </xsl:apply-templates>
+            <!-- now the methods that are not properties -->
+            <xsl:apply-templates select=".//memberdef[@kind='function'][not(.//prop)]">
+              <xsl:with-param name="pname" select="$lower_name"/>
+              <xsl:with-param name="ptype" select="$ptype"/>
+            </xsl:apply-templates>
+          </xsl:if>
         </xsl:element>
-      </xsl:when>
+        </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="./innerclass"/>
         <xsl:apply-templates select=".//memberdef[@kind='enum']"/>
-        <xsl:apply-templates select=".//memberdef[@kind='typedef']"/>
+        <xsl:apply-templates select=".//memberdef[@kind='typedef']">
+          <xsl:with-param name="only-proto" select="$only-proto"/>
+        </xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
