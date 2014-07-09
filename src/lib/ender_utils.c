@@ -48,6 +48,14 @@ static char * _ender_utils_name_convert_english_latin(char *s)
 	{
 		swap = EINA_TRUE;
 	}
+	else if (!strncmp(s, "create", len))
+	{
+		swap = EINA_TRUE;
+	}
+	else if (!strncmp(s, "append", len))
+	{
+		swap = EINA_TRUE;
+	}
 
 	/* ok we got a verb */
 	if (swap)
