@@ -155,8 +155,10 @@
       <return type="enesim.pool" transfer="full"/>
     </function>
     <method name="default_set"/>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.pool" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <ctor name="eina_new">
       <arg name="mp" type="eina.mempool" direction="in" transfer="full"/>
     </ctor>
@@ -402,8 +404,10 @@
   </enum>
   <object name="enesim.path">
     <ctor name="new"/>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.path" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <method name="command_clear"/>
     <method name="command_add">
       <arg name="cmd" type="enesim.path.command" direction="in" transfer="full"/>
@@ -518,8 +522,10 @@
       <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full"/>
       <arg name="free_func_data" type="pointer" direction="in" transfer="full"/>
     </ctor>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.buffer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <method name="size_get">
       <arg name="w" type="int32" direction="out" transfer="full"/>
       <arg name="h" type="int32" direction="out" transfer="full"/>
@@ -618,8 +624,10 @@
     <ctor name="new_buffer_from">
       <arg name="buffer" type="enesim.buffer" direction="in" transfer="full"/>
     </ctor>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.surface" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <method name="buffer_get">
       <return type="enesim.buffer" transfer="full"/>
     </method>
@@ -682,8 +690,10 @@
       <return type="pointer" transfer="full"/>
       <arg name="name" type="string" direction="in" transfer="none"/>
     </method>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.renderer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <method name="ref_count">
       <return type="int32" transfer="full"/>
     </method>
@@ -814,8 +824,10 @@
   </object>
   <callback name="enesim.renderer.damage.cb"/>
   <object name="enesim.stream">
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.stream" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <method name="read">
       <return type="ssize.t" transfer="full"/>
       <arg name="buffer" type="pointer" direction="in" transfer="full"/>
@@ -1081,8 +1093,10 @@
     <function name="freetype_get">
       <return type="enesim.text.engine" transfer="full"/>
     </function>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.text.engine" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
   </object>
   <object name="enesim.text.font">
     <ctor name="new_description_from">
@@ -1096,8 +1110,10 @@
       <arg name="index" type="int32" direction="in" transfer="full"/>
       <arg name="size" type="int32" direction="in" transfer="full"/>
     </ctor>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.text.font" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <method name="max_ascent_get">
       <return type="int32" transfer="full"/>
     </method>
@@ -1106,8 +1122,10 @@
     </method>
   </object>
   <object name="enesim.text.buffer">
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.text.buffer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <method name="string_set">
       <arg name="string" type="string" direction="in" transfer="none"/>
       <arg name="length" type="int32" direction="in" transfer="full"/>
@@ -1296,8 +1314,10 @@
   </object>
   <object name="enesim.renderer.compound.layer">
     <ctor name="new"/>
-    <ref/>
-    <unref/>
+    <ref name="ref">
+      <return type="enesim.renderer.compound.layer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
     <prop name="renderer">
       <setter>
         <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>

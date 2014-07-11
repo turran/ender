@@ -340,7 +340,7 @@ EAPI Eina_Bool ender_item_object_ref(Ender_Item *i, void *o)
 		return ender_item_object_ref(thiz->inherit, o);
 	}
 	args[0].ptr = o;
-	return ender_item_function_call(i, args, NULL);
+	return ender_item_function_call(thiz->ref, args, NULL);
 }
 
 EAPI Eina_Bool ender_item_object_unref(Ender_Item *i, void *o)
@@ -356,5 +356,5 @@ EAPI Eina_Bool ender_item_object_unref(Ender_Item *i, void *o)
 		return ender_item_object_unref(thiz->inherit, o);
 	}
 	args[0].ptr = o;
-	return ender_item_function_call(i, args, NULL);
+	return ender_item_function_call(thiz->unref, args, NULL);
 }

@@ -779,6 +779,67 @@ static Eina_Bool _ender_parser_ctor_attrs_set(Ender_Parser_Context *c,
 	}
 	return EINA_TRUE;
 }
+
+/*----------------------------------------------------------------------------*
+ *                                  ref tag                                   *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_ref_ctor(Ender_Parser_Context *c)
+{
+	if (!_ender_parser_object_function_ctor(c))
+		return EINA_FALSE;
+
+	ender_item_function_flags_set(c->i, ENDER_ITEM_FUNCTION_FLAG_IS_METHOD
+			| ENDER_ITEM_FUNCTION_FLAG_REF);
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_ref_dtor(Ender_Parser_Context *c)
+{
+	_ender_parser_object_function_dtor(c);
+}
+
+static Eina_Bool _ender_parser_ref_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (_ender_parser_common_function_attrs_set(c, key, value))
+		return EINA_TRUE;
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                                 unref tag                                  *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_unref_ctor(Ender_Parser_Context *c)
+{
+	if (!_ender_parser_object_function_ctor(c))
+		return EINA_FALSE;
+
+	ender_item_function_flags_set(c->i, ENDER_ITEM_FUNCTION_FLAG_IS_METHOD
+			| ENDER_ITEM_FUNCTION_FLAG_UNREF);
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_unref_dtor(Ender_Parser_Context *c)
+{
+	_ender_parser_object_function_dtor(c);
+}
+
+static Eina_Bool _ender_parser_unref_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (_ender_parser_common_function_attrs_set(c, key, value))
+		return EINA_TRUE;
+	else
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
 /*----------------------------------------------------------------------------*
  *                                 value tag                                  *
  *----------------------------------------------------------------------------*/
@@ -1188,6 +1249,8 @@ static Ender_Parser_Tag _tags[] = {
 	{ "setter", _ender_parser_setter_ctor, _ender_parser_setter_dtor, _ender_parser_setter_attrs_set },
 	{ "function", _ender_parser_function_ctor, _ender_parser_function_dtor, _ender_parser_function_attrs_set },
 	{ "ctor", _ender_parser_ctor_ctor, _ender_parser_ctor_dtor, _ender_parser_ctor_attrs_set },
+	{ "ref", _ender_parser_ref_ctor, _ender_parser_ref_dtor, _ender_parser_ref_attrs_set },
+	{ "unref", _ender_parser_unref_ctor, _ender_parser_unref_dtor, _ender_parser_unref_attrs_set },
 	{ "arg", _ender_parser_arg_ctor, _ender_parser_arg_dtor, _ender_parser_arg_attrs_set },
 	{ "return", _ender_parser_return_ctor, _ender_parser_return_dtor, _ender_parser_return_attrs_set },
 	{ "class", NULL, NULL, NULL },

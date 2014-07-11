@@ -455,11 +455,25 @@
       </xsl:when>
       <!-- unref -->
       <xsl:when test="$name = 'unref'">
-        <unref/>
+        <unref name="unref">
+          <!-- get the return value -->
+          <xsl:apply-templates select="./type"/>
+          <!-- get the args -->
+          <xsl:apply-templates select=".//param[position() > 1]">
+            <xsl:with-param name="skip-first" select="true()"/>
+          </xsl:apply-templates>
+        </unref>
       </xsl:when>
       <!-- ref -->
       <xsl:when test="$name = 'ref'">
-        <ref/>
+        <ref name="ref">
+          <!-- get the return value -->
+          <xsl:apply-templates select="./type"/>
+          <!-- get the args -->
+          <xsl:apply-templates select=".//param[position() > 1]">
+            <xsl:with-param name="skip-first" select="true()"/>
+          </xsl:apply-templates>
+        </ref>
       </xsl:when>
       <xsl:when test="contains($first_param_type, $ptype)">
         <method name="{$name}">
