@@ -24,6 +24,7 @@
 #include "ender_item_function.h"
 #include "ender_item_basic.h"
 #include "ender_item_arg.h"
+#include "ender_item_struct.h"
 
 #include "ender_main_private.h"
 #include "ender_item_attr_private.h"
@@ -205,6 +206,28 @@ static Eina_Bool _ender_item_attr_value_get(Ender_Item *getter,
 		case ENDER_ITEM_ATTR_GETTER_TYPE_INOUT:
 		{
 			Ender_Value args[2];
+			Ender_Item *arg;
+			Ender_Item *arg_content;
+
+			/* In case is an out struct and no pointer, create it
+			 * for the user
+			 */
+			arg = ender_item_function_args_at(getter, 1);
+			arg_content = ender_item_arg_type_get(arg);
+			if (ender_item_type_get(arg_content) == ENDER_ITEM_TYPE_STRUCT)
+			{
+				if (!v->ptr)
+				{
+					size_t s;
+
+					DBG("Creating new struct for out arg");
+					s = ender_item_struct_size_get(arg_content);
+					v->ptr = calloc(1, s);
+					/* TODO set the correct xfer */
+				}
+			}
+			ender_item_unref(arg_content);
+			ender_item_unref(arg);
 
 			args[0].ptr = o;
 			args[1] = *v;
