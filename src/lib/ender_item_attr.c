@@ -430,7 +430,7 @@ EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o,
 	switch (ender_item_type_get(parent))
 	{
 		case ENDER_ITEM_TYPE_STRUCT:
-		*xfer = ENDER_ITEM_TRANSFER_FULL;
+		if (xfer) *xfer = ENDER_ITEM_TRANSFER_FULL;
 		ret = ender_item_struct_field_value_get(o, i, v, err);
 		break;
 
