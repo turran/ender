@@ -1157,6 +1157,8 @@ static Eina_Bool _ender_parser_include_attrs_set(Ender_Parser_Context *c,
 			DBG("Including %s %p", file, s);
 			ender_parser_parse(s);
 			free(file);
+
+			dep = ender_lib_find(value);
 		}
 		if (dep)
 		{
