@@ -233,6 +233,7 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 	Ender_Item *item;
 	Ender_Item *ret = NULL;
 	Eina_List *l;
+	Eina_Bool found = EINA_FALSE;
 
 	thiz = ENDER_ITEM_OBJECT(i);
 	/* check for attributes that have the value-of flag */
@@ -247,10 +248,25 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 			DBG("Property found '%s'", ender_item_name_get(item));
 			ender_item_attr_value_get(item, o, NULL, &val, NULL);
 			ret = val.ptr;
+			found = EINA_TRUE;
 			goto done;
 		}
 	}
 done:
+	/* it might be possible that we are still an abstract class in the middle
+	 * of the hierarchy, for that, go up until no inherits
+	 */
+	if (!found)
+	{
+		Ender_Item *inherit;
+
+		inherit = ender_item_object_inherit_get(i);
+		if (inherit)
+		{
+			ret = ender_item_object_downcast(inherit, o);
+			ender_item_unref(inherit);
+		}
+	}
 	return ret;
 }
 
