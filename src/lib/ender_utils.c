@@ -160,6 +160,17 @@ static char * _ender_utils_name_convert_camel_english_underscore_latin(
 		}
 		else
 		{
+			/* for SVGPoint -> svg_point */
+			if (is_upper)
+			{
+				if ((dtmp - 2 > d) && (*(dtmp - 2) != '_'))
+				{
+					*dtmp = *(dtmp - 1);
+					*(dtmp - 1) = '_';
+					dtmp++;
+				}
+			}
+
 			*dtmp = *stmp;
 			dtmp++;
 
