@@ -122,11 +122,14 @@
       <xsl:when test="$name = 'long int'">
         <xsl:value-of select="'int64'"/>
       </xsl:when>
+      <xsl:when test="$name = 'unsigned char'">
+        <xsl:value-of select="'uint8'"/>
+      </xsl:when>
       <!-- uint8 variants -->
       <xsl:when test="$name = 'uint8_t'">
         <xsl:value-of select="'uint8'"/>
       </xsl:when>
-      <!-- uint8 variants -->
+      <!-- uint16 variants -->
       <xsl:when test="$name = 'uint16_t'">
         <xsl:value-of select="'uint16'"/>
       </xsl:when>
