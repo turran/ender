@@ -444,8 +444,8 @@
       <arg name="rx" type="double" direction="in" transfer="full"/>
       <arg name="ry" type="double" direction="in" transfer="full"/>
       <arg name="angle" type="double" direction="in" transfer="full"/>
-      <arg name="large" type="unsigned char" direction="in" transfer="full"/>
-      <arg name="sweep" type="unsigned char" direction="in" transfer="full"/>
+      <arg name="large" type="uint8" direction="in" transfer="full"/>
+      <arg name="sweep" type="uint8" direction="in" transfer="full"/>
       <arg name="x" type="double" direction="in" transfer="full"/>
       <arg name="y" type="double" direction="in" transfer="full"/>
     </method>
@@ -1296,10 +1296,18 @@
   </object>
   <object name="enesim.renderer.compound.layer">
     <ctor name="new"/>
-    <prop name="renderer"/>
-    <prop name="rop"/>
     <ref/>
     <unref/>
+    <prop name="renderer">
+      <setter>
+        <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="rop">
+      <setter>
+        <arg name="rop" type="enesim.rop" direction="in" transfer="full"/>
+      </setter>
+    </prop>
   </object>
   <callback name="enesim.renderer.compound.cb"/>
   <object name="enesim.renderer.compound">
