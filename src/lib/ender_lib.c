@@ -311,7 +311,8 @@ EAPI Ender_Item * ender_lib_item_find(const Ender_Lib *thiz, const char *name)
 	/* check on the dependencies */
 	EINA_LIST_FOREACH(thiz->deps, l, dep)
 	{
-		i = ender_lib_item_find(dep, name);
+		/* do not make it too recursive */
+		i = eina_hash_find(dep->items, name);
 		if (i) return i;
 	}
 
