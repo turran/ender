@@ -152,7 +152,7 @@
   </struct>
   <object name="enesim.pool">
     <function name="default_get">
-      <return type="enesim.pool" transfer="full"/>
+      <return type="enesim.pool" transfer="none"/>
     </function>
     <method name="default_set"/>
     <ref name="ref">
@@ -545,7 +545,7 @@
     <method name="private_get">
       <return type="pointer" transfer="full"/>
     </method>
-    <method name="data_get">
+    <method name="sw_data_get">
       <return type="bool" transfer="full"/>
       <arg name="data" type="enesim.buffer.sw.data" direction="out" transfer="full"/>
     </method>
@@ -650,7 +650,7 @@
     <method name="private_get">
       <return type="pointer" transfer="full"/>
     </method>
-    <method name="data_get">
+    <method name="sw_data_get">
       <return type="bool" transfer="full"/>
       <arg name="stride" type="size.t" direction="in" transfer="full"/>
     </method>
@@ -750,7 +750,7 @@
       <arg name="mask" type="enesim.renderer" direction="in" transfer="full"/>
     </method>
     <method name="mask_get">
-      <return type="enesim.renderer" transfer="full"/>
+      <return type="enesim.renderer" transfer="none"/>
     </method>
     <method name="quality_set">
       <arg name="quality" type="enesim.quality" direction="in" transfer="full"/>
@@ -1191,7 +1191,7 @@
         <arg name="src" type="enesim.surface" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.surface" transfer="full"/>
+        <return type="enesim.surface" transfer="none"/>
       </getter>
     </prop>
     <prop name="source_renderer">
@@ -1199,7 +1199,7 @@
         <arg name="sr" type="enesim.renderer" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.renderer" transfer="full"/>
+        <return type="enesim.renderer" transfer="none"/>
       </getter>
     </prop>
     <prop name="channel">
@@ -1269,7 +1269,7 @@
       <arg name="clipped" type="enesim.renderer" direction="in" transfer="full"/>
     </method>
     <method name="clipped_get">
-      <return type="enesim.renderer" transfer="full"/>
+      <return type="enesim.renderer" transfer="none"/>
     </method>
     <method name="x_set">
       <arg name="x" type="int32" direction="in" transfer="full"/>
@@ -1510,7 +1510,7 @@
         <arg name="buffer" type="enesim.buffer" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.buffer" transfer="full"/>
+        <return type="enesim.buffer" transfer="none"/>
       </getter>
     </prop>
     <ctor name="new"/>
@@ -1549,12 +1549,12 @@
         <arg name="source" type="enesim.renderer" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.renderer" transfer="full"/>
+        <return type="enesim.renderer" transfer="none"/>
       </getter>
     </prop>
     <prop name="source_surface">
       <getter>
-        <return type="enesim.surface" transfer="full"/>
+        <return type="enesim.surface" transfer="none"/>
       </getter>
     </prop>
     <prop name="repeat_mode">
@@ -1576,7 +1576,7 @@
         <arg name="proxied" type="enesim.renderer" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.renderer" transfer="full"/>
+        <return type="enesim.renderer" transfer="none"/>
       </getter>
     </prop>
     <ctor name="new"/>
@@ -1632,7 +1632,7 @@
         <arg name="paint" type="enesim.renderer" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.renderer" transfer="full"/>
+        <return type="enesim.renderer" transfer="none"/>
       </getter>
     </prop>
     <prop name="even_thickness">
@@ -1656,7 +1656,7 @@
         <arg name="paint" type="enesim.renderer" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.renderer" transfer="full"/>
+        <return type="enesim.renderer" transfer="none"/>
       </getter>
     </prop>
     <prop name="odd_thickness">
@@ -2114,7 +2114,7 @@
         <arg name="path" type="enesim.path" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.path" transfer="full"/>
+        <return type="enesim.path" transfer="none"/>
       </getter>
     </prop>
     <ctor name="new"/>
