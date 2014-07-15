@@ -104,6 +104,10 @@
       <xsl:when test="$name = 'char *'">
         <xsl:value-of select="'string'"/>
       </xsl:when>
+      <!-- size variants -->
+      <xsl:when test="$name = 'size_t'">
+        <xsl:value-of select="'size'"/>
+      </xsl:when>
       <!-- int8 variants -->
       <xsl:when test="$name = 'int8_t'">
         <xsl:value-of select="'int8'"/>

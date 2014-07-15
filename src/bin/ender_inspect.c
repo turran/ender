@@ -56,6 +56,9 @@ static const char * value_type_dump(Ender_Value_Type vtype)
 		case ENDER_VALUE_TYPE_POINTER:
 		return "pointer";
 
+		case ENDER_VALUE_TYPE_SIZE:
+		return "size";
+
 		default:
 		return "unknown";
 	}

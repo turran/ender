@@ -60,6 +60,9 @@ size_t ender_value_type_size_get(Ender_Value_Type t)
 		case ENDER_VALUE_TYPE_POINTER:
 		return sizeof(void *);
 
+		case ENDER_VALUE_TYPE_SIZE:
+		return sizeof(size_t);
+
 		default:
 		CRI("Unsupported value %d", t);
 		return 0;
@@ -97,6 +100,9 @@ ssize_t ender_value_type_alignment_get(Ender_Value_Type t)
 		case ENDER_VALUE_TYPE_STRING:
 		case ENDER_VALUE_TYPE_POINTER:
 		return __alignof__(void *);
+
+		case ENDER_VALUE_TYPE_SIZE:
+		return __alignof__(size_t);
 
 		default:
 		CRI("Unsupported value %d", t);

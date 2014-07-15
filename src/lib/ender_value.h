@@ -34,6 +34,7 @@ typedef union _Ender_Value
 	uint64_t u64;
 	double d;
 	void *ptr;
+	size_t sz;
 } Ender_Value;
 
 typedef enum _Ender_Value_Type
@@ -48,6 +49,7 @@ typedef enum _Ender_Value_Type
 	ENDER_VALUE_TYPE_DOUBLE,
 	ENDER_VALUE_TYPE_STRING,
 	ENDER_VALUE_TYPE_POINTER,
+	ENDER_VALUE_TYPE_SIZE,
 } Ender_Value_Type;
 
 #endif
