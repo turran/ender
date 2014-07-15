@@ -550,7 +550,7 @@
       <arg name="data" type="enesim.buffer.sw.data" direction="out" transfer="full"/>
     </method>
     <method name="format_size_get">
-      <return type="size.t" transfer="full"/>
+      <return type="size" transfer="full"/>
       <arg name="w" type="uint32" direction="in" transfer="full"/>
       <arg name="h" type="uint32" direction="in" transfer="full"/>
     </method>
@@ -600,7 +600,7 @@
       <arg name="h" type="uint32" direction="in" transfer="full"/>
       <arg name="copy" type="bool" direction="in" transfer="full"/>
       <arg name="data" type="pointer" direction="in" transfer="full"/>
-      <arg name="stride" type="size.t" direction="in" transfer="full"/>
+      <arg name="stride" type="size" direction="in" transfer="full"/>
       <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full"/>
       <arg name="free_func_data" type="pointer" direction="in" transfer="full"/>
     </ctor>
@@ -617,7 +617,7 @@
       <arg name="p" type="enesim.pool" direction="in" transfer="full"/>
       <arg name="copy" type="bool" direction="in" transfer="full"/>
       <arg name="data" type="pointer" direction="in" transfer="full"/>
-      <arg name="stride" type="size.t" direction="in" transfer="full"/>
+      <arg name="stride" type="size" direction="in" transfer="full"/>
       <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full"/>
       <arg name="free_func_data" type="pointer" direction="in" transfer="full"/>
     </ctor>
@@ -652,7 +652,8 @@
     </method>
     <method name="sw_data_get">
       <return type="bool" transfer="full"/>
-      <arg name="stride" type="size.t" direction="in" transfer="full"/>
+      <arg name="data" type="pointer" direction="out" transfer="full"/>
+      <arg name="stride" type="size" direction="out" transfer="full"/>
     </method>
     <method name="lock">
       <arg name="write" type="bool" direction="in" transfer="full"/>
@@ -831,19 +832,19 @@
     <method name="read">
       <return type="ssize.t" transfer="full"/>
       <arg name="buffer" type="pointer" direction="in" transfer="full"/>
-      <arg name="len" type="size.t" direction="in" transfer="full"/>
+      <arg name="len" type="size" direction="in" transfer="full"/>
     </method>
     <method name="write">
       <return type="ssize.t" transfer="full"/>
       <arg name="buffer" type="pointer" direction="in" transfer="full"/>
-      <arg name="len" type="size.t" direction="in" transfer="full"/>
+      <arg name="len" type="size" direction="in" transfer="full"/>
     </method>
     <method name="length">
-      <return type="size.t" transfer="full"/>
+      <return type="size" transfer="full"/>
     </method>
     <method name="mmap">
       <return type="pointer" transfer="full"/>
-      <arg name="size" type="size.t" direction="in" transfer="full"/>
+      <arg name="size" type="size" direction="out" transfer="full"/>
     </method>
     <method name="munmap">
       <arg name="ptr" type="pointer" direction="in" transfer="full"/>
@@ -858,7 +859,7 @@
     </ctor>
     <ctor name="buffer_new">
       <arg name="buffer" type="pointer" direction="in" transfer="full"/>
-      <arg name="len" type="size.t" direction="in" transfer="full"/>
+      <arg name="len" type="size" direction="in" transfer="full"/>
     </ctor>
     <ctor name="base64_new">
       <arg name="d" type="enesim.stream" direction="in" transfer="full"/>
