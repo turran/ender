@@ -1,2 +1,5 @@
 + Add support for callbacks
-+ Support size_t type
++ Add support for constants
++ Add support for lists types
++ Add support for hash types
++ Add support for arrays types
