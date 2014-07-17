@@ -823,7 +823,9 @@
       <arg name="quality" type="enesim.quality" direction="in" transfer="full"/>
     </function>
   </object>
-  <callback name="enesim.renderer.damage.cb"/>
+  <callback name="enesim.renderer.damage.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
   <object name="enesim.stream">
     <ref name="ref">
       <return type="enesim.stream" transfer="full"/>
@@ -1064,14 +1066,28 @@
       <arg name="err" type="eina.error" direction="in" transfer="full"/>
     </method>
   </object>
-  <callback name="enesim.image.provider.options.parse.cb"/>
+  <callback name="enesim.image.provider.options.parse.cb">
+    <return type="pointer" transfer="full"/>
+  </callback>
   <callback name="enesim.image.provider.options.free.cb"/>
-  <callback name="enesim.image.provider.loadable.cb"/>
-  <callback name="enesim.image.provider.saveable.cb"/>
-  <callback name="enesim.image.provider.info.get.cb"/>
-  <callback name="enesim.image.provider.formats.get.cb"/>
-  <callback name="enesim.image.provider.load.cb"/>
-  <callback name="enesim.image.provider.save.cb"/>
+  <callback name="enesim.image.provider.loadable.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.saveable.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.info.get.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.formats.get.cb">
+    <return type="int32" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.load.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.save.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
   <struct name="enesim.image.finder.descriptor">
     <field name="version" type="int32"/>
     <field name="data_from" type="enesim.image.finder.data.from.cb"/>
@@ -1081,8 +1097,12 @@
     </method>
     <method name="enesim_image_finder_unregister"/>
   </struct>
-  <callback name="enesim.image.finder.data.from.cb"/>
-  <callback name="enesim.image.finder.extension.from.cb"/>
+  <callback name="enesim.image.finder.data.from.cb">
+    <return type="string" transfer="none"/>
+  </callback>
+  <callback name="enesim.image.finder.extension.from.cb">
+    <return type="string" transfer="none"/>
+  </callback>
   <enum name="enesim.text.direction">
     <value name="ltr"/>
     <value name="rtl"/>
@@ -1330,7 +1350,9 @@
       </setter>
     </prop>
   </object>
-  <callback name="enesim.renderer.compound.cb"/>
+  <callback name="enesim.renderer.compound.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
   <object name="enesim.renderer.compound">
     <prop name="background_enable">
       <setter>
