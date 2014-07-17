@@ -266,7 +266,22 @@
 
   <!-- return value -->
   <xsl:template match="type">
-    <xsl:variable name="name" select="string(.)"/>
+    <!-- remove the (* for function pointers -->
+    <xsl:variable name="name">
+      <xsl:variable name="orig-name" select="string(.)"/>
+      <xsl:choose>
+        <xsl:when test="contains($orig-name, '(*')">
+          <xsl:call-template name="string-replace-all">
+            <xsl:with-param name="text" select="$orig-name"/>
+            <xsl:with-param name="replace" select="'(*'"/>
+            <xsl:with-param name="by" select="''"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$orig-name"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="direction" select="'in'"/>
     <!-- handle the transfer -->
     <xsl:variable name="transfer-attr" select="../detaileddescription/para/simplesect[@kind='return']//ender-transfer/@type"/>
@@ -563,7 +578,14 @@
       </xsl:when>
       <!-- function pointer -->
       <xsl:when test="contains($type, '(*')">
-        <callback name="{$name}"/>
+        <callback name="{$name}">
+          <!-- get the return value -->
+          <xsl:apply-templates select="./type"/>
+          <!-- get the args -->
+          <xsl:apply-templates select=".//param">
+            <xsl:with-param name="skip-first" select="false()"/>
+          </xsl:apply-templates>
+        </callback>
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="dtype">
