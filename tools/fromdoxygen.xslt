@@ -2,7 +2,8 @@
      needed to create a .ender file
      xsltproc \-\-param lib "'enesim'" \-\-param version 0 \-\-param case "'underscore'" fromdoxygen.xslt doc/xml/index.xml
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:dyn="http://exslt.org/dynamic" extension-element-prefxes="dyn">
   <xsl:output method="xml" version="1.0" indent="no" standalone="yes" />
 
   <!-- Our tables to do the lower/upper case -->
@@ -206,7 +207,23 @@
         <xsl:with-param name="by" select="''"/>
       </xsl:call-template>
     </xsl:variable>
-    <value name="{$name}"/>
+    <xsl:element name="value">
+      <xsl:attribute name="name">
+        <xsl:value-of select="$name"/>
+      </xsl:attribute>
+      <xsl:if test="initializer">
+        <xsl:attribute name="initializer" value="initializer/text()">
+          <xsl:variable name="expr">
+            <xsl:call-template name="string-replace-all">
+              <xsl:with-param name="text" select="initializer/text()"/>
+              <xsl:with-param name="replace" select="'='"/>
+              <xsl:with-param name="by" select="''"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="dyn:evaluate($expr)"/>
+      </xsl:attribute>
+      </xsl:if>
+    </xsl:element>
   </xsl:template>
 
   <!-- remove the const thing -->

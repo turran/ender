@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="yes"?>
-<lib name="enesim" version="0" case="underscore">
+<lib xmlns:dyn="http://exslt.org/dynamic" name="enesim" version="0" case="underscore">
   <includes name="eina"/>
   <object name="enesim.log">
     <method name="add">
@@ -36,10 +36,10 @@
     <value name="last"/>
   </enum>
   <enum name="enesim.priority">
-    <value name="none"/>
-    <value name="marginal"/>
-    <value name="secondary"/>
-    <value name="primary"/>
+    <value name="none" initializer="0"/>
+    <value name="marginal" initializer="64"/>
+    <value name="secondary" initializer="128"/>
+    <value name="primary" initializer="256"/>
   </enum>
   <enum name="enesim.channel">
     <value name="red"/>
@@ -673,14 +673,14 @@
     </function>
   </object>
   <enum name="enesim.renderer.feature">
-    <value name="translate"/>
-    <value name="affine"/>
-    <value name="projective"/>
-    <value name="a8"/>
-    <value name="argb8888"/>
-    <value name="quality"/>
-    <value name="backend_software"/>
-    <value name="backend_opengl"/>
+    <value name="translate" initializer=""/>
+    <value name="affine" initializer=""/>
+    <value name="projective" initializer=""/>
+    <value name="a8" initializer=""/>
+    <value name="argb8888" initializer=""/>
+    <value name="quality" initializer=""/>
+    <value name="backend_software" initializer=""/>
+    <value name="backend_opengl" initializer=""/>
   </enum>
   <object name="enesim.renderer">
     <method name="private_set">
@@ -1848,14 +1848,14 @@
     <field name="gap" type="double"/>
   </struct>
   <enum name="enesim.renderer.shape.feature">
-    <value name="fill_renderer"/>
-    <value name="stroke_renderer"/>
-    <value name="stroke_location"/>
-    <value name="stroke_dash"/>
+    <value name="fill_renderer" initializer=""/>
+    <value name="stroke_renderer" initializer=""/>
+    <value name="stroke_location" initializer=""/>
+    <value name="stroke_dash" initializer=""/>
   </enum>
   <enum name="enesim.renderer.shape.draw.mode">
-    <value name="fill"/>
-    <value name="stroke"/>
+    <value name="fill" initializer=""/>
+    <value name="stroke" initializer=""/>
   </enum>
   <enum name="enesim.renderer.shape.stroke.location">
     <value name="inside"/>
