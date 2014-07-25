@@ -1,5 +1,5 @@
-What is it
-==========
+What is it?
+===========
 Ender is library written in C that describes other libraries. The purpose of Ender is to easily create bindings for any C library without
 much struggling.
 
