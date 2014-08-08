@@ -39,6 +39,10 @@ And the corresponding XML's Ender file foo.ender:
 For some big libraries, it might be tedious to do the XML file manually, for that, there is an automatic generator from doxygen
 documentation.
 
+Documentation
+=============
+For API reference check out the automatically generated [doxygen](https://turran.github.io/ender/docs/index.html) documentation
+
 Available bindings
 ==================
 There are several projects for creating bindings of ender to specific languages. Several are still in deveolping tho
