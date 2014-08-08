@@ -1,0 +1,6 @@
+@INCLUDE = common/doc/Doxyfile_common
+
+PROJECT_BRIEF          = Descriptor library
+FILE_PATTERNS          = ender_*.c ender_*.h Ender.h
+INPUT                  = src/lib
+EXCLUDE_PATTERNS       = *_private.h
