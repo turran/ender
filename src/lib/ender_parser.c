@@ -497,6 +497,24 @@ static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
 		}
 		ender_item_arg_type_set(c->i, type);
 	}
+	else if (!strcmp(key, "transfer"))
+	{
+		Ender_Item_Transfer xfer = ENDER_ITEM_TRANSFER_FULL;
+
+		if (!strcmp(value, "full"))
+			xfer = ENDER_ITEM_TRANSFER_FULL;
+		else if (!strcmp(value, "none"))
+			xfer = ENDER_ITEM_TRANSFER_NONE;
+		else if (!strcmp(value, "container"))
+			xfer = ENDER_ITEM_TRANSFER_CONTAINER;
+		else if (!strcmp(value, "content"))
+			xfer = ENDER_ITEM_TRANSFER_CONTENT;
+		else
+		{
+			WRN("Unknown transfer '%s'", value);
+		}
+		ender_item_arg_transfer_set(c->i, xfer);
+	}
 	else
 	{
 		return EINA_FALSE;
@@ -546,6 +564,24 @@ static Eina_Bool _ender_parser_return_attrs_set(Ender_Parser_Context *c,
 			return EINA_FALSE;
 		}
 		ender_item_arg_type_set(c->i, type);
+	}
+	else if (!strcmp(key, "transfer"))
+	{
+		Ender_Item_Transfer xfer = ENDER_ITEM_TRANSFER_FULL;
+
+		if (!strcmp(value, "full"))
+			xfer = ENDER_ITEM_TRANSFER_FULL;
+		else if (!strcmp(value, "none"))
+			xfer = ENDER_ITEM_TRANSFER_NONE;
+		else if (!strcmp(value, "container"))
+			xfer = ENDER_ITEM_TRANSFER_CONTAINER;
+		else if (!strcmp(value, "content"))
+			xfer = ENDER_ITEM_TRANSFER_CONTENT;
+		else
+		{
+			WRN("Unknown transfer '%s'", value);
+		}
+		ender_item_arg_transfer_set(c->i, xfer);
 	}
 	else
 	{
