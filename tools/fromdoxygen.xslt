@@ -460,6 +460,71 @@
     </xsl:element>
   </xsl:template>
 
+  <!-- A function that returns the compound (struct, etc) ender name. If the node has
+       an ender-name, that one is used, otherwise, we use the compounddef's text
+       node and enderize it
+       Param in: the compounddef node of a struct
+       Value out: the name
+  !-->
+  <xsl:template name="compound-name">
+    <xsl:param name="node"/>
+    <xsl:variable name="name">
+      <xsl:choose>
+        <xsl:when test="$node/detaileddescription//ender-name">
+          <xsl:value-of select="$node/detaileddescription//ender-name/@name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="type-to-ender">
+            <xsl:with-param name="text" select="$node/compoundname/text()"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$name"/>
+  </xsl:template>
+
+  <!-- Resolve the case of <type>const <ref ...>foo</ref></type> -->
+  <xsl:template name="type-ref-resolve">
+    <xsl:param name="node"/>
+    <xsl:variable name="refid" value="$node/@refid"/>
+    <xsl:for-each select="$node/node()">
+      <xsl:choose>
+        <xsl:when test="self::text()">
+          <xsl:value-of select="."/>
+        </xsl:when>
+        <xsl:when test="name() = 'ref'">
+          <xsl:call-template name="compound-name">
+            <xsl:with-param name="node" select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- Given that a function arg can be <type>const <ref ...>foo</ref></type>
+       it is possible that the ref node actually points to an object which
+       has an ender-name set. In that case the returned string must be
+       const referred.name otherwise const foo
+  !-->
+  <xsl:template name="type-resolve">
+    <xsl:param name="node"/>
+    <xsl:variable name="rname">
+      <xsl:choose>
+        <xsl:when test="$node/ref">
+          <xsl:call-template name="type-ref-resolve">
+            <xsl:with-param name="node" select="$node"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="type-to-ender">
+            <xsl:with-param name="text" select="string($node)"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$rname"/>
+  </xsl:template>
+
   <!-- method handling -->
   <xsl:template match="memberdef[@kind='function'][not(.//ender-prop)]">
     <xsl:param name="pname"/>
@@ -475,17 +540,25 @@
     <!-- decide to define a method, ctor, ref, unref -->
     <xsl:variable name="first_param" select=".//param[1]"/>
     <xsl:variable name="first_param_type">
-      <xsl:call-template name="type-to-ender">
-        <xsl:with-param name="text" select="string($first_param/type)"/>
+      <xsl:call-template name="type-resolve">
+        <xsl:with-param name="node" select="$first_param/type"/>
       </xsl:call-template>
     </xsl:variable>
+    <first-param name="{$first_param_type}"/>
     <xsl:choose>
       <!-- for top level functions, use the ender name -->
       <xsl:when test="$pname = 'none'">
         <xsl:variable name="rname">
-          <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="string($name)"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test=".//ender-name">
+              <xsl:value-of select=".//ender-name/@name"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="type-to-ender">
+                <xsl:with-param name="text" select="string($name)"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
         <function name="{$rname}">
           <!-- get the return value -->
@@ -626,11 +699,10 @@
   <!-- Process innerclasses, i.e structs -->
   <xsl:template match="innerclass">
     <!-- The name of the struct must be all lower case, replace the '_' by '.', etc -->
-    <!--<xsl:variable name="name" select="translate(translate(compoundname/text(), '_', '.'), $uppercase, $lowercase)"/>-->
     <xsl:variable name="lower_name" select="translate(text(), $uppercase, $lowercase)"/>
     <xsl:variable name="name">
-      <xsl:call-template name="type-to-ender">
-        <xsl:with-param name="text" select="text()"/>
+      <xsl:call-template name="compound-name">
+        <xsl:with-param name="node" select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef[@kind='struct']"/>
       </xsl:call-template>
     </xsl:variable>
     <struct name="{$name}">
