@@ -33,6 +33,29 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- substring before last occurence http://www.heber.it/?p=1278 -->
+  <xsl:template name="substring-before-last">
+    <!--passed template parameter -->
+    <xsl:param name="list"/>
+    <xsl:param name="delimiter"/>
+    <xsl:choose>
+      <xsl:when test="contains($list, $delimiter)">
+        <!-- get everything in front of the first delimiter -->
+        <xsl:value-of select="substring-before($list,$delimiter)"/>
+        <xsl:choose>
+          <xsl:when test="contains(substring-after($list,$delimiter),$delimiter)">
+            <xsl:value-of select="$delimiter"/>
+          </xsl:when>
+        </xsl:choose>
+        <xsl:call-template name="substring-before-last">
+          <!-- store anything left in another variable -->
+          <xsl:with-param name="list" select="substring-after($list,$delimiter)"/>
+          <xsl:with-param name="delimiter" select="$delimiter"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- get the return type of a function that is a ctor, usefull to know if a
        function is a method or not
   -->
@@ -282,10 +305,11 @@
   </xsl:template>
 
   <!-- return value -->
-  <xsl:template match="type">
+  <xsl:template name="return-item">
+    <xsl:param name="node"/>
     <!-- remove the (* for function pointers -->
     <xsl:variable name="name">
-      <xsl:variable name="orig-name" select="string(.)"/>
+      <xsl:variable name="orig-name" select="string($node)"/>
       <xsl:choose>
         <xsl:when test="contains($orig-name, '(*')">
           <xsl:call-template name="string-replace-all">
@@ -301,7 +325,7 @@
     </xsl:variable>
     <xsl:variable name="direction" select="'in'"/>
     <!-- handle the transfer -->
-    <xsl:variable name="transfer-attr" select="../detaileddescription/para/simplesect[@kind='return']//ender-transfer/@type"/>
+    <xsl:variable name="transfer-attr" select="$node/../detaileddescription/para/simplesect[@kind='return']//ender-transfer/@type"/>
     <xsl:variable name="transfer">
       <xsl:choose>
         <xsl:when test="string($transfer-attr)">
@@ -324,8 +348,8 @@
     <!-- get the type -->
     <xsl:variable name="type">
       <xsl:choose>
-        <xsl:when test="../detaileddescription//simplesect[@kind='return']//ender-type">
-          <xsl:value-of select="../detaileddescription//simplesect[@kind='return']//ender-type/@type"/>
+        <xsl:when test="$node/../detaileddescription//simplesect[@kind='return']//ender-type">
+          <xsl:value-of select="$node/../detaileddescription//simplesect[@kind='return']//ender-type/@type"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="param-type">
@@ -435,7 +459,9 @@
         <xsl:when test="$name = 'get'">
           <getter>
             <!-- get the return value -->
-            <xsl:apply-templates select="./type"/>
+            <xsl:call-template name="return-item">
+              <xsl:with-param name="node" select="./type"/>
+            </xsl:call-template>
             <!-- get the args -->
             <xsl:apply-templates select=".//param[position() > 1]">
               <xsl:with-param name="skip-first" select="true()"/>
@@ -445,7 +471,9 @@
         <xsl:when test="$name = 'set'">
           <setter>
             <!-- get the return value -->
-            <xsl:apply-templates select="./type"/>
+            <xsl:call-template name="return-item">
+              <xsl:with-param name="node" select="./type"/>
+            </xsl:call-template>
             <!-- get the args -->
             <xsl:apply-templates select=".//param[position() > 1]">
               <xsl:with-param name="skip-first" select="true()"/>
@@ -483,44 +511,60 @@
     <xsl:value-of select="$name"/>
   </xsl:template>
 
-  <!-- Resolve the case of <type>const <ref ...>foo</ref></type> -->
-  <xsl:template name="type-ref-resolve">
-    <xsl:param name="node"/>
-    <xsl:variable name="refid" value="$node/@refid"/>
-    <xsl:for-each select="$node/node()">
-      <xsl:choose>
-        <xsl:when test="self::text()">
-          <xsl:value-of select="."/>
-        </xsl:when>
-        <xsl:when test="name() = 'ref'">
-          <xsl:call-template name="compound-name">
-            <xsl:with-param name="node" select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
-          </xsl:call-template>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:for-each>
+  <xsl:template name="member-name">
   </xsl:template>
 
-  <!-- Given that a function arg can be <type>const <ref ...>foo</ref></type>
-       it is possible that the ref node actually points to an object which
-       has an ender-name set. In that case the returned string must be
-       const referred.name otherwise const foo
-  !-->
-  <xsl:template name="type-resolve">
-    <xsl:param name="node"/>
+  <!-- Get the name of a type without member reference or compound reference -->
+  <xsl:template match="type">
     <xsl:variable name="rname">
-      <xsl:choose>
-        <xsl:when test="$node/ref">
-          <xsl:call-template name="type-ref-resolve">
-            <xsl:with-param name="node" select="$node"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="string($node)"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="type-to-ender">
+        <xsl:with-param name="text" select="string(.)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$rname"/>
+  </xsl:template>
+
+  <!-- Get the name of a type that has a member reference -->
+  <xsl:template match="type[./ref[@kindref='member']]">
+    <xsl:variable name="rname">
+      <xsl:for-each select="./node()">
+        <xsl:choose>
+          <xsl:when test="self::text()">
+            <xsl:value-of select="."/>
+          </xsl:when>
+          <xsl:when test="name() = 'ref'">
+            <!-- For a member reference we need to take out the string after the last _ -->
+            <xsl:variable name="ssname">
+              <xsl:call-template name="substring-before-last">
+                <xsl:with-param name="list" select="@refid"/>
+                <xsl:with-param name="delimiter" select="'_'"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:call-template name="compound-name">
+              <xsl:with-param name="node" select="document(concat($ssname, '.xml'), @refid)/doxygen/compounddef"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:value-of select="$rname"/>
+  </xsl:template>
+
+  <!-- Get the name of a type that has a compound reference -->
+  <xsl:template match="type[./ref[@kindref='compound']]">
+    <xsl:variable name="rname">
+      <xsl:for-each select="./node()">
+        <xsl:choose>
+          <xsl:when test="self::text()">
+            <xsl:value-of select="."/>
+          </xsl:when>
+          <xsl:when test="name() = 'ref'">
+            <xsl:call-template name="compound-name">
+              <xsl:with-param name="node" select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:for-each>
     </xsl:variable>
     <xsl:value-of select="$rname"/>
   </xsl:template>
@@ -540,11 +584,8 @@
     <!-- decide to define a method, ctor, ref, unref -->
     <xsl:variable name="first_param" select=".//param[1]"/>
     <xsl:variable name="first_param_type">
-      <xsl:call-template name="type-resolve">
-        <xsl:with-param name="node" select="$first_param/type"/>
-      </xsl:call-template>
+      <xsl:apply-templates select="$first_param/type"/>
     </xsl:variable>
-    <first-param name="{$first_param_type}"/>
     <xsl:choose>
       <!-- for top level functions, use the ender name -->
       <xsl:when test="$pname = 'none'">
@@ -562,7 +603,9 @@
         </xsl:variable>
         <function name="{$rname}">
           <!-- get the return value -->
-          <xsl:apply-templates select="./type"/>
+          <xsl:call-template name="return-item">
+            <xsl:with-param name="node" select="./type"/>
+          </xsl:call-template>
           <!-- get the args -->
           <xsl:apply-templates select=".//param">
             <xsl:with-param name="skip-first" select="false()"/>
@@ -582,7 +625,9 @@
       <xsl:when test="$name = 'unref'">
         <unref name="unref">
           <!-- get the return value -->
-          <xsl:apply-templates select="./type"/>
+          <xsl:call-template name="return-item">
+            <xsl:with-param name="node" select="./type"/>
+          </xsl:call-template>
           <!-- get the args -->
           <xsl:apply-templates select=".//param[position() > 1]">
             <xsl:with-param name="skip-first" select="true()"/>
@@ -593,7 +638,9 @@
       <xsl:when test="$name = 'ref'">
         <ref name="ref">
           <!-- get the return value -->
-          <xsl:apply-templates select="./type"/>
+          <xsl:call-template name="return-item">
+            <xsl:with-param name="node" select="./type"/>
+          </xsl:call-template>
           <!-- get the args -->
           <xsl:apply-templates select=".//param[position() > 1]">
             <xsl:with-param name="skip-first" select="true()"/>
@@ -603,7 +650,9 @@
       <xsl:when test="contains($first_param_type, $ptype)">
         <method name="{$name}">
           <!-- get the return value -->
-          <xsl:apply-templates select="./type"/>
+          <xsl:call-template name="return-item">
+            <xsl:with-param name="node" select="./type"/>
+          </xsl:call-template>
           <!-- get the args -->
           <xsl:apply-templates select=".//param[position() > 1]">
             <xsl:with-param name="skip-first" select="true()"/>
@@ -613,7 +662,9 @@
       <xsl:otherwise>
         <function name="{$name}">
           <!-- get the return value -->
-          <xsl:apply-templates select="./type"/>
+          <xsl:call-template name="return-item">
+            <xsl:with-param name="node" select="./type"/>
+          </xsl:call-template>
           <!-- get the args -->
           <xsl:apply-templates select=".//param">
             <xsl:with-param name="skip-first" select="false()"/>
@@ -670,7 +721,9 @@
       <xsl:when test="contains($type, '(*')">
         <callback name="{$name}">
           <!-- get the return value -->
-          <xsl:apply-templates select="./type"/>
+          <xsl:call-template name="return-item">
+            <xsl:with-param name="node" select="./type"/>
+          </xsl:call-template>
           <!-- get the args -->
           <xsl:apply-templates select=".//param">
             <xsl:with-param name="skip-first" select="false()"/>
