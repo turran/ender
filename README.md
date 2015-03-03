@@ -51,6 +51,7 @@ There are several projects for creating bindings of ender to specific languages.
 + [JavaScript (SpiderMonkey)](http://github.com/turran/ender-js-sm)
 + [JavaScript (V8)](http://github.com/turran/ender-js-v8)
 + [Lua](http://github.com/turran/ender-lua)
++ [C#](http://github.com/turran/ender-sharp)
 
 FAQ
 ===
