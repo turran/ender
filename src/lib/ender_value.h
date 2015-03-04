@@ -20,9 +20,13 @@
 
 /**
  * @defgroup Ender_Value_Group Value
+ * @brief A value represents every C primitive data types
  * @{
  */
 
+/**
+ * A representation of all different value types
+ */
 typedef union _Ender_Value
 {
 	Eina_Bool b;
@@ -37,6 +41,9 @@ typedef union _Ender_Value
 	size_t sz;
 } Ender_Value;
 
+/**
+ * Different types of a value
+ */
 typedef enum _Ender_Value_Type
 {
 	ENDER_VALUE_TYPE_BOOL,
@@ -51,5 +58,9 @@ typedef enum _Ender_Value_Type
 	ENDER_VALUE_TYPE_POINTER,
 	ENDER_VALUE_TYPE_SIZE,
 } Ender_Value_Type;
+
+/**
+ * @}
+ */
 
 #endif

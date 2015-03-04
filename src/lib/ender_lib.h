@@ -19,8 +19,9 @@
 #ifndef _ENDER_LIB_H_
 #define _ENDER_LIB_H_
 
-/*
+/**
  * @defgroup Ender_Lib_Group Lib
+ * @brief A library matches the C library you want to describe
  * @{
  */
 

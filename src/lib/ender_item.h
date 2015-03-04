@@ -19,8 +19,9 @@
 #ifndef _ENDER_ITEM_H_
 #define _ENDER_ITEM_H_
 
-/*
+/**
  * @defgroup Ender_Item_Group Item
+ * @brief An item represents any identifier a @ref Ender_Lib might have
  * @{
  */
 

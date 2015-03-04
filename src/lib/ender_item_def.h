@@ -19,7 +19,17 @@
 #ifndef _ENDER_ITEM_DEF_H_
 #define _ENDER_ITEM_DEF_H_
 
+/**
+ * @defgroup Ender_Def_Group Def
+ * @brief A def represents a definition of an identifier based in another, i.e an alias
+ * @{
+ */
+
 EAPI Ender_Item * ender_item_def_type_get(Ender_Item *i);
 EAPI Eina_List * ender_item_def_functions_get(Ender_Item *i);
+
+/**
+ * @}
+ */
 
 #endif

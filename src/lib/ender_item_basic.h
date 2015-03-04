@@ -19,6 +19,16 @@
 #ifndef _ENDER_ITEM_BASIC_H_
 #define _ENDER_ITEM_BASIC_H_
 
+/**
+ * @defgroup Ender_Basic_Group Basic
+ * @brief A basic item represents an identifier that can be resolved by a @ref Ender_Value_Type
+ * @{
+ */
+
 EAPI Ender_Value_Type ender_item_basic_value_type_get(Ender_Item *i);
+
+/**
+ * @}
+ */
 
 #endif

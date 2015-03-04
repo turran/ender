@@ -19,8 +19,9 @@
 #ifndef _ENDER_MAIN_H_
 #define _ENDER_MAIN_H_
 
-/*
+/**
  * @defgroup Ender_Main_Group Main
+ * @brief Core functions
  * @{
  */
 
@@ -47,7 +48,16 @@ EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *
  * @}
  */
 
+/**
+ * @ingroup Ender_Item_Group
+ * @brief Item handle
+ */
 typedef struct _Ender_Item Ender_Item;
+
+/**
+ * @ingroup Ender_Lib_Group
+ * @brief Lib handle
+ */
 typedef struct _Ender_Lib Ender_Lib;
 
 #endif

@@ -19,6 +19,16 @@
 #ifndef _ENDER_ITEM_ENUM_H_
 #define _ENDER_ITEM_ENUM_H_
 
+/**
+ * @defgroup Ender_Enum_Group Enum
+ * @brief An enum represents a C enumeration
+ * @{
+ */
+
 EAPI Eina_List * ender_item_enum_values_get(Ender_Item *i);
+
+/**
+ * @}
+ */
 
 #endif

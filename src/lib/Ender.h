@@ -54,8 +54,9 @@ extern "C" {
 /**
  * @mainpage Ender
  * @section intro Introduction
- * Ender is a library that loads descriptions of objects
- * them into a collection of properties that are accesible through a common API.
+ * Ender is library written in C that describes other libraries. 
+ * The purpose of Ender is to easily create bindings for any C library without
+ * much struggling.
  *
  * @section dependencies Dependencies
  * - Eina
@@ -76,10 +77,6 @@ extern "C" {
 #include "ender_item_enum.h"
 #include "ender_utils.h"
 #include "ender_parser.h"
-
-/**
- * @}
- */
 
 #ifdef __cplusplus
 }

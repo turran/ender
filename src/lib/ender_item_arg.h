@@ -19,6 +19,12 @@
 #ifndef _ENDER_ITEM_ARG_H_
 #define _ENDER_ITEM_ARG_H_
 
+/**
+ * @defgroup Ender_Arg_Group Arg
+ * @brief An arg represents a @ref Ender_Function_Group argument
+ * @{
+ */
+
 typedef enum _Ender_Item_Arg_Direction
 {
 	ENDER_ITEM_ARG_DIRECTION_IN,
@@ -36,5 +42,9 @@ EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i);
 EAPI Ender_Item_Arg_Direction ender_item_arg_direction_get(Ender_Item *i);
 EAPI Ender_Item_Transfer ender_item_arg_transfer_get(Ender_Item *i);
 EAPI int ender_item_arg_flags_get(Ender_Item *i);
+
+/**
+ * @}
+ */
 
 #endif

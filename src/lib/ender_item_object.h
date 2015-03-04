@@ -19,6 +19,16 @@
 #ifndef _ENDER_ITEM_OBJECT_H_
 #define _ENDER_ITEM_OBJECT_H_
 
+/**
+ * @defgroup Ender_Object_Group Object
+ * @brief An object represents opaque structs
+ *
+ * Basically an object must have constructors, a destructor and reference
+ * counting. It can also have functions and properties, and can inherit
+ * from another object.
+ * @{
+ */
+
 EAPI Eina_Bool ender_item_object_string_to(Ender_Item *i, void *o, char **str,
 		Ender_Item_Transfer *xfer, Eina_Error *err);
 EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o);

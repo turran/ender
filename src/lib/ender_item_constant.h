@@ -21,6 +21,7 @@
 
 /**
  * @defgroup Ender_Constant_Group Constant
+ * @brief A constant represents an identifier with its associated value
  * @{
  */
 

@@ -21,6 +21,7 @@
 
 /**
  * @defgroup Ender_Function_Group Function
+ * @brief A function represents an exported function of the library
  * @{
  */
 
