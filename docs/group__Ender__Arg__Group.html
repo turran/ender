@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>ender: Parser</title>
+<title>ender: Arg</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -70,17 +70,45 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Parser</div>  </div>
+<div class="title">Arg</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>An arg represents a <a class="el" href="group__Ender__Function__Group.html">Function</a> argument.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><b>Ender_Item_Arg_Direction</b> { <br/>
+&#160;&#160;<b>ENDER_ITEM_ARG_DIRECTION_IN</b>, 
+<br/>
+&#160;&#160;<b>ENDER_ITEM_ARG_DIRECTION_OUT</b>, 
+<br/>
+&#160;&#160;<b>ENDER_ITEM_ARG_DIRECTION_IN_OUT</b>
+<br/>
+ }</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><b>Ender_Item_Arg_Flag</b> { <br/>
+&#160;&#160;<b>ENDER_ITEM_ARG_FLAG_IS_RETURN</b> =  (1 &lt;&lt; 0), 
+<br/>
+&#160;&#160;<b>ENDER_ITEM_ARG_FLAG_IS_CLOSURE</b> =  (1 &lt;&lt; 1)
+<br/>
+ }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga7e9fc160e4dfa157b739e09655b729b0"></a><!-- doxytag: member="Ender_Parser_Group::ender_parser_parse" ref="ga7e9fc160e4dfa157b739e09655b729b0" args="(Enesim_Stream *s)" -->
-EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>ender_parser_parse</b> (Enesim_Stream *s)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga235bbb7710e99392cf703acde5a84ffe"></a><!-- doxytag: member="Ender_Arg_Group::ender_item_arg_type_get" ref="ga235bbb7710e99392cf703acde5a84ffe" args="(Ender_Item *i)" -->
+EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_arg_type_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gadd6bbdef9d5153d4b760fa37cc77dd37"></a><!-- doxytag: member="Ender_Arg_Group::ender_item_arg_direction_get" ref="gadd6bbdef9d5153d4b760fa37cc77dd37" args="(Ender_Item *i)" -->
+EAPI Ender_Item_Arg_Direction&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_arg_direction_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga3792a3df5617f622fb601e43cbdc4b60"></a><!-- doxytag: member="Ender_Arg_Group::ender_item_arg_transfer_get" ref="ga3792a3df5617f622fb601e43cbdc4b60" args="(Ender_Item *i)" -->
+EAPI Ender_Item_Transfer&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_arg_transfer_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga85d9592b636cb9dc6b8fbf881cc5e5b0"></a><!-- doxytag: member="Ender_Arg_Group::ender_item_arg_flags_get" ref="ga85d9592b636cb9dc6b8fbf881cc5e5b0" args="(Ender_Item *i)" -->
+EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_arg_flags_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
 </table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<p>An arg represents a <a class="el" href="group__Ender__Function__Group.html">Function</a> argument. </p>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"

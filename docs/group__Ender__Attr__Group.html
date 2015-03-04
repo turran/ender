@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>ender: Parser</title>
+<title>ender: Attr</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -70,17 +70,39 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Parser</div>  </div>
+<div class="title">Attr</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>An attr represents a <a class="el" href="group__Ender__Object__Group.html">Object</a> attribute.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><b>Ender_Item_Attr_Flag</b> { <br/>
+&#160;&#160;<b>ENDER_ITEM_ATTR_FLAG_VALUE_OF</b> =  (1 &lt;&lt; 0), 
+<br/>
+&#160;&#160;<b>ENDER_ITEM_ATTR_FLAG_DOWNCAST</b> =  (1 &lt;&lt; 1)
+<br/>
+ }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga7e9fc160e4dfa157b739e09655b729b0"></a><!-- doxytag: member="Ender_Parser_Group::ender_parser_parse" ref="ga7e9fc160e4dfa157b739e09655b729b0" args="(Enesim_Stream *s)" -->
-EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>ender_parser_parse</b> (Enesim_Stream *s)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga0eebd883d5b4e6847c4b3673da237bc0"></a><!-- doxytag: member="Ender_Attr_Group::ender_item_attr_type_get" ref="ga0eebd883d5b4e6847c4b3673da237bc0" args="(Ender_Item *i)" -->
+EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_attr_type_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga36374ed2fcd6478d94fb2f778ddc4ff5"></a><!-- doxytag: member="Ender_Attr_Group::ender_item_attr_offset_get" ref="ga36374ed2fcd6478d94fb2f778ddc4ff5" args="(Ender_Item *i)" -->
+EAPI ssize_t&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_attr_offset_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gad0dbc8e5f74f022a757aa4c7364cfd07"></a><!-- doxytag: member="Ender_Attr_Group::ender_item_attr_value_get" ref="gad0dbc8e5f74f022a757aa4c7364cfd07" args="(Ender_Item *i, void *o, Ender_Item_Transfer *xfer, Ender_Value *v, Eina_Error *err)" -->
+EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_attr_value_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i, void *o, Ender_Item_Transfer *xfer, <a class="el" href="unionEnder__Value.html">Ender_Value</a> *v, Eina_Error *err)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga8efc4667767d4cd901cbaf966427ec37"></a><!-- doxytag: member="Ender_Attr_Group::ender_item_attr_value_set" ref="ga8efc4667767d4cd901cbaf966427ec37" args="(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)" -->
+EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_attr_value_set</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i, void *o, <a class="el" href="unionEnder__Value.html">Ender_Value</a> *v, Eina_Error *err)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga440b0312af8a99f8eb93d76dec56dd77"></a><!-- doxytag: member="Ender_Attr_Group::ender_item_attr_flags_get" ref="ga440b0312af8a99f8eb93d76dec56dd77" args="(Ender_Item *i)" -->
+EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_attr_flags_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
 </table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<p>An attr represents a <a class="el" href="group__Ender__Object__Group.html">Object</a> attribute. </p>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
