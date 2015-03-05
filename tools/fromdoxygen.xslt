@@ -56,6 +56,93 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- remove the const thing -->
+  <xsl:template name="remove-const">
+    <xsl:param name="type"/>
+    <!-- remove any const thing -->
+    <xsl:variable name="no-const-type">
+      <xsl:call-template name="string-replace-all">
+        <xsl:with-param name="text" select="$type"/>
+        <xsl:with-param name="replace" select="'const'"/>
+        <xsl:with-param name="by" select="''"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$no-const-type"/>
+  </xsl:template>
+
+  <!-- remove the (* for function pointers -->
+  <xsl:template name="remove-fpointer">
+    <xsl:param name="type"/>
+    <xsl:variable name="no-fpointer-type">
+      <xsl:choose>
+        <xsl:when test="contains($type, '(*')">
+          <xsl:call-template name="string-replace-all">
+            <xsl:with-param name="text" select="$type"/>
+            <xsl:with-param name="replace" select="'(*'"/>
+            <xsl:with-param name="by" select="''"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$type"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$no-fpointer-type"/>
+  </xsl:template>
+
+  <!-- remove the direction pointer -->
+  <xsl:template name="remove-direction">
+    <xsl:param name="direction"/>
+    <xsl:param name="text"/>
+    <xsl:variable name="ret">
+      <xsl:choose>
+        <xsl:when test="$direction = 'out'">
+          <xsl:value-of select="normalize-space(substring($text, 1, string-length($text) - 1))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="normalize-space($text)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$ret"/>
+  </xsl:template>
+
+  <!-- remove the exported prefix -->
+  <xsl:template name="remove-exported">
+    <xsl:param name="type"/>
+    <!-- remove any const thing -->
+    <xsl:variable name="no-exported-type">
+      <xsl:call-template name="string-replace-all">
+        <xsl:with-param name="text" select="$type"/>
+        <xsl:with-param name="replace" select="'EAPI'"/>
+        <xsl:with-param name="by" select="''"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$no-exported-type"/>
+  </xsl:template>
+
+  <!-- remove the exported prefix and the const -->
+  <xsl:template name="sanitize-prefix">
+    <xsl:param name="type"/>
+    <!-- remove any const thing -->
+    <xsl:variable name="no-const-type">
+      <xsl:call-template name="remove-const">
+        <xsl:with-param name="type" select="$type"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- remove any const thing -->
+    <xsl:variable name="no-exported-type">
+      <xsl:call-template name="remove-exported">
+        <xsl:with-param name="type" select="$no-const-type"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- sanitize it -->
+    <xsl:variable name="sanitized-prefix">
+      <xsl:value-of select="$no-exported-type"/>
+    </xsl:variable>
+    <xsl:value-of select="$sanitized-prefix"/>
+  </xsl:template>
+
   <!-- get the return type of a function that is a ctor, usefull to know if a
        function is a method or not
   -->
@@ -69,61 +156,9 @@
     <xsl:value-of select="$rtype"/>
   </xsl:template>
 
-  <!-- ender-group ref -->
-  <xsl:template match="ender-group/ref">
-    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef">
-      <xsl:with-param name="only-proto" select="false()"/>
-    </xsl:apply-templates>
-  </xsl:template>
-
-  <!-- for protos -->
-  <xsl:template match="ender-group-proto/ref">
-    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef">
-      <xsl:with-param name="only-proto" select="true()"/>
-    </xsl:apply-templates>
-  </xsl:template>
-
-  <!-- header file -->
-  <xsl:template match="compounddef[@kind='file']">
-    <!-- first get all the proto -->
-    <xsl:apply-templates select=".//ender-group-proto/ref"/>
-    <!-- get all the groups with the <ender-group> tag -->
-    <xsl:apply-templates select=".//ender-group/ref"/>
-  </xsl:template>
-
-  <!-- header ref -->
-  <xsl:template match="includes[@local='yes']">
-    <!-- get all the header files -->
-    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
-  </xsl:template>
-
-  <xsl:template match="ender-depends">
-    <xsl:variable name="name" select="@from"/>
-    <includes name="{$name}"/>
-  </xsl:template>
-
-  <!-- main entry point -->
-  <xsl:template match="/">
-    <lib name="{$lib}" version="{$version}" case="{$case}">
-      <!-- first get the dependencies -->
-      <xsl:apply-templates select=".//ender-depends"/>
-      <!-- We need to get every header, get it and then get every group from such header -->
-      <xsl:apply-templates select="doxygen/compounddef/includes[@local='yes']"/>
-    </lib>
-  </xsl:template>
-
-  <!-- convert a type to ender -->
-  <xsl:template name="type-to-ender">
-    <xsl:param name="text"/>
-    <!-- remove the EAPI thing -->
-    <xsl:variable name="replaced">
-      <xsl:call-template name="string-replace-all">
-        <xsl:with-param name="text" select="$text"/>
-        <xsl:with-param name="replace" select="'EAPI'"/>
-        <xsl:with-param name="by" select="''"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="name" select="normalize-space($replaced)"/>
+  <!-- given a type name, transform it to ender -->
+  <xsl:template name="name-to-ender">
+    <xsl:param name="name"/>
     <xsl:choose>
       <xsl:when test="$name = 'char *'">
         <xsl:value-of select="'string'"/>
@@ -186,6 +221,70 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- convert a type to ender
+       TODO this should go away and use only name-to-ender and match type,
+       later, the above function will be renamed to type-to-ender
+   -->
+  <xsl:template name="type-to-ender">
+    <xsl:param name="text"/>
+    <!-- remove the EAPI thing -->
+    <xsl:variable name="replaced">
+      <xsl:call-template name="remove-exported">
+        <xsl:with-param name="type" select="$text"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="name" select="normalize-space($replaced)"/>
+    <xsl:variable name="type">
+      <xsl:call-template name="name-to-ender">
+        <xsl:with-param name="name" select="$name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$type"/>
+  </xsl:template>
+
+  <!-- ender-group ref -->
+  <xsl:template match="ender-group/ref">
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef">
+      <xsl:with-param name="only-proto" select="false()"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <!-- for protos -->
+  <xsl:template match="ender-group-proto/ref">
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef">
+      <xsl:with-param name="only-proto" select="true()"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <!-- header file -->
+  <xsl:template match="compounddef[@kind='file']">
+    <!-- first get all the proto -->
+    <xsl:apply-templates select=".//ender-group-proto/ref"/>
+    <!-- get all the groups with the <ender-group> tag -->
+    <xsl:apply-templates select=".//ender-group/ref"/>
+  </xsl:template>
+
+  <!-- header ref -->
+  <xsl:template match="includes[@local='yes']">
+    <!-- get all the header files -->
+    <xsl:apply-templates select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef"/>
+  </xsl:template>
+
+  <xsl:template match="ender-depends">
+    <xsl:variable name="name" select="@from"/>
+    <includes name="{$name}"/>
+  </xsl:template>
+
+  <!-- main entry point -->
+  <xsl:template match="/">
+    <lib name="{$lib}" version="{$version}" case="{$case}">
+      <!-- first get the dependencies -->
+      <xsl:apply-templates select=".//ender-depends"/>
+      <!-- We need to get every header, get it and then get every group from such header -->
+      <xsl:apply-templates select="doxygen/compounddef/includes[@local='yes']"/>
+    </lib>
+  </xsl:template>
+
   <!-- struct handling -->
   <xsl:template match="compounddef[@kind='struct']">
     <xsl:apply-templates select=".//memberdef[@kind='variable']"/>
@@ -206,8 +305,8 @@
   <!-- enums handling -->
   <xsl:template match="memberdef[@kind='enum']">
     <xsl:variable name="name">
-      <xsl:call-template name="type-to-ender">
-        <xsl:with-param name="text" select="name/text()"/>
+      <xsl:call-template name="member-name">
+        <xsl:with-param name="node" select="."/>
       </xsl:call-template>
     </xsl:variable>
     <enum name="{$name}">
@@ -249,20 +348,6 @@
     </xsl:element>
   </xsl:template>
 
-  <!-- remove the const thing -->
-  <xsl:template name="remove-const">
-    <xsl:param name="type"/>
-    <!-- remove any const thing -->
-    <xsl:variable name="no-const-type">
-      <xsl:call-template name="string-replace-all">
-        <xsl:with-param name="text" select="$type"/>
-        <xsl:with-param name="replace" select="'const'"/>
-        <xsl:with-param name="by" select="''"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:value-of select="$no-const-type"/>
-  </xsl:template>
-
   <!-- get the transfer type based on the const attribute -->
   <xsl:template name="param-transfer-type">
     <xsl:param name="type"/>
@@ -282,46 +367,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- get the type of an argument/param/return value -->
-  <xsl:template name="param-type">
-    <xsl:param name="direction"/>
-    <xsl:param name="name"/>
-    <!-- in case is an out direction, remove one pointer -->
-    <xsl:variable name="type">
-      <xsl:choose>
-        <xsl:when test="$direction = 'in'">
-          <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="$name"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="normalize-space(substring(string($name), 1, string-length(string($name)) - 1))"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:value-of select="$type"/>
-  </xsl:template>
-
   <!-- return value -->
   <xsl:template name="return-item">
     <xsl:param name="node"/>
     <!-- remove the (* for function pointers -->
     <xsl:variable name="name">
-      <xsl:variable name="orig-name" select="string($node)"/>
-      <xsl:choose>
-        <xsl:when test="contains($orig-name, '(*')">
-          <xsl:call-template name="string-replace-all">
-            <xsl:with-param name="text" select="$orig-name"/>
-            <xsl:with-param name="replace" select="'(*'"/>
-            <xsl:with-param name="by" select="''"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$orig-name"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="remove-fpointer">
+        <xsl:with-param name="type" select="string($node)"/>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="direction" select="'in'"/>
     <!-- handle the transfer -->
@@ -352,10 +405,9 @@
           <xsl:value-of select="$node/../detaileddescription//simplesect[@kind='return']//ender-type/@type"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="param-type">
-            <xsl:with-param name="name" select="$no-space-type"/>
+          <xsl:apply-templates select="type">
             <xsl:with-param name="direction" select="$direction"/>
-          </xsl:call-template>
+          </xsl:apply-templates>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -412,10 +464,9 @@
     <xsl:variable name="no-space-type" select="normalize-space($no-const-type)"/>
     <!-- get the type -->
     <xsl:variable name="type">
-      <xsl:call-template name="param-type">
-        <xsl:with-param name="name" select="$no-space-type"/>
+      <xsl:apply-templates select="type">
         <xsl:with-param name="direction" select="$direction"/>
-      </xsl:call-template>
+      </xsl:apply-templates>
     </xsl:variable>
     <xsl:if test="not($type = 'void')">
       <arg name="{$name}" type="{$type}" direction="{$direction}" transfer="{$transfer}"/>
@@ -502,8 +553,8 @@
           <xsl:value-of select="$node/detaileddescription//ender-name/@name"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="type-to-ender">
-            <xsl:with-param name="text" select="$node/compoundname/text()"/>
+          <xsl:call-template name="name-to-ender">
+            <xsl:with-param name="name" select="$node/compoundname/text()"/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
@@ -511,14 +562,55 @@
     <xsl:value-of select="$name"/>
   </xsl:template>
 
+  <!-- A function that returns the member (typedef, etc) ender name. If the node has
+       an ender-name, that one is used, otherwise, we use the memberdef's name
+       node and enderize it
+       Param in: the memberdef node
+       Value out: the name
+  !-->
   <xsl:template name="member-name">
+    <xsl:param name="node"/>
+    <xsl:variable name="name">
+      <xsl:choose>
+        <xsl:when test="$node/detaileddescription//ender-name">
+          <xsl:value-of select="$node/detaileddescription//ender-name/@name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="name-to-ender">
+            <xsl:with-param name="name" select="$node/name/text()"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$name"/>
   </xsl:template>
 
   <!-- Get the name of a type without member reference or compound reference -->
   <xsl:template match="type">
+    <xsl:param name="direction"/>
+    <!-- remove any function pointer * -->
+    <xsl:variable name="fname">
+      <xsl:call-template name="remove-fpointer">
+        <xsl:with-param name="type" select="string(.)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- first sanitize -->
+    <xsl:variable name="sname">
+      <xsl:call-template name="sanitize-prefix">
+        <xsl:with-param name="type" select="$fname"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- remove trailing * if is an out type -->
+    <xsl:variable name="dname">
+      <xsl:call-template name="remove-direction">
+        <xsl:with-param name="text" select="$sname"/>
+        <xsl:with-param name="direction" select="$direction"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- convert to ender -->
     <xsl:variable name="rname">
-      <xsl:call-template name="type-to-ender">
-        <xsl:with-param name="text" select="string(.)"/>
+      <xsl:call-template name="name-to-ender">
+        <xsl:with-param name="name" select="$dname"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:value-of select="$rname"/>
@@ -526,37 +618,54 @@
 
   <!-- Get the name of a type that has a member reference -->
   <xsl:template match="type[./ref[@kindref='member']]">
+    <xsl:param name="direction"/>
     <xsl:variable name="rname">
       <xsl:for-each select="./node()">
         <xsl:choose>
           <xsl:when test="self::text()">
-            <xsl:value-of select="."/>
+            <xsl:variable name="text">
+              <xsl:call-template name="sanitize-prefix">
+                <xsl:with-param name="type" select="."/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$text"/>
           </xsl:when>
           <xsl:when test="name() = 'ref'">
             <!-- For a member reference we need to take out the string after the last _ -->
+            <xsl:variable name="refid" select="@refid"/>
             <xsl:variable name="ssname">
               <xsl:call-template name="substring-before-last">
                 <xsl:with-param name="list" select="@refid"/>
                 <xsl:with-param name="delimiter" select="'_'"/>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:call-template name="compound-name">
-              <xsl:with-param name="node" select="document(concat($ssname, '.xml'), @refid)/doxygen/compounddef"/>
+            <xsl:call-template name="member-name">
+              <xsl:with-param name="node" select="document(concat($ssname, '.xml'), @refid)/doxygen/compounddef//memberdef[@id=$refid]"/>
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
-    <xsl:value-of select="$rname"/>
+    <!-- remove trailing * -->
+    <xsl:variable name="dname">
+      <xsl:value-of select="normalize-space(translate($rname, '*', ''))"/>
+    </xsl:variable>
+    <xsl:value-of select="$dname"/>
   </xsl:template>
 
   <!-- Get the name of a type that has a compound reference -->
   <xsl:template match="type[./ref[@kindref='compound']]">
+    <xsl:param name="direction"/>
     <xsl:variable name="rname">
       <xsl:for-each select="./node()">
         <xsl:choose>
           <xsl:when test="self::text()">
-            <xsl:value-of select="."/>
+            <xsl:variable name="text">
+              <xsl:call-template name="sanitize-prefix">
+                <xsl:with-param name="type" select="."/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$text"/>
           </xsl:when>
           <xsl:when test="name() = 'ref'">
             <xsl:call-template name="compound-name">
@@ -566,7 +675,11 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
-    <xsl:value-of select="$rname"/>
+    <!-- remove trailing * if is an out type -->
+    <xsl:variable name="dname">
+      <xsl:value-of select="normalize-space(translate($rname, '*', ''))"/>
+    </xsl:variable>
+    <xsl:value-of select="$dname"/>
   </xsl:template>
 
   <!-- method handling -->
@@ -586,6 +699,7 @@
     <xsl:variable name="first_param_type">
       <xsl:apply-templates select="$first_param/type"/>
     </xsl:variable>
+    <!--<first-param name="{$first_param_type}"/>-->
     <xsl:choose>
       <!-- for top level functions, use the ender name -->
       <xsl:when test="$pname = 'none'">
@@ -753,9 +867,10 @@
   <xsl:template match="innerclass">
     <!-- The name of the struct must be all lower case, replace the '_' by '.', etc -->
     <xsl:variable name="lower_name" select="translate(text(), $uppercase, $lowercase)"/>
+    <xsl:variable name="refid" select="@refid"/>
     <xsl:variable name="name">
       <xsl:call-template name="compound-name">
-        <xsl:with-param name="node" select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef[@kind='struct']"/>
+        <xsl:with-param name="node" select="document(concat(@refid, '.xml'), @refid)/doxygen/compounddef[@id=$refid]"/>
       </xsl:call-template>
     </xsl:variable>
     <struct name="{$name}">
