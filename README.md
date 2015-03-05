@@ -43,6 +43,8 @@ Documentation
 =============
 For API reference check out the automatically generated [doxygen](https://turran.github.io/ender/docs/index.html) documentation
 
+Take a look on the [wiki](https://github.com/turran/ender/wiki) pages for extra information about the project
+
 Available bindings
 ==================
 There are several projects for creating bindings of ender to specific languages. Several are still in deveolping tho
