@@ -48,12 +48,12 @@
     <value name="alpha"/>
     <value name="luminance"/>
   </enum>
-  <enum name="enesim.alpha.hint">
+  <enum name="enesim.aplha_hint">
     <value name="normal"/>
     <value name="sparse"/>
     <value name="opaque"/>
   </enum>
-  <enum name="enesim.repeat.mode">
+  <enum name="enesim.repeat_mode">
     <value name="restrict"/>
     <value name="pad"/>
     <value name="reflect"/>
@@ -71,7 +71,7 @@
   <function name="enesim.shutdown">
     <return type="int32" transfer="full"/>
   </function>
-  <function name="enesim.version.get">
+  <function name="enesim.version_get">
     <arg name="major" type="uint32" direction="out" transfer="full"/>
     <arg name="minor" type="uint32" direction="out" transfer="full"/>
     <arg name="micro" type="uint32" direction="out" transfer="full"/>
@@ -203,7 +203,7 @@
     <value name="affine"/>
     <value name="projective"/>
   </enum>
-  <struct name="enesim.matrix.f16p16">
+  <struct name="enesim.matrix_f16p16">
     <field name="xx" type="eina.f16p16"/>
     <field name="xy" type="eina.f16p16"/>
     <field name="xz" type="eina.f16p16"/>
@@ -215,8 +215,8 @@
     <field name="zz" type="eina.f16p16"/>
     <method name="identity"/>
     <method name="compose">
-      <arg name="m2" type="enesim.matrix.f16p16" direction="in" transfer="none"/>
-      <arg name="dst" type="enesim.matrix.f16p16" direction="in" transfer="full"/>
+      <arg name="m2" type="enesim.matrix_f16p16" direction="in" transfer="none"/>
+      <arg name="dst" type="enesim.matrix_f16p16" direction="in" transfer="full"/>
     </method>
     <method name="type_get">
       <return type="enesim.matrix.type" transfer="full"/>
@@ -269,7 +269,7 @@
       <arg name="i" type="eina.f16p16" direction="in" transfer="full"/>
     </method>
     <method name="matrix_f16p16_to">
-      <arg name="fm" type="enesim.matrix.f16p16" direction="in" transfer="full"/>
+      <arg name="fm" type="enesim.matrix_f16p16" direction="in" transfer="full"/>
     </method>
     <method name="is_equal">
       <return type="bool" transfer="full"/>
@@ -590,10 +590,10 @@
     </method>
     <method name="unlock"/>
     <method name="alpha_hint_set">
-      <arg name="hint" type="enesim.alpha.hint" direction="in" transfer="full"/>
+      <arg name="hint" type="enesim.aplha_hint" direction="in" transfer="full"/>
     </method>
     <method name="alpha_hint_get">
-      <return type="enesim.alpha.hint" transfer="full"/>
+      <return type="enesim.aplha_hint" transfer="full"/>
     </method>
   </object>
   <callback name="enesim.buffer.free"/>
@@ -679,10 +679,10 @@
     </method>
     <method name="unlock"/>
     <method name="alpha_hint_set">
-      <arg name="hint" type="enesim.alpha.hint" direction="in" transfer="full"/>
+      <arg name="hint" type="enesim.aplha_hint" direction="in" transfer="full"/>
     </method>
     <method name="alpha_hint_get">
-      <return type="enesim.alpha.hint" transfer="full"/>
+      <return type="enesim.aplha_hint" transfer="full"/>
     </method>
   </object>
   <object name="enesim.converter">
@@ -697,16 +697,6 @@
       <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
     </function>
   </object>
-  <enum name="enesim.renderer.feature">
-    <value name="translate" initializer=""/>
-    <value name="affine" initializer=""/>
-    <value name="projective" initializer=""/>
-    <value name="a8" initializer=""/>
-    <value name="argb8888" initializer=""/>
-    <value name="quality" initializer=""/>
-    <value name="backend_software" initializer=""/>
-    <value name="backend_opengl" initializer=""/>
-  </enum>
   <object name="enesim.renderer">
     <method name="private_set">
       <arg name="name" type="string" direction="in" transfer="none"/>
@@ -791,7 +781,7 @@
       <return type="enesim.quality" transfer="full"/>
     </method>
     <method name="alpha_hints_get">
-      <return type="enesim.alpha.hint" transfer="full"/>
+      <return type="enesim.aplha_hint" transfer="full"/>
     </method>
     <method name="is_supported">
       <return type="bool" transfer="full"/>
@@ -860,6 +850,16 @@
   <callback name="enesim.renderer.damage.cb">
     <return type="bool" transfer="full"/>
   </callback>
+  <enum name="enesim.renderer.feature">
+    <value name="translate" initializer=""/>
+    <value name="affine" initializer=""/>
+    <value name="projective" initializer=""/>
+    <value name="a8" initializer=""/>
+    <value name="argb8888" initializer=""/>
+    <value name="quality" initializer=""/>
+    <value name="backend_software" initializer=""/>
+    <value name="backend_opengl" initializer=""/>
+  </enum>
   <object name="enesim.stream">
     <ref name="ref">
       <return type="enesim.stream" transfer="full"/>
@@ -1626,10 +1626,10 @@
     </prop>
     <prop name="repeat_mode">
       <setter>
-        <arg name="mode" type="enesim.repeat.mode" direction="in" transfer="full"/>
+        <arg name="mode" type="enesim.repeat_mode" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.repeat.mode" transfer="full"/>
+        <return type="enesim.repeat_mode" transfer="full"/>
       </getter>
     </prop>
     <ctor name="new"/>
@@ -1770,10 +1770,10 @@
   <object name="enesim.renderer.gradient" inherits="enesim.renderer">
     <prop name="repeat_mode">
       <setter>
-        <arg name="mode" type="enesim.repeat.mode" direction="in" transfer="full"/>
+        <arg name="mode" type="enesim.repeat_mode" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.repeat.mode" transfer="full"/>
+        <return type="enesim.repeat_mode" transfer="full"/>
       </getter>
     </prop>
     <method name="stop_add">
