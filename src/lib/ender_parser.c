@@ -41,6 +41,8 @@
 #include "ender_item_object_private.h"
 #include "ender_item_enum_private.h"
 #include "ender_item_constant_private.h"
+
+#include <sys/mman.h>
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -66,7 +68,6 @@ typedef struct _Ender_Parser
 	Ender_Lib *lib;
 	Ender_Case lcase;
 	Ender_Notation lnotation;
-	Enesim_Stream *s;
 	Eina_Bool failed;
 } Ender_Parser;
 
@@ -101,6 +102,10 @@ static Ender_Parser_Context * _ender_parser_parent_context_get(Ender_Parser *thi
 	if (count)
 	{
 		c = eina_array_data_get(thiz->context, count - 1);
+	}
+	else
+	{
+		CRI("Bad stack");
 	}
 	return c;
 }
@@ -532,7 +537,7 @@ static Eina_Bool _ender_parser_return_ctor(Ender_Parser_Context *c)
 	if ((!parent) || (!parent->i) ||
 			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_FUNCTION))
 	{
-		ERR("An return must be a child of a function");
+		ERR("A return must be a child of a function");
 		return EINA_FALSE;
 	}
 	c->i = ender_item_arg_new();
@@ -981,7 +986,7 @@ static Eina_Bool _ender_parser_enum_ctor(Ender_Parser_Context *c)
 
 	/* a enum can only be child of the main lib */
 	parent = _ender_parser_parent_context_get(c->parser);
-	if (parent->i)
+	if (!parent || parent->i)
 	{
 		ERR("An enum must be child of the lib only");
 		return EINA_FALSE;
@@ -1244,15 +1249,16 @@ static Eina_Bool _ender_parser_include_attrs_set(Ender_Parser_Context *c,
 		dep = ender_lib_find(value);
 		if (!dep)
 		{
-			Enesim_Stream *s;
 			char *file = NULL;
+			FILE *f;
 
 			if (asprintf(&file, "%s/%s.ender", PACKAGE_DATA_DIR, value) < 0)
 				return EINA_FALSE;
 
-			s = enesim_stream_file_new(file, "r");
-			DBG("Including %s %p", file, s);
-			ender_parser_parse(s);
+			f = fopen(file, "r");
+			DBG("Including %s %p", file, f);
+			ender_parser_parse(f);
+			fclose(f);
 			free(file);
 
 			dep = ender_lib_find(value);
@@ -1442,28 +1448,40 @@ static Eina_Bool _ender_parser_parse_cb(void *data, Eina_Simple_XML_Type type,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Eina_Bool ender_parser_parse(Enesim_Stream *s)
+EAPI Eina_Bool ender_parser_parse(FILE *f)
 {
 	Ender_Parser *thiz;
 	Eina_Bool ret = EINA_FALSE;
-	void *content;
+	void *content = NULL;
 	size_t len = 0;
 
-	if (!s) return EINA_FALSE;
+	if (!f) return EINA_FALSE;
+
+	/* map the file */
+	{
+		int fd;
+		struct stat st;
+
+		fd = fileno(f);
+		fstat(fd, &st);
+		len = st.st_size;
+
+		content = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
+	}
+
+	if (!content || !len)
+		return EINA_FALSE;
 
 	thiz = calloc(1, sizeof(Ender_Parser));
 	thiz->context = eina_array_new(1);
-	thiz->s = s;
+	eina_simple_xml_parse(content, len, EINA_TRUE,
+				_ender_parser_parse_cb, thiz);
 
-	content = enesim_stream_mmap(thiz->s, &len);
-	if (!content) goto no_mmap;
+	/* unmap */
+	munmap(content, len);
 
-	eina_simple_xml_parse(content, len, EINA_TRUE, _ender_parser_parse_cb, thiz);
-	enesim_stream_munmap(thiz->s, content);
 	ret = EINA_TRUE;
-no_mmap:
 	eina_array_free(thiz->context);
-	enesim_stream_unref(thiz->s);
 	free(thiz);
 
 	return ret;

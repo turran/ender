@@ -24,7 +24,7 @@
  * @{
  */
 
-EAPI Eina_Bool ender_parser_parse(Enesim_Stream *s);
+EAPI Eina_Bool ender_parser_parse(FILE *f);
 
 /**
  * @}
