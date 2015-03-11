@@ -32,47 +32,28 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENDER_ITEM_STRUCT(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
-		Ender_Item_Struct, ender_item_struct_descriptor_get())
+#define ENDER_ITEM_STRUCT(o) (Ender_Item_Struct *)(ender_item_data_get(o))
 
 typedef struct _Ender_Item_Struct
 {
-	Ender_Item base;
 	Eina_List *fields;
 	Eina_List *functions;
 	size_t size;
 } Ender_Item_Struct;
 
-typedef struct _Ender_Item_Struct_Class
-{
-	Ender_Item_Class base;
-} Ender_Item_Struct_Class;
-
 /*----------------------------------------------------------------------------*
- *                            Object definition                               *
+ *                             Item descriptor                                *
  *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
-		Ender_Item_Struct, Ender_Item_Struct_Class,
-		ender_item_struct);
-
-static void _ender_item_struct_class_init(void *k)
+static void _ender_item_struct_init(Ender_Item *i)
 {
-}
-
-static void _ender_item_struct_instance_init(void *o)
-{
-	Ender_Item *i;
-
-	i = ENDER_ITEM(o);
 	i->type = ENDER_ITEM_TYPE_STRUCT;
 }
 
-static void _ender_item_struct_instance_deinit(void *o)
+static void _ender_item_struct_deinit(Ender_Item *i)
 {
 	Ender_Item_Struct *thiz;
-	Ender_Item *i;
 
-	thiz = ENDER_ITEM_STRUCT(o);
+	thiz = ENDER_ITEM_STRUCT(i);
 	EINA_LIST_FREE(thiz->fields, i)
 	{
 		ender_item_parent_set(i, NULL);
@@ -83,7 +64,13 @@ static void _ender_item_struct_instance_deinit(void *o)
 		ender_item_parent_set(i, NULL);
 		ender_item_unref(i);
 	}
+	free(thiz);
 }
+
+static Ender_Item_Descriptor _descriptor = {
+	/* .init 	= */ _ender_item_struct_init,
+	/* .deinit 	= */ _ender_item_struct_deinit,
+};
 
 static Eina_Bool _ender_item_field_size_alignment_get(Ender_Item *i, size_t *sz, ssize_t *al)
 {
@@ -118,8 +105,10 @@ static Eina_Bool _ender_item_field_size_alignment_get(Ender_Item *i, size_t *sz,
 Ender_Item * ender_item_struct_new(void)
 {
 	Ender_Item *i;
+	Ender_Item_Struct *thiz;
 
-	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_struct);
+	thiz = calloc(1, sizeof(Ender_Item_Struct));
+	i = ender_item_new(&_descriptor, thiz);
 	return i;
 }
 

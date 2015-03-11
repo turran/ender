@@ -47,8 +47,8 @@ static int _init = 0;
 
 static void _ender_lib_dir_list_cb(const char *name, const char *path, void *data)
 {
+	FILE *f;
 	const Ender_Lib *lib;
-	Enesim_Stream *s;
 	char *file = NULL;
 	char *token;
 	char *fname;
@@ -70,8 +70,9 @@ static void _ender_lib_dir_list_cb(const char *name, const char *path, void *dat
 		return;
 
 	DBG("Parsing file '%s'", file);
-	s = enesim_stream_file_new(file, "r");
-	ender_parser_parse(s);
+	f = fopen(file, "r");
+	ender_parser_parse(f);
+	fclose(f);
 	free(file);
 }
 

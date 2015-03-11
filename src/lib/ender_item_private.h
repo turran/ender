@@ -21,16 +21,13 @@
 
 #include "ender_lib.h"
 
-Enesim_Object_Descriptor * ender_item_descriptor_get(void);
-#define ENDER_ITEM_DESCRIPTOR ender_item_descriptor_get()
-#define ENDER_ITEM_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, Ender_Item_Class, ENDER_ITEM_DESCRIPTOR)
-#define ENDER_ITEM_CLASS_GET(o) ENDER_ITEM_CLASS(ENESIM_OBJECT_INSTANCE_CLASS(o))
-#define ENDER_ITEM(o) ENESIM_OBJECT_INSTANCE_CHECK(o, Ender_Item, ENDER_ITEM_DESCRIPTOR)
+typedef struct _Ender_Item_Descriptor Ender_Item_Descriptor;
 
 typedef struct _Ender_Item
 {
-	Enesim_Object_Instance base;
 	Ender_Lib *lib;
+	Ender_Item_Descriptor *desc;
+	void *data;
 	Ender_Item *parent;
 	Ender_Item_Type type;
 	char *name;
@@ -38,10 +35,17 @@ typedef struct _Ender_Item
 	int cycle_ref;
 } Ender_Item;
 
-typedef struct _Ender_Item_Class
+typedef void (*Ender_Item_Descriptor_Init)(Ender_Item *thiz);
+typedef void (*Ender_Item_Descriptor_Deinit)(Ender_Item *thiz);
+
+struct _Ender_Item_Descriptor
 {
-	Enesim_Object_Class base;
-} Ender_Item_Class;
+	Ender_Item_Descriptor_Init init;
+	Ender_Item_Descriptor_Deinit deinit;
+};
+
+Ender_Item * ender_item_new(Ender_Item_Descriptor *desc, void *data);
+void * ender_item_data_get(Ender_Item *thiz);
 
 void ender_item_name_set(Ender_Item *thiz, const char *name);
 void ender_item_parent_set(Ender_Item *thiz, Ender_Item *parent);

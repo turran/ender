@@ -27,39 +27,37 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-/*----------------------------------------------------------------------------*
- *                            Object definition                               *
- *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Ender_Item,
-		Ender_Item_Class, ender_item);
-
-static void _ender_item_class_init(void *k)
-{
-}
-
-static void _ender_item_instance_init(void *o)
-{
-	Ender_Item *thiz;
-
-	thiz = ENDER_ITEM(o);
-	thiz->ref = 1;
-}
-
-static void _ender_item_instance_deinit(void *o)
-{
-	Ender_Item *thiz;
-
-	thiz = ENDER_ITEM(o);
-	if (thiz->parent)
-	{
-		CRI("Removing last reference of '%s' with a parent", thiz->name);
-	}
-	if (thiz->name)
-		free(thiz->name);
-}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Ender_Item * ender_item_new(Ender_Item_Descriptor *desc, void *data)
+{
+	Ender_Item *thiz;
+
+	if (!desc)
+		return NULL;
+
+	thiz = calloc(1, sizeof(Ender_Item));
+	thiz->ref = 1;
+	thiz->desc = desc;
+	thiz->data = data;
+
+	if (thiz->desc->init)
+		thiz->desc->init(thiz);
+
+	return thiz;
+}
+
+void * ender_item_data_get(Ender_Item *thiz)
+{
+	return thiz->data;
+}
+
+void ender_item_type_set(Ender_Item *thiz, Ender_Item_Type type)
+{
+	thiz->type = type;
+}
+
 void ender_item_name_set(Ender_Item *thiz, const char *name)
 {
 	if (thiz->name)
@@ -132,7 +130,16 @@ EAPI void ender_item_unref(Ender_Item *thiz)
 	thiz->ref--;
 	if (thiz->ref == thiz->cycle_ref)
 	{
-		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(thiz));
+		if (thiz->desc->deinit)
+			thiz->desc->deinit(thiz);
+		if (thiz->parent)
+		{
+			CRI("Removing last reference of '%s' with a parent", thiz->name);
+		}
+		if (thiz->name)
+			free(thiz->name);
+
+		free(thiz);
 	}
 }
 

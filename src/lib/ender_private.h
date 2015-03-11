@@ -27,7 +27,6 @@
 #endif
 
 #include <Eina.h>
-#include <Enesim.h>
 #include <ffi.h>
 #include <dlfcn.h>
 

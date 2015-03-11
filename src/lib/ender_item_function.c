@@ -32,12 +32,10 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENDER_ITEM_FUNCTION(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
-		Ender_Item_Function, ender_item_function_descriptor_get())
+#define ENDER_ITEM_FUNCTION(o) (Ender_Item_Function *)(ender_item_data_get(o))
 
 typedef struct _Ender_Item_Function
 {
-	Ender_Item base;
 	Ender_Item *ret;
 	Eina_List *args;
 	int throw_position;
@@ -45,11 +43,6 @@ typedef struct _Ender_Item_Function
 	int flags;
 	void *sym;
 } Ender_Item_Function;
-
-typedef struct _Ender_Item_Function_Class
-{
-	Ender_Item_Class base;
-} Ender_Item_Function_Class;
 
 /* TODO handle the direction */
 static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
@@ -148,30 +141,18 @@ static ffi_type * _ender_item_function_arg_ffi_to(Ender_Item *i)
 }
 
 /*----------------------------------------------------------------------------*
- *                            Object definition                               *
+ *                             Item descriptor                                *
  *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
-		Ender_Item_Function, Ender_Item_Function_Class,
-		ender_item_function);
-
-static void _ender_item_function_class_init(void *k)
+static void _ender_item_function_init(Ender_Item *i)
 {
-}
-
-static void _ender_item_function_instance_init(void *o)
-{
-	Ender_Item *i;
-
-	i = ENDER_ITEM(o);
 	i->type = ENDER_ITEM_TYPE_FUNCTION;
 }
 
-static void _ender_item_function_instance_deinit(void *o)
+static void _ender_item_function_deinit(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;
-	Ender_Item *i;
 
-	thiz = ENDER_ITEM_FUNCTION(o);
+	thiz = ENDER_ITEM_FUNCTION(i);
 	if (thiz->ret)
 	{
 		ender_item_parent_set(thiz->ret, NULL);
@@ -184,15 +165,23 @@ static void _ender_item_function_instance_deinit(void *o)
 	}
 	if (thiz->symname)
 		free(thiz->symname);
+	free(thiz);
 }
+
+static Ender_Item_Descriptor _descriptor = {
+	/* .init 	= */ _ender_item_function_init,
+	/* .deinit 	= */ _ender_item_function_deinit,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Ender_Item * ender_item_function_new(void)
 {
 	Ender_Item *i;
+	Ender_Item_Function *thiz;
 
-	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_function);
+	thiz = calloc(1, sizeof(Ender_Item_Function));
+	i = ender_item_new(&_descriptor, thiz);
 	return i;
 }
 

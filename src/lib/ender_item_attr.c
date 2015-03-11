@@ -33,8 +33,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENDER_ITEM_ATTR(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
-		Ender_Item_Attr, ender_item_attr_descriptor_get())
+#define ENDER_ITEM_ATTR(o) (Ender_Item_Attr *)(ender_item_data_get(o))
 
 typedef enum _Ender_Item_Attr_Getter_Type
 {
@@ -50,7 +49,6 @@ typedef enum _Ender_Item_Attr_Getter_Type
 
 typedef struct _Ender_Item_Attr
 {
-	Ender_Item base;
 	Ender_Item *type;
 	Ender_Item *setter;
 	Ender_Item *getter;
@@ -59,40 +57,24 @@ typedef struct _Ender_Item_Attr
 	ssize_t offset;
 	int flags;
 } Ender_Item_Attr;
-
-typedef struct _Ender_Item_Attr_Class
-{
-	Ender_Item_Class base;
-} Ender_Item_Attr_Class;
-
 /*----------------------------------------------------------------------------*
- *                            Object definition                               *
+ *                             Item descriptor                                *
  *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
-		Ender_Item_Attr, Ender_Item_Attr_Class,
-		ender_item_attr);
-
-static void _ender_item_attr_class_init(void *k)
-{
-}
-
-static void _ender_item_attr_instance_init(void *o)
+static void _ender_item_attr_init(Ender_Item *i)
 {
 	Ender_Item_Attr *thiz;
-	Ender_Item *i;
 
-	i = ENDER_ITEM(o);
 	i->type = ENDER_ITEM_TYPE_ATTR;
 
-	thiz = ENDER_ITEM_ATTR(o);
+	thiz = ENDER_ITEM_ATTR(i);
 	thiz->offset = -1;
 }
 
-static void _ender_item_attr_instance_deinit(void *o)
+static void _ender_item_attr_deinit(Ender_Item *i)
 {
 	Ender_Item_Attr *thiz;
 
-	thiz = ENDER_ITEM_ATTR(o);
+	thiz = ENDER_ITEM_ATTR(i);
 	ender_item_unref(thiz->type);
 	if (thiz->getter)
 	{
@@ -104,7 +86,13 @@ static void _ender_item_attr_instance_deinit(void *o)
 		ender_item_parent_set(thiz->setter, NULL);
 		ender_item_unref(thiz->setter);
 	}
+	free(thiz);
 }
+
+static Ender_Item_Descriptor _descriptor = {
+	/* .init 	= */ _ender_item_attr_init,
+	/* .deinit 	= */ _ender_item_attr_deinit,
+};
 
 static Eina_Bool _ender_item_attr_getter_type_get(Ender_Item *getter,
 		Ender_Item_Attr_Getter_Type *type,
@@ -281,8 +269,10 @@ static Eina_Bool _ender_item_attr_value_set(Ender_Item *setter, void *o,
 Ender_Item * ender_item_attr_new(void)
 {
 	Ender_Item *i;
+	Ender_Item_Attr *thiz;
 
-	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_attr);
+	thiz = calloc(1, sizeof(Ender_Item_Attr));
+	i = ender_item_new(&_descriptor, thiz);
 	return i;
 }
 

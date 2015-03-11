@@ -27,59 +27,50 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENDER_ITEM_CONSTANT(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
-		Ender_Item_Constant, ender_item_constant_descriptor_get())
+#define ENDER_ITEM_CONSTANT(o) (Ender_Item_Constant *)(ender_item_data_get(o))
 
 typedef struct _Ender_Item_Constant
 {
-	Ender_Item base;
 	Ender_Item *type;
 	Ender_Value value;
 	char *symname;
 	void *sym;
 } Ender_Item_Constant;
 
-typedef struct _Ender_Item_Constant_Class
-{
-	Ender_Item_Class base;
-} Ender_Item_Constant_Class;
-
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
-		Ender_Item_Constant, Ender_Item_Constant_Class,
-		ender_item_constant);
-
-static void _ender_item_constant_class_init(void *k)
+static void _ender_item_constant_init(Ender_Item *i)
 {
-}
-
-static void _ender_item_constant_instance_init(void *o)
-{
-	Ender_Item *i;
-
-	i = ENDER_ITEM(o);
 	i->type = ENDER_ITEM_TYPE_CONSTANT;
 }
 
-static void _ender_item_constant_instance_deinit(void *o)
+static void _ender_item_constant_deinit(Ender_Item *i)
 {
 	Ender_Item_Constant *thiz;
 
-	thiz = ENDER_ITEM_CONSTANT(o);
+	thiz = ENDER_ITEM_CONSTANT(i);
 	ender_item_unref(thiz->type);
 	if (thiz->symname)
 		free(thiz->symname);
+	free(thiz);
 }
+
+static Ender_Item_Descriptor _descriptor = {
+	/* .init 	= */ _ender_item_constant_init,
+	/* .deinit 	= */ _ender_item_constant_deinit,
+};
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Ender_Item * ender_item_constant_new(void)
 {
 	Ender_Item *i;
+	Ender_Item_Constant *thiz;
 
-	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_constant);
+	thiz = calloc(1, sizeof(Ender_Item_Constant));
+	i = ender_item_new(&_descriptor, thiz);
 	return i;
 }
 

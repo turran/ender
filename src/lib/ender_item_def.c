@@ -27,61 +27,50 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENDER_ITEM_DEF(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
-		Ender_Item_Def, ender_item_def_descriptor_get())
+#define ENDER_ITEM_DEF(o) (Ender_Item_Def *)(ender_item_data_get(o))
 
 typedef struct _Ender_Item_Def
 {
-	Ender_Item base;
 	Ender_Item *type;
 	Eina_List *functions;
 } Ender_Item_Def;
 
-typedef struct _Ender_Item_Def_Class
-{
-	Ender_Item_Class base;
-} Ender_Item_Def_Class;
-
 /*----------------------------------------------------------------------------*
- *                            Object definition                               *
+ *                             Item descriptor                                *
  *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
-		Ender_Item_Def, Ender_Item_Def_Class,
-		ender_item_def);
-
-static void _ender_item_def_class_init(void *k)
+static void _ender_item_def_init(Ender_Item *i)
 {
-}
-
-static void _ender_item_def_instance_init(void *o)
-{
-	Ender_Item *i;
-
-	i = ENDER_ITEM(o);
 	i->type = ENDER_ITEM_TYPE_DEF;
 }
 
-static void _ender_item_def_instance_deinit(void *o)
+static void _ender_item_def_deinit(Ender_Item *i)
 {
 	Ender_Item_Def *thiz;
-	Ender_Item *i;
 
-	thiz = ENDER_ITEM_DEF(o);
+	thiz = ENDER_ITEM_DEF(i);
 	ender_item_unref(thiz->type);
 	EINA_LIST_FREE(thiz->functions, i)
 	{
 		ender_item_parent_set(i, NULL);
 		ender_item_unref(i);
 	}
+	free(thiz);
 }
+
+static Ender_Item_Descriptor _descriptor = {
+	/* .init 	= */ _ender_item_def_init,
+	/* .deinit 	= */ _ender_item_def_deinit,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Ender_Item * ender_item_def_new(void)
 {
 	Ender_Item *i;
+	Ender_Item_Def *thiz;
 
-	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_def);
+	thiz = calloc(1, sizeof(Ender_Item_Def));
+	i = ender_item_new(&_descriptor, thiz);
 	return i;
 }
 

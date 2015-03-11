@@ -30,12 +30,10 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENDER_ITEM_OBJECT(o) ENESIM_OBJECT_INSTANCE_CHECK(o,			\
-		Ender_Item_Object, ender_item_object_descriptor_get())
+#define ENDER_ITEM_OBJECT(o) (Ender_Item_Object *)(ender_item_data_get(o))
 
 typedef struct _Ender_Item_Object
 {
-	Ender_Item base;
 	Ender_Item *inherit;
 	Ender_Item *ref;
 	Ender_Item *unref;
@@ -43,43 +41,29 @@ typedef struct _Ender_Item_Object
 	Eina_List *props;
 } Ender_Item_Object;
 
-typedef struct _Ender_Item_Object_Object
-{
-	Ender_Item_Object base;
-} Ender_Item_Object_Object;
-
-static void _ender_item_object_function_add(Ender_Item_Object *thiz,
+static void _ender_item_object_function_add(Ender_Item *i,
 		Ender_Item *f)
 {
+	Ender_Item_Object *thiz;
+
+	thiz = ENDER_ITEM_OBJECT(i);
 	thiz->functions = eina_list_append(thiz->functions, f);
-	ender_item_parent_set(f, ENDER_ITEM(thiz));
+	ender_item_parent_set(f, i);
 }
 
 /*----------------------------------------------------------------------------*
- *                            Object definition                               *
+ *                             Item descriptor                                *
  *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENDER_ITEM_DESCRIPTOR,
-		Ender_Item_Object, Ender_Item_Object_Object,
-		ender_item_object);
-
-static void _ender_item_object_class_init(void *k)
+static void _ender_item_object_init(Ender_Item *i)
 {
-}
-
-static void _ender_item_object_instance_init(void *o)
-{
-	Ender_Item *i;
-
-	i = ENDER_ITEM(o);
 	i->type = ENDER_ITEM_TYPE_OBJECT;
 }
 
-static void _ender_item_object_instance_deinit(void *o)
+static void _ender_item_object_deinit(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;
-	Ender_Item *i;
 
-	thiz = ENDER_ITEM_OBJECT(o);
+	thiz = ENDER_ITEM_OBJECT(i);
 	EINA_LIST_FREE(thiz->functions, i)
 	{
 		ender_item_parent_set(i, NULL);
@@ -105,15 +89,23 @@ static void _ender_item_object_instance_deinit(void *o)
 		ender_item_parent_set(thiz->unref, NULL);
 		ender_item_unref(thiz->unref);
 	}
+	free(thiz);
 }
+
+static Ender_Item_Descriptor _descriptor = {
+	/* .init 	= */ _ender_item_object_init,
+	/* .deinit 	= */ _ender_item_object_deinit,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Ender_Item * ender_item_object_new(void)
 {
 	Ender_Item *i;
+	Ender_Item_Object *thiz;
 
-	i = ENESIM_OBJECT_INSTANCE_NEW(ender_item_object);
+	thiz = calloc(1, sizeof(Ender_Item_Object));
+	i = ender_item_new(&_descriptor, thiz);
 	return i;
 }
 
@@ -170,7 +162,7 @@ void ender_item_object_function_add(Ender_Item *i, Ender_Item *f)
 		}
 	}
 
-	_ender_item_object_function_add(thiz, f);
+	_ender_item_object_function_add(i, f);
 }
 
 void ender_item_object_prop_add(Ender_Item *i, Ender_Item *p)
