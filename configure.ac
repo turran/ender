@@ -35,10 +35,6 @@ AC_SUBST([VMAJ])
 ## Add parameters for aclocal (keep in sync with Makefile.am)
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 
-### Additional options to configure
-
-EFL_WITH_BIN([ender], [ender-generator])
-
 ### default values
 
 AC_CANONICAL_HOST
@@ -73,7 +69,7 @@ LT_SYS_MODULE_EXT
 
 ### Checks for libraries
 
-requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0 enesim >= 0.0.21 libffi"
+requirements_ender_pc="${requirements_ender_pc} eina >= 1.7.0 libffi"
 if test "x${have_win32}" = "xyes" ; then
    requirements_ender_pc="${requirements_ender_pc} evil >= 1.7.0"
 fi
