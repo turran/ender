@@ -19,7 +19,6 @@
 #define _ENDER_H
 
 #include <Eina.h>
-#include <Enesim.h>
 
 #ifdef EAPI
 # undef EAPI
