@@ -228,7 +228,7 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 	Eina_Bool found = EINA_FALSE;
 
 	thiz = ENDER_ITEM_OBJECT(i);
-	/* check for attributes that have the value-of flag */
+	/* check for attributes that have the downcast flag */
 	EINA_LIST_FOREACH (thiz->props, l, item)
 	{
 		Ender_Value val = { 0 };
