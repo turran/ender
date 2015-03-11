@@ -1252,7 +1252,7 @@ static Eina_Bool _ender_parser_include_attrs_set(Ender_Parser_Context *c,
 			char *file = NULL;
 			FILE *f;
 
-			if (asprintf(&file, "%s/%s.ender", PACKAGE_DATA_DIR, value) < 0)
+			if (asprintf(&file, "%s/%s.ender", DESCRIPTIONS_DIR, value) < 0)
 				return EINA_FALSE;
 
 			f = fopen(file, "r");

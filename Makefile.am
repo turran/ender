@@ -44,6 +44,10 @@ include src/bin/Makefile.mk
 
 include data/Makefile.mk
 
+### Tools
+
+include tools/Makefile.mk
+
 EXTRA_DIST += \
 AUTHORS \
 COPYING \

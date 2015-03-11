@@ -146,7 +146,7 @@ void ender_lib_init(void)
 		ender_item_basic_value_type_set(i, ENDER_VALUE_TYPE_SIZE);
 		ender_lib_item_add(_c_lib, i);
 		/* load all the libs on the data dir */
-		eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _ender_lib_dir_list_cb, NULL);
+		eina_file_dir_list(DESCRIPTIONS_DIR, EINA_FALSE, _ender_lib_dir_list_cb, NULL);
 	}
 }
 

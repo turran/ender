@@ -144,7 +144,7 @@ static Eina_Bool _file_locate(const char *file, char *real_file)
 
 		tmp = strdup(real_file);
 		/* TODO check if the file is relative or absolute */
-		strncpy(real_file, PACKAGE_DATA_DIR, PATH_MAX);
+		strncpy(real_file, DESCRIPTIONS_DIR, PATH_MAX);
 		strncat(real_file, "/", PATH_MAX - strlen(real_file));
 		strncat(real_file, tmp, PATH_MAX - strlen(real_file));
 		free(tmp);
@@ -588,7 +588,7 @@ void ender_loader_load_all(void)
 	}
 
 	/* iterate over the list of .ender files and parse them */
-	eina_file_dir_list(PACKAGE_DATA_DIR, EINA_FALSE, _dir_list_cb, NULL);
+	eina_file_dir_list(DESCRIPTIONS_DIR, EINA_FALSE, _dir_list_cb, NULL);
 }
 /*============================================================================*
  *                                   API                                      *

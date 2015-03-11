@@ -52,7 +52,7 @@ src/lib/ender_value_private.h
 
 src_lib_libender_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
--DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
+-DDESCRIPTIONS_DIR=\"$(pkgdatadir)/descriptions\" \
 -DENDER_BUILD \
 @ENDER_CFLAGS@
 

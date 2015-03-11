@@ -5,6 +5,8 @@ includedir=@includedir@
 pkgincludedir=@pkgincludedir@-@VMAJ@
 datarootdir=@datarootdir@
 pkgdatadir=@pkgdatadir@
+descriptionsdir=@pkgdatadir@/descriptions
+
 
 Name: Ender
 Version: @VERSION@
