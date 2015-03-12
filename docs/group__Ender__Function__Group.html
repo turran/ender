@@ -82,20 +82,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><b>Ender_Item_Function_Flag</b> { <br/>
-&#160;&#160;<b>ENDER_ITEM_FUNCTION_FLAG_IS_METHOD</b> =  (1 &lt;&lt; 0), 
+<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Function__Group.html#ga97c27ee78c1aa993f52027de5cb3fd46">Ender_Item_Function_Flag</a> { <br/>
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46aa248ad4964ba83c8ed62996d1a79fd02">ENDER_ITEM_FUNCTION_FLAG_IS_METHOD</a> =  (1 &lt;&lt; 0), 
 <br/>
-&#160;&#160;<b>ENDER_ITEM_FUNCTION_FLAG_THROWS</b> =  (1 &lt;&lt; 1), 
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a8d17c8ec56fccd6effab045857ab7e63">ENDER_ITEM_FUNCTION_FLAG_THROWS</a> =  (1 &lt;&lt; 1), 
 <br/>
-&#160;&#160;<b>ENDER_ITEM_FUNCTION_FLAG_CTOR</b> =  (1 &lt;&lt; 2), 
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46af628e9a265141348e356be4c4cf5c8f8">ENDER_ITEM_FUNCTION_FLAG_CTOR</a> =  (1 &lt;&lt; 2), 
 <br/>
-&#160;&#160;<b>ENDER_ITEM_FUNCTION_FLAG_REF</b> =  (1 &lt;&lt; 3), 
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a54140c0bfdb36608dab720aad71015da">ENDER_ITEM_FUNCTION_FLAG_REF</a> =  (1 &lt;&lt; 3), 
 <br/>
-&#160;&#160;<b>ENDER_ITEM_FUNCTION_FLAG_UNREF</b> =  (1 &lt;&lt; 4), 
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a483f33acabed5be5a0959c39a3696dee">ENDER_ITEM_FUNCTION_FLAG_UNREF</a> =  (1 &lt;&lt; 4), 
 <br/>
-&#160;&#160;<b>ENDER_ITEM_FUNCTION_FLAG_CALLBACK</b> =  (1 &lt;&lt; 5), 
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a48f8ba1ca79bc7889b01f88602e2d64a">ENDER_ITEM_FUNCTION_FLAG_CALLBACK</a> =  (1 &lt;&lt; 5), 
 <br/>
-&#160;&#160;<b>ENDER_ITEM_FUNCTION_FLAG_VALUE_OF</b> =  (1 &lt;&lt; 6)
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a440420ef5a519ecffeb80ab043e83bc3">ENDER_ITEM_FUNCTION_FLAG_VALUE_OF</a> =  (1 &lt;&lt; 6)
 <br/>
  }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
@@ -117,6 +117,47 @@ EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_functi
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>A function represents an exported function of the library. </p>
+<hr/><h2>Enumeration Type Documentation</h2>
+<a class="anchor" id="ga97c27ee78c1aa993f52027de5cb3fd46"></a><!-- doxytag: member="ender_item_function.h::Ender_Item_Function_Flag" ref="ga97c27ee78c1aa993f52027de5cb3fd46" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__Ender__Function__Group.html#ga97c27ee78c1aa993f52027de5cb3fd46">Ender_Item_Function_Flag</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Different flags a function can have </p>
+<dl class="see"><dt><b>See also:</b></dt><dd>ender_item_function_flags_get </dd></dl>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46aa248ad4964ba83c8ed62996d1a79fd02"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_IS_METHOD" ref="gga97c27ee78c1aa993f52027de5cb3fd46aa248ad4964ba83c8ed62996d1a79fd02" args="" -->ENDER_ITEM_FUNCTION_FLAG_IS_METHOD</em>&nbsp;</td><td>
+<p>In case the function belongs to a particular item. In such case the parent of the function is the instance and the first attribute is the instance itself </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46a8d17c8ec56fccd6effab045857ab7e63"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_THROWS" ref="gga97c27ee78c1aa993f52027de5cb3fd46a8d17c8ec56fccd6effab045857ab7e63" args="" -->ENDER_ITEM_FUNCTION_FLAG_THROWS</em>&nbsp;</td><td>
+<p>In case the function throws an exception </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46af628e9a265141348e356be4c4cf5c8f8"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_CTOR" ref="gga97c27ee78c1aa993f52027de5cb3fd46af628e9a265141348e356be4c4cf5c8f8" args="" -->ENDER_ITEM_FUNCTION_FLAG_CTOR</em>&nbsp;</td><td>
+<p>In case the function is a constructor </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46a54140c0bfdb36608dab720aad71015da"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_REF" ref="gga97c27ee78c1aa993f52027de5cb3fd46a54140c0bfdb36608dab720aad71015da" args="" -->ENDER_ITEM_FUNCTION_FLAG_REF</em>&nbsp;</td><td>
+<p>In case the function increments the reference counting of the parent item </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46a483f33acabed5be5a0959c39a3696dee"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_UNREF" ref="gga97c27ee78c1aa993f52027de5cb3fd46a483f33acabed5be5a0959c39a3696dee" args="" -->ENDER_ITEM_FUNCTION_FLAG_UNREF</em>&nbsp;</td><td>
+<p>In case the function decrements the reference counting of the parent item </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46a48f8ba1ca79bc7889b01f88602e2d64a"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_CALLBACK" ref="gga97c27ee78c1aa993f52027de5cb3fd46a48f8ba1ca79bc7889b01f88602e2d64a" args="" -->ENDER_ITEM_FUNCTION_FLAG_CALLBACK</em>&nbsp;</td><td>
+<p>In case the function is a callback definition </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46a440420ef5a519ecffeb80ab043e83bc3"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_VALUE_OF" ref="gga97c27ee78c1aa993f52027de5cb3fd46a440420ef5a519ecffeb80ab043e83bc3" args="" -->ENDER_ITEM_FUNCTION_FLAG_VALUE_OF</em>&nbsp;</td><td>
+<p>In case the function describes how an item can be converted into another type. It is useful for example to coneert an object into a string </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -135,7 +176,7 @@ EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_functi
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 11 2015 20:51:38 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 12 2015 00:33:44 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
