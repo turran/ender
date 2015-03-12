@@ -87,12 +87,9 @@ Typedefs</h2></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gaa4d24831ff3c143e2617babf651c085c">ender_lib_find</a> (const char *name)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gae9904b2a721cb72f41757104a2456f83"></a><!-- doxytag: member="Ender_Lib_Group::ender_lib_version_get" ref="gae9904b2a721cb72f41757104a2456f83" args="(const Ender_Lib *thiz)" -->
-EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>ender_lib_version_get</b> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga891dae23506d643d5c34cb46065789eb"></a><!-- doxytag: member="Ender_Lib_Group::ender_lib_name_get" ref="ga891dae23506d643d5c34cb46065789eb" args="(const Ender_Lib *thiz)" -->
-EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_lib_name_get</b> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gac3e65a1bc6b131aa32a152fd747eec87"></a><!-- doxytag: member="Ender_Lib_Group::ender_lib_dependencies_get" ref="gac3e65a1bc6b131aa32a152fd747eec87" args="(const Ender_Lib *thiz)" -->
-EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_lib_dependencies_get</b> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gae9904b2a721cb72f41757104a2456f83">ender_lib_version_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#ga891dae23506d643d5c34cb46065789eb">ender_lib_name_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gac3e65a1bc6b131aa32a152fd747eec87">ender_lib_dependencies_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1ba30f28d52ede15e28e77fac7e084e5"></a><!-- doxytag: member="Ender_Lib_Group::ender_lib_item_find" ref="ga1ba30f28d52ede15e28e77fac7e084e5" args="(const Ender_Lib *thiz, const char *name)" -->
 EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_lib_item_find</b> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz, const char *name)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf4429e5878c3fc37bbbb688845a7c852"></a><!-- doxytag: member="Ender_Lib_Group::ender_lib_item_list" ref="gaf4429e5878c3fc37bbbb688845a7c852" args="(const Ender_Lib *thiz, Ender_Item_Type type)" -->
@@ -131,6 +128,89 @@ EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_lib
       </table>
 </div>
 <div class="memdoc">
+<p>Find a registered library by name </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name of the library to find </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The library found, NULL otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gae9904b2a721cb72f41757104a2456f83"></a><!-- doxytag: member="ender_lib.h::ender_lib_version_get" ref="gae9904b2a721cb72f41757104a2456f83" args="(const Ender_Lib *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI int <a class="el" href="group__Ender__Lib__Group.html#gae9904b2a721cb72f41757104a2456f83">ender_lib_version_get</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the version of the library </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thiz</td><td>The library to get version from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The version of the library </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga891dae23506d643d5c34cb46065789eb"></a><!-- doxytag: member="ender_lib.h::ender_lib_name_get" ref="ga891dae23506d643d5c34cb46065789eb" args="(const Ender_Lib *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI const char* <a class="el" href="group__Ender__Lib__Group.html#ga891dae23506d643d5c34cb46065789eb">ender_lib_name_get</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the name of the library </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thiz</td><td>The library to get name from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The name of the library </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac3e65a1bc6b131aa32a152fd747eec87"></a><!-- doxytag: member="ender_lib.h::ender_lib_dependencies_get" ref="gac3e65a1bc6b131aa32a152fd747eec87" args="(const Ender_Lib *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_List* <a class="el" href="group__Ender__Lib__Group.html#gac3e65a1bc6b131aa32a152fd747eec87">ender_lib_dependencies_get</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the dependencies of the library </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thiz</td><td>The library to get the dependencies from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The list of dependencies or NULL if it does not have any. Make sure to free the returning list </dd></dl>
 
 </div>
 </div>
@@ -152,7 +232,7 @@ EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_lib
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 12 2015 00:33:44 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 12 2015 00:51:50 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
