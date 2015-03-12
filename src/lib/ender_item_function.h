@@ -25,14 +25,45 @@
  * @{
  */
 
+/**
+ * Different flags a function can have
+ * @see ender_item_function_flags_get
+ */
 typedef enum _Ender_Item_Function_Flag
 {
+	/**
+	 * In case the function belongs to a particular item.
+	 * In such case the parent of the function is the instance and the
+	 * first attribute is the instance itself
+	 */
 	ENDER_ITEM_FUNCTION_FLAG_IS_METHOD = (1 << 0),
+	/**
+	 * In case the function throws an exception
+	 */
 	ENDER_ITEM_FUNCTION_FLAG_THROWS    = (1 << 1),
+	/**
+	 * In case the function is a constructor
+	 */
 	ENDER_ITEM_FUNCTION_FLAG_CTOR      = (1 << 2),
+	/**
+	 * In case the function increments the reference counting of the parent
+	 * item
+	 */
 	ENDER_ITEM_FUNCTION_FLAG_REF       = (1 << 3),
+	/**
+	 * In case the function decrements the reference counting of the parent
+	 *  item
+	 */
 	ENDER_ITEM_FUNCTION_FLAG_UNREF     = (1 << 4),
+	/**
+	 * In case the function is a callback definition
+	 */
 	ENDER_ITEM_FUNCTION_FLAG_CALLBACK  = (1 << 5),
+	/**
+	 * In case the function describes how an item can be converted into
+	 * another type. It is useful for example to coneert an object
+	 * into a string
+	 */
 	ENDER_ITEM_FUNCTION_FLAG_VALUE_OF  = (1 << 6),
 } Ender_Item_Function_Flag;
 

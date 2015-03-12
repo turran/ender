@@ -25,19 +25,37 @@
  * @{
  */
 
+/**
+ * The type of an item
+ * @see ender_item_type_get
+ */
 typedef enum _Ender_Item_Type {
+	/** Impossible case */
 	ENDER_ITEM_TYPE_INVALID,
+	/** The item is a @ref Ender_Basic_Group */
 	ENDER_ITEM_TYPE_BASIC,
+	/** The item is a @ref Ender_Function_Group */
 	ENDER_ITEM_TYPE_FUNCTION,
+	/** The item is a @ref Ender_Attr_Group */
 	ENDER_ITEM_TYPE_ATTR,
+	/** The item is a @ref Ender_Arg_Group */
 	ENDER_ITEM_TYPE_ARG,
+	/** The item is a @ref Ender_Object_Group */
 	ENDER_ITEM_TYPE_OBJECT,
+	/** The item is a @ref Ender_Struct_Group */
 	ENDER_ITEM_TYPE_STRUCT,
+	/** The item is a @ref Ender_Constant_Group */
 	ENDER_ITEM_TYPE_CONSTANT,
+	/** The item is a @ref Ender_Enum_Group */
 	ENDER_ITEM_TYPE_ENUM,
+	/** The item is a @ref Ender_Def_Group */
 	ENDER_ITEM_TYPE_DEF,
 } Ender_Item_Type;
 
+/**
+ * The type of transfer
+ * TODO move it to the arg
+ */
 typedef enum _Ender_Item_Transfer
 {
 	ENDER_ITEM_TRANSFER_FULL,
