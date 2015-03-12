@@ -182,6 +182,21 @@ void ender_item_object_prop_add(Ender_Item *i, Ender_Item *p)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Convert an object into a string
+ *
+ * A property that has the flag of @ref ENDER_ITEM_ATTR_FLAG_VALUE_OF that
+ * returns a string is found, if none is found, the method with flag @ref
+ * ENDER_ITEM_FUNCTION_FLAG_VALUE_OF is searched that returns a string is
+ * searched.
+ *
+ * @param i The object to convert
+ * @param o The object instance
+ * @param[out] str The converted string
+ * @param[out] xfer The transfer of the string
+ * @param[out] err In case the call fails, the error informs what happened
+ * @return EINA_TRUE if the call is succesful, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_item_object_string_to(Ender_Item *i, void *o, char **str,
 		Ender_Item_Transfer *xfer, Eina_Error *err)
 {
@@ -219,6 +234,17 @@ done:
 	return ret;
 }
 
+/**
+ * Get the downcasted item of an object
+ *
+ * A property that has the flag of @ref ENDER_ITEM_ATTR_FLAG_DOWNCAST that
+ * returns a string is found, if none is found, the method with flag @ref
+ * ENDER_ITEM_FUNCTION_FLAG_DOWNCAST is searched that returns a string is
+ * searched.
+ * @param i The object to downcast
+ * @param o The object instance
+ * @return The downcasted item
+ */
 EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 {
 	Ender_Item_Object *thiz;
@@ -262,6 +288,11 @@ done:
 	return ret;
 }
 
+/** 
+ * Get the parent object in the inheritance hierarchy
+ * @param i The object to get the parent from
+ * @return The parent object
+ */
 EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;
@@ -270,6 +301,13 @@ EAPI Ender_Item * ender_item_object_inherit_get(Ender_Item *i)
 	return ender_item_ref(thiz->inherit);
 }
 
+
+/**
+ * Get the list of functions from an object
+ * @param i The object to get the functions from
+ * @return The list of functions. Use @ref ender_item_unref to free every
+ * item on the list
+ */
 EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;
@@ -285,6 +323,12 @@ EAPI Eina_List * ender_item_object_functions_get(Ender_Item *i)
 	return ret;
 }
 
+/**
+ * Get the list of properties from an object
+ * @param i The object to get the properties from
+ * @return The list of properties. Use @ref ender_item_unref to free every
+ * item on the list
+ */
 EAPI Eina_List * ender_item_object_props_get(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;
@@ -300,6 +344,12 @@ EAPI Eina_List * ender_item_object_props_get(Ender_Item *i)
 	return ret;
 }
 
+/**
+ * Get the list of constructors from an object
+ * @param i The object to get the constructors from
+ * @return The list of construcots. Use @ref ender_item_unref to free every
+ * item on the list
+ */
 EAPI Eina_List * ender_item_object_ctor_get(Ender_Item *i)
 {
 	Ender_Item_Object *thiz;
@@ -319,6 +369,12 @@ EAPI Eina_List * ender_item_object_ctor_get(Ender_Item *i)
 	return ret;
 }
 
+/**
+ * Call the object's ref function
+ * @param i The object to call the ref function on
+ * @param o The object instance
+ * @return EINA_TRUE if success, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_item_object_ref(Ender_Item *i, void *o)
 {
 	Ender_Item_Object *thiz;
@@ -335,6 +391,12 @@ EAPI Eina_Bool ender_item_object_ref(Ender_Item *i, void *o)
 	return ender_item_function_call(thiz->ref, args, NULL);
 }
 
+/**
+ * Call the object's unref function
+ * @param i The object to call the unref function on
+ * @param o The object instance
+ * @return EINA_TRUE if success, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_item_object_unref(Ender_Item *i, void *o)
 {
 	Ender_Item_Object *thiz;

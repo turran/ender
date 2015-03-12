@@ -311,6 +311,11 @@ void ender_item_struct_function_add(Ender_Item *i, Ender_Item *f)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the size of the struct
+ * @param i The struct to get the size from
+ * @return The size of the struct
+ */
 EAPI size_t ender_item_struct_size_get(Ender_Item *i)
 {
 	Ender_Item_Struct *thiz;
@@ -319,6 +324,12 @@ EAPI size_t ender_item_struct_size_get(Ender_Item *i)
 	return thiz->size;
 }
 
+/**
+ * Get the list of fields from a struct
+ * @param i The struct to get the fields from
+ * @return The list of fields. Use @ref ender_item_unref to free every
+ * item on the list
+ */
 EAPI Eina_List * ender_item_struct_fields_get(Ender_Item *i)
 {
 	Ender_Item_Struct *thiz;
@@ -334,6 +345,13 @@ EAPI Eina_List * ender_item_struct_fields_get(Ender_Item *i)
 	return ret;
 }
 
+
+/**
+ * Get the list of functions from a struct
+ * @param i The struct to get the functions from
+ * @return The list of functions. Use @ref ender_item_unref to free every
+ * item on the list
+ */
 EAPI Eina_List * ender_item_struct_functions_get(Ender_Item *i)
 {
 	Ender_Item_Struct *thiz;
