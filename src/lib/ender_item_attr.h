@@ -37,7 +37,7 @@ typedef enum _Ender_Item_Attr_Flag
 	ENDER_ITEM_ATTR_FLAG_VALUE_OF  = (1 << 0),
 	/**
 	 * In case the attribute returns an @ref Ender_Item_Group representing
-	 * the downcasted value of the item
+	 * the downcasted value of the owner of the attribute
 	 */
 	ENDER_ITEM_ATTR_FLAG_DOWNCAST  = (1 << 1),
 } Ender_Item_Attr_Flag;

@@ -275,23 +275,44 @@ void * ender_lib_sym_get(Ender_Lib *thiz, const char *name)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Find a registered library by name
+ * @param name The name of the library to find
+ * @return The library found, NULL otherwise
+ */
 EAPI const Ender_Lib * ender_lib_find(const char *name)
 {
 	return eina_hash_find(_libraries, name);
 }
 
+/**
+ * Get the version of the library
+ * @param thiz The library to get version from
+ * @return The version of the library
+ */
 EAPI int ender_lib_version_get(const Ender_Lib *thiz)
 {
 	if (!thiz) return -1;
 	return thiz->version;
 }
 
+/**
+ * Get the name of the library
+ * @param thiz The library to get name from
+ * @return The name of the library
+ */
 EAPI const char * ender_lib_name_get(const Ender_Lib *thiz)
 {
 	if (!thiz) return NULL;
 	return thiz->name;
 }
 
+/**
+ * Get the dependencies of the library
+ * @param thiz The library to get the dependencies from
+ * @return The list of dependencies or NULL if it does not have any.
+ * Make sure to free the returning list
+ */
 EAPI Eina_List * ender_lib_dependencies_get(const Ender_Lib *thiz)
 {
 	Ender_Lib *dep;
