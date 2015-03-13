@@ -337,6 +337,11 @@ void ender_item_attr_flags_set(Ender_Item *i, int flags)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the type of an attribute
+ * @param i The attribute to get the type from
+ * @return The type of an attribute
+ */
 EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i)
 {
 	Ender_Item_Attr *thiz;
@@ -403,6 +408,13 @@ EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i)
 	return NULL;
 }
 
+/**
+ * Get the offset of an attribute
+ *
+ * This is only valid for attributes that @ref Ender_Struct_Group fields
+ * @param i The attribute to get the offset from
+ * @return The offset of an attribute
+ */
 EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
 {
 	Ender_Item_Attr *thiz;
@@ -411,6 +423,11 @@ EAPI ssize_t ender_item_attr_offset_get(Ender_Item *i)
 	return thiz->offset;
 }
 
+/**
+ * Get the flags of an attribute
+ * @param i The attribute to get the flags from
+ * @return The attribute flags
+ */
 EAPI int ender_item_attr_flags_get(Ender_Item *i)
 {
 	Ender_Item_Attr *thiz;
@@ -419,6 +436,16 @@ EAPI int ender_item_attr_flags_get(Ender_Item *i)
 	return thiz->flags;
 }
 
+/**
+ * Get the value from an attribute
+ * @param i The attribute to get the value from
+ * @param o The object instance that has such attribute
+ * @param[out] xfer The transfer of the value. It is responsible of the caller
+ * to free the resource based on the transfer type
+ * @param v The value of the attribute
+ * @param[out] err In case the return value is EINA_FALSE, an error will be set
+ * @return EINA_TRUE if success, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o,
 		Ender_Item_Transfer *xfer, Ender_Value *v, Eina_Error *err)
 {
@@ -456,6 +483,14 @@ done:
 	return ret;
 }
 
+/**
+ * Set the value from an attribute
+ * @param i The attribute to set the value
+ * @param o The object instance that has such attribute
+ * @param v The value of the attribute
+ * @param[out] err In case the return value is EINA_FALSE, an error will be set
+ * @return EINA_TRUE if success, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err)
 {
 	Ender_Item_Attr *thiz;

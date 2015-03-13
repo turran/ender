@@ -107,6 +107,11 @@ void ender_item_def_function_add(Ender_Item *i, Ender_Item *f)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the type of a def
+ * @param i The def to get the type from
+ * @return The type of a def
+ */
 EAPI Ender_Item * ender_item_def_type_get(Ender_Item *i)
 {
 	Ender_Item_Def *thiz;
@@ -115,6 +120,12 @@ EAPI Ender_Item * ender_item_def_type_get(Ender_Item *i)
 	return ender_item_ref(thiz->type);
 }
 
+/**
+ * Get the functions of a def
+ * @param i The def to get the functions from
+ * @return The list of functions. Free it by calling @ref ender_item_unref on
+ * each item. Each item is of type @ref ENDER_ITEM_TYPE_FUNCTION.
+ */
 EAPI Eina_List * ender_item_def_functions_get(Ender_Item *i)
 {
 	Ender_Item_Def *thiz;

@@ -110,6 +110,11 @@ void ender_item_arg_flags_set(Ender_Item *i, int flags)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the type of the argument
+ * @param i The argument to get the type from
+ * @return The type of the argument
+ */
 EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i)
 {
 	Ender_Item_Arg *thiz;
@@ -118,6 +123,11 @@ EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i)
 	return ender_item_ref(thiz->type);
 }
 
+/**
+ * Get the transfer mode of an argument
+ * @param i The argument to get the transfer from
+ * @return The transfer mode
+ */
 EAPI Ender_Item_Transfer ender_item_arg_transfer_get(Ender_Item *i)
 {
 	Ender_Item_Arg *thiz;
@@ -126,6 +136,11 @@ EAPI Ender_Item_Transfer ender_item_arg_transfer_get(Ender_Item *i)
 	return thiz->transfer;
 }
 
+/**
+ * Get the direction of an argument
+ * @param i The argument to get the direction from
+ * @return The argument direction
+ */
 EAPI Ender_Item_Arg_Direction ender_item_arg_direction_get(Ender_Item *i)
 {
 	Ender_Item_Arg *thiz;
@@ -134,6 +149,11 @@ EAPI Ender_Item_Arg_Direction ender_item_arg_direction_get(Ender_Item *i)
 	return thiz->direction;
 }
 
+/**
+ * Get the flags of an argument
+ * @param i The argument to get the flags from
+ * @return The argument flags
+ */
 EAPI int ender_item_arg_flags_get(Ender_Item *i)
 {
 	Ender_Item_Arg *thiz;

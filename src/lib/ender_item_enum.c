@@ -95,6 +95,12 @@ void ender_item_enum_value_add(Ender_Item *i, Ender_Item *value)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the values of an enum
+ * @param i The enum to get the values from
+ * @return The list of values. Free it by calling @ref ender_item_unref on
+ * each item. Each item is of type @ref ENDER_ITEM_TYPE_CONSTANT.
+ */
 EAPI Eina_List * ender_item_enum_values_get(Ender_Item *i)
 {
 	Ender_Item_Enum *thiz;

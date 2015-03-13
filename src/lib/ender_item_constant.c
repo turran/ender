@@ -116,6 +116,11 @@ void ender_item_constant_type_set(Ender_Item *i, Ender_Item *t)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the type of a constant
+ * @param i The constant to get the type from
+ * @return The type of a constant
+ */
 EAPI Ender_Item * ender_item_constant_type_get(Ender_Item *i)
 {
 	Ender_Item_Constant *thiz;
@@ -124,6 +129,11 @@ EAPI Ender_Item * ender_item_constant_type_get(Ender_Item *i)
 	return ender_item_ref(thiz->type);
 }
 
+/**
+ * Get the value of a constant
+ * @param i The constant to get the value from
+ * @param[out] v The value of the constant
+ */
 EAPI void ender_item_constant_value_get(Ender_Item *i, Ender_Value *v)
 {
 	Ender_Item_Constant *thiz;

@@ -54,7 +54,6 @@ typedef enum _Ender_Item_Type {
 
 /**
  * The type of transfer
- * TODO move it to the arg
  */
 typedef enum _Ender_Item_Transfer
 {

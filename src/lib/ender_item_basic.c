@@ -77,6 +77,11 @@ void ender_item_basic_value_type_set(Ender_Item *i, Ender_Value_Type type)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the type of the basic item
+ * @param i The basic item to get the type from
+ * @return The type of the basic item
+ */
 EAPI Ender_Value_Type ender_item_basic_value_type_get(Ender_Item *i)
 {
 	Ender_Item_Basic *thiz;

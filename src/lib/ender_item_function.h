@@ -65,6 +65,14 @@ typedef enum _Ender_Item_Function_Flag
 	 * into a string
 	 */
 	ENDER_ITEM_FUNCTION_FLAG_VALUE_OF  = (1 << 6),
+	/**
+	 * In case the function implements a way to downcast an object
+	 * The function can have the following prototypes:
+	 * void foo_bar_get(const char **lib, const char **name);
+	 * void foo_bar_get(char **lib, char **name);
+	 * Ender_Item * foo_bar_get(void);
+	 */
+	ENDER_ITEM_FUNCTION_FLAG_DOWNCAST  = (1 << 1),
 } Ender_Item_Function_Flag;
 
 EAPI Eina_List * ender_item_function_args_get(Ender_Item *i);
