@@ -46,16 +46,27 @@ typedef union _Ender_Value
  */
 typedef enum _Ender_Value_Type
 {
+	/** Represents an Eina_Bool */
 	ENDER_VALUE_TYPE_BOOL,
+	/** Represents an uint8_t */
 	ENDER_VALUE_TYPE_UINT8,
+	/** Represents an int8_t */
 	ENDER_VALUE_TYPE_INT8,
+	/** Represents an uint32_t */
 	ENDER_VALUE_TYPE_UINT32,
+	/** Represents an int32_t */
 	ENDER_VALUE_TYPE_INT32,
+	/** Represents an uint64_t */
 	ENDER_VALUE_TYPE_UINT64,
+	/** Represents an int64_t */
 	ENDER_VALUE_TYPE_INT64,
+	/** Represents a double */
 	ENDER_VALUE_TYPE_DOUBLE,
+	/** Represents a char * */
 	ENDER_VALUE_TYPE_STRING,
+	/** Represents a void * */
 	ENDER_VALUE_TYPE_POINTER,
+	/** Represents a size_t */
 	ENDER_VALUE_TYPE_SIZE,
 } Ender_Value_Type;
 

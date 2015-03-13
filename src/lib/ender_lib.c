@@ -311,7 +311,7 @@ EAPI const char * ender_lib_name_get(const Ender_Lib *thiz)
  * Get the dependencies of the library
  * @param thiz The library to get the dependencies from
  * @return The list of dependencies or NULL if it does not have any.
- * Make sure to free the returning list
+ * Make sure to free the returning list. @ender_transfer{none}
  */
 EAPI Eina_List * ender_lib_dependencies_get(const Ender_Lib *thiz)
 {
@@ -326,6 +326,13 @@ EAPI Eina_List * ender_lib_dependencies_get(const Ender_Lib *thiz)
 	return ret;
 }
 
+/**
+ * Find an item
+ * @param thiz The library to find the item on
+ * @param name The item name to find
+ * @return The item found or NULL if it is not found. Use @ref ender_item_unref
+ * to free the returning item. @ender_transfer{none}
+ */
 EAPI Ender_Item * ender_lib_item_find(const Ender_Lib *thiz, const char *name)
 {
 	Ender_Item *i;
@@ -354,6 +361,13 @@ EAPI Ender_Item * ender_lib_item_find(const Ender_Lib *thiz, const char *name)
 	return NULL;
 }
 
+/**
+ * List the items based on their type
+ * @param thiz The library to list the items from
+ * @param type The type of items to list
+ * @return The list of items of the requested type. Use @ref ender_item_unref to
+ * free every item on the list.  @ender_transfer{none}
+ */
 EAPI Eina_List * ender_lib_item_list(const Ender_Lib *thiz, Ender_Item_Type type)
 {
 	Ender_Item *i;

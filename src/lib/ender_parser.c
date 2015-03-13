@@ -1448,6 +1448,11 @@ static Eina_Bool _ender_parser_parse_cb(void *data, Eina_Simple_XML_Type type,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Parse a file and register the items on the system
+ * @param f The file to parse
+ * @return EINA_TRUE if the call is succesful, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_parser_parse(FILE *f)
 {
 	Ender_Parser *thiz;
