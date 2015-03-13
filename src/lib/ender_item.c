@@ -143,16 +143,36 @@ EAPI void ender_item_unref(Ender_Item *thiz)
 	}
 }
 
+/**
+ * Get the name of an item
+ * @param thiz The item to get the name from
+ * @return The name of the item
+ */
 EAPI const char * ender_item_name_get(Ender_Item *thiz)
 {
 	return thiz->name;
 }
 
+/**
+ * Get the type of an item
+ * @param thiz The item to get the type from
+ * @return The item type
+ */
 EAPI Ender_Item_Type ender_item_type_get(Ender_Item *thiz)
 {
 	return thiz->type;
 }
 
+/**
+ * Get the parent of an item
+ *
+ * Depending on the type of item, the item might have or not
+ * a parent. The @ref Ender_Arg_Group for example has always
+ * a @ref Ender_Function_Group as a parent.
+ *
+ * @param thiz The item to get the parent from
+ * @return The parent of the item. @ender_transfer{none}
+ */
 EAPI Ender_Item * ender_item_parent_get(Ender_Item *thiz)
 {
 	return ender_item_ref(thiz->parent);
@@ -195,6 +215,11 @@ EAPI const char * ender_item_type_name_get(Ender_Item_Type type)
 	}
 }
 
+/**
+ * Get the library an item belongs to
+ * @param thiz The item to get the library from
+ * @return The library the item belongs to
+ */
 EAPI const Ender_Lib * ender_item_lib_get(Ender_Item *thiz)
 {
 	if (!thiz->lib)
@@ -209,6 +234,13 @@ EAPI const Ender_Lib * ender_item_lib_get(Ender_Item *thiz)
 	}
 }
 
+/**
+ * Check if the item is an exception item
+ * An exception item is an item of type eina.error
+ *
+ * @param i The item to check
+ * @return EINA_TRUE if the item is an exception, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_item_is_exception(Ender_Item *i)
 {
 	if (!i) return EINA_FALSE;
