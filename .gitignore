@@ -41,3 +41,6 @@ coverage
 /m4/ltsugar.m4
 /m4/ltversion.m4
 /m4/lt~obsolete.m4
+src/bin/ender-inspect
+src/bin/ender-loader
+
