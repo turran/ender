@@ -42,6 +42,7 @@ src/lib/ender_item_function_private.h \
 src/lib/ender_item_enum.c \
 src/lib/ender_item_enum_private.h \
 src/lib/ender_lib.c \
+src/lib/ender_lib_private.h \
 src/lib/ender_main.c \
 src/lib/ender_main_private.h \
 src/lib/ender_parser.c \
