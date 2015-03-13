@@ -185,10 +185,9 @@ void ender_item_object_prop_add(Ender_Item *i, Ender_Item *p)
 /**
  * Convert an object into a string
  *
- * A property that has the flag of @ref ENDER_ITEM_ATTR_FLAG_VALUE_OF that
- * returns a string is found, if none is found, the method with flag @ref
- * ENDER_ITEM_FUNCTION_FLAG_VALUE_OF is searched that returns a string is
- * searched.
+ * Looks for a property that has the flag of @ref ENDER_ITEM_ATTR_FLAG_VALUE_OF
+ * that returns a string. If none is found, it looks for a method with flag @ref
+ * ENDER_ITEM_FUNCTION_FLAG_VALUE_OF that returns a string, if so, it is called.
  *
  * @param i The object to convert
  * @param o The object instance
@@ -237,10 +236,9 @@ done:
 /**
  * Get the downcasted item of an object
  *
- * A property that has the flag of @ref ENDER_ITEM_ATTR_FLAG_DOWNCAST that
- * returns a string is found, if none is found, the method with flag @ref
- * ENDER_ITEM_FUNCTION_FLAG_DOWNCAST is searched that returns a string is
- * searched.
+ * Gets the value of a property that has the flag of @ref ENDER_ITEM_ATTR_FLAG_DOWNCAST,
+ * if none is found, it looks for a method with flag @ref
+ * ENDER_ITEM_FUNCTION_FLAG_DOWNCAST and uses it for downcasting.
  * @param i The object to downcast
  * @param o The object instance
  * @return The downcasted item
