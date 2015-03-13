@@ -62,8 +62,10 @@ EAPI void ender_shutdown(void)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * Get the version
+ * @param[out] major The major number of the version
+ * @param[out] minor The minor number of the version
+ * @param[out] micro The micro number of the version
  */
 EAPI void ender_version(unsigned int *major, unsigned int *minor, unsigned int *micro)
 {
