@@ -254,6 +254,16 @@ void ender_item_function_flags_set(Ender_Item *i, int flags)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Get the index position of the argument that is used for exceptions
+ *
+ * A function that has the flag @ref ENDER_ITEM_FUNCTION_FLAG_THROWS has an
+ * Eina_Error based argument. This function returns the position of such
+ * argument.
+ *
+ * @param i The function to get the position index from
+ * @return The position index of the argument
+ */
 EAPI int ender_item_function_throw_position_get(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;
@@ -270,6 +280,12 @@ EAPI int ender_item_function_throw_position_get(Ender_Item *i)
 	}
 }
 
+/**
+ * Get the list of arguments from a function
+ * @param i The function to get the arguments from
+ * @return The list of arguments. Use @ref ender_item_unref to free every
+ * item on the list
+ */
 EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;
@@ -294,6 +310,12 @@ EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 	return ret;
 }
 
+/**
+ * Get the argument in a specified index
+ * @param i The function to get the argument from
+ * @param idx The index on the argument list
+ * @return The argument at the specified index
+ */
 EAPI Ender_Item * ender_item_function_args_at(Ender_Item *i, int idx)
 {
 	Ender_Item_Function *thiz;
@@ -320,6 +342,11 @@ EAPI Ender_Item * ender_item_function_args_at(Ender_Item *i, int idx)
 	return ender_item_ref(ret);
 }
 
+/**
+ * Count the number of arguments a function has
+ * @param i The function to count the number of arguments on
+ * @return The number of arguments
+ */
 EAPI int ender_item_function_args_count(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;
@@ -332,6 +359,11 @@ EAPI int ender_item_function_args_count(Ender_Item *i)
 	return ret;
 }
 
+/**
+ * Get the function flags
+ * @param i The function to get the flags from
+ * @return The function flags
+ */
 EAPI int ender_item_function_flags_get(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;
@@ -340,6 +372,11 @@ EAPI int ender_item_function_flags_get(Ender_Item *i)
 	return thiz->flags;
 }
 
+/**
+ * Get the return item of a function
+ * @param i The function to get the return from
+ * @return The return item
+ */
 EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 {
 	Ender_Item_Function *thiz;
@@ -362,6 +399,13 @@ EAPI Ender_Item * ender_item_function_ret_get(Ender_Item *i)
 	}
 }
 
+/**
+ * Call a function
+ * @param i The function to call
+ * @param args The array of values that matches the number of arguments
+ * @param retval The returning value of the function call
+ * @return EINA_TRUE if the call is succesful, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool ender_item_function_call(Ender_Item *i, Ender_Value *args, Ender_Value *retval)
 {
 	Ender_Item_Function *thiz;
