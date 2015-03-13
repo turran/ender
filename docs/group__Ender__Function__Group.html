@@ -95,7 +95,9 @@ Enumerations</h2></td></tr>
 <br/>
 &#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a48f8ba1ca79bc7889b01f88602e2d64a">ENDER_ITEM_FUNCTION_FLAG_CALLBACK</a> =  (1 &lt;&lt; 5), 
 <br/>
-&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a440420ef5a519ecffeb80ab043e83bc3">ENDER_ITEM_FUNCTION_FLAG_VALUE_OF</a> =  (1 &lt;&lt; 6)
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46a440420ef5a519ecffeb80ab043e83bc3">ENDER_ITEM_FUNCTION_FLAG_VALUE_OF</a> =  (1 &lt;&lt; 6), 
+<br/>
+&#160;&#160;<a class="el" href="group__Ender__Function__Group.html#gga97c27ee78c1aa993f52027de5cb3fd46afd1c55c4bc229781eeb7038d7f002440">ENDER_ITEM_FUNCTION_FLAG_DOWNCAST</a> =  (1 &lt;&lt; 1)
 <br/>
  }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
@@ -152,6 +154,9 @@ EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_functi
 <tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46a440420ef5a519ecffeb80ab043e83bc3"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_VALUE_OF" ref="gga97c27ee78c1aa993f52027de5cb3fd46a440420ef5a519ecffeb80ab043e83bc3" args="" -->ENDER_ITEM_FUNCTION_FLAG_VALUE_OF</em>&nbsp;</td><td>
 <p>In case the function describes how an item can be converted into another type. It is useful for example to coneert an object into a string </p>
 </td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga97c27ee78c1aa993f52027de5cb3fd46afd1c55c4bc229781eeb7038d7f002440"></a><!-- doxytag: member="ENDER_ITEM_FUNCTION_FLAG_DOWNCAST" ref="gga97c27ee78c1aa993f52027de5cb3fd46afd1c55c4bc229781eeb7038d7f002440" args="" -->ENDER_ITEM_FUNCTION_FLAG_DOWNCAST</em>&nbsp;</td><td>
+<p>In case the function implements a way to downcast an object The function can have the following prototypes: void foo_bar_get(const char **lib, const char **name); void foo_bar_get(char **lib, char **name); Ender_Item * foo_bar_get(void); </p>
+</td></tr>
 </table>
 </dd>
 </dl>
@@ -176,7 +181,7 @@ EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_functi
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 12 2015 20:09:08 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 13 2015 09:35:10 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

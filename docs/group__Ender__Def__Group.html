@@ -81,13 +81,62 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga947464e6654ebfb1760e66f2f3365d32"></a><!-- doxytag: member="Ender_Def_Group::ender_item_def_type_get" ref="ga947464e6654ebfb1760e66f2f3365d32" args="(Ender_Item *i)" -->
-EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_def_type_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gacda93dadf2fc7030da90bb5818abe85a"></a><!-- doxytag: member="Ender_Def_Group::ender_item_def_functions_get" ref="gacda93dadf2fc7030da90bb5818abe85a" args="(Ender_Item *i)" -->
-EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_def_functions_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Def__Group.html#ga947464e6654ebfb1760e66f2f3365d32">ender_item_def_type_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Def__Group.html#gacda93dadf2fc7030da90bb5818abe85a">ender_item_def_functions_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>A def represents a definition of an identifier based in another, i.e an alias. </p>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="ga947464e6654ebfb1760e66f2f3365d32"></a><!-- doxytag: member="ender_item_def.h::ender_item_def_type_get" ref="ga947464e6654ebfb1760e66f2f3365d32" args="(Ender_Item *i)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a>* <a class="el" href="group__Ender__Def__Group.html#ga947464e6654ebfb1760e66f2f3365d32">ender_item_def_type_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the type of a def </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>The def to get the type from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The type of a def </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gacda93dadf2fc7030da90bb5818abe85a"></a><!-- doxytag: member="ender_item_def.h::ender_item_def_functions_get" ref="gacda93dadf2fc7030da90bb5818abe85a" args="(Ender_Item *i)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_List* <a class="el" href="group__Ender__Def__Group.html#gacda93dadf2fc7030da90bb5818abe85a">ender_item_def_functions_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the functions of a def </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>The def to get the functions from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The list of functions. Free it by calling <a class="el" href="group__Ender__Item__Group.html#ga100778d4c2840cf2b50dcd86769f00cc">ender_item_unref</a> on each item. Each item is of type <a class="el" href="group__Ender__Item__Group.html#ggaead91b3b0bff627126f36d2db3489559aa7d9c31a8e7de90f4b54d14bcac3db4c">ENDER_ITEM_TYPE_FUNCTION</a>. </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -106,7 +155,7 @@ EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_ite
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 12 2015 20:09:08 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 13 2015 09:35:10 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

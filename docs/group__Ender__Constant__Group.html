@@ -81,13 +81,72 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga2e945214f37df979ee036089630cfaad"></a><!-- doxytag: member="Ender_Constant_Group::ender_item_constant_type_get" ref="ga2e945214f37df979ee036089630cfaad" args="(Ender_Item *i)" -->
-EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_constant_type_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga42189fdba298ea8efde7c28dec9641cc"></a><!-- doxytag: member="Ender_Constant_Group::ender_item_constant_value_get" ref="ga42189fdba298ea8efde7c28dec9641cc" args="(Ender_Item *i, Ender_Value *v)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_constant_value_get</b> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i, <a class="el" href="unionEnder__Value.html">Ender_Value</a> *v)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Constant__Group.html#ga2e945214f37df979ee036089630cfaad">ender_item_constant_type_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Constant__Group.html#ga42189fdba298ea8efde7c28dec9641cc">ender_item_constant_value_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i, <a class="el" href="unionEnder__Value.html">Ender_Value</a> *v)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>A constant represents an identifier with its associated value. </p>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="ga2e945214f37df979ee036089630cfaad"></a><!-- doxytag: member="ender_item_constant.h::ender_item_constant_type_get" ref="ga2e945214f37df979ee036089630cfaad" args="(Ender_Item *i)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a>* <a class="el" href="group__Ender__Constant__Group.html#ga2e945214f37df979ee036089630cfaad">ender_item_constant_type_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the type of a constant </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>The constant to get the type from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The type of a constant </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga42189fdba298ea8efde7c28dec9641cc"></a><!-- doxytag: member="ender_item_constant.h::ender_item_constant_value_get" ref="ga42189fdba298ea8efde7c28dec9641cc" args="(Ender_Item *i, Ender_Value *v)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Ender__Constant__Group.html#ga42189fdba298ea8efde7c28dec9641cc">ender_item_constant_value_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td>
+          <td class="paramname"><em>i</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="unionEnder__Value.html">Ender_Value</a> *&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the value of a constant </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">i</td><td>The constant to get the value from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">v</td><td>The value of the constant </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -106,7 +165,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>ender_item_const
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 12 2015 20:09:08 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 13 2015 09:35:10 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
