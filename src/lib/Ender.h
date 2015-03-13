@@ -53,7 +53,7 @@ extern "C" {
 /**
  * @mainpage Ender
  * @section intro Introduction
- * Ender is library written in C that describes other libraries. 
+ * Ender is a library written in C that describes other C libraries. 
  * The purpose of Ender is to easily create bindings for any C library without
  * much struggling.
  *
