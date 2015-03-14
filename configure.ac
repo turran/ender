@@ -85,6 +85,10 @@ AC_SUBST(ENDER_LIBS)
 
 EFL_CHECK_DLOPEN
 
+# Unit tests, coverage and benchmarking
+
+ENS_CHECK_TESTS([enable_tests="yes"], [enable_tests="no"])
+
 ## Make the debug preprocessor configurable
 
 AC_CONFIG_FILES([
@@ -107,11 +111,13 @@ echo
 echo
 echo "Configuration Options Summary:"
 echo
-echo "Compilation............: make (or gmake)"
-echo "  CPPFLAGS.............: $CPPFLAGS"
-echo "  CFLAGS...............: $CFLAGS"
-echo "  LDFLAGS..............: $LDFLAGS"
+echo "  Build tests.............................: ${enable_tests}"
 echo
-echo "Installation...........: make install (as root if needed, with 'su' or 'sudo')"
-echo "  prefix...............: $prefix"
+echo "Compilation...............................: make (or gmake)"
+echo "  CPPFLAGS................................: $CPPFLAGS"
+echo "  CFLAGS..................................: $CFLAGS"
+echo "  LDFLAGS.................................: $LDFLAGS"
+echo
+echo "Installation..............................: make install (as root if needed, with 'su' or 'sudo')"
+echo "  prefix..................................: $prefix"
 echo

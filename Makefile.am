@@ -21,6 +21,7 @@ ender.pc
 
 lib_LTLIBRARIES =
 check_PROGRAMS =
+TESTS =
 EXTRA_DIST =
 CLEAN_LOCAL = ender.pc
 
@@ -38,7 +39,7 @@ include src/bin/Makefile.mk
 
 ### Tests
 
-#include src/tests/Makefile.mk
+include src/tests/Makefile.mk
 
 ### Data
 
