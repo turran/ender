@@ -26,6 +26,80 @@
  *============================================================================*/
 typedef char * (*Ender_Name_Convert)(const char *s);
 
+static Eina_Bool _is_verb(const char *s, int len)
+{
+	Eina_Bool is_verb = EINA_FALSE;
+
+	if (!strncmp(s, "get", len))
+	{
+		is_verb = EINA_TRUE;
+	}
+	else if (!strncmp(s, "set", len))
+	{
+		is_verb = EINA_TRUE;
+	}
+	else if (!strncmp(s, "create", len))
+	{
+		is_verb = EINA_TRUE;
+	}
+	else if (!strncmp(s, "append", len))
+	{
+		is_verb = EINA_TRUE;
+	}
+
+	return is_verb;
+}
+
+/* name_get -> get_name
+ * name_get_id_by -> get_name_by_id
+ * new_data_from -> new_from_data
+ * foo_new -> new_foo
+ * foo_new_data_from -> new_foo_from_data
+ */
+static char * _ender_utils_name_convert_latin_english(const char *s)
+{
+	Eina_Bool swap = EINA_FALSE;
+	const char *tmp;
+	char *ret;
+	size_t len;
+
+	/* iterate until we find a verb */
+	tmp = strchr(s, '_');
+
+	while (tmp)
+	{
+		const char *stmp;
+
+		tmp = tmp + 1;
+		/* get the length of the verb */
+		stmp = strchr(tmp, '_');
+		if (!stmp)
+			len = strlen(tmp);
+		else
+			len = stmp - tmp;
+
+		swap = _is_verb(tmp, len);
+		if (swap)
+			break;
+		tmp = stmp;
+	}
+	/* if none found, just exit */
+	if (!swap)
+		return strdup(s);
+
+	ret = calloc(strlen(s) + 1, sizeof(char));
+	/* copy the verb */
+	strncpy(ret, tmp, len);
+	/* add the unerscore (so far verb_) */
+	ret[len] = '_';
+	/* finally add everything before the verb without the trailing '_'*/
+	strncpy(ret + len + 1, s, tmp - s - 1);
+	ret[len + 1 + (tmp - s - 1)] = '\0';
+
+	/* iterate until we find a modifier */
+	return ret;
+}
+
 static char * _ender_utils_name_convert_english_latin(char *s)
 {
 	Eina_Bool swap = EINA_FALSE;
@@ -40,22 +114,9 @@ static char * _ender_utils_name_convert_english_latin(char *s)
 	if (!tmp) return strdup(s);
 
 	len = tmp - s;
-	if (!strncmp(s, "get", len))
-	{
-		swap = EINA_TRUE;
-	}
-	else if (!strncmp(s, "set", len))
-	{
-		swap = EINA_TRUE;
-	}
-	else if (!strncmp(s, "create", len))
-	{
-		swap = EINA_TRUE;
-	}
-	else if (!strncmp(s, "append", len))
-	{
-		swap = EINA_TRUE;
-	}
+
+	/* check if first word is a verb */
+	swap = _is_verb(s, len);
 
 	/* ok we got a verb */
 	if (swap)
@@ -119,10 +180,59 @@ static char * _ender_utils_name_convert_english_latin(char *s)
 	return ret;
 }
 
+/* replace every char following '_' by the upper case char */
+static char * _ender_utils_case_convert_underscore_camel(
+		const char *s)
+{
+	Eina_Bool swap = EINA_FALSE;
+	char *dtmp;
+	char *d;
+	const char *stmp;
+	const char *send;
+	size_t len;
+
+	len = strlen(s);
+	send = s + len;
+
+	d = calloc(len + 1, sizeof(char));
+	dtmp = d;
+	for (stmp = s; stmp < send; stmp++)
+	{
+		if (*stmp == '_')
+		{
+			swap = EINA_TRUE;
+			continue;
+		}
+
+		if (swap)
+		{
+			*dtmp = toupper(*stmp);
+			swap = EINA_FALSE;
+		}
+		else
+		{
+			*dtmp = *stmp;
+		}
+		dtmp++;
+	}
+
+	return d;
+}
+
 static char * _ender_utils_name_convert_underscore_latin_camel_english(
 		const char *s)
 {
-	return NULL;
+	char *tmp;
+	char *ret;
+
+	tmp = _ender_utils_name_convert_latin_english(s);
+	if (!tmp)
+		return NULL;
+
+	ret = _ender_utils_case_convert_underscore_camel(tmp);
+	free(tmp);
+
+	return ret;
 }
 
 static char * _ender_utils_name_convert_camel_english_underscore_latin(

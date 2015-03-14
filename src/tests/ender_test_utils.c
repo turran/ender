@@ -37,18 +37,18 @@ START_TEST(ender_test_utils_convert)
 {
 	char *converted;
 
-	converted = ender_utils_name_convert("enesimRendererGetName",
+	converted = ender_utils_name_convert("getName",
 		ENDER_CASE_CAMEL, ENDER_NOTATION_ENGLISH,
 		ENDER_CASE_UNDERSCORE, ENDER_NOTATION_LATIN);
 	ck_assert_ptr_ne(converted, NULL);
-	ck_assert_str_eq(converted, "enesim_renderer_get_name");
+	ck_assert_str_eq(converted, "name_get");
 	free(converted);
 
-	converted = ender_utils_name_convert("enesim_renderer_name_get",
+	converted = ender_utils_name_convert("name_get",
 		ENDER_CASE_UNDERSCORE, ENDER_NOTATION_LATIN,
 		ENDER_CASE_CAMEL, ENDER_NOTATION_ENGLISH);
 	ck_assert_ptr_ne(converted, NULL);
-	ck_assert_str_eq(converted, "enesimRendererGetName");
+	ck_assert_str_eq(converted, "getName");
 	free(converted);
 }
 END_TEST
