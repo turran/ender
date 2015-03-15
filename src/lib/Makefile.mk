@@ -4,6 +4,7 @@ lib_LTLIBRARIES += src/lib/libender.la
 installed_headersdir = $(pkgincludedir)-$(VMAJ)
 dist_installed_headers_DATA = \
 src/lib/Ender.h \
+src/lib/ender_build.h \
 src/lib/ender_item.h \
 src/lib/ender_item_struct.h \
 src/lib/ender_item_basic.h \
