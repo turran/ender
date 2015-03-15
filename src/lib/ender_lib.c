@@ -56,7 +56,8 @@ static void _ender_lib_dir_list_cb(const char *name, const char *path, void *dat
 	token = strchr(name, '.');
 	if (!token) return;
 
-	fname = strndup(name, token - name);
+	fname = strdup(name);
+	fname[token - name] = '\0';
 	lib = ender_lib_find(fname);
 	if (lib)
 	{
