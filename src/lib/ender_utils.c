@@ -100,7 +100,7 @@ static char * _ender_utils_name_convert_latin_english(const char *s)
 	return ret;
 }
 
-static char * _ender_utils_name_convert_english_latin(char *s)
+static char * _ender_utils_name_convert_english_latin(const char *s)
 {
 	Eina_Bool swap = EINA_FALSE;
 	const char *tmp;
@@ -231,43 +231,10 @@ static char * _ender_utils_case_convert_underscore_pascal(
 	return _ender_utils_case_convert_underscore_camel_pascal(s, EINA_TRUE);
 }
 
-static char * _ender_utils_name_convert_underscore_latin_camel_english(
-		const char *s)
-{
-	char *tmp;
-	char *ret;
-
-	tmp = _ender_utils_name_convert_latin_english(s);
-	if (!tmp)
-		return NULL;
-
-	ret = _ender_utils_case_convert_underscore_camel(tmp);
-	free(tmp);
-
-	return ret;
-}
-
-static char * _ender_utils_name_convert_underscore_latin_pascal_english(
-		const char *s)
-{
-	char *tmp;
-	char *ret;
-
-	tmp = _ender_utils_name_convert_latin_english(s);
-	if (!tmp)
-		return NULL;
-
-	ret = _ender_utils_case_convert_underscore_pascal(tmp);
-	free(tmp);
-
-	return ret;
-}
-
-static char * _ender_utils_name_convert_camel_english_underscore_latin(
+static char * _ender_utils_case_convert_camel_underscore(
 		const char *s)
 {
 	Eina_Bool is_upper = EINA_FALSE;
-	char *ret;
 	char *dtmp;
 	char *d;
 	const char *stmp;
@@ -316,10 +283,7 @@ static char * _ender_utils_name_convert_camel_english_underscore_latin(
 		}
 	}
 
-	ret = _ender_utils_name_convert_english_latin(d);
-	free(d);
-
-	return ret;
+	return d;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -330,32 +294,57 @@ static char * _ender_utils_name_convert_camel_english_underscore_latin(
 EAPI char * ender_utils_name_convert(const char *s, Ender_Case src_case,
 		Ender_Notation src_not, Ender_Case dst_case, Ender_Notation dst_not)
 {
-	static Ender_Name_Convert _conv[ENDER_CASE_TYPES][ENDER_NOTATION_TYPES]
-			[ENDER_CASE_TYPES][ENDER_NOTATION_TYPES];
+	static Ender_Name_Convert _cconv[ENDER_CASE_TYPES][ENDER_CASE_TYPES];
+	static Ender_Name_Convert _nconv[ENDER_NOTATION_TYPES][ENDER_NOTATION_TYPES];
 	static Eina_Bool _init = EINA_FALSE;
-	Ender_Name_Convert conv;
+	Ender_Name_Convert cconv;
+	Ender_Name_Convert nconv;
+	char *tmp;
+	char *ret;
 
 	if (!_init)
 	{
-		/* TODO split the conversion into two
-		 * first the case, then the notation
-		 */
-		_conv[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN]
-				[ENDER_CASE_CAMEL][ENDER_NOTATION_ENGLISH] =
-				_ender_utils_name_convert_underscore_latin_camel_english;
-		_conv[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN]
-				[ENDER_CASE_PASCAL][ENDER_NOTATION_ENGLISH] =
-				_ender_utils_name_convert_underscore_latin_pascal_english;
-		_conv[ENDER_CASE_CAMEL][ENDER_NOTATION_ENGLISH]
-				[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN] =
-				_ender_utils_name_convert_camel_english_underscore_latin;
+		_cconv[ENDER_CASE_UNDERSCORE][ENDER_CASE_CAMEL] =
+				_ender_utils_case_convert_underscore_camel;
+		_cconv[ENDER_CASE_UNDERSCORE][ENDER_CASE_PASCAL] =
+				_ender_utils_case_convert_underscore_pascal;
+		_cconv[ENDER_CASE_CAMEL][ENDER_CASE_UNDERSCORE] = 
+			_ender_utils_case_convert_camel_underscore;
+
+		_nconv[ENDER_NOTATION_LATIN][ENDER_NOTATION_ENGLISH] =
+				_ender_utils_name_convert_latin_english;
+		_nconv[ENDER_NOTATION_ENGLISH][ENDER_NOTATION_LATIN] =
+				_ender_utils_name_convert_english_latin;
 		_init = EINA_TRUE;
 	}
 
-	conv = _conv[src_case][src_not][dst_case][dst_not];
-	if (!conv) return NULL;
+	nconv = _nconv[src_not][dst_not];
+	cconv = _cconv[src_case][dst_case];
 
-	return conv(s);
+	if (!nconv || !cconv)
+		return NULL;
+
+	/* first the case, we only work with underscore */
+	if (src_case != ENDER_CASE_UNDERSCORE)
+	{
+		tmp = cconv(s);
+		if (!tmp)
+			return NULL;
+
+		ret = nconv(tmp);
+		free(tmp);
+	}
+	else
+	{
+		tmp = nconv(s);
+		if (!tmp)
+			return NULL;
+
+		ret = cconv(tmp);
+		free(tmp);
+	}
+
+	return ret;
 }
 
 EAPI char * ender_utils_to_lower(const char *str)
