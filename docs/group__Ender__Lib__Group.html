@@ -89,6 +89,8 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gaa4d24831ff3c143e2617babf651c085c">ender_lib_find</a> (const char *name)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gae9904b2a721cb72f41757104a2456f83">ender_lib_version_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#ga891dae23506d643d5c34cb46065789eb">ender_lib_name_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Ender_Case&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#ga4ed5aa80c36c66064b03310f9c486765">ender_lib_case_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Ender_Notation&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gad9e3c5709dada48572be747af209554b">ender_lib_notation_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gac3e65a1bc6b131aa32a152fd747eec87">ender_lib_dependencies_get</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#ga1ba30f28d52ede15e28e77fac7e084e5">ender_lib_item_find</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz, const char *name)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_List *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Lib__Group.html#gaf4429e5878c3fc37bbbb688845a7c852">ender_lib_item_list</a> (const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *thiz, <a class="el" href="group__Ender__Item__Group.html#gaead91b3b0bff627126f36d2db3489559">Ender_Item_Type</a> type)</td></tr>
@@ -184,6 +186,56 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The name of the library </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga4ed5aa80c36c66064b03310f9c486765"></a><!-- doxytag: member="ender_lib.h::ender_lib_case_get" ref="ga4ed5aa80c36c66064b03310f9c486765" args="(const Ender_Lib *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Ender_Case <a class="el" href="group__Ender__Lib__Group.html#ga4ed5aa80c36c66064b03310f9c486765">ender_lib_case_get</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the case of the library </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thiz</td><td>The library to get the case from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The library case </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gad9e3c5709dada48572be747af209554b"></a><!-- doxytag: member="ender_lib.h::ender_lib_notation_get" ref="gad9e3c5709dada48572be747af209554b" args="(const Ender_Lib *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Ender_Notation <a class="el" href="group__Ender__Lib__Group.html#gad9e3c5709dada48572be747af209554b">ender_lib_notation_get</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Ender__Lib__Group.html#gaf7bdd8288879aa7887cff17702ac94fb">Ender_Lib</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the notation of the library </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thiz</td><td>The library to get the notation from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The library notation </dd></dl>
 
 </div>
 </div>
@@ -302,7 +354,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Mar 15 2015 23:55:29 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Mar 16 2015 20:23:06 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
