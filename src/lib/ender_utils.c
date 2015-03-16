@@ -180,11 +180,10 @@ static char * _ender_utils_name_convert_english_latin(char *s)
 	return ret;
 }
 
-/* replace every char following '_' by the upper case char */
-static char * _ender_utils_case_convert_underscore_camel(
-		const char *s)
+static char * _ender_utils_case_convert_underscore_camel_pascal(
+		const char *s, Eina_Bool pascal)
 {
-	Eina_Bool swap = EINA_FALSE;
+	Eina_Bool swap = pascal;
 	char *dtmp;
 	char *d;
 	const char *stmp;
@@ -219,6 +218,19 @@ static char * _ender_utils_case_convert_underscore_camel(
 	return d;
 }
 
+/* replace every char following '_' by the upper case char */
+static char * _ender_utils_case_convert_underscore_camel(
+		const char *s)
+{
+	return _ender_utils_case_convert_underscore_camel_pascal(s, EINA_FALSE);
+}
+
+static char * _ender_utils_case_convert_underscore_pascal(
+		const char *s)
+{
+	return _ender_utils_case_convert_underscore_camel_pascal(s, EINA_TRUE);
+}
+
 static char * _ender_utils_name_convert_underscore_latin_camel_english(
 		const char *s)
 {
@@ -230,6 +242,22 @@ static char * _ender_utils_name_convert_underscore_latin_camel_english(
 		return NULL;
 
 	ret = _ender_utils_case_convert_underscore_camel(tmp);
+	free(tmp);
+
+	return ret;
+}
+
+static char * _ender_utils_name_convert_underscore_latin_pascal_english(
+		const char *s)
+{
+	char *tmp;
+	char *ret;
+
+	tmp = _ender_utils_name_convert_latin_english(s);
+	if (!tmp)
+		return NULL;
+
+	ret = _ender_utils_case_convert_underscore_pascal(tmp);
 	free(tmp);
 
 	return ret;
@@ -309,9 +337,15 @@ EAPI char * ender_utils_name_convert(const char *s, Ender_Case src_case,
 
 	if (!_init)
 	{
+		/* TODO split the conversion into two
+		 * first the case, then the notation
+		 */
 		_conv[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN]
 				[ENDER_CASE_CAMEL][ENDER_NOTATION_ENGLISH] =
 				_ender_utils_name_convert_underscore_latin_camel_english;
+		_conv[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN]
+				[ENDER_CASE_PASCAL][ENDER_NOTATION_ENGLISH] =
+				_ender_utils_name_convert_underscore_latin_pascal_english;
 		_conv[ENDER_CASE_CAMEL][ENDER_NOTATION_ENGLISH]
 				[ENDER_CASE_UNDERSCORE][ENDER_NOTATION_LATIN] =
 				_ender_utils_name_convert_camel_english_underscore_latin;
