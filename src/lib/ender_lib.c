@@ -169,7 +169,11 @@ Ender_Lib * ender_lib_new(void)
 
 	thiz = calloc(1, sizeof(Ender_Lib));
 	thiz->items = eina_hash_string_superfast_new(EINA_FREE_CB(ender_item_unref));
+	/* default values */
 	thiz->version = -1;
+	thiz->notation = ENDER_NOTATION_LATIN;
+	thiz->kase = ENDER_CASE_UNDERSCORE;
+
 	return thiz;
 }
 
