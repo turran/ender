@@ -27,6 +27,8 @@ Ender_Lib * ender_lib_new(void);
 void ender_lib_free(Ender_Lib *thiz);
 void ender_lib_version_set(Ender_Lib *thiz, int version);
 void ender_lib_name_set(Ender_Lib *thiz, const char *name);
+void ender_lib_case_set(Ender_Lib *thiz, Ender_Case kase);
+void ender_lib_notation_set(Ender_Lib *thiz, Ender_Notation notation);
 void ender_lib_dependency_add(Ender_Lib *thiz, const Ender_Lib *dep);
 void ender_lib_item_add(Ender_Lib *thiz, Ender_Item *i);
 void ender_lib_load(Ender_Lib *thiz);

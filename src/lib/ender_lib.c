@@ -36,6 +36,8 @@ struct _Ender_Lib
 	Eina_List *deps;
 	Eina_Hash *items;
 	int version;
+	Ender_Case kase;
+	Ender_Notation notation;
 	char *name;
 	char *file;
 	void *dl;
@@ -206,6 +208,16 @@ void ender_lib_name_set(Ender_Lib *thiz, const char *name)
 		return;
 }
 
+void ender_lib_case_set(Ender_Lib *thiz, Ender_Case kase)
+{
+	thiz->kase = kase;
+}
+
+void ender_lib_notation_set(Ender_Lib *thiz, Ender_Notation notation)
+{
+	thiz->notation = notation;
+}
+
 void ender_lib_dependency_add(Ender_Lib *thiz, const Ender_Lib *dep)
 {
 	if (!thiz) return;
@@ -309,6 +321,26 @@ EAPI const char * ender_lib_name_get(const Ender_Lib *thiz)
 }
 
 /**
+ * Get the case of the library
+ * @param thiz The library to get the case from
+ * @return The library case
+ */
+EAPI Ender_Case ender_lib_case_get(const Ender_Lib *thiz)
+{
+	return thiz->kase;
+}
+
+/**
+ * Get the notation of the library
+ * @param thiz The library to get the notation from
+ * @return The library notation
+ */
+EAPI Ender_Notation ender_lib_notation_get(const Ender_Lib *thiz)
+{
+	return thiz->notation;
+}
+
+/**
  * Get the dependencies of the library
  * @param thiz The library to get the dependencies from
  * @return The list of dependencies or NULL if it does not have any.
@@ -387,3 +419,4 @@ EAPI Eina_List * ender_lib_item_list(const Ender_Lib *thiz, Ender_Item_Type type
 	eina_iterator_free(it);
 	return ret;
 }
+

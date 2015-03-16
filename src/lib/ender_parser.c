@@ -1221,6 +1221,17 @@ static Eina_Bool _ender_parser_lib_attrs_set(Ender_Parser_Context *c,
 			c->parser->lcase = ENDER_CASE_CAMEL;
 		else if (!strcmp(value, "pascal"))
 			c->parser->lcase = ENDER_CASE_PASCAL;
+		ender_lib_case_set(c->parser->lib, c->parser->lcase);
+	}
+	else if (!strcmp(key, "notation"))
+	{
+		Ender_Notation notation = ENDER_NOTATION_LATIN;
+
+		if (!strcmp(value, "english"))
+			notation = ENDER_NOTATION_ENGLISH;
+		else if (!strcmp(value, "latin"))
+			notation = ENDER_NOTATION_LATIN;
+		ender_lib_notation_set(c->parser->lib, notation);
 	}
 	else if (!strcmp(key, "name"))
 	{
