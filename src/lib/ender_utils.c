@@ -181,9 +181,9 @@ static char * _ender_utils_name_convert_english_latin(const char *s)
 }
 
 static char * _ender_utils_case_convert_underscore_camel_pascal(
-		const char *s, Eina_Bool pascal)
+		const char *s, Eina_Bool pascal_swap)
 {
-	Eina_Bool swap = pascal;
+	Eina_Bool swap = pascal_swap;
 	char *dtmp;
 	char *d;
 	const char *stmp;
