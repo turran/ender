@@ -167,6 +167,10 @@
       <xsl:when test="$name = 'size_t'">
         <xsl:value-of select="'size'"/>
       </xsl:when>
+      <!-- ssize variants -->
+      <xsl:when test="$name = 'ssize_t'">
+        <xsl:value-of select="'size'"/>
+      </xsl:when>
       <!-- int8 variants -->
       <xsl:when test="$name = 'int8_t'">
         <xsl:value-of select="'int8'"/>
@@ -212,6 +216,15 @@
       </xsl:when>
       <!-- pointer variants -->
       <xsl:when test="$name = 'void *'">
+        <xsl:value-of select="'pointer'"/>
+      </xsl:when>
+      <xsl:when test="$name = 'uint8_t *'">
+        <xsl:value-of select="'pointer'"/>
+      </xsl:when>
+      <xsl:when test="$name = 'uint16_t *'">
+        <xsl:value-of select="'pointer'"/>
+      </xsl:when>
+      <xsl:when test="$name = 'uint32_t *'">
         <xsl:value-of select="'pointer'"/>
       </xsl:when>
       <xsl:otherwise>
@@ -292,12 +305,12 @@
 
   <!-- field handling -->
   <xsl:template match="memberdef[@kind='variable']">
-     <xsl:variable name="name" select="name/text()"/>
+    <xsl:variable name="name" select="name/text()"/>
     <xsl:variable name="fieldtype" select="type//text()"/>
     <xsl:variable name="type">
-      <xsl:call-template name="type-to-ender">
-        <xsl:with-param name="text" select="$fieldtype"/>
-      </xsl:call-template>
+      <xsl:apply-templates select="type">
+        <xsl:with-param name="direction" select="in"/>
+      </xsl:apply-templates>
     </xsl:variable>
     <field name="{$name}" type="{$type}"/>
   </xsl:template>
