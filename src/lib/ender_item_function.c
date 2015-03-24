@@ -296,10 +296,21 @@ EAPI Eina_List * ender_item_function_args_get(Ender_Item *i)
 	if (thiz->flags & ENDER_ITEM_FUNCTION_FLAG_IS_METHOD)
 	{
 		Ender_Item *arg;
+		Ender_Item *parent;
 
 		arg = ender_item_arg_new();
 		ender_item_name_set(arg, "self");
-		ender_item_arg_type_set(arg, ender_item_parent_get(i));
+
+		parent = ender_item_parent_get(i);
+		/* For attributes, the first argument is of type of the grandparent */
+		if (ender_item_type_get(parent) == ENDER_ITEM_TYPE_ATTR)
+		{
+			Ender_Item *tmp;
+			tmp = ender_item_parent_get(parent);
+			ender_item_unref(parent);
+			parent = tmp;
+		}
+		ender_item_arg_type_set(arg, parent);
 		ret = eina_list_append(ret, arg);
 	}
 
