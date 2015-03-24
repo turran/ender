@@ -49,6 +49,9 @@ EAPI Eina_Bool ender_item_attr_value_get(Ender_Item *i, void *o, Ender_Item_Tran
 EAPI Eina_Bool ender_item_attr_value_set(Ender_Item *i, void *o, Ender_Value *v, Eina_Error *err);
 EAPI int ender_item_attr_flags_get(Ender_Item *i);
 
+EAPI Ender_Item * ender_item_attr_getter_get(Ender_Item *i);
+EAPI Ender_Item * ender_item_attr_setter_get(Ender_Item *i);
+
 /**
  * @}
  */

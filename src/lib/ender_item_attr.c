@@ -522,3 +522,34 @@ done:
 	return ret;
 }
 
+/**
+ * Get the getter for the attribute
+ * @param i The attribute to get the getter from
+ * @return The getter function or NULL if there is no getter
+ */
+EAPI Ender_Item * ender_item_attr_getter_get(Ender_Item *i)
+{
+	Ender_Item_Attr *thiz;
+
+	thiz = ENDER_ITEM_ATTR(i);
+	if (!thiz->getter)
+		return NULL;
+
+	return ender_item_ref(thiz->getter);
+}
+
+/**
+ * Get the setter for the attribute
+ * @param i The attribute to get the setter from
+ * @return The setter function or NULL if there is no setter
+ */
+EAPI Ender_Item * ender_item_attr_setter_get(Ender_Item *i)
+{
+	Ender_Item_Attr *thiz;
+
+	thiz = ENDER_ITEM_ATTR(i);
+	if (!thiz->setter)
+		return NULL;
+
+	return ender_item_ref(thiz->setter);
+}
