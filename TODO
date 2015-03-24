@@ -3,3 +3,7 @@
 + Add support for lists types
 + Add support for hash types
 + Add support for arrays types
++ Add support for nullable args, args that can be null
++ To simplify the bindings we might get the symbol directly by API
+  and make the xml have a symname attribute, to avoid deducing it
+  eveyrtime
