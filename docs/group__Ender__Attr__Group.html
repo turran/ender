@@ -85,7 +85,9 @@ Enumerations</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Attr__Group.html#gaa02dba9f3e06b4c2e2edc6b9ed92ca65">Ender_Item_Attr_Flag</a> { <br/>
 &#160;&#160;<a class="el" href="group__Ender__Attr__Group.html#ggaa02dba9f3e06b4c2e2edc6b9ed92ca65a1bc76d14cfdcf2693968641736ab0fc9">ENDER_ITEM_ATTR_FLAG_VALUE_OF</a> =  (1 &lt;&lt; 0), 
 <br/>
-&#160;&#160;<a class="el" href="group__Ender__Attr__Group.html#ggaa02dba9f3e06b4c2e2edc6b9ed92ca65a903834cfdfe126d88bee847a73f3d6d5">ENDER_ITEM_ATTR_FLAG_DOWNCAST</a> =  (1 &lt;&lt; 1)
+&#160;&#160;<a class="el" href="group__Ender__Attr__Group.html#ggaa02dba9f3e06b4c2e2edc6b9ed92ca65a903834cfdfe126d88bee847a73f3d6d5">ENDER_ITEM_ATTR_FLAG_DOWNCAST</a> =  (1 &lt;&lt; 1), 
+<br/>
+&#160;&#160;<a class="el" href="group__Ender__Attr__Group.html#ggaa02dba9f3e06b4c2e2edc6b9ed92ca65ac09c2ec21be1fd0652e2bb5bea0faacd">ENDER_ITEM_ATTR_FLAG_NULLABLE</a> =  (1 &lt;&lt; 2)
 <br/>
  }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
@@ -95,6 +97,8 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Attr__Group.html#gad0dbc8e5f74f022a757aa4c7364cfd07">ender_item_attr_value_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i, void *o, <a class="el" href="group__Ender__Item__Group.html#ga1d44f0fed591367c82f9b1d46dfc1948">Ender_Item_Transfer</a> *xfer, <a class="el" href="unionEnder__Value.html">Ender_Value</a> *v, Eina_Error *err)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Attr__Group.html#ga8efc4667767d4cd901cbaf966427ec37">ender_item_attr_value_set</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i, void *o, <a class="el" href="unionEnder__Value.html">Ender_Value</a> *v, Eina_Error *err)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Attr__Group.html#ga440b0312af8a99f8eb93d76dec56dd77">ender_item_attr_flags_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Attr__Group.html#gafd6490dd6d7af8ee763e658fd0becc4d">ender_item_attr_getter_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Attr__Group.html#gadbf075c793e9f19a92a276a04a56d4ef">ender_item_attr_setter_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *i)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>An attr represents a <a class="el" href="group__Ender__Object__Group.html">Object</a> attribute. </p>
@@ -116,6 +120,9 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="ggaa02dba9f3e06b4c2e2edc6b9ed92ca65a903834cfdfe126d88bee847a73f3d6d5"></a><!-- doxytag: member="ENDER_ITEM_ATTR_FLAG_DOWNCAST" ref="ggaa02dba9f3e06b4c2e2edc6b9ed92ca65a903834cfdfe126d88bee847a73f3d6d5" args="" -->ENDER_ITEM_ATTR_FLAG_DOWNCAST</em>&nbsp;</td><td>
 <p>In case the attribute returns an <a class="el" href="group__Ender__Item__Group.html">Item</a> representing the downcasted value of the owner of the attribute </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ggaa02dba9f3e06b4c2e2edc6b9ed92ca65ac09c2ec21be1fd0652e2bb5bea0faacd"></a><!-- doxytag: member="ENDER_ITEM_ATTR_FLAG_NULLABLE" ref="ggaa02dba9f3e06b4c2e2edc6b9ed92ca65ac09c2ec21be1fd0652e2bb5bea0faacd" args="" -->ENDER_ITEM_ATTR_FLAG_NULLABLE</em>&nbsp;</td><td>
+<p>In case the attribute can be NULL </p>
 </td></tr>
 </table>
 </dd>
@@ -307,6 +314,56 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="gafd6490dd6d7af8ee763e658fd0becc4d"></a><!-- doxytag: member="ender_item_attr.h::ender_item_attr_getter_get" ref="gafd6490dd6d7af8ee763e658fd0becc4d" args="(Ender_Item *i)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a>* <a class="el" href="group__Ender__Attr__Group.html#gafd6490dd6d7af8ee763e658fd0becc4d">ender_item_attr_getter_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the getter for the attribute </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>The attribute to get the getter from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The getter function or NULL if there is no getter </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gadbf075c793e9f19a92a276a04a56d4ef"></a><!-- doxytag: member="ender_item_attr.h::ender_item_attr_setter_get" ref="gadbf075c793e9f19a92a276a04a56d4ef" args="(Ender_Item *i)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a>* <a class="el" href="group__Ender__Attr__Group.html#gadbf075c793e9f19a92a276a04a56d4ef">ender_item_attr_setter_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the setter for the attribute </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>The attribute to get the setter from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The setter function or NULL if there is no setter </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -325,7 +382,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 20 2015 19:41:02 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 25 2015 23:32:00 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
