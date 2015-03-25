@@ -62,6 +62,8 @@ typedef enum _Ender_Item_Arg_Flag
 	ENDER_ITEM_ARG_FLAG_IS_RETURN  = (1 << 0),
 	/** In a callback, this argument is the user provided data */
 	ENDER_ITEM_ARG_FLAG_IS_CLOSURE = (1 << 1),
+	/** In case the argument can be NULL */
+	ENDER_ITEM_ARG_FLAG_NULLABLE   = (1 << 2),
 } Ender_Item_Arg_Flag;
 
 EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i);

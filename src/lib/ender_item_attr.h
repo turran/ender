@@ -40,6 +40,8 @@ typedef enum _Ender_Item_Attr_Flag
 	 * the downcasted value of the owner of the attribute
 	 */
 	ENDER_ITEM_ATTR_FLAG_DOWNCAST  = (1 << 1),
+	/** In case the attribute can be NULL */
+	ENDER_ITEM_ATTR_FLAG_NULLABLE  = (1 << 2),
 } Ender_Item_Attr_Flag;
 
 EAPI Ender_Item * ender_item_attr_type_get(Ender_Item *i);
