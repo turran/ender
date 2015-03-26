@@ -404,6 +404,17 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <!-- handle the nullable -->
+    <xsl:variable name="nullable">
+      <xsl:choose>
+        <xsl:when test="$node/../detaileddescription/para/simplesect[@kind='return']//ender-nullable">
+          <xsl:value-of select="true()"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="false()"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <!-- keep a no const -->
     <xsl:variable name="no-const-type">
       <xsl:call-template name="remove-const">
@@ -425,7 +436,7 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:if test="not($type = 'void')">
-      <return type="{$type}" transfer="{$transfer}"/>
+      <return type="{$type}" transfer="{$transfer}" nullable="{$nullable}"/>
     </xsl:if>
   </xsl:template>
 
@@ -468,6 +479,17 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <!-- handle the nullable -->
+    <xsl:variable name="nullable">
+      <xsl:choose>
+        <xsl:when test="../detaileddescription/para/parameterlist[@kind='param']/parameteritem[position() = $pos]//ender-nullable">
+          <xsl:value-of select="true()"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="false()"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <!-- keep a no const -->
     <xsl:variable name="no-const-type">
       <xsl:call-template name="remove-const">
@@ -482,7 +504,7 @@
       </xsl:apply-templates>
     </xsl:variable>
     <xsl:if test="not($type = 'void')">
-      <arg name="{$name}" type="{$type}" direction="{$direction}" transfer="{$transfer}"/>
+      <arg name="{$name}" type="{$type}" direction="{$direction}" transfer="{$transfer}" nullable="{$nullable}"/>
     </xsl:if>
   </xsl:template>
 
