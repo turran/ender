@@ -520,6 +520,16 @@ static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
 		}
 		ender_item_arg_transfer_set(c->i, xfer);
 	}
+	else if (!strcmp(key, "nullable"))
+	{
+		if (!strcmp(value, "true"))
+		{
+			int flags;
+
+			flags = ender_item_arg_flags_get(c->i);
+			ender_item_attr_flags_set(c->i, flags | ENDER_ITEM_ARG_FLAG_NULLABLE);
+		}
+	}
 	else
 	{
 		return EINA_FALSE;
