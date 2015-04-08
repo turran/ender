@@ -834,9 +834,16 @@
     <!-- typedefs can be or either functions, new types or objects. object must be a typedef of an struct -->
     <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
     <xsl:variable name="name">
-      <xsl:call-template name="type-to-ender">
-        <xsl:with-param name="text" select="name/text()"/>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test=".//ender-name">
+          <xsl:value-of select=".//ender-name/@name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="type-to-ender">
+            <xsl:with-param name="text" select="name/text()"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="type" select="type/text()"/>
     <xsl:choose>
