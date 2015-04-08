@@ -375,6 +375,7 @@ static Eina_Bool _ender_parser_callback_ctor(Ender_Parser_Context *c)
 		return EINA_FALSE;
 	}
 	_ender_parser_common_function_ctor(c);
+	ender_item_function_flags_set(c->i, ENDER_ITEM_FUNCTION_FLAG_CALLBACK);
 
 	return EINA_TRUE;
 }
