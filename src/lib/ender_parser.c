@@ -356,6 +356,43 @@ static Eina_Bool _ender_parser_function_attrs_set(Ender_Parser_Context *c,
 	return EINA_FALSE;
 }
 /*----------------------------------------------------------------------------*
+ *                               callback tag                                 *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_callback_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Context *parent;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	/* the lib case */
+	if (!parent)
+	{
+		ERR("A callback must have a parent");
+		return EINA_FALSE;
+	}
+	if (parent->i)
+	{
+		ERR("A callback can not have a parent item");
+		return EINA_FALSE;
+	}
+	_ender_parser_common_function_ctor(c);
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_callback_dtor(Ender_Parser_Context *c)
+{
+	ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+	_ender_parser_common_function_dtor(c);
+}
+
+static Eina_Bool _ender_parser_callback_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	if (_ender_parser_common_function_attrs_set(c, key, value))
+		return EINA_TRUE;
+	return EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
  *                                object tag                                  *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _ender_parser_object_function_ctor(Ender_Parser_Context *c)
@@ -449,10 +486,17 @@ static Eina_Bool _ender_parser_arg_ctor(Ender_Parser_Context *c)
 	Ender_Parser_Context *parent;
 
 	parent = _ender_parser_parent_context_get(c->parser);
-	if ((!parent) || (!parent->i) ||
-			!(ender_item_type_get(parent->i) == ENDER_ITEM_TYPE_FUNCTION))
+	if ((!parent) || (!parent->i))
 	{
-		ERR("An arg must be a child of a function");
+		ERR("An arg must have a parent");
+		return EINA_FALSE;
+	}
+
+	if (ender_item_type_get(parent->i) != ENDER_ITEM_TYPE_FUNCTION)
+	{
+		ERR("An arg must be a child of a function instead of a %s",
+				ender_item_type_name_get(ender_item_type_get(
+				parent->i)));
 		return EINA_FALSE;
 	}
 	c->i = ender_item_arg_new();
@@ -1326,6 +1370,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "unref", _ender_parser_unref_ctor, _ender_parser_unref_dtor, _ender_parser_unref_attrs_set },
 	{ "arg", _ender_parser_arg_ctor, _ender_parser_arg_dtor, _ender_parser_arg_attrs_set },
 	{ "return", _ender_parser_return_ctor, _ender_parser_return_dtor, _ender_parser_return_attrs_set },
+	{ "callback", _ender_parser_callback_ctor, _ender_parser_callback_dtor, _ender_parser_callback_attrs_set },
 	{ "class", NULL, NULL, NULL },
 };
 
