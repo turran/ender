@@ -322,10 +322,16 @@
         <xsl:with-param name="node" select="."/>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
     <enum name="{$name}">
       <!-- pick every enumvalue and pass the parent name to temove it from the generated names -->
       <xsl:apply-templates select="enumvalue">
-        <xsl:with-param name="pname" select="translate(name/text(), $uppercase, $lowercase)"/>
+        <xsl:with-param name="pname" select="$lower_name"/>
+      </xsl:apply-templates>
+      <!-- get every function that belongs to this group -->
+      <xsl:apply-templates select="/descendant::memberdef[@kind='function'][not(.//ender-prop)]">
+        <xsl:with-param name="pname" select="$lower_name"/>
+        <xsl:with-param name="ptype" select="$name"/>
       </xsl:apply-templates>
     </enum>
   </xsl:template>
@@ -796,7 +802,7 @@
           </xsl:apply-templates>
         </ref>
       </xsl:when>
-      <xsl:when test="contains($first_param_type, $ptype)">
+      <xsl:when test="$first_param_type = $ptype">
         <method name="{$name}">
           <!-- get the return value -->
           <xsl:call-template name="return-item">
