@@ -1005,7 +1005,7 @@
             </xsl:apply-templates>
           </xsl:if>
         </xsl:element>
-        </xsl:when>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="./innerclass"/>
         <xsl:apply-templates select=".//memberdef[@kind='enum']"/>
