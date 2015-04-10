@@ -1416,15 +1416,16 @@ static Ender_Parser_Context * _ender_parser_tag_new(Ender_Parser *thiz,
 
 	c = calloc(1, sizeof(Ender_Parser_Context));
 	c->parser = thiz;
+	c->tag = _ender_parser_get_tag(content);
 
 	/* if the parser has failed, keep failing */
 	if (thiz->failed)
 	{
+		ERR("Can not parse tag '%s', failing state (%d)", c->tag->name, thiz->failed);
 		thiz->failed++;
 		goto done;
 	}
 
-	c->tag = _ender_parser_get_tag(content);
 	if (c->tag)
 	{
 		if (c->tag->ctor_cb)
