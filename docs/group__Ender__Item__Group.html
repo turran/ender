@@ -126,6 +126,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Item__Group.html#ga100778d4c2840cf2b50dcd86769f00cc">ender_item_unref</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease the reference counter of an item.  <a href="#ga100778d4c2840cf2b50dcd86769f00cc"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Item__Group.html#gacc1d4d69d16c137c887ca0539c81cdeb">ender_item_name_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Item__Group.html#ga3aff9ce25ebd27146107a9cf5b220a9e">ender_item_full_name_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Ender__Item__Group.html#gaead91b3b0bff627126f36d2db3489559">Ender_Item_Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Item__Group.html#ga36d8555f922f716910ec9ba2c49362c4">ender_item_type_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Ender__Item__Group.html#ga212d05ed316c6926f1a17e48ed743a26">ender_item_parent_get</a> (<a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga15bff71ee458ce6d14d6215e976ddc90"></a><!-- doxytag: member="Ender_Item_Group::ender_item_type_name_get" ref="ga15bff71ee458ce6d14d6215e976ddc90" args="(Ender_Item_Type type)" -->
@@ -292,6 +293,32 @@ EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_it
 
 </div>
 </div>
+<a class="anchor" id="ga3aff9ce25ebd27146107a9cf5b220a9e"></a><!-- doxytag: member="ender_item.h::ender_item_full_name_get" ref="ga3aff9ce25ebd27146107a9cf5b220a9e" args="(Ender_Item *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI char* <a class="el" href="group__Ender__Item__Group.html#ga3aff9ce25ebd27146107a9cf5b220a9e">ender_item_full_name_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Ender__Item__Group.html#gad9673e376d7718e5d3317a5a5353e254">Ender_Item</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the full name of an item</p>
+<p>The full name is the actual item's name appended to every parent's name</p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thiz</td><td>The item to get the full name from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The full name [full] </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ga36d8555f922f716910ec9ba2c49362c4"></a><!-- doxytag: member="ender_item.h::ender_item_type_get" ref="ga36d8555f922f716910ec9ba2c49362c4" args="(Ender_Item *thiz)" -->
 <div class="memitem">
 <div class="memproto">
@@ -411,7 +438,7 @@ EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>ender_it
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 10 2015 17:27:00 for ender by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Apr 12 2015 19:34:09 for ender by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
