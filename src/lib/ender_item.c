@@ -154,6 +154,56 @@ EAPI const char * ender_item_name_get(Ender_Item *thiz)
 }
 
 /**
+ * Get the full name of an item
+ *
+ * The full name is the actual item's name appended
+ * to every parent's name
+ *
+ * @param thiz The item to get the full name from
+ * @return The full name @ender_transfer[full]
+ */
+EAPI char * ender_item_full_name_get(Ender_Item *thiz)
+{
+	Ender_Item *parent;
+	char *ret;
+	int len;
+
+	parent = ender_item_parent_get(thiz);
+	ret = strdup(ender_item_name_get(thiz));
+	len = strlen(ret);
+
+	/* simples case */
+	if (!parent)
+		return ret;
+	/* append the name to every ancestor name */
+	while (parent)
+	{
+		Ender_Item *tmp;
+		char *tret;
+		const char *pname;
+		int plen;
+
+		pname = ender_item_name_get(parent);
+		plen = strlen(pname);
+		tret = malloc(plen + 1 + len + 1); // + 1 '.' + 1 '\0'
+		strcpy(tret, pname);
+		tret[plen] = '.';
+		strcpy(&tret[plen + 1], ret);
+		tret[plen + 1 + len] = '\0';
+
+		free(ret);
+		ret = tret;
+		len = plen + 1 + len;
+
+		tmp = ender_item_parent_get(parent);
+		ender_item_unref(parent);
+		parent = tmp;
+	}
+
+	return ret;
+}
+
+/**
  * Get the type of an item
  * @param thiz The item to get the type from
  * @return The item type
