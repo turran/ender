@@ -300,9 +300,10 @@ static Eina_Bool _ender_parser_function_ctor(Ender_Parser_Context *c)
 	{
 		Ender_Item_Type type = ender_item_type_get(parent->i);
 		if (type != ENDER_ITEM_TYPE_STRUCT && type != ENDER_ITEM_TYPE_OBJECT
-				&& type != ENDER_ITEM_TYPE_DEF)
+				&& type != ENDER_ITEM_TYPE_DEF
+				&& type != ENDER_ITEM_TYPE_ENUM)
 		{
-			ERR("The parent must be of type struct, object or def");
+			ERR("The parent must be of type: struct, object, enum or def");
 			return EINA_FALSE;
 		}
 	}
@@ -333,6 +334,10 @@ static void _ender_parser_function_dtor(Ender_Parser_Context *c)
 
 			case ENDER_ITEM_TYPE_DEF:
 			ender_item_def_function_add(parent->i, ender_item_ref(c->i));
+			break;
+
+			case ENDER_ITEM_TYPE_ENUM:
+			ender_item_enum_function_add(parent->i, ender_item_ref(c->i));
 			break;
 
 			default:
@@ -799,9 +804,11 @@ static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 		return EINA_FALSE;
 	}
 	type = ender_item_type_get(parent->i);
-	if ((type != ENDER_ITEM_TYPE_STRUCT) && (type != ENDER_ITEM_TYPE_OBJECT))
+	if (type != ENDER_ITEM_TYPE_STRUCT && type != ENDER_ITEM_TYPE_OBJECT
+			&& type != ENDER_ITEM_TYPE_DEF
+			&& type != ENDER_ITEM_TYPE_ENUM)
 	{
-		ERR("A method must be a child of a struct or object");
+		ERR("The parent must be of type: struct, object, enum or def");
 		return EINA_FALSE;
 	}
 
@@ -822,6 +829,14 @@ static Eina_Bool _ender_parser_method_ctor(Ender_Parser_Context *c)
 
 		case ENDER_ITEM_TYPE_OBJECT:
 		ender_item_object_function_add(parent->i, ender_item_ref(c->i));
+		break;
+
+		case ENDER_ITEM_TYPE_DEF:
+		ender_item_def_function_add(parent->i, ender_item_ref(c->i));
+		break;
+
+		case ENDER_ITEM_TYPE_ENUM:
+		ender_item_enum_function_add(parent->i, ender_item_ref(c->i));
 		break;
 
 		default:

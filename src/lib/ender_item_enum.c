@@ -32,6 +32,7 @@
 typedef struct _Ender_Item_Enum
 {
 	Eina_List *values;
+	Eina_List *functions;
 } Ender_Item_Enum;
 
 /*----------------------------------------------------------------------------*
@@ -92,6 +93,23 @@ void ender_item_enum_value_add(Ender_Item *i, Ender_Item *value)
 	thiz->values = eina_list_append(thiz->values, value);
 	ender_item_parent_set(value, i);
 }
+
+void ender_item_enum_function_add(Ender_Item *i, Ender_Item *f)
+{
+	Ender_Item_Enum *thiz;
+	Ender_Item_Type type;
+
+	thiz = ENDER_ITEM_ENUM(i);
+	type = ender_item_type_get(f);
+	if (type != ENDER_ITEM_TYPE_FUNCTION)
+	{
+		ender_item_unref(f);
+		return;
+	}
+
+	thiz->functions = eina_list_append(thiz->functions, f);
+	ender_item_parent_set(f, i);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -111,6 +129,27 @@ EAPI Eina_List * ender_item_enum_values_get(Ender_Item *i)
 	EINA_LIST_FOREACH(thiz->values, l, i)
 	{
 		ret = eina_list_append(ret, ender_item_ref(i));
+	}
+	return ret;
+}
+
+/**
+ * Get the list of functions from an enum
+ * @param i The enum to get the functions from
+ * @return The list of functions. Use @ref ender_item_unref to free every
+ * item on the list
+ */
+EAPI Eina_List * ender_item_enum_functions_get(Ender_Item *i)
+{
+	Ender_Item_Enum *thiz;
+	Ender_Item *f;
+	Eina_List *ret = NULL;
+	Eina_List *l;
+
+	thiz = ENDER_ITEM_ENUM(i);
+	EINA_LIST_FOREACH(thiz->functions, l, f)
+	{
+		ret = eina_list_append(ret, ender_item_ref(f));
 	}
 	return ret;
 }

@@ -26,6 +26,7 @@
  */
 
 EAPI Eina_List * ender_item_enum_values_get(Ender_Item *i);
+EAPI Eina_List * ender_item_enum_functions_get(Ender_Item *i);
 
 /**
  * @}

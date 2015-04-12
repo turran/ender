@@ -23,6 +23,7 @@
 
 Ender_Item * ender_item_enum_new(void);
 void ender_item_enum_value_add(Ender_Item *i, Ender_Item *value);
+void ender_item_enum_function_add(Ender_Item *i, Ender_Item *f);
 
 #endif
 
