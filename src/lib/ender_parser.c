@@ -602,6 +602,7 @@ static Eina_Bool _ender_parser_return_ctor(Ender_Parser_Context *c)
 	}
 	c->i = ender_item_arg_new();
 	ender_item_arg_flags_set(c->i, ENDER_ITEM_ARG_FLAG_IS_RETURN);
+	ender_item_arg_direction_set(c->i, ENDER_ITEM_ARG_DIRECTION_OUT); 
 	/* add the return to the function */
 	parent = _ender_parser_parent_context_get(c->parser);
 	ender_item_function_ret_set(parent->i, ender_item_ref(c->i));
