@@ -580,6 +580,16 @@ static Eina_Bool _ender_parser_arg_attrs_set(Ender_Parser_Context *c,
 			ender_item_arg_flags_set(c->i, flags | ENDER_ITEM_ARG_FLAG_NULLABLE);
 		}
 	}
+	else if (!strcmp(key, "delayed-callback"))
+	{
+		if (!strcmp(value, "true"))
+		{
+			int flags;
+
+			flags = ender_item_arg_flags_get(c->i);
+			ender_item_arg_flags_set(c->i, flags | ENDER_ITEM_ARG_FLAG_DELAYED_CALLBACK);
+		}
+	}
 	else
 	{
 		return EINA_FALSE;
