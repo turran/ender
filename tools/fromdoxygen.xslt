@@ -524,59 +524,59 @@
       <xsl:attribute name="name">
         <xsl:value-of select="$pname"/>
       </xsl:attribute>
-    <!-- check if it is a valueof -->
-    <xsl:if test=".//ender-valueof">
-      <xsl:attribute name="value-of">
-        <xsl:value-of select="'true'"/>
-      </xsl:attribute>
-    </xsl:if>
-    <!-- check if it is a downcast -->
-    <xsl:if test=".//ender-prop-downcast">
-      <xsl:attribute name="downcast">
-        <xsl:value-of select="'true'"/>
-      </xsl:attribute>
-    </xsl:if>
-    <!-- look for setters/getters -->
-    <xsl:for-each select="key('prop',.//ender-prop/@name)">
-      <!-- get the function name without the property name -->
-      <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
-      <xsl:variable name="name">
-        <xsl:call-template name="string-replace-all">
-          <xsl:with-param name="text" select="$lower_name"/>
-          <xsl:with-param name="replace" select="concat($oname, concat(concat('_', $pname), '_'))"/>
-          <xsl:with-param name="by" select="''"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="$name = 'get'">
-          <getter>
-            <!-- get the return value -->
-            <xsl:call-template name="return-item">
-              <xsl:with-param name="node" select="./type"/>
-            </xsl:call-template>
-            <!-- get the args -->
-            <xsl:apply-templates select=".//param[position() > 1]">
-              <xsl:with-param name="skip-first" select="true()"/>
-            </xsl:apply-templates>
-          </getter>
-        </xsl:when>
-        <xsl:when test="$name = 'set'">
-          <setter>
-            <!-- get the return value -->
-            <xsl:call-template name="return-item">
-              <xsl:with-param name="node" select="./type"/>
-            </xsl:call-template>
-            <!-- get the args -->
-            <xsl:apply-templates select=".//param[position() > 1]">
-              <xsl:with-param name="skip-first" select="true()"/>
-            </xsl:apply-templates>
-          </setter>
-        </xsl:when>
-        <xsl:otherwise>
-          <accessor name="{$name}" oname="{$oname}" otype="{$otype}"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
+      <!-- check if it is a valueof -->
+      <xsl:if test=".//ender-valueof">
+        <xsl:attribute name="value-of">
+          <xsl:value-of select="'true'"/>
+        </xsl:attribute>
+      </xsl:if>
+      <!-- check if it is a downcast -->
+      <xsl:if test=".//ender-prop-downcast">
+        <xsl:attribute name="downcast">
+          <xsl:value-of select="'true'"/>
+        </xsl:attribute>
+      </xsl:if>
+      <!-- look for setters/getters -->
+      <xsl:for-each select="key('prop',.//ender-prop/@name)">
+        <!-- get the function name without the property name -->
+        <xsl:variable name="lower_name" select="translate(name/text(), $uppercase, $lowercase)"/>
+        <xsl:variable name="name">
+          <xsl:call-template name="string-replace-all">
+            <xsl:with-param name="text" select="$lower_name"/>
+            <xsl:with-param name="replace" select="concat($oname, concat(concat('_', $pname), '_'))"/>
+            <xsl:with-param name="by" select="''"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="$name = 'get'">
+            <getter>
+              <!-- get the return value -->
+              <xsl:call-template name="return-item">
+                <xsl:with-param name="node" select="./type"/>
+              </xsl:call-template>
+              <!-- get the args -->
+              <xsl:apply-templates select=".//param[position() > 1]">
+                <xsl:with-param name="skip-first" select="true()"/>
+              </xsl:apply-templates>
+            </getter>
+          </xsl:when>
+          <xsl:when test="$name = 'set'">
+            <setter>
+              <!-- get the return value -->
+              <xsl:call-template name="return-item">
+                <xsl:with-param name="node" select="./type"/>
+              </xsl:call-template>
+              <!-- get the args -->
+              <xsl:apply-templates select=".//param[position() > 1]">
+                <xsl:with-param name="skip-first" select="true()"/>
+              </xsl:apply-templates>
+            </setter>
+          </xsl:when>
+          <xsl:otherwise>
+            <accessor name="{$name}" oname="{$oname}" otype="{$otype}"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
     </xsl:element>
   </xsl:template>
 
