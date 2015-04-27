@@ -65,11 +65,8 @@ typedef enum _Ender_Item_Arg_Flag
 	/** In case the argument can be NULL */
 	ENDER_ITEM_ARG_FLAG_NULLABLE           = (1 << 2),
 	/** In case the argument type is a callback, inform that the callback
-	 * will be called immediately
-	 */
-	ENDER_ITEM_ARG_FLAG_IMMEDIATE_CALLBACK = (1 << 3)
-	/** In case the argument type is a callback, inform that the callback
-	 * will be called later
+	 * will be called later, if this flag is not set, the callback is
+	 * assumed to be called immediately
 	 */
 	ENDER_ITEM_ARG_FLAG_DELAYED_CALLBACK   = (1 << 4)
 } Ender_Item_Arg_Flag;
