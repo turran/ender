@@ -59,11 +59,19 @@ typedef enum _Ender_Item_Arg_Flag
 	 * In case the argument is the return value
 	 * @see ender_item_function_ret_get
 	 */
-	ENDER_ITEM_ARG_FLAG_IS_RETURN  = (1 << 0),
+	ENDER_ITEM_ARG_FLAG_IS_RETURN          = (1 << 0),
 	/** In a callback, this argument is the user provided data */
-	ENDER_ITEM_ARG_FLAG_IS_CLOSURE = (1 << 1),
+	ENDER_ITEM_ARG_FLAG_IS_CLOSURE         = (1 << 1),
 	/** In case the argument can be NULL */
-	ENDER_ITEM_ARG_FLAG_NULLABLE   = (1 << 2),
+	ENDER_ITEM_ARG_FLAG_NULLABLE           = (1 << 2),
+	/** In case the argument type is a callback, inform that the callback
+	 * will be called immediately
+	 */
+	ENDER_ITEM_ARG_FLAG_IMMEDIATE_CALLBACK = (1 << 3)
+	/** In case the argument type is a callback, inform that the callback
+	 * will be called later
+	 */
+	ENDER_ITEM_ARG_FLAG_DELAYED_CALLBACK   = (1 << 4)
 } Ender_Item_Arg_Flag;
 
 EAPI Ender_Item * ender_item_arg_type_get(Ender_Item *i);
