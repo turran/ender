@@ -485,17 +485,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <!-- handle the nullable -->
-    <xsl:variable name="nullable">
-      <xsl:choose>
-        <xsl:when test="../detaileddescription/para/parameterlist[@kind='param']/parameteritem[position() = $pos]//ender-nullable">
-          <xsl:value-of select="true()"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="false()"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
     <!-- keep a no const -->
     <xsl:variable name="no-const-type">
       <xsl:call-template name="remove-const">
@@ -510,7 +499,32 @@
       </xsl:apply-templates>
     </xsl:variable>
     <xsl:if test="not($type = 'void')">
-      <arg name="{$name}" type="{$type}" direction="{$direction}" transfer="{$transfer}" nullable="{$nullable}"/>
+      <xsl:element name="arg">
+        <xsl:attribute name="name">
+          <xsl:value-of select="$name"/>
+        </xsl:attribute>
+        <xsl:attribute name="type">
+          <xsl:value-of select="$type"/>
+        </xsl:attribute>
+        <xsl:attribute name="direction">
+          <xsl:value-of select="$direction"/>
+        </xsl:attribute>
+        <xsl:attribute name="transfer">
+          <xsl:value-of select="$transfer"/>
+        </xsl:attribute>
+        <!-- handle the nullable -->
+        <xsl:if test="../detaileddescription/para/parameterlist[@kind='param']/parameteritem[position() = $pos]//ender-nullable">
+          <xsl:attribute name="nullable">
+            <xsl:value-of select="true()"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!-- handle the delayed callback -->
+        <xsl:if test="../detaileddescription/para/parameterlist[@kind='param']/parameteritem[position() = $pos]//ender-delayed">
+          <xsl:attribute name="delayed-callback">
+            <xsl:value-of select="true()"/>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:element>
     </xsl:if>
   </xsl:template>
 
