@@ -2,7 +2,7 @@
 <lib name="ender" version="1" case="underscore">
   <includes name="eina"/>
   <object name="ender.item">
-    <ref/>
-    <unref/>
+    <ref name="ref"/>
+    <unref name="unref"/>
   </object>
 </lib>
