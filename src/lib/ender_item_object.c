@@ -21,6 +21,7 @@
 #include "ender_value.h"
 #include "ender_item.h"
 #include "ender_item_object.h"
+#include "ender_item_arg.h"
 #include "ender_item_attr.h"
 #include "ender_item_function.h"
 
@@ -252,6 +253,89 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 	Eina_Bool found = EINA_FALSE;
 
 	thiz = ENDER_ITEM_OBJECT(i);
+	/* check for methods that have the downcast flag */
+	EINA_LIST_FOREACH (thiz->functions, l, item)
+	{
+		int flags;
+
+		flags = ender_item_function_flags_get(item);
+		if (flags & ENDER_ITEM_FUNCTION_FLAG_DOWNCAST)
+		{
+			Ender_Item *ret;
+			DBG("Method found for downcasting '%s'", ender_item_name_get(item));
+			/* Check what type of function it is, it can be one of the following:
+			 * void foo_bar_get(void *o, const char **lib, const char **name);
+			 * void foo_bar_get(void *o, char **lib, char **name);
+			 * Ender_Item * foo_bar_get(void *o);
+			 */
+			ret = ender_item_function_ret_get(item);
+			if (ret)
+			{
+				Ender_Value fargs[1];
+				Ender_Value fret = { 0 };
+
+				fargs[0].ptr = o;
+				if (ender_item_function_call(item, fargs, &fret))
+				{
+					ret = fret.ptr;
+					found = EINA_TRUE;
+					goto done;
+				}
+			}
+			else
+			{
+				Ender_Value fargs[3];
+				char *libname = NULL, *iname = NULL;
+
+				fargs[0].ptr = o;
+				fargs[1].ptr = &libname;
+				fargs[2].ptr = &iname;
+				if (ender_item_function_call(item, fargs, NULL))
+				{
+					Ender_Item *arg;
+					const Ender_Lib *lib;
+
+					ret = NULL;
+					if (!libname || !iname)
+					{
+						WRN("No lib name or item name returned");
+						goto done_call;
+
+					}
+
+ 					lib = ender_lib_find(libname);
+					if (!lib)
+					{
+						WRN("No lib '%s' found", libname);
+						goto done_call;
+					}
+
+					ret = ender_lib_item_find(lib, iname);
+done_call:
+					arg = ender_item_function_args_at(item, 0);
+					if (ender_item_arg_transfer_get(arg) == ENDER_ITEM_TRANSFER_FULL)
+					{
+						if (libname)
+							free(libname);
+					}
+					ender_item_unref(arg);
+
+					arg = ender_item_function_args_at(item, 1);
+					if (ender_item_arg_transfer_get(arg) == ENDER_ITEM_TRANSFER_FULL)
+					{
+						if (iname)
+							free(iname);
+					}
+					ender_item_unref(arg);
+					if (ret)
+					{
+						found = EINA_TRUE;
+						goto done;
+					}
+				}
+			}
+		}
+	}
 	/* check for attributes that have the downcast flag */
 	EINA_LIST_FOREACH (thiz->props, l, item)
 	{
@@ -261,7 +345,7 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 		flags = ender_item_attr_flags_get(item);
 		if (flags & ENDER_ITEM_ATTR_FLAG_DOWNCAST)
 		{
-			DBG("Property found '%s'", ender_item_name_get(item));
+			DBG("Property found for downcasting '%s'", ender_item_name_get(item));
 			ender_item_attr_value_get(item, o, NULL, &val, NULL);
 			ret = val.ptr;
 			found = EINA_TRUE;
