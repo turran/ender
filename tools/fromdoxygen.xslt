@@ -545,7 +545,7 @@
         </xsl:attribute>
       </xsl:if>
       <!-- check if it is a downcast -->
-      <xsl:if test=".//ender-prop-downcast">
+      <xsl:if test=".//ender-downcast">
         <xsl:attribute name="downcast">
           <xsl:value-of select="'true'"/>
         </xsl:attribute>
@@ -817,7 +817,16 @@
         </ref>
       </xsl:when>
       <xsl:when test="$first_param_type = $ptype">
-        <method name="{$name}">
+        <xsl:element name="method">
+          <xsl:attribute name="name">
+            <xsl:value-of select="$name"/>
+          </xsl:attribute>
+          <!-- the flags -->
+          <xsl:if test=".//ender-downcast">
+            <xsl:attribute name="downcast">
+              <xsl:value-of select="'true'"/>
+            </xsl:attribute>
+          </xsl:if>
           <!-- get the return value -->
           <xsl:call-template name="return-item">
             <xsl:with-param name="node" select="./type"/>
@@ -826,7 +835,7 @@
           <xsl:apply-templates select=".//param[position() > 1]">
             <xsl:with-param name="skip-first" select="true()"/>
           </xsl:apply-templates>
-        </method>
+        </xsl:element>
       </xsl:when>
       <xsl:otherwise>
         <function name="{$name}">
