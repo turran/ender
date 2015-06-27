@@ -1,3 +1,7 @@
++ Add the interface concept:
+  Basically a struct with only functions. Change every code on egueb
+  enesim or whatever that requires such thing. Basically remove
+  every non function member
 + Add support for constants
 + Add support for lists types
 + Add support for hash types
