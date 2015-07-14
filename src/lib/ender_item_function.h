@@ -72,7 +72,7 @@ typedef enum _Ender_Item_Function_Flag
 	 * void foo_bar_get(void *o, char **lib, char **name);
 	 * Ender_Item * foo_bar_get(void *o);
 	 */
-	ENDER_ITEM_FUNCTION_FLAG_DOWNCAST  = (1 << 1),
+	ENDER_ITEM_FUNCTION_FLAG_DOWNCAST  = (1 << 7),
 } Ender_Item_Function_Flag;
 
 EAPI Eina_List * ender_item_function_args_get(Ender_Item *i);
