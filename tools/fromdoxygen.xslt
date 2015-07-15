@@ -966,8 +966,8 @@
     </xsl:variable>
     <xsl:variable name="lower_name" select="translate(compoundname/text(), $uppercase, $lowercase)"/>
     <xsl:variable name="name">
-      <xsl:call-template name="type-to-ender">
-        <xsl:with-param name="text" select="compoundname/text()"/>
+      <xsl:call-template name="compound-name">
+        <xsl:with-param name="node" select="."/>
       </xsl:call-template>
     </xsl:variable>
     <!-- check that we have a valid struct/enum/def -->
