@@ -93,6 +93,12 @@ static Eina_Bool _ender_item_field_size_alignment_get(Ender_Item *i, size_t *sz,
 		ender_item_unref(other);
 		break;
 
+		case ENDER_ITEM_TYPE_FUNCTION:
+		*sz = ender_value_type_size_get(ENDER_VALUE_TYPE_POINTER);
+		*al = ender_value_type_alignment_get(ENDER_VALUE_TYPE_POINTER);
+		ret = EINA_TRUE;
+		break;
+
 		default:
 		CRI("Unsupported attr type '%d'", type);
 		break;
