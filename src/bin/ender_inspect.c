@@ -144,9 +144,30 @@ static void lib_dump(const Ender_Lib *l)
 	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_ENUM);
 	EINA_LIST_FREE(items, i)
 	{
+		Ender_Item *lv;
+		Eina_List *values;
+		Eina_List *functions;
+
 		printf("  %s\n", ender_item_name_get(i));
-		/* TODO values */
-		/* TODO functions */
+		/* values */
+		printf("    Values:\n");
+		values = ender_item_enum_values_get(i);
+		EINA_LIST_FREE(values, lv)
+		{
+			Ender_Value v;
+
+			ender_item_constant_value_get(lv, &v);
+			printf("        %s %d\n", ender_item_name_get(lv), v.i32);
+			ender_item_unref(lv);
+		}
+		/* functions */
+		printf("    Functions:\n");
+		functions = ender_item_enum_functions_get(i);
+		EINA_LIST_FREE(functions, lv)
+		{
+			function_dump(lv, 8);
+			ender_item_unref(lv);
+		}
 		ender_item_unref(i);
 	}
 
