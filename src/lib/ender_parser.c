@@ -1012,19 +1012,18 @@ static void _ender_parser_value_dtor(Ender_Parser_Context *c)
 {
 	Ender_Parser_Value *thiz;
 	Ender_Parser_Context *parent;
+	Ender_Value v;
 	
 	parent = _ender_parser_parent_context_get(c->parser);
 	thiz = c->prv;
 	if (thiz->value)
 	{
-		/* TODO parse the value */
-		WRN("TODO");
+		sscanf(thiz->value, "%d", &v.i32);
 		free(thiz->value);
 	}
 	else
 	{
 		Ender_Item *i;
-		Ender_Value v;
 		Eina_List *values;
 
 		/* pick the last value and autoincrement it */
@@ -1042,10 +1041,10 @@ static void _ender_parser_value_dtor(Ender_Parser_Context *c)
 		{
 			v.i32 = 0;
 		}
-		ender_item_constant_value_set(c->i, &v);
 		EINA_LIST_FREE(values, i)
 			ender_item_unref(i);
 	}
+	ender_item_constant_value_set(c->i, &v);
 	ender_item_enum_value_add(parent->i, ender_item_ref(c->i));
 	free(thiz);
 }
@@ -1058,7 +1057,7 @@ static Eina_Bool _ender_parser_value_attrs_set(Ender_Parser_Context *c,
 	thiz = c->prv;
 	if (_ender_parser_item_attrs_set(c, key, value))
 		return EINA_TRUE;
-	else if (!strcmp(key, "value"))
+	else if (!strcmp(key, "initializer"))
 	{
 		thiz->value = strdup(value);
 	}
