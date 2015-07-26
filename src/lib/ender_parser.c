@@ -876,6 +876,16 @@ static Eina_Bool _ender_parser_method_attrs_set(Ender_Parser_Context *c,
 {
 	if (_ender_parser_common_function_attrs_set(c, key, value))
 		return EINA_TRUE;
+	else if (!strcmp(key, "downcast"))
+	{
+		if (!strcmp(value, "true"))
+		{
+			int flags;
+
+			flags = ender_item_function_flags_get(c->i);
+			ender_item_function_flags_set(c->i, flags | ENDER_ITEM_FUNCTION_FLAG_DOWNCAST);
+		}
+	}
 	else
 	{
 		return EINA_FALSE;
