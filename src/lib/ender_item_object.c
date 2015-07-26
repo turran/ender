@@ -20,6 +20,7 @@
 #include "ender_main.h"
 #include "ender_value.h"
 #include "ender_item.h"
+#include "ender_item_basic.h"
 #include "ender_item_object.h"
 #include "ender_item_arg.h"
 #include "ender_item_attr.h"
@@ -261,19 +262,23 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 		flags = ender_item_function_flags_get(item);
 		if (flags & ENDER_ITEM_FUNCTION_FLAG_DOWNCAST)
 		{
-			Ender_Item *ret;
+			Ender_Item *ret_item;
+			Ender_Item *ret_type = NULL;
 			DBG("Method found for downcasting '%s'", ender_item_name_get(item));
 			/* Check what type of function it is, it can be one of the following:
-			 * void foo_bar_get(void *o, const char **lib, const char **name);
-			 * void foo_bar_get(void *o, char **lib, char **name);
+			 * [bool,void] foo_bar_get(void *o, [const] char **lib, [const char] **name);
 			 * Ender_Item * foo_bar_get(void *o);
 			 */
-			ret = ender_item_function_ret_get(item);
-			if (ret)
+			ret_item = ender_item_function_ret_get(item);
+			if (ret_item)
+				ret_type = ender_item_arg_type_get(ret_item);
+
+			if (ret_type && ender_item_type_get(ret_type) == ENDER_ITEM_TYPE_OBJECT)
 			{
 				Ender_Value fargs[1];
 				Ender_Value fret = { 0 };
 
+				ender_item_unref(ret_type);
 				fargs[0].ptr = o;
 				if (ender_item_function_call(item, fargs, &fret))
 				{
@@ -282,20 +287,23 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 					goto done;
 				}
 			}
-			else
+			else if (!ret_type || (ret_type && ender_item_type_get(ret_type) == ENDER_ITEM_TYPE_BASIC
+					&& ender_item_basic_value_type_get(ret_type) == ENDER_VALUE_TYPE_BOOL))
 			{
+				Ender_Value fret;
 				Ender_Value fargs[3];
 				char *libname = NULL, *iname = NULL;
 
+				ender_item_unref(ret_type);
 				fargs[0].ptr = o;
 				fargs[1].ptr = &libname;
 				fargs[2].ptr = &iname;
-				if (ender_item_function_call(item, fargs, NULL))
+				if (ender_item_function_call(item, fargs, &fret))
 				{
 					Ender_Item *arg;
 					const Ender_Lib *lib;
 
-					ret = NULL;
+					ret_item = NULL;
 					if (!libname || !iname)
 					{
 						WRN("No lib name or item name returned");
@@ -310,9 +318,10 @@ EAPI Ender_Item * ender_item_object_downcast(Ender_Item *i, void *o)
 						goto done_call;
 					}
 
-					ret = ender_lib_item_find(lib, iname);
+					DBG("Downcasted item found '%s'", iname);
+					ret_item = ender_lib_item_find(lib, iname);
 done_call:
-					arg = ender_item_function_args_at(item, 0);
+					arg = ender_item_function_args_at(item, 1);
 					if (ender_item_arg_transfer_get(arg) == ENDER_ITEM_TRANSFER_FULL)
 					{
 						if (libname)
@@ -320,18 +329,26 @@ done_call:
 					}
 					ender_item_unref(arg);
 
-					arg = ender_item_function_args_at(item, 1);
+					arg = ender_item_function_args_at(item, 2);
 					if (ender_item_arg_transfer_get(arg) == ENDER_ITEM_TRANSFER_FULL)
 					{
 						if (iname)
 							free(iname);
 					}
 					ender_item_unref(arg);
-					if (ret)
+					if (ret_item)
 					{
+						ret = ret_item;
 						found = EINA_TRUE;
 						goto done;
 					}
+				}
+				else
+				{
+					if (ret_type)
+						ender_item_unref(ret_type);
+
+					WRN("Unsupprted downcast method");
 				}
 			}
 		}
