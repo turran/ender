@@ -1367,6 +1367,12 @@ static Eina_Bool _ender_parser_include_attrs_set(Ender_Parser_Context *c,
 				return EINA_FALSE;
 
 			f = fopen(file, "r");
+			if (!f)
+			{
+				ERR("File '%s' does not exist", file);
+				free(file);
+				return EINA_FALSE;
+			}
 			DBG("Including %s %p", file, f);
 			ender_parser_parse(f);
 			fclose(f);
