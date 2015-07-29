@@ -1462,7 +1462,7 @@ static Ender_Parser_Context * _ender_parser_tag_new(Ender_Parser *thiz,
 	/* if the parser has failed, keep failing */
 	if (thiz->failed)
 	{
-		ERR("Can not parse tag '%s', failing state (%d)", c->tag->name, thiz->failed);
+		ERR("Can not parse tag '%s', failing state (%d)", c->tag ? c->tag->name : "NULL", thiz->failed);
 		thiz->failed++;
 		goto done;
 	}
