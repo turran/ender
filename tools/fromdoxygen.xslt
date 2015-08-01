@@ -304,7 +304,7 @@
   </xsl:template>
 
   <!-- field handling -->
-  <xsl:template match="memberdef[@kind='variable']">
+  <xsl:template match="sectiondef[@kind='public-attrib']/memberdef[@kind='variable']">
     <xsl:variable name="name" select="name/text()"/>
     <xsl:variable name="fieldtype" select="type//text()"/>
     <xsl:variable name="type">
@@ -313,6 +313,21 @@
       </xsl:apply-templates>
     </xsl:variable>
     <field name="{$name}" type="{$type}"/>
+  </xsl:template>
+
+  <!-- constant handling -->
+  <xsl:template match="sectiondef[@kind='var']/memberdef[@kind='variable']">
+    <xsl:variable name="type">
+      <xsl:apply-templates select="type">
+        <xsl:with-param name="direction" select="in"/>
+      </xsl:apply-templates>
+    </xsl:variable>
+    <xsl:variable name="name">
+      <xsl:call-template name="member-name">
+        <xsl:with-param name="node" select="."/>
+      </xsl:call-template>
+    </xsl:variable>
+    <constant name="{$name}" type="{$type}"/>
   </xsl:template>
 
   <!-- enums handling -->
@@ -1024,6 +1039,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="./innerclass"/>
+        <xsl:apply-templates select=".//memberdef[@kind='variable']"/>
         <xsl:apply-templates select=".//memberdef[@kind='enum']"/>
         <xsl:apply-templates select=".//memberdef[@kind='typedef']">
           <xsl:with-param name="only-proto" select="$only-proto"/>
