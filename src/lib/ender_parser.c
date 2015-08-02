@@ -78,6 +78,11 @@ struct _Ender_Parser_Context {
 	void *prv;
 };
 
+typedef struct _Ender_Parser_Constant {
+	char *type;
+	char *symname;
+} Ender_Parser_Constant;
+
 typedef struct _Ender_Parser_Field {
 	char *type;
 } Ender_Parser_Field;
@@ -396,6 +401,88 @@ static Eina_Bool _ender_parser_callback_attrs_set(Ender_Parser_Context *c,
 {
 	if (_ender_parser_common_function_attrs_set(c, key, value))
 		return EINA_TRUE;
+	return EINA_FALSE;
+}
+
+/*----------------------------------------------------------------------------*
+ *                               constant tag                                 *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _ender_parser_constant_ctor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Context *parent;
+	Ender_Parser_Constant *thiz;
+
+	parent = _ender_parser_parent_context_get(c->parser);
+	/* the lib case */
+	if (!parent)
+	{
+		ERR("A constant must have a parent");
+		return EINA_FALSE;
+	}
+	if (parent->i)
+	{
+		ERR("A constant can not have a parent item");
+		return EINA_FALSE;
+	}
+	/* our context */
+	thiz = calloc(1, sizeof(Ender_Parser_Constant));
+	c->prv = thiz;
+	c->i = ender_item_constant_new();
+
+	return EINA_TRUE;
+}
+
+static void _ender_parser_constant_dtor(Ender_Parser_Context *c)
+{
+	Ender_Parser_Constant *thiz = c->prv;
+	Ender_Item *i;
+
+	/* set the attributes */
+	/* set the type */
+	i = ender_lib_item_find(c->parser->lib, thiz->type);
+	if (!i)
+	{
+		ERR("Can not find type '%s'", thiz->type);
+		goto done;
+	}
+	ender_item_attr_type_set(c->i, i);
+
+	/* set the symbol name */
+	if (!thiz->symname)
+		thiz->symname = _ender_parser_symname_get(c->parser, c->i);
+	ender_item_constant_symname_set(c->i, thiz->symname);
+
+	ender_lib_item_add(c->parser->lib, ender_item_ref(c->i));
+
+done:
+	/* free our private context */
+	if (thiz->type)
+		free(thiz->type);
+	if (thiz->symname)
+		free(thiz->symname);
+	free(thiz);
+	c->prv = NULL;
+}
+
+static Eina_Bool _ender_parser_constant_attrs_set(Ender_Parser_Context *c,
+		const char *key, const char *value)
+{
+	Ender_Parser_Constant *thiz = c->prv;
+
+	if (_ender_parser_item_attrs_set(c, key, value))
+		return EINA_TRUE;
+	else if (!strcmp(key, "type"))
+	{
+		thiz->type = strdup(value);
+	}
+	else if (!strcmp(key, "symname"))
+	{
+		thiz->symname = strdup(value);
+	}
+	else
+	{
+		return EINA_FALSE;
+	}
 	return EINA_FALSE;
 }
 /*----------------------------------------------------------------------------*
@@ -1413,6 +1500,7 @@ static Ender_Parser_Tag _tags[] = {
 	{ "arg", _ender_parser_arg_ctor, _ender_parser_arg_dtor, _ender_parser_arg_attrs_set },
 	{ "return", _ender_parser_return_ctor, _ender_parser_return_dtor, _ender_parser_return_attrs_set },
 	{ "callback", _ender_parser_callback_ctor, _ender_parser_callback_dtor, _ender_parser_callback_attrs_set },
+	{ "constant", _ender_parser_constant_ctor, _ender_parser_constant_dtor, _ender_parser_constant_attrs_set },
 	{ "class", NULL, NULL, NULL },
 };
 

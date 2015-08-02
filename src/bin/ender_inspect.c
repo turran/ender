@@ -134,6 +134,16 @@ static void function_dump(Ender_Item *i, int indent)
 	printf(")\n");
 }
 
+static void constant_dump(Ender_Item *i, int indent)
+{
+	Ender_Item *type;
+
+	type = ender_item_attr_type_get(i);
+	printf("%*c", indent, ' ');
+	printf("%s: %s\n", ender_item_name_get(i), item_type_dump(type));
+	ender_item_unref(type);
+}
+
 static void lib_dump(const Ender_Lib *l)
 {
 	Ender_Item *i;
@@ -249,12 +259,20 @@ static void lib_dump(const Ender_Lib *l)
 		}
 		ender_item_unref(i);
 	}
-	/* objects */
+	/* functions */
 	printf("Functions:\n");
 	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_FUNCTION);
 	EINA_LIST_FREE(items, i)
 	{
 		function_dump(i, 4);
+		ender_item_unref(i);
+	}
+	/* functions */
+	printf("Constants:\n");
+	items = ender_lib_item_list(l, ENDER_ITEM_TYPE_CONSTANT);
+	EINA_LIST_FREE(items, i)
+	{
+		constant_dump(i, 4);
 		ender_item_unref(i);
 	}
 }
