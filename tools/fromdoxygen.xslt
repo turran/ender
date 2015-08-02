@@ -509,9 +509,16 @@
     <xsl:variable name="no-space-type" select="normalize-space($no-const-type)"/>
     <!-- get the type -->
     <xsl:variable name="type">
-      <xsl:apply-templates select="type">
-        <xsl:with-param name="direction" select="$direction"/>
-      </xsl:apply-templates>
+      <xsl:choose>
+        <xsl:when test="../detaileddescription/para/parameterlist[@kind='param']/parameteritem[position() = $pos]//ender-type">
+          <xsl:value-of select="../detaileddescription/para/parameterlist[@kind='param']/parameteritem[position() = $pos]//ender-type/@type"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="type">
+            <xsl:with-param name="direction" select="$direction"/>
+          </xsl:apply-templates>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:if test="not($type = 'void')">
       <xsl:element name="arg">
