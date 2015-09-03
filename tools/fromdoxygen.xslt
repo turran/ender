@@ -990,6 +990,7 @@
     <xsl:variable name="has-enum" select="count(.//memberdef[@kind='enum']) > 0"/>
     <xsl:variable name="has-struct" select="count(.//innerclass) > 0"/>
     <xsl:variable name="has-def" select="count(.//memberdef[@kind='typedef']) > 0"/>
+    <xsl:variable name="has-constant" select="count(.//memberdef[@kind='variable']) > 0"/>
     <xsl:choose>
       <!-- main library functions -->
       <xsl:when test="$is-main">
@@ -999,7 +1000,7 @@
         </xsl:apply-templates>
       </xsl:when>
       <!-- we define an object with the name of the group -->
-      <xsl:when test="not($has-enum or $has-struct or $has-def)">
+      <xsl:when test="not($has-enum or $has-struct or $has-def or $has-constant)">
         <!-- get the return type of a constructor in case it has it -->
         <xsl:variable name="rtype">
           <xsl:call-template name="ctor-return-type">
