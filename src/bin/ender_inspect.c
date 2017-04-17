@@ -79,6 +79,7 @@ static const char * item_type_dump(Ender_Item *i)
 		case ENDER_ITEM_TYPE_OBJECT:
 		case ENDER_ITEM_TYPE_STRUCT:
 		case ENDER_ITEM_TYPE_ENUM:
+		case ENDER_ITEM_TYPE_FUNCTION:
 		return ender_item_name_get(i);
 
 		default:
