@@ -100,7 +100,7 @@ static Eina_Bool _ender_item_field_size_alignment_get(Ender_Item *i, size_t *sz,
 		break;
 
 		default:
-		CRI("Unsupported attr type '%d'", type);
+		CRI("Unsupported attr type '%s'", ender_item_type_name_get(type));
 		break;
 	}
 	return ret;
